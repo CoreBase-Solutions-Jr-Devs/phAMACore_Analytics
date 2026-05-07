@@ -5,3 +5,77 @@ Website: https://themesbrand.com/
 Contact: support@themesbrand.com
 File: Custom Css File
 */
+
+
+/* Sidebar background */
+.app-menu.navbar-menu {
+    background-color: #fff !important;
+}
+
+/* Sidebar links default */
+.navbar-nav .nav-link {
+    color: #000 !important;
+    transition: color 0.2s ease;
+}
+
+/* Icons default */
+.navbar-nav .nav-link i {
+    color: #000 !important;
+}
+
+/* Hover state */
+.navbar-nav .nav-link:hover {
+    color: #c58c4f !important;
+}
+
+.navbar-nav .nav-link:hover i {
+    color: #c58c4f !important;
+}
+
+/* Active (selected) state */
+.navbar-nav .nav-link.active {
+    color: #c58c4f !important;
+}
+
+.navbar-nav .nav-link.active i {
+    color: #c58c4f !important;
+}
+
+/* Submenu items */
+.nav.nav-sm .nav-link {
+    color: #000 !important;
+}
+
+.nav.nav-sm .nav-link:hover,
+.nav.nav-sm .nav-link.active {
+    color: #c58c4f !important;
+}
+
+/* Section headers (MENU, PAGES, etc.) */
+.menu-title {
+    color: #6c757d !important; // subtle gray for hierarchy
+}
+
+/* Logo Text */
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+    justify-content: center;
+}
+
+[data-sidebar-size="sm"] .logo-lg {
+    display: none !important;
+}
+
+[data-sidebar-size="sm"] .logo-sm {
+    display: inline-flex !important;
+}
+
+[data-sidebar-size="lg"] .logo-lg {
+    display: flex !important;
+}
+
+[data-sidebar-size="lg"] .logo-sm {
+    display: none !important;
+}
