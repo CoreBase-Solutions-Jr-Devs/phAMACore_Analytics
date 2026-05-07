@@ -5,6 +5,9 @@ import SimpleBar from "simplebar-react";
 import logoSm from "../assets/images/logo-sm.png";
 import logoDark from "../assets/images/logo-dark.png";
 import logoLight from "../assets/images/logo-light.png";
+//phAMAcore logo
+import phamacoreLogo from "../assets/images/phamacoreLogo.png";
+import phamacoreImage from "../assets/images/phamacore.png";
 
 //Import Components
 import VerticalLayout from "./VerticalLayouts";
@@ -38,21 +41,29 @@ const Sidebar = ({ layoutType }) => {
     <React.Fragment>
       <div className="app-menu navbar-menu">
         <div className="navbar-brand-box">
-          <Link to="/" className="logo logo-dark">
+          <Link to="/" className="logo logo-dark pt-2">
             <span className="logo-sm">
-              <img src={logoSm} alt="" height="22" />
+              <img src={phamacoreImage} alt="" height="22" />
             </span>
-            <span className="logo-lg">
-              <img src={logoDark} alt="" height="17" />
+            <span className="logo-lg d-flex align-items-center gap-2">
+              <img src={phamacoreImage} alt="" height="17" />
+              <span className="logo-text d-flex flex-column lh-1">
+                <span className="fw-bold">phAMACore</span>
+                <span className="small">Analytics</span>
+              </span>
             </span>
           </Link>
 
-          <Link to="/" className="logo logo-light">
+          <Link to="/" className="logo logo-light pt-2">
             <span className="logo-sm">
-              <img src={logoSm} alt="" height="22" />
+              <img src={phamacoreImage} alt="" height="22" />
             </span>
-            <span className="logo-lg">
-              <img src={logoLight} alt="" height="17" />
+            <span className="logo-lg d-flex align-items-center gap-2">
+              <img src={phamacoreImage} alt="" height="17" />
+              <span className="logo-text d-flex flex-column lh-1" style={{ color: "#c58c4f" }}>
+                <span className="fw-bold">phAMACore</span>
+                <span className="small">Analytics</span>
+              </span>
             </span>
           </Link>
           <button
