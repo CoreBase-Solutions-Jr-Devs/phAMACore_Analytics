@@ -5,6 +5,7 @@ import { Collapse, Container } from 'reactstrap';
 import withRouter from '../../Components/Common/withRouter';
 
 import logoSm from "../../assets/images/logo-sm.png";
+import phamacoreImage from "../../assets/images/phamacore.png";
 //i18n
 import { withTranslation } from "react-i18next";
 
@@ -141,7 +142,7 @@ const TwoColumnLayout = (props) => {
                         <div id="two-column-menu">
                             <SimpleBar className="twocolumn-iconview">
                                 <Link to="#" className="logo">
-                                    <img src={logoSm} alt="" height="22" />
+                                    <img src={phamacoreImage} alt="" height="22" />
                                 </Link>
                                 {(navData || []).map((item, key) => (
                                     <React.Fragment key={key}>
