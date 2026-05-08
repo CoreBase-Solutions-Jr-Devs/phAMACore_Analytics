@@ -43,54 +43,17 @@ a {
 // Soft Buttons
 // 
 
-@each $state in map-keys($theme-colors) {
+@each $color, $value in $theme-colors {
+  .btn-#{$color} {
+    background-color: $value;
+    border-color: $value;
+    color: #fff;
 
-    .btn-#{$state} {
-        --#{$prefix}btn-bg: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-border-color: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-hover-bg: var(--#{$prefix}#{$state}-text-emphasis);
-        --#{$prefix}btn-hover-border-color: var(--#{$prefix}#{$state}-text-emphasis);
-        --#{$prefix}btn-focus-shadow-rgb: var(--#{$prefix}#{$state}-rgb);
-        --#{$prefix}btn-active-bg: var(--#{$prefix}#{$state}-text-emphasis);
-        --#{$prefix}btn-active-border-color: var(--#{$prefix}#{$state}-text-emphasis);
+    &:hover {
+      background-color: darken($value, 8%);
+      border-color: darken($value, 10%);
     }
-
-    .btn-outline-#{$state} {
-        --#{$prefix}btn-color: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-bg: transparent;
-        --#{$prefix}btn-border-color: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-hover-bg: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-hover-border-color: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-focus-shadow-rgb: var(--#{$prefix}#{$state}-rgb);
-        --#{$prefix}btn-active-bg: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-active-border-color: var(--#{$prefix}#{$state});
-    }
-
-    // soft Buttons
-    .btn-soft-#{$state} {
-        --#{$prefix}btn-color: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-bg: var(--#{$prefix}#{$state}-bg-subtle);
-        --#{$prefix}btn-border-color: transparent;
-        --#{$prefix}btn-hover-bg: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-hover-border-color: transparent;
-        --#{$prefix}btn-focus-shadow-rgb: var(--#{$prefix}#{$state}-rgb);
-        --#{$prefix}btn-active-bg: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-active-border-color: transparent;
-    }
-
-    // Ghost Buttons
-    .btn-ghost-#{$state} {
-        --#{$prefix}btn-color: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-bg: transparent;
-        --#{$prefix}btn-border-color: transparent;
-        --#{$prefix}btn-hover-color: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-hover-bg: var(--#{$prefix}#{$state}-bg-subtle);
-        --#{$prefix}btn-hover-border-color: transparent;
-        --#{$prefix}btn-focus-shadow-rgb: var(--#{$prefix}#{$state}-rgb);
-        --#{$prefix}btn-active-color: var(--#{$prefix}#{$state});
-        --#{$prefix}btn-active-bg: var(--#{$prefix}#{$state}-bg-subtle);
-        --#{$prefix}btn-active-border-color: transparent;
-    }
+  }
 }
 
 //button with icon

@@ -6,6 +6,7 @@
 
 // Prefix for :root CSS variables
 
+
 $variable-prefix:             vz-; // Deprecated in v5.2.0 for the shorter `$prefix`
 $prefix:                      $variable-prefix;
 
@@ -71,6 +72,7 @@ $yellow:     #f7b84b;
 $green:      #0ab39c;
 $teal:       #02a8b5;
 $cyan:       #299cdb;
+$caramel:      #c58c4f;
 // scss-docs-end color-variables
 
 // scss-docs-start colors-map
@@ -87,6 +89,7 @@ $colors: (
   "cyan":       $cyan,
   "white":      $white,
   "gray":       $gray-600,
+  "caramel":      $caramel,
   "gray-dark":  $gray-800
 );
 // scss-docs-end colors-map
@@ -109,6 +112,16 @@ $blue-600: shade-color($blue, 20%);
 $blue-700: shade-color($blue, 40%);
 $blue-800: shade-color($blue, 60%);
 $blue-900: shade-color($blue, 80%);
+
+$caramel-100: tint-color($caramel, 80%);
+$caramel-200: tint-color($caramel, 60%);
+$caramel-300: tint-color($caramel, 40%);
+$caramel-400: tint-color($caramel, 20%);
+$caramel-500: $caramel;
+$caramel-600: shade-color($caramel, 20%);
+$caramel-700: shade-color($caramel, 40%);
+$caramel-800: shade-color($caramel, 60%);
+$caramel-900: shade-color($caramel, 80%);
 
 $indigo-100: tint-color($indigo, 80%);
 $indigo-200: tint-color($indigo, 60%);
@@ -210,6 +223,18 @@ $blues: (
   "blue-700": $blue-700,
   "blue-800": $blue-800,
   "blue-900": $blue-900
+);
+
+$caramels: (
+  "caramel-100": $caramel-100,
+  "caramel-200": $caramel-200,
+  "caramel-300": $caramel-300,
+  "caramel-400": $caramel-400,
+  "caramel-500": $caramel-500,
+  "caramel-600": $caramel-600,
+  "caramel-700": $caramel-700,
+  "caramel-800": $caramel-800,
+  "caramel-900": $caramel-900
 );
 
 $indigos: (
@@ -321,6 +346,7 @@ $cyans: (
 );
 // fusv-enable
 
+$caramel-rgb: red($caramel), green($caramel), blue($caramel);
 // scss-docs-start theme-color-variables
 $primary:       $indigo;
 $secondary:     $blue;
@@ -328,7 +354,9 @@ $success:       $green;
 $info:          $cyan;
 $warning:       $yellow;
 $danger:        $red;
+$orange:        $orange;
 $light:         $gray-100;
+$caramel:       $caramel;
 $dark:          $gray-900;
 
 
@@ -345,6 +373,8 @@ $theme-colors: (
   "warning":    $warning,
   "danger":     $danger,
   "light":      $light,
+  "orange":     $orange,  
+  "caramel":      $caramel,
   "dark":       $dark
 );
 // scss-docs-end theme-colors-map
@@ -358,6 +388,9 @@ $warning-text-emphasis:   shade-color($warning, 15%);
 $danger-text-emphasis:    shade-color($danger, 15%);
 $light-text-emphasis:     $gray-400;
 $dark-text-emphasis:      $gray-800;
+$caramel-text-emphasis: shade-color($caramel, 15%);
+$orange-text-emphasis: shade-color($orange, 15%);
+
 // scss-docs-end theme-text-variables
 
 // scss-docs-start theme-bg-subtle-variables
@@ -369,6 +402,8 @@ $warning-bg-subtle:       tint-color($warning, 85%);
 $danger-bg-subtle:        tint-color($danger, 85%);
 $light-bg-subtle:         mix($gray-100, $white);
 $dark-bg-subtle:          $gray-300;
+$caramel-bg-subtle: tint-color($caramel, 85%);
+$orange-bg-subtle: tint-color($orange, 85%);
 // scss-docs-end theme-bg-subtle-variables
 
 // scss-docs-start theme-border-subtle-variables
@@ -380,6 +415,8 @@ $warning-border-subtle:   tint-color($warning, 60%);
 $danger-border-subtle:    tint-color($danger, 60%);
 $light-border-subtle:     $gray-200;
 $dark-border-subtle:      $gray-500;
+$caramel-border-subtle: tint-color($caramel, 60%);
+$orange-border-subtle: tint-color($orange, 60%);
 // scss-docs-end theme-border-subtle-variables
 
 // Characters which are escaped by the escape-svg function

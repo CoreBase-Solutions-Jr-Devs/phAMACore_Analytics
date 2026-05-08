@@ -26,8 +26,8 @@ import { useFormik } from "formik";
 
 // actions
 import { loginUser, socialLogin, resetLoginFlag } from "../../slices/thunks";
-
-import logoLight from "../../assets/images/logo-light.png";
+import phamacoreCloud from "../../assets/images/phamacore-cloud.jpg";
+// import logoLight from "../../assets/images/logo-light.png";
 import { createSelector } from "reselect";
 //import images
 
@@ -135,13 +135,13 @@ const Login = (props) => {
               <Col lg={12}>
                 <div className="text-center mt-sm-5 mb-4 text-white-50">
                   <div>
-                    <Link to="/" className="d-inline-block auth-logo">
-                      <img src={logoLight} alt="" height="20" />
+                    <Link to="/" className="w-100 auth-logo">
+                      <img src={phamacoreCloud} alt="" height="100"/>
                     </Link>
                   </div>
-                  <p className="mt-3 fs-15 fw-medium">
+                  {/* <p className="mt-3 fs-15 fw-medium">
                     Premium Admin & Dashboard Template
-                  </p>
+                  </p> */}
                 </div>
               </Col>
             </Row>
@@ -153,7 +153,7 @@ const Login = (props) => {
                     <div className="text-center mt-2">
                       <h5 className="text-primary">Welcome Back !</h5>
                       <p className="text-muted">
-                        Sign in to continue to Velzon.
+                        Please enter your credentials to sign in!
                       </p>
                     </div>
                     {error && error ? (
@@ -197,7 +197,7 @@ const Login = (props) => {
 
                         <div className="mb-3">
                           <div className="float-end">
-                            <Link to="/forgot-password" className="text-muted">
+                            <Link to="/forgot-password" className="text-caramel">
                               Forgot password?
                             </Link>
                           </div>
@@ -257,9 +257,9 @@ const Login = (props) => {
 
                         <div className="mt-4">
                           <Button
-                            color="success"
+                            color="caramel"
                             disabled={error ? null : loading ? true : false}
-                            className="btn btn-success w-100"
+                            className="btn btn-caramel w-100"
                             type="submit"
                           >
                             {loading ? (
@@ -315,7 +315,7 @@ const Login = (props) => {
                     Don't have an account ?{" "}
                     <Link
                       to="/register"
-                      className="fw-semibold text-primary text-decoration-underline"
+                      className="fw-semibold text-caramel text-decoration-underline"
                     >
                       {" "}
                       Signup{" "}
