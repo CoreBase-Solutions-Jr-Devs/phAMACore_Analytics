@@ -9,6 +9,7 @@ import SalesByLocations from "./SalesByLocations";
 import Section from "./Section";
 import StoreVisits from "./StoreVisits";
 import TopSellers from "./TopSellers";
+import SupplierSpend from "./SupplierSpend";
 
 const DashboardEcommerce = () => {
   document.title = "Dashboard | Velzon - React Admin & Dashboard Template";
@@ -29,19 +30,32 @@ const DashboardEcommerce = () => {
                 <Row>
                   <Widget />
                 </Row>
+                 <Row>
+                  <SupplierSpend />
+                </Row>
                 <Row>
-                  <Col xl={8}>
+                  <Col xl={6}>
+                     <StoreVisits />
+                  </Col>
+                  <Col xl={6}>
+          <SalesByLocations />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col xl={12}>
                     <Revenue />
                   </Col>
-                  <SalesByLocations />
+                 
                 </Row>
-                <Row>
+                {/* <Row>
                   <BestSellingProducts />
                   <TopSellers />
-                </Row>
+                </Row> */}
                 <Row>
-                  <StoreVisits />
-                  <RecentOrders />
+                <Col xl={12}>
+                 <RecentOrders />
+                 </Col>
+                 
                 </Row>
               </div>
             </Col>

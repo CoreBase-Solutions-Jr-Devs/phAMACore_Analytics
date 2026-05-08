@@ -15,12 +15,12 @@ const RevenueCharts = ({ dataColors, series }) => {
     },
     stroke: {
       curve: "straight",
-      dashArray: [0, 0, 8],
-      width: [2, 0, 2.2],
+     dashArray: [0, 8],
+  width: [2, 2],
     },
-    fill: {
-      opacity: [0.1, 0.9, 1],
-    },
+  fill: {
+  opacity: 1,
+},
     markers: {
       size: [0, 0, 0],
       strokeWidth: 2,
@@ -50,25 +50,35 @@ const RevenueCharts = ({ dataColors, series }) => {
         show: false,
       },
     },
-    grid: {
-      show: true,
-      xaxis: {
-        lines: {
-          show: true,
-        },
-      },
-      yaxis: {
-        lines: {
-          show: false,
-        },
-      },
-      padding: {
-        top: 0,
-        right: -2,
-        bottom: 15,
-        left: 10,
-      },
+yaxis: {
+  min: 0,
+  max: 25,
+  tickAmount: 5,
+
+  labels: {
+    show: true,
+    formatter: (val) => `KES ${val.toFixed(1)}M`,
+    style: {
+      colors: "#878a99",
+      fontSize: "11px",
     },
+  },
+},
+   grid: {
+  show: true,
+  xaxis: {
+    lines: {
+      show: true,
+    },
+  },
+  padding: {
+    top: 0,
+    right: -2,
+    bottom: 15,
+    left: 10,
+  },
+},
+
     legend: {
       show: true,
       horizontalAlign: "center",
@@ -86,40 +96,32 @@ const RevenueCharts = ({ dataColors, series }) => {
     },
     plotOptions: {
       bar: {
-        columnWidth: "30%",
-        barHeight: "70%",
+        columnWidth: "70%",
+        // barHeight: "70%",
       },
     },
     colors: linechartcustomerColors,
-    tooltip: {
-      shared: true,
-      y: [
-        {
-          formatter: function (y) {
-            if (typeof y !== "undefined") {
-              return y.toFixed(0);
-            }
-            return y;
-          },
-        },
-        {
-          formatter: function (y) {
-            if (typeof y !== "undefined") {
-              return "$" + y.toFixed(2) + "k";
-            }
-            return y;
-          },
-        },
-        {
-          formatter: function (y) {
-            if (typeof y !== "undefined") {
-              return y.toFixed(0) + " Sales";
-            }
-            return y;
-          },
-        },
-      ],
+tooltip: {
+  shared: true,
+  y: [
+    {
+      formatter: function (y) {
+        if (typeof y !== "undefined") {
+          return `KES ${y.toFixed(1)}M`;
+        }
+        return y;
+      },
     },
+    {
+      formatter: function (y) {
+        if (typeof y !== "undefined") {
+          return y.toFixed(0) + " Refunds";
+        }
+        return y;
+      },
+    },
+  ],
+},
   };
   return (
     <React.Fragment>
@@ -134,11 +136,114 @@ const RevenueCharts = ({ dataColors, series }) => {
   );
 };
 
+
+const SpendCharts = ({ dataColors, series }) => {
+    let barchartCountriesColors = [];
+    try {
+        barchartCountriesColors = dataColors ? getChartColorsArray(dataColors) : [];
+    } catch (error) {
+        console.warn('Chart colors parsing failed:', error);
+        barchartCountriesColors = ['#f06548'];
+    }
+
+    // Ensure series data is mutable
+    const validSeries = React.useMemo(() => {
+        if (!series || !Array.isArray(series)) return [{ data: [] }];
+        return series.map((s) => ({ ...s }));
+    }, [series]);
+
+    var options = {
+        chart: {
+            type: 'bar',
+            height: 400,
+            toolbar: {
+                show: false,
+            }
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                horizontal: true,
+                distributed: true,
+                dataLabels: {
+                    position: 'top',
+                },
+            }
+        },
+        colors: barchartCountriesColors,
+        dataLabels: {
+            enabled: true,
+            offsetX: 32,
+             formatter: (val) => `${val}M`,
+            style: {
+                fontSize: '12px',
+                fontWeight: 400,
+                colors: ['#adb5bd']
+                // colors:['#878a99']
+            }
+        },
+tooltip: {
+    y: {
+        formatter: (val) => `${val}M`
+    }
+},
+        legend: {
+            show: false,
+        },
+        grid: {
+            show: false,
+        },
+xaxis: {
+    categories: [
+        'Cosmos Ltd',
+        'Biodeal Ltd',
+        'Elys Chemicals',
+        'Universal Corp',
+        'PharmaChem EA'
+    ],
+    labels: {
+        show: false
+    },
+    axisTicks: {
+        show: false
+    },
+    axisBorder: {
+        show: false
+    }
+},
+    };
+    return (
+        <React.Fragment>
+            <ReactApexChart dir="ltr"
+                options={options}
+                series={validSeries}
+                type="bar"
+                height={300}
+                className="apex-charts"
+            />
+        </React.Fragment>
+    );
+};
+
 const StoreVisitsCharts = ({ dataColors }) => {
   var chartDonutBasicColors = getChartColorsArray(dataColors);
   const series = [44, 55, 41, 17, 15];
   var options = {
-    labels: ["Direct", "Social", "Email", "Other", "Referrals"],
+   labels: [
+  "Antibiotics",
+  "ARVs",
+  "Antimalarials",
+  "Chronic Disease",
+  "OTC/Supp"
+],
+
+dataLabels: {
+  enabled: true,
+  formatter: (val) => `${val.toFixed(0)}%`,
+  dropShadow: {
+    enabled: false,
+  },
+},
     chart: {
       height: 333,
       type: "donut",
@@ -169,4 +274,4 @@ const StoreVisitsCharts = ({ dataColors }) => {
   );
 };
 
-export { RevenueCharts, StoreVisitsCharts };
+export { RevenueCharts, StoreVisitsCharts, SpendCharts };

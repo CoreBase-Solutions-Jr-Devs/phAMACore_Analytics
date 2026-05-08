@@ -34,7 +34,7 @@ const Revenue = () => {
     <React.Fragment>
       <Card>
         <CardHeader className="border-0 align-items-center d-flex">
-          <h4 className="card-title mb-0 flex-grow-1">Revenue</h4>
+          <h4 className="card-title mb-0 flex-grow-1">Monthly Spend Trend-Last 6 Months</h4>
           <div className="d-flex gap-1">
             <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { onChangeChartPeriod("all"); }}>
               ALL
@@ -50,7 +50,7 @@ const Revenue = () => {
             </button>
           </div>
         </CardHeader>
-
+{/* 
         <CardHeader className="p-0 border-0 bg-light-subtle">
           <Row className="g-0 text-center">
             <Col xs={6} sm={3}>
@@ -99,7 +99,7 @@ const Revenue = () => {
               </div>
             </Col>
           </Row>
-        </CardHeader>
+        </CardHeader> */}
 
         <CardBody className="p-0 pb-2">
           <div className="w-100">

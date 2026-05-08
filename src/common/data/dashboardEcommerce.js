@@ -20,66 +20,65 @@ import avatar6 from "../../assets/images/users/avatar-6.jpg";
 const ecomWidgets = [
     {
         id: 1,
-        cardColor: "primary",
-        label: "Total Earnings",
-        badge: "ri-arrow-right-up-line",
-        badgeClass: "success",
-        percentage: "+16.24",
-        counter: "559.25",
-        link: "View net earnings",
-        bgcolor: "success",
-        icon: "bx bx-dollar-circle",
-        decimals: 2,
-        prefix: "$",
-        suffix: "k"
+        label: "Total Spend",
+        counter: "12.4",
+        link: "Budgeted: 14.0M (89%)",
+        decimals: 1,
+        prefix: "KES ",
+        suffix: "M",
+        textColor: "white"
     },
     {
         id: 2,
-        cardColor: "secondary",
-        label: "Orders",
-        badge: "ri-arrow-right-down-line",
-        badgeClass: "danger",
-        percentage: "-3.57",
-        counter: "36894",
-        link: "View all orders",
-        bgcolor: "info",
-        icon: "bx bx-shopping-bag",
-        decimals: 0,
-        prefix: "",
-        separator: ",",
-        suffix: ""
+        label: "Budget Left",
+        counter: "1.6",
+        link: "11% unused",
+        decimals: 1,
+        prefix: "KES ",
+        suffix: "M",
+        textColor: "success"
     },
     {
         id: 3,
-        cardColor: "success",
-        label: "Customers",
-        badge: "ri-arrow-right-up-line",
-        badgeClass: "success",
-        percentage: "+29.08",
-        counter: "183.35",
-        link: "See details",
-        bgcolor: "warning",
-        icon: "bx bx-user-circle",
-        decimals: 2,
+        label: "Active Suppliers",
+        counter: "5",
+        link: "2 approved, 3 secondary",
+        decimals: 0,
         prefix: "",
-        suffix: "M"
+        suffix: "",
+        textColor: "white"
     },
     {
         id: 4,
-        cardColor: "info",
-        label: "My Balance",
-        badgeClass: "muted",
-        percentage: "+0.00",
-        counter: "165.89",
-        link: "Withdraw money",
-        bgcolor: "primary",
-        icon: "bx bx-wallet",
-        decimals: 2,
-        prefix: "$",
-        suffix: "k"
+        label: "Price Alerts",
+        counter: "4",
+        link: "Products up >5%",
+        decimals: 0,
+        prefix: "",
+        suffix: "",
+        textColor: "danger"
     },
+    {
+        id: 5,
+        label: "Maverick Spend",
+        counter: "340",
+        link: "2.7% of total",
+        decimals: 0,
+        prefix: "KES ",
+        suffix: "K",
+        textColor: "warning"
+    },
+    {
+        id: 6,
+        label: "Avg lead time",
+        counter: "4.2",
+        link: "Target: 3 days",
+        decimals: 1,
+        prefix: "",
+        suffix: " days",
+        textColor: "warning"
+    }
 ];
-
 const bestSellingProducts = [
     {
         id: 1,
@@ -185,71 +184,39 @@ const topSellers = [
 ];
 
 const recentOrders = [
-    {
-        id: 1,
-        orderId: "#VZ2112",
-        img: avatar1,
-        name: "Alex Smith",
-        product: "Clothes",
-        amount: 109.0,
-        vendor: "Zoetic Fashion",
-        status: "Paid",
-        statusClass: "success",
-        rating: 5,
-        votes: "61",
-    },
-    {
-        id: 2,
-        orderId: "#VZ2111",
-        img: avatar2,
-        name: "Jansh Brown",
-        product: "Kitchen Storage",
-        amount: 149.0,
-        vendor: "Micro Design",
-        status: "Pending",
-        statusClass: "warning",
-        rating: 4.5,
-        votes: "61",
-    },
-    {
-        id: 3,
-        orderId: "#VZ2109",
-        img: avatar3,
-        name: "Ayaan Bowen",
-        product: "Bike Accessories",
-        amount: 215.0,
-        vendor: "Nesta Technologies",
-        status: "Paid",
-        statusClass: "success",
-        rating: 4.9,
-        votes: "89",
-    },
-    {
-        id: 4,
-        orderId: "#VZ2108",
-        img: avatar4,
-        name: "Prezy Mark",
-        product: "Furniture",
-        amount: 199.0,
-        vendor: "Syntyce Solutions",
-        status: "Unpaid",
-        statusClass: "danger",
-        rating: 4.3,
-        votes: "47",
-    },
-    {
-        id: 5,
-        orderId: "#VZ2107",
-        img: avatar6,
-        name: "Vihan Hudda",
-        product: "Bags and Wallets",
-        amount: 330.0,
-        vendor: "iTest Factory",
-        status: "Paid",
-        statusClass: "success",
-        rating: 4.7,
-        votes: "161",
-    },
+  {
+    id: 1,
+    supplier: "Cosmos Ltd",
+    invoice: "INV-COS-2026-0318",
+    amount: "KES 480K",
+    dueDate: "Apr 14",
+    daysOverdue: "15 days",
+    terms: "Net 30",
+    action: "Pay today",
+    actionClass: "danger",
+  },
+  {
+    id: 2,
+    supplier: "Biodeal Ltd",
+    invoice: "INV-BIO-2026-0214",
+    amount: "KES 312K",
+    dueDate: "Apr 20",
+    daysOverdue: "9 days",
+    terms: "Net 30",
+    action: "Pay today",
+    actionClass: "danger",
+  },
+  {
+    id: 3,
+    supplier: "Elys Chemicals",
+    invoice: "INV-ELY-2026-0098",
+    amount: "KES 148K",
+    dueDate: "Apr 26",
+    daysOverdue: "3 days",
+    terms: "Net 45",
+    action: "Pay this week",
+    actionClass: "warning",
+  },
 ];
 
 const topCategories = [
@@ -308,85 +275,65 @@ const topCategories = [
 // Revenue Chart Data
 const allRevenueData = [
     {
-        name: "Orders",
-        type: "area",
-        data: [34, 65, 46, 68, 49, 61, 42, 44, 78, 52, 63, 67],
-    },
-    {
-        name: "Earnings",
+        name: "Actual Spend",
         type: "bar",
         data: [
-            89.25, 98.58, 68.74, 108.87, 77.54, 84.03, 51.24, 28.57, 92.57, 42.36,
-            88.51, 36.57,
+            12.4, 15.8, 10.6, 18.2, 14.7, 16.3,
+            11.9, 9.5, 17.1, 13.2, 16.8, 14.1,
         ],
     },
     {
-        name: "Refunds",
+        name: "Budget",
         type: "line",
-        data: [8, 12, 7, 17, 21, 11, 5, 9, 7, 29, 12, 35],
+        data: [1.2, 1.8, 1.1, 2.4, 2.8, 1.6, 0.9, 1.3, 1.1, 3.2, 1.7, 3.8],
     },
 ];
 
 const monthRevenueData = [
     {
-        name: "Orders",
-        type: "area",
-        data: [54, 85, 66, 18, 29, 31, 12, 14, 38, 72, 33, 27],
-    },
-    {
-        name: "Earnings",
+        name: "Actual Spend",
         type: "bar",
         data: [
-            89.25, 98.58, 68.74, 108.87, 77.54, 84.03, 51.24, 28.57, 92.57, 42.36,
-            88.51, 36.57,
+            14.2, 16.5, 12.8, 19.1, 15.3, 17.4,
+            13.2, 10.1, 18.6, 14.8, 17.9, 15.6,
         ],
     },
     {
-        name: "Refunds",
+        name: "Budget",
         type: "line",
-        data: [18, 22, 27, 37, 41, 21, 15, 19, 27, 19, 22, 45],
+        data: [1.9, 2.4, 2.8, 3.6, 4.1, 2.2, 1.5, 1.8, 2.5, 2.1, 2.6, 4.4],
     },
 ];
 
 const halfYearRevenueData = [
     {
-        name: "Orders",
-        type: "area",
-        data: [34, 65, 46, 68, 49, 61, 42, 44, 78, 52, 63, 67],
-    },
-    {
-        name: "Earnings",
+        name: "Actual Spend",
         type: "bar",
         data: [
-            89.25, 98.58, 68.74, 108.87, 77.54, 84.03, 51.24, 28.57, 92.57, 42.36,
-            88.51, 36.57,
+            16.8, 18.2, 14.9, 20.6, 17.1, 18.4,
+            15.2, 12.6, 19.3, 16.4, 18.8, 17.2,
         ],
     },
     {
-        name: "Refunds",
+        name: "Budget",
         type: "line",
-        data: [8, 22, 87, 47, 41, 31, 5, 9, 47, 49, 32, 55],
+        data: [1.1, 2.7, 3.9, 4.5, 4.2, 3.1, 1.4, 1.8, 4.1, 4.6, 3.3, 5.2],
     },
 ];
 
 const yearRevenueData = [
     {
-        name: "Orders",
-        type: "area",
-        data: [14, 35, 26, 38, 29, 31, 22, 24, 58, 32, 33, 77],
-    },
-    {
-        name: "Earnings",
+        name: "Actual Spend",
         type: "bar",
         data: [
-            99.25, 88.58, 78.74, 118.87, 87.54, 94.03, 61.24, 58.57, 102.57, 62.36,
-            48.51, 66.57,
+            18.5, 17.3, 16.1, 22.4, 19.6, 21.3,
+            15.8, 14.9, 23.1, 17.6, 19.2, 20.4,
         ],
     },
     {
-        name: "Refunds",
+        name: "Budget",
         type: "line",
-        data: [58, 42, 47, 57, 71, 21, 15, 69, 17, 39, 52, 55],
+        data: [2.8, 2.1, 2.5, 3.8, 4.6, 1.9, 1.3, 4.1, 1.8, 3.2, 3.9, 4.4],
     },
 ];
 

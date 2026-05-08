@@ -46,17 +46,17 @@ const topPages = [
 // Charts Data
 
 const allData = [{
-    data: [1230, 1240, 590, 1255, 1250, 789, 960, 522, 1285, 729],
+    data: [4.8, 3.4,2.4, 2.2, 1.9],
     name: 'Sessions',
 }];
 
 const monthData = [{
-    data: [820, 1320, 390, 1000, 850, 579, 630, 380, 825, 479],
+    data: [3.2, 3.1, 3.9, 1.0, 0.85],
     name: 'Sessions',
 }];
 
 const halfyearData = [{
-    data: [1010, 1140, 1290, 1255, 1050, 689, 800, 420, 1085, 589],
+    data: [2.9, 2.7, 2.4, 1.255, 1.050],
     name: 'Sessions',
 }];
 
