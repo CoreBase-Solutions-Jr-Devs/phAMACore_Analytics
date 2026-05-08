@@ -63,6 +63,127 @@ const crmWidgets = [
     },
 ];
 
+const networkInvData = [
+    {
+        id: 1,
+        label: "Total SKUs",
+        badge: "ri-arrow-up-circle-line text-success",
+        icon: "ri-space-ship-line",
+        counter: "284",
+        decimals: 0,
+        suffix: "",
+        prefix: ""
+    },
+    {
+        id: 2,
+        label: "Total Stock Value",
+        badge: "ri-arrow-up-circle-line text-success",
+        icon: "ri-exchange-dollar-line",
+        counter: "38.4",
+        decimals: 2,
+        suffix: "m",
+        prefix: "KES"
+    },
+    {
+        id: 3,
+        label: "Items below Reorder Level",
+        badge: "ri-arrow-down-circle-line text-danger",
+        icon: "ri-pulse-line",
+        counter: "18",
+        decimals: 0,
+        suffix: "",
+        prefix: ""
+    },
+    {
+        id: 4,
+        label: "Out of Stock Items",
+        badge: "ri-arrow-up-circle-line text-success",
+        icon: "ri-trophy-line",
+        counter: "4",
+        decimals: 0,
+        prefix: "",
+        separator: "",
+        suffix: ""
+    },
+    {
+        id: 5,
+        label: "Near Expiry(<= 90 days)",
+        badge: "ri-arrow-down-circle-line text-danger",
+        icon: "ri-service-line",
+        counter: "12",
+        decimals: 0,
+        separator: ",",
+        suffix: "",
+        prefix: ""
+    },
+    {
+        id: 6,
+        label: "Slow Movers(30d)",
+        badge: "ri-arrow-down-circle-line text-danger",
+        icon: "ri-service-line",
+        counter: "31",
+        decimals: 0,
+        separator: ",",
+        suffix: "",
+        prefix: ""
+    },
+    {
+        id: 7,
+        label: "Overstocked Items",
+        badge: "ri-arrow-down-circle-line text-danger",
+        icon: "ri-service-line",
+        counter: "9",
+        decimals: 0,
+        separator: ",",
+        suffix: "",
+        prefix: ""
+    },
+    {
+        id: 8,
+        label: "Branch Imbalances(> 20%)",
+        badge: "ri-arrow-down-circle-line text-danger",
+        icon: "ri-service-line",
+        counter: "7",
+        decimals: 0,
+        separator: ",",
+        suffix: "",
+        prefix: ""
+    },
+];
+
+const stkLvlData = [
+    {
+        id: 1,
+        label: "<= 30 Days Stock",
+        badge: "ri-arrow-up-circle-line text-success",
+        icon: "ri-space-ship-line",
+        counter: "2",
+        decimals: 0,
+        suffix: " Products",
+        prefix: ""
+    },
+    {
+        id: 2,
+        label: "31-60 Days Stock",
+        badge: "ri-arrow-up-circle-line text-success",
+        icon: "ri-exchange-dollar-line",
+        counter: "5",
+        decimals: 0,
+        suffix: " Products",
+        prefix: ""
+    },
+    {
+        id: 3,
+        label: "61-90 Days Stock",
+        badge: "ri-arrow-down-circle-line text-danger",
+        icon: "ri-pulse-line",
+        counter: "5",
+        decimals: 0,
+        suffix: " Products",
+        prefix: ""
+    },
+];
+
 const dealsStatus = [
     {
         id: 1,
@@ -388,4 +509,4 @@ const janData = [{
     data: [32]
 }];
 
-export { crmWidgets, dealsStatus, tasks, activities, closingDeals, todayBalanceData, lastWeekBalanceData, lastMonthBalanceData, currentYearBalanceData, todayDealData, weeklyDealData, monthlyDealData, yealyDealData, octData, novData, decData, janData };
+export { crmWidgets, networkInvData, stkLvlData, dealsStatus, tasks, activities, closingDeals, todayBalanceData, lastWeekBalanceData, lastMonthBalanceData, currentYearBalanceData, todayDealData, weeklyDealData, monthlyDealData, yealyDealData, octData, novData, decData, janData };

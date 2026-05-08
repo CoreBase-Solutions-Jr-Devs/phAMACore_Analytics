@@ -1,6 +1,8 @@
 import { topPages, allData, monthData, halfyearData, allaudiencesMetricsData, monthaudiencesMetricsData, halfyearaudiencesMetricsData, yaeraudiencesMetricsData, todayDeviceData, lastWeekDeviceData, lastMonthDeviceData, currentYearDeviceData, todayaudiencesCountryData, lastWeekaudiencesCountryData, lastMonthaudiencesCountryData, currentyearaudiencesCountryData } from "./analytics";
 import {
   crmWidgets,
+  networkInvData,
+  stkLvlData,
   dealsStatus,
   tasks,
   activities,
@@ -106,6 +108,8 @@ import { todoTaskList, todoCollapse } from "./todoData";
 export {
   topPages,
   crmWidgets,
+  networkInvData,
+  stkLvlData,
   cryptoSlider,
   dealsStatus,
   tasks,
