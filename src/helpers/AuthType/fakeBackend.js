@@ -62,7 +62,7 @@ import {
   allMarketplaceData,
   monthMarketplaceData,
   halfyearMarketplaceData,
-  yearMarketplaceData,
+  // yearMarketplaceData,
   todayaudiencesCountryData,
   lastWeekaudiencesCountryData,
   lastMonthaudiencesCountryData,
@@ -1127,18 +1127,17 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onGet(url.GET_YEARMARKETPLACE_DATA).reply(() => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (yearMarketplaceData) {
-          // Passing fake JSON data as response
-          resolve([200, yearMarketplaceData]);
-        } else {
-          reject([400, "Cannot get Year Chart Data"]);
-        }
-      });
-    });
-  });
+  // mock.onGet(url.GET_YEARMARKETPLACE_DATA).reply(() => {
+  //   return new Promise((resolve, reject) => {
+  //     setTimeout(() => {
+  //       if (yearMarketplaceData) {
+  //         resolve([200, yearMarketplaceData]);
+  //       } else {
+  //         reject([400, "Cannot get Year Chart Data"]);
+  //       }
+  //     });
+  //   });
+  // });
 
   mock.onPost(url.ADD_NEW_PROJECT).reply((project) => {
     return new Promise((resolve, reject) => {

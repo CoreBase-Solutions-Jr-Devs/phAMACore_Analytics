@@ -180,6 +180,145 @@ const AudiencesSessionsCharts = ({ dataColors, series }) => {
     );
 };
 
+const TopProductsCharts = ({ dataColors, series }) => {
+    let barchartCountriesColors = [];
+    try {
+        barchartCountriesColors = dataColors ? getChartColorsArray(dataColors) : [];
+    } catch (error) {
+        console.warn('Chart colors parsing failed:', error);
+        barchartCountriesColors = ['#f06548'];
+    }
+
+    // Ensure series data is mutable
+    const validSeries = React.useMemo(() => {
+        if (!series || !Array.isArray(series)) return [{ data: [] }];
+        return series.map((s) => ({ ...s }));
+    }, [series]);
+
+    var options = {
+        chart: {
+            type: 'bar',
+            height: 300,
+            toolbar: {
+                show: false,
+            }
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                horizontal: true,
+                distributed: true,
+                dataLabels: {
+                    position: 'top',
+                },
+            }
+        },
+        colors: barchartCountriesColors,
+ dataLabels: {
+    enabled: true,
+    offsetX: 32,
+    formatter: (val) => `${(val * 1000).toFixed(0)}`,
+    style: {
+        fontSize: '12px',
+        fontWeight: 400,
+        colors: ['#adb5bd']
+    }
+},
+
+tooltip: {
+    y: {
+        formatter: (val) => `${(val * 1000).toFixed(0)}`
+    }
+},
+        legend: {
+            show: false,
+        },
+        grid: {
+            show: false,
+        },
+xaxis: {
+    categories: [
+           'Amoxicillin 500mg',
+        'Paracetamol 500mg',
+        'Metformin 500mg',
+        'Omeprazole 20mg',
+        'Ciprofloxacin 500mg',
+        'Co-Arten 20/120',
+        'Ibuprofen 400mg'
+    ],
+    labels: {
+        show: false
+    },
+    axisTicks: {
+        show: false
+    },
+    axisBorder: {
+        show: false
+    }
+},
+    };
+    return (
+        <React.Fragment>
+            <ReactApexChart dir="ltr"
+                options={options}
+                series={validSeries}
+                type="bar"
+                height={350}
+                className="apex-charts"
+            />
+        </React.Fragment>
+    );
+};
+
+const ProgressiveSalesChart = ({ dataColors, series, period = "all" }) => {
+
+    const periodLabels = {
+        month: ["Week 1", "Week 2", "Week 3", "Week 4"],
+        halfyear: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        all: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+    };
+
+    const cleanPeriod = (period || "all").toLowerCase().trim();
+
+    var MarketplaceChartColors = getChartColorsArray(dataColors);
+
+    var options = {
+        chart: {
+            height: 350,
+            type: 'line',
+            zoom: { enabled: false },
+            toolbar: { show: false }
+        },
+        dataLabels: { enabled: false },
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+        colors: MarketplaceChartColors,
+
+        yaxis: {
+            labels: {
+                formatter: (val) => `${val}K`
+            }
+        },
+
+        xaxis: {
+            categories: periodLabels[cleanPeriod] || periodLabels.all
+        }
+    };
+
+    return (
+        <ReactApexChart
+            dir="ltr"
+            options={options}
+            series={series}
+            type="line"
+            height="350"
+            className="apex-charts"
+        />
+    );
+};
+
 const CountriesCharts = ({ dataColors, series }) => {
     let barchartCountriesColors = [];
     try {
@@ -324,4 +463,4 @@ const UsersByDeviceCharts = ({ dataColors, series }) => {
 };
 
 
-export { AudiencesCharts, AudiencesSessionsCharts, CountriesCharts, UsersByDeviceCharts };
+export { AudiencesCharts, AudiencesSessionsCharts, ProgressiveSalesChart, CountriesCharts, UsersByDeviceCharts, TopProductsCharts };

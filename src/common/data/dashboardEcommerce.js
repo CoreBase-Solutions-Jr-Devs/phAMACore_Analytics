@@ -219,6 +219,140 @@ const recentOrders = [
   },
 ];
 
+const salesmanRevenue = [
+  {
+    id: 1,
+    rep: "J. Mwangi",
+    branch: "Nairobi",
+    revenue: "342K",
+    rate: "94%",
+    rateClass: "success",
+  },
+  {
+    id: 2,
+    rep: "A. Ochieng",
+    branch: "Kisumu",
+    revenue: "298K",
+    rate: "88%",
+    rateClass: "success",
+  },
+  {
+    id: 3,
+    rep: "F. Njoroge",
+    branch: "Nakuru",
+    revenue: "271K",
+    rate: "81%",
+    rateClass: "info",
+  },
+  {
+    id: 4,
+    rep: "P. Kariuki",
+    branch: "Thika",
+    revenue: "244K",
+    rate: "76%",
+    rateClass: "primary",
+  },
+  {
+    id: 5,
+    rep: "S. Hassan",
+    branch: "Mombasa",
+    revenue: "189K",
+    rate: "62%",
+    rateClass: "warning",
+  },
+  {
+    id: 6,
+    rep: "M. Wanjiku",
+    branch: "Eldoret",
+    revenue: "134K",
+    rate: "48%",
+    rateClass: "danger",
+  },
+];
+
+const topCustomers = [
+  {
+    id: 1,
+    customerName: "PharmaCare Ltd",
+    branch: "Nairobi",
+    revenue: "342K",
+    rate: "94%",
+    rateClass: "success",
+  },
+  {
+    id: 2,
+    customerName: "MediHealth Supplies",
+    branch: "Kisumu",
+    revenue: "298K",
+    rate: "88%",
+    rateClass: "success",
+  },
+  {
+    id: 3,
+    customerName: "City Pharmacy Group",
+    branch: "Nakuru",
+    revenue: "271K",
+    rate: "81%",
+    rateClass: "info",
+  },
+  {
+    id: 4,
+    customerName: "Goodlife Chemists",
+    branch: "Thika",
+    revenue: "244K",
+    rate: "76%",
+    rateClass: "primary",
+  },
+  {
+    id: 5,
+    customerName: "HealthPlus Distributors",
+    branch: "Mombasa",
+    revenue: "189K",
+    rate: "62%",
+    rateClass: "warning",
+  },
+  {
+    id: 6,
+    customerName: "Eldoret Medical Store",
+    branch: "Eldoret",
+    revenue: "134K",
+    rate: "48%",
+    rateClass: "danger",
+  },
+  {
+    id: 7,
+    customerName: "Kiambu Pharma Ltd",
+    branch: "Kiambu",
+    revenue: "176K",
+    rate: "55%",
+    rateClass: "warning",
+  },
+  {
+    id: 8,
+    customerName: "Meru Care Pharmacy",
+    branch: "Meru",
+    revenue: "162K",
+    rate: "52%",
+    rateClass: "danger",
+  },
+  {
+    id: 9,
+    customerName: "Machakos Health Ltd",
+    branch: "Machakos",
+    revenue: "150K",
+    rate: "50%",
+    rateClass: "danger",
+  },
+  {
+    id: 10,
+    customerName: "Nyeri Wellness Center",
+    branch: "Nyeri",
+    revenue: "145K",
+    rate: "49%",
+    rateClass: "danger",
+  },
+];
+
 const topCategories = [
     {
         id: 1,
@@ -337,4 +471,4 @@ const yearRevenueData = [
     },
 ];
 
-export { ecomWidgets, bestSellingProducts, topSellers, recentOrders, topCategories, allRevenueData, monthRevenueData, halfYearRevenueData, yearRevenueData };
+export { ecomWidgets, bestSellingProducts, topSellers, topCustomers, recentOrders, salesmanRevenue, topCategories, allRevenueData, monthRevenueData, halfYearRevenueData, yearRevenueData };

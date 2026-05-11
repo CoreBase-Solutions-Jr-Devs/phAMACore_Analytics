@@ -46,19 +46,20 @@ const topPages = [
 // Charts Data
 
 const allData = [{
-    data: [4.8, 3.4,2.4, 2.2, 1.9],
+    data: [4.8, 3.4,2.4, 2.2, 1.9, 1.5, 1.2],
     name: 'Sessions',
 }];
 
 const monthData = [{
-    data: [3.2, 3.1, 3.9, 1.0, 0.85],
+    data: [3.2, 3.1, 3.9, 1.0, 0.85, 0.5, 0.2],
     name: 'Sessions',
 }];
 
 const halfyearData = [{
-    data: [2.9, 2.7, 2.4, 1.255, 1.050],
+    data: [2.9, 2.7, 2.4, 1.255, 1.050 , 0.8, 0.5],
     name: 'Sessions',
 }];
+
 
 
 // Audiences Metrics

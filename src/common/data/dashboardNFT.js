@@ -306,56 +306,27 @@ const popularCreatorsData = [
     },
 ];
 
-const allMarketplaceData = [{
-    name: "Artwork",
-    data: [10, 41, 35, 51, 49, 62, 69, 91, 148]
-},
+const allMarketplaceData = [
 {
-    name: "Auction",
-    data: [40, 120, 83, 45, 31, 74, 35, 34, 78]
+    name: "Sales",
+    data: [40, 120, 83, 45, 31, 74, 35, 34, 78, 45, 31, 74]
 },
-{
-    name: "Creators",
-    data: [95, 35, 20, 130, 64, 22, 43, 45, 31]
-}];
+];
 
-const monthMarketplaceData = [{
-    name: "Artwork",
-    data: [10, 21, 25, 31, 29, 42, 59, 51, 48]
-},
+const monthMarketplaceData = [
 {
-    name: "Auction",
-    data: [20, 20, 63, 25, 21, 54, 15, 14, 48]
+    name: "Sales",
+    data: [20, 20, 63, 25]
 },
-{
-    name: "Creators",
-    data: [55, 55, 30, 150, 84, 52, 53, 65, 51]
-}];
+];
 
-const halfyearMarketplaceData = [{
-    name: "Artwork",
-    data: [30, 51, 45, 71, 89, 82, 79, 81, 158]
-},
+const halfyearMarketplaceData = [
 {
-    name: "Auction",
-    data: [90, 140, 123, 75, 61, 94, 65, 64, 98]
+    name: "Sales",
+    data: [90, 140, 123, 75, 61, 94]
 },
-{
-    name: "Creators",
-    data: [125, 95, 60, 150, 74, 32, 63, 65, 71]
-}];
+];
 
-const yearMarketplaceData = [{
-    name: "Artwork",
-    data: [20, 61, 65, 71, 69, 82, 89, 121, 168]
-},
-{
-    name: "Auction",
-    data: [60, 140, 103, 65, 51, 84, 75, 94, 98]
-},
-{
-    name: "Creators",
-    data: [145, 75, 60, 150, 74, 52, 63, 65, 61]
-}];
 
-export { topartWork, featuredNFTData, popularityData, recentNFTsData, topCollectionData, popularCreatorsData, allMarketplaceData, monthMarketplaceData, halfyearMarketplaceData, yearMarketplaceData };
+
+export { topartWork, featuredNFTData, popularityData, recentNFTsData, topCollectionData, popularCreatorsData, allMarketplaceData, monthMarketplaceData, halfyearMarketplaceData };
