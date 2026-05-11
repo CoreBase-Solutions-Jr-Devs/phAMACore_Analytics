@@ -13,7 +13,6 @@ import { createSelector } from "reselect";
 const Logout = (props) => {
   const dispatch = useDispatch();
 
-
   const logoutData = createSelector(
     (state) => state.Login,
     (isUserLogout) => isUserLogout.isUserLogout

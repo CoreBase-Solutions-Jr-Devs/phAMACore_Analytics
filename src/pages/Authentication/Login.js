@@ -14,10 +14,10 @@ import {
   Spinner,
 } from "reactstrap";
 import ParticlesAuth from "../AuthenticationInner/ParticlesAuth";
-import { loginUserAPI } from "../../helpers/url_helper";
+// import { loginUserAPI } from "../../helpers/url_helper";
 //redux
 import { useSelector, useDispatch } from "react-redux";
-import { setAuthorization } from "../../helpers/api_helper";
+// import { setAuthorization } from "../../helpers/api_helper";
 import { Link, useNavigate } from "react-router-dom";
 import withRouter from "../../Components/Common/withRouter";
 // Formik validation
@@ -45,7 +45,7 @@ const Login = (props) => {
   // Inside your component
   const { user, error, loading, errorMsg } = useSelector(loginpageData);
 
-  const [userLogin, setUserLogin] = useState([]);
+const [userLogin, setUserLogin] = useState({});
   const [passwordShow, setPasswordShow] = useState(false);
 
   useEffect(() => {
@@ -69,41 +69,26 @@ const Login = (props) => {
     // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
-    initialValues: {
-      username: userLogin.username || "admin" || "",
-      password: userLogin.password || "123456" || "",
-    },
+initialValues: {
+  username: userLogin.username || "",
+  password: userLogin.password || "",
+},
     validationSchema: Yup.object({
       username: Yup.string().required("Please Enter Your Username"),
       password: Yup.string().required("Please Enter Your Password"),
     }),
-   onSubmit: async (values) => {
-  try {
-    const response = await loginUserAPI({
-      userName: values.username,
-      password: values.password,
-      clientPin: 0,
-      long: "",
-      latt: "",
-      machineCookie: "",
-      ipLocation: ""
-    });
 
-    console.log("LOGIN RESPONSE:", response);
-
-       // 🔥 SAVE TOKEN
-    if (response?.token) {
-      sessionStorage.setItem("authUser", JSON.stringify(response));
-
-      // 🔥 IMPORTANT: SET AUTH HEADER IMMEDIATELY
-      setAuthorization(response.token);
-    }
-
-    navigate("/dashboard");
-  } catch (error) {
-    console.error("LOGIN ERROR:", error);
-  }
-}
+    onSubmit: async (values) => {
+      dispatch(
+        loginUser(
+          {
+            username: values.username,
+            password: values.password,
+          },
+          navigate,
+        ),
+      );
+    },
   });
 
   const signIn = (type) => {
@@ -136,7 +121,7 @@ const Login = (props) => {
                 <div className="text-center mt-sm-5 mb-4 text-white-50">
                   <div>
                     <Link to="/" className="w-100 auth-logo">
-                      <img src={phamacoreCloud} alt="" height="100"/>
+                      <img src={phamacoreCloud} alt="" height="100" />
                     </Link>
                   </div>
                   {/* <p className="mt-3 fs-15 fw-medium">
@@ -197,7 +182,10 @@ const Login = (props) => {
 
                         <div className="mb-3">
                           <div className="float-end">
-                            <Link to="/forgot-password" className="text-caramel">
+                            <Link
+                              to="/forgot-password"
+                              className="text-caramel"
+                            >
                               Forgot password?
                             </Link>
                           </div>

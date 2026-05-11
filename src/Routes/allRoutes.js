@@ -471,7 +471,7 @@ const authProtectedRoutes = [
 const publicRoutes = [
   // Authentication Page
   { path: "/logout", component: <Logout /> },
-  { path: "/", component: <Login /> },
+  { path: "/login", component: <Login /> },
   { path: "/forgot-password", component: <ForgetPasswordPage /> },
   { path: "/register", component: <Register /> },
 

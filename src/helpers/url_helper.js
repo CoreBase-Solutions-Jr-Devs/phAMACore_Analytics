@@ -18,6 +18,10 @@ export const loginUserAPI = (data) => {
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
 export const POST_EDIT_PROFILE = "/user";
 
+export const logoutUserAPI = () => {
+  return AuthAPI.post("/Auth/Logout");
+};
+
 // Calendar
 export const GET_EVENTS = "/events";
 export const GET_CATEGORIES = "/categories";

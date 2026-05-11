@@ -7,23 +7,37 @@ const AuthAPI = axios.create({
   baseURL: api.AUTH_API_URL,
 });
 
+
 // content type
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 axios.interceptors.request.use((config) => {
+  const user = JSON.parse(sessionStorage.getItem("authUser"));
+  const token = user?.token;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
   const accessKey = process.env.REACT_APP_AUTH_ACCESS_KEY;
 
   if (accessKey) {
-    config.headers = {
-      ...config.headers,
-      accesskey: accessKey,
-    };
+    config.headers.accesskey = accessKey;
   }
 
   return config;
 });
 
+AuthAPI.interceptors.request.use((config) => {
+  const user = JSON.parse(sessionStorage.getItem("authUser"));
+  const token = user?.token;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
 // content type
 // const token = JSON.parse(sessionStorage.getItem("authUser")) ? JSON.parse(sessionStorage.getItem("authUser")).token : null;
 // if (token)
@@ -118,7 +132,7 @@ class APIClient {
   };
 }
 const getLoggedinUser = () => {
-  const user = localStorage.getItem("authUser");
+const user = sessionStorage.getItem("authUser");
   if (!user) {
     return null;
   } else {
