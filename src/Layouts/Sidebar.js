@@ -43,23 +43,23 @@ const Sidebar = ({ layoutType }) => {
         <div className="navbar-brand-box">
           <Link to="/" className="logo logo-dark pt-2">
             <span className="logo-sm">
-              <img src={phamacoreImage} alt="" height="22" />
+              <img src={phamacoreImage} alt="" height="40" />
             </span>
             <span className="logo-lg d-flex align-items-center gap-2">
-              <img src={phamacoreImage} alt="" height="17" />
+              <img src={phamacoreImage} alt="" height="40" />
               <span className="logo-text d-flex flex-column lh-1">
-                <span className="fw-bold">phAMACore</span>
-                <span className="small">Analytics</span>
+                <span className="fw-bold" style={{ color: "#c58c4f" }}>phAMACore</span>
+                <span className="small" style={{ color: "#c58c4f" }}>Analytics</span>
               </span>
             </span>
           </Link>
 
           <Link to="/" className="logo logo-light pt-2">
             <span className="logo-sm">
-              <img src={phamacoreImage} alt="" height="22" />
+              <img src={phamacoreImage} alt="" height="40" />
             </span>
             <span className="logo-lg d-flex align-items-center gap-2">
-              <img src={phamacoreImage} alt="" height="17" />
+              <img src={phamacoreImage} alt="" height="40" />
               <span className="logo-text d-flex flex-column lh-1" style={{ color: "#c58c4f" }}>
                 <span className="fw-bold">phAMACore</span>
                 <span className="small">Analytics</span>
