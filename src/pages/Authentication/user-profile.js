@@ -53,25 +53,27 @@ const UserProfile = () => {
 
 
 
-  useEffect(() => {
-    if (sessionStorage.getItem("authUser")) {
-      const obj = JSON.parse(sessionStorage.getItem("authUser"));
+useEffect(() => {
+  const stored = sessionStorage.getItem("authUser");
 
-      if (!isEmpty(user)) {
-        obj.data.first_name = user.first_name;
-        sessionStorage.removeItem("authUser");
-        sessionStorage.setItem("authUser", JSON.stringify(obj));
-      }
+  if (!stored) return;
 
-      setUserName(obj.data.first_name);
-      setemail(obj.data.email);
-      setidx(obj.data._id || "1");
+  const obj = JSON.parse(stored);
 
-      setTimeout(() => {
-        dispatch(resetProfileFlag());
-      }, 3000);
-    }
-  }, [dispatch, user]);
+  const firstName =
+    user?.first_name ||
+    obj?.data?.first_name ||
+    obj?.first_name ||
+    "Admin";
+
+  setUserName(firstName);
+  setemail(obj?.data?.email || obj?.email || "admin@gmail.com");
+  setidx(obj?.data?._id || obj?._id || "1");
+
+  setTimeout(() => {
+    dispatch(resetProfileFlag());
+  }, 3000);
+}, [dispatch, user]);
 
 
 
@@ -80,7 +82,7 @@ const UserProfile = () => {
     enableReinitialize: true,
 
     initialValues: {
-      first_name: userName || 'Admin',
+   first_name: userName ?? "Admin",
       idx: idx || '',
     },
     validationSchema: Yup.object({
