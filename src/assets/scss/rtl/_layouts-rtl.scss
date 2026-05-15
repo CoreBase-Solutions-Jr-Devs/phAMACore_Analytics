@@ -113,6 +113,9 @@
 
     .horizontal-logo {
         padding-right: calc(1.5rem / 2);
+        height: $header-height;
+        display: flex;
+        align-items: center;
     }
 
     .navbar-menu {
@@ -131,6 +134,7 @@
                     }
                 }
             }
+
             .vertical-sidebar-enable .app-menu {
                 margin-left: auto !important;
                 z-index: 1004;

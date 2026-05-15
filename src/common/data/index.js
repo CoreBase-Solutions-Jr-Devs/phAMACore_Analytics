@@ -29,6 +29,7 @@ import {
 import { apiKey } from "./apiKey";
 import {
   projectsWidgets,
+  branchReceivables,
   activeProjects,
   projectTasks,
   teamMembers,
@@ -126,6 +127,7 @@ export {
   recentActivity,
   newsFeed,
   projectsWidgets,
+  branchReceivables,
   activeProjects,
   projectTasks,
   teamMembers,

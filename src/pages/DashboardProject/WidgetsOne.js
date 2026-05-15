@@ -1,16 +1,16 @@
 import React from 'react';
-import { projectsWidgets } from '../../common/data';
+import { branchReceivables } from '../../common/data';
 import CountUp from "react-countup";
 
 //Import Icons
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from 'reactstrap';
 
-const Widgets = () => {
+const WidgetsOne = () => {
     return (
         <React.Fragment>
             <Row>
-                {(projectsWidgets || []).map((item, key) => (
+                {(branchReceivables || []).map((item, key) => (
                     <Col xl={3} key={key}>
                         <Card className="card-animate">
                             <CardBody>
@@ -23,13 +23,12 @@ const Widgets = () => {
                                     <div className="flex-grow-1 overflow-hidden ms-3">
                                         <p className="text-uppercase fw-medium text-muted text-truncate mb-3">{item.label}</p>
                                         <div className="d-flex align-items-center mb-3">
-                                            <h4 className={`fs-4 flex-grow-1 mb-0 text-${item.feaIconClass}`}>
+                                            <h4 className="fs-4 flex-grow-1 mb-0">
                                                 {item.subCounter.map((item,key)=>(<span className="counter-value me-1" data-target="825" key={key}>
                                                     <CountUp
                                                         start={0}
                                                         suffix={item.suffix}
                                                         separator={item.separator}
-                                                        decimals={item.decimals || 0}
                                                         end={item.counter}
                                                         duration={4}
                                                     />
@@ -49,4 +48,4 @@ const Widgets = () => {
     );
 };
 
-export default Widgets;
+export default WidgetsOne;
