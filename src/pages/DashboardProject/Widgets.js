@@ -23,12 +23,13 @@ const Widgets = () => {
                                     <div className="flex-grow-1 overflow-hidden ms-3">
                                         <p className="text-uppercase fw-medium text-muted text-truncate mb-3">{item.label}</p>
                                         <div className="d-flex align-items-center mb-3">
-                                            <h4 className="fs-4 flex-grow-1 mb-0">
+                                            <h4 className={`fs-4 flex-grow-1 mb-0 text-${item.feaIconClass}`}>
                                                 {item.subCounter.map((item,key)=>(<span className="counter-value me-1" data-target="825" key={key}>
                                                     <CountUp
                                                         start={0}
                                                         suffix={item.suffix}
                                                         separator={item.separator}
+                                                        decimals={item.decimals || 0}
                                                         end={item.counter}
                                                         duration={4}
                                                     />
