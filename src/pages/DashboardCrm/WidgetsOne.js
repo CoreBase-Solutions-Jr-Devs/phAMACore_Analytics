@@ -16,7 +16,7 @@ const WidgetsOne = () => {
                                         <h5 className="text-muted text-uppercase fs-13">{widget.label}<i className={widget.badge + " fs-18 float-end align-middle"}></i></h5>
                                         <div className="d-flex align-items-center">
                                             <div className="flex-shrink-0">
-                                                <i className={widget.icon + " display-6 text-muted"}></i>
+                                                <i className={widget.icon + " display-6"}></i>
                                             </div>
                                             <div className="flex-grow-1 ms-3">
                                                 <h2 className="mb-0"><span className="counter-value" data-target="197">

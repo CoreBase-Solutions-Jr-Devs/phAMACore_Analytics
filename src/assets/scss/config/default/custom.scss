@@ -8,19 +8,42 @@ File: Custom Css File
 
 
 /* Sidebar background */
-.app-menu.navbar-menu {
-    background-color: #fff !important;
-}
+// .app-menu.navbar-menu {
+//     background-color: #fff !important;
+// }
 
 /* Sidebar links default */
-.navbar-nav .nav-link {
-    color: #000 !important;
-    transition: color 0.2s ease;
+[data-bs-theme="light"] {
+    .navbar-nav .nav-link {
+        color: #000 !important;
+        transition: color 0.2s ease;
+    }
+
+    /* Icons default */
+    .navbar-nav .nav-link i {
+        color: #000 !important;
+    }
 }
 
-/* Icons default */
-.navbar-nav .nav-link i {
-    color: #000 !important;
+[data-bs-theme="dark"] {
+    .navbar-menu {
+        background: #212529 !important;
+        border-right-color: #212529 !important;
+    }
+    /* Logo box when sidebar is collapsed (sm) */
+    &[data-sidebar-size="sm"] .navbar-brand-box {
+        background-color: #212529 !important;
+    }
+
+    /* Flyout submenu background when sidebar is collapsed (sm) */
+    &[data-sidebar-size="sm"] .navbar-menu .navbar-nav .nav-item:hover > .menu-dropdown {
+        background: #212529 !important;
+    }
+
+    /* sm-hover variant (icon-only hover-expand sidebar) */
+    &[data-sidebar-size="sm-hover"] .navbar-menu .navbar-nav .menu-dropdown {
+        background: #212529 !important;
+    }
 }
 
 /* Hover state */
@@ -42,8 +65,10 @@ File: Custom Css File
 }
 
 /* Submenu items */
-.nav.nav-sm .nav-link {
-    color: #000 !important;
+[data-bs-theme="light"] {
+    .nav.nav-sm .nav-link {
+        color: #000 !important;
+    }
 }
 
 .nav.nav-sm .nav-link:hover,
@@ -52,7 +77,7 @@ File: Custom Css File
 }
 
 /* Section headers (MENU, PAGES, etc.) */
-.menu-title {
+[data-bs-theme="light"] .menu-title {
     color: #6c757d !important; // subtle gray for hierarchy
 }
 

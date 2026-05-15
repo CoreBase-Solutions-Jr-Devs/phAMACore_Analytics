@@ -11,37 +11,158 @@ import avatar8 from "../../assets/images/users/avatar-8.jpg";
 const projectsWidgets = [
     {
         id: 1,
+        feaIcon: "trending-up",
+        feaIconClass: "success",
+        label: "Total Revenue",
+        badgeClass: "success",
+        icon: "ri-arrow-up-s-line",
+        percentage: "11 %",
+        caption: "VS Yesterday",
+        counter: "4.2",
+        decimals: 1,
+        prefix: "",
+        suffix: "M",
+        subCounter: [{ id: 1, counter: "4.2", suffix: "M", decimals: 1 }]
+    },
+    {
+        id: 2,
+        feaIcon: "dollar-sign",
+        feaIconClass: "success",
+        label: "Cash Sales",
+        badgeClass: "warning",
+        icon: "",
+        percentage: "62 %",
+        caption: "% age of total sales",
+        decimals: 1,
+        counter: "4.2",
+        prefix: "",
+        suffix: "M",
+        subCounter: [{ id: 1, counter: "2.6", suffix: "M", separator: ",", decimals: 1 }]
+    },
+    {
+        id: 3,
+        feaIcon: "file-text",
+        feaIconClass: "info",
+        label: "Credit Sales",
+        badgeClass: "warning",
+        icon: "",
+        percentage: "38 %",
+        caption: "%age of total sales",
+        decimals: 1,
+        counter: 1.6,
+        suffix: "M",
+        decimals: 2,
+        separator: ",",
+        subCounter: [{ counter: "1.6", suffix: "M", decimals: 1 }]
+    },
+    {
+        id: 4,
+        feaIcon: "check-circle",
+        feaIconClass: "success",
+        label: "Collections",
+        badgeClass: "warning",
+        icon: "",
+        percentage: "68 %",
+        caption: "Collection Rate",
+        counter: "1.1",
+        suffix: "M",
+        decimals: 1,
+        subCounter: [{ id: 1, counter: "1.1", suffix: "M", decimals: 1 }]
+    },
+    {
+        id: 5,
+        feaIcon: "alert-circle",
+        feaIconClass: "danger",
+        label: "Outstanding",
+        caption: "Total Receivables",
+        decimals: 1,
+        counter: "8.4",
+        suffix: "M",
+        decimals: 1,
+        subCounter: [{ id: 1, counter: "8.4", suffix: "M", decimals: 1 }]
+    },
+    {
+        id: 6,
+        feaIcon: "users",
+        feaIconClass: "info",
+        label: "Active Customers",
+        caption: "Served Today",
+        counter: "214",
+        decimals: 0,
+        subCounter: [{ id: 1, counter: "214", decimals: 0 }]
+    },
+    {
+        id: 7,
+        feaIcon: "shopping-cart",
+        feaIconClass: "success",
+        label: "Orders Placed",
+        badgeClass: "success",
+        icon: "ri-arrow-up-s-line",
+        percentage: "24",
+        caption: "VS avg",
+        counter: "318",
+        decimals: 0,
+        subCounter: [{ id: 1, counter: "318", decimals: 0 }]
+    },
+    {
+        id: 8,
+        feaIcon: "rotate-ccw",
+        feaIconClass: "danger",
+        label: "Cancelled/Returns",
+        caption: "90+ days",
+        counter: "37",
+        decimals: 0,
+        subCounter: [{ id: 1, counter: "37", decimals: 0 }]
+    },
+];
+
+const branchReceivables = [
+    {
+        id: 1,
         feaIcon: "briefcase",
-        feaIconClass: "primary",
-        label: "Active Projects",
-        badgeClass: "danger",
-        icon: "ri-arrow-down-s-line",
-        percentage: "5.02 %",
-        caption: "Projects this month",
-        subCounter: [{ id: 1, counter: "825", suffix: "" }]
+        feaIconClass: "success",
+        label: "Current",
+        badgeClass: "success",
+        icon: "ri-arrow-up-s-line",
+        percentage: "11 %",
+        // caption: "VS Yesterday",
+        subCounter: [{ id: 1, counter: "4.2", suffix: "M", decimals: 1 }]
     },
     {
         id: 2,
         feaIcon: "award",
-        feaIconClass: "warning",
-        label: "New Leads",
-        badgeClass: "success",
-        icon: "ri-arrow-up-s-line",
-        percentage: "3.58 %",
-        caption: "Leads this month",
-        subCounter: [{ id: 1, counter: "7522", suffix: "", separator: "," }]
+        feaIconClass: "info",
+        label: "1-30 Days",
+        badgeClass: "info",
+        icon: "",
+        percentage: "62 %",
+        // caption: "% age of total sales",
+        decimals: 1,
+        subCounter: [{ id: 1, counter: "2.6", suffix: "M", separator: ",", decimals: 1 }]
     },
     {
         id: 3,
         feaIcon: "clock",
-        feaIconClass: "info",
-        label: "Total Hours",
+        feaIconClass: "warning",
+        label: "31-60 Days",
+        badgeClass: "warning",
+        icon: "",
+        percentage: "38 %",
+        // caption: "%age of total sales",
+        decimals: 1,
+        subCounter: [{ id: 1, counter: "1.6", suffix: "M", decimals: 1 }]
+    },
+    {
+        id: 4,
+        feaIcon: "clock",
+        feaIconClass: "danger",
+        label: "90+ Days",
         badgeClass: "danger",
-        icon: "ri-arrow-down-s-line",
-        percentage: "10.35 %",
-        caption: "Work this month",
-        subCounter: [{ id: 1, counter: "168", suffix: "h" }, { id: 1, counter: "40", suffix: "m" }]
-    }
+        icon: "",
+        percentage: "68 %",
+        // caption: "Collection Rate",
+        subCounter: [{ id: 1, counter: "1.1", suffix: "m", decimals: 1 }]
+    },
 ];
 
 const overviewCounter = [
@@ -389,4 +510,4 @@ const lastMonthData = [155, 82, 78, 99];
 const lastquarterData = [185, 142, 158, 149];
 
 
-export { projectsWidgets, overviewCounter, activeProjects, projectTasks, teamMembers, allProjectData, monthProjectData, halfyearProjectData, yearProjectData, allTimeData, lastWeekData, lastMonthData, lastquarterData, dashboardChat };
+export { projectsWidgets, branchReceivables, overviewCounter, activeProjects, projectTasks, teamMembers, allProjectData, monthProjectData, halfyearProjectData, yearProjectData, allTimeData, lastWeekData, lastMonthData, lastquarterData, dashboardChat };
