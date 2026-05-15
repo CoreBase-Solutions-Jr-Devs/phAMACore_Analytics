@@ -6,7 +6,7 @@ const LineChartTwo = ({ dataColors }) => {
     var linechartBasicColors = getChartColorsArray(dataColors);
 
     const series = [{
-        name: "YTD Receivables (KES '000)",
+        name: "YTD Sales (KES '000)",
         data: [
             3980, 8450, 1320, 19800, 21380, null, null, null, null, null, null, null 
         ]
@@ -30,7 +30,7 @@ const LineChartTwo = ({ dataColors }) => {
         },
         colors: linechartBasicColors,
         title: {
-            text: "YTD Receivables — 2026 (KES '000)",
+            text: "YTD Sales — 2026 (KES '000)",
             align: 'left',
             style: { fontWeight: 500 },
         },
