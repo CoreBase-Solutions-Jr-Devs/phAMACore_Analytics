@@ -15,17 +15,17 @@ import CustomTableOne from './Tables/Custom/CustomTableOne';
 import BarChartThree from './Charts/Custom/Bar/BarChartThree';
 import WidgetsOne from './WidgetsOne';
 import CustomTableTwo from './Tables/Custom/CustomTableTwo';
-import { LineChartThree } from './Charts/Custom/Line/LineChartThree';
 import { LineChartOne } from './Charts/Custom/Line/LineChartOne';
 import { LineChartTwo } from './Charts/Custom/Line/LineChartTwo';
+import LineChartThree from './Charts/Custom/Line/LineChartThree';
 
 const DashboardProject = () => {
-    document.title="Projects | Velzon - React Admin & Dashboard Template";
+    document.title="Branch Sales | phAMACore Analytics";
     return (
         <React.Fragment>
             <div className="page-content">
                 <Container fluid>
-                    <BreadCrumb title="Projects" pageTitle="Dashboards" />
+                    <BreadCrumb title="Branch Sales - Nairobi" pageTitle="Dashboards" />
                     <Row className="project-wrapper">
                         <Col xxl={8}>
                             <Widgets />
@@ -104,22 +104,13 @@ const DashboardProject = () => {
                             </Card>
                         </Col>
                     </Row>
-                    {/* <Row>
+                    <Row>
                         <Card>
                             <CardBody>
-                                <LineChartThree dataColors='["--vz-primary"]' />
+                                <LineChartThree />
                             </CardBody>
                         </Card>
-                    </Row> */}
-                    {/* <Row>
-                        <ActiveProjects />
-                        <MyTasks />
                     </Row>
-                    <Row>
-                        <TeamMembers />
-                        <Chat />
-                        <ProjectsStatus />
-                    </Row> */}
                 </Container>
             </div>
         </React.Fragment>
