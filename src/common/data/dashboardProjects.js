@@ -11,30 +11,37 @@ import avatar8 from "../../assets/images/users/avatar-8.jpg";
 const projectsWidgets = [
     {
         id: 1,
-        feaIcon: "briefcase",
-        feaIconClass: "primary",
+        feaIcon: "trending-up",
+        feaIconClass: "success",
         label: "Total Revenue",
         badgeClass: "success",
         icon: "ri-arrow-up-s-line",
         percentage: "11 %",
         caption: "VS Yesterday",
+        counter: "4.2",
+        decimals: 1,
+        prefix: "",
+        suffix: "M",
         subCounter: [{ id: 1, counter: "4.2", suffix: "M", decimals: 1 }]
     },
     {
         id: 2,
-        feaIcon: "award",
-        feaIconClass: "warning",
+        feaIcon: "dollar-sign",
+        feaIconClass: "success",
         label: "Cash Sales",
         badgeClass: "warning",
         icon: "",
         percentage: "62 %",
         caption: "% age of total sales",
         decimals: 1,
+        counter: "4.2",
+        prefix: "",
+        suffix: "M",
         subCounter: [{ id: 1, counter: "2.6", suffix: "M", separator: ",", decimals: 1 }]
     },
     {
         id: 3,
-        feaIcon: "clock",
+        feaIcon: "file-text",
         feaIconClass: "info",
         label: "Credit Sales",
         badgeClass: "warning",
@@ -42,63 +49,70 @@ const projectsWidgets = [
         percentage: "38 %",
         caption: "%age of total sales",
         decimals: 1,
-        subCounter: [{ id: 1, counter: "1.6", suffix: "M", decimals: 1 }]
+        counter: 1.6,
+        suffix: "M",
+        decimals: 2,
+        separator: ",",
+        subCounter: [{ counter: "1.6", suffix: "M", decimals: 1 }]
     },
     {
         id: 4,
-        feaIcon: "clock",
-        feaIconClass: "info",
+        feaIcon: "check-circle",
+        feaIconClass: "success",
         label: "Collections",
         badgeClass: "warning",
         icon: "",
         percentage: "68 %",
         caption: "Collection Rate",
-        subCounter: [{ id: 1, counter: "1.1", suffix: "m", decimals: 1 }]
+        counter: "1.1",
+        suffix: "M",
+        decimals: 1,
+        subCounter: [{ id: 1, counter: "1.1", suffix: "M", decimals: 1 }]
     },
     {
         id: 5,
-        feaIcon: "clock",
-        feaIconClass: "info",
+        feaIcon: "alert-circle",
+        feaIconClass: "danger",
         label: "Outstanding",
-        // badgeClass: "danger",
-        // icon: "ri-arrow-down-s-line",
-        // percentage: "10.35 %",
         caption: "Total Receivables",
         decimals: 1,
-        subCounter: [{ id: 1, counter: "8.4", suffix: "M" }]
+        counter: "8.4",
+        suffix: "M",
+        decimals: 1,
+        subCounter: [{ id: 1, counter: "8.4", suffix: "M", decimals: 1 }]
     },
     {
         id: 6,
-        feaIcon: "clock",
+        feaIcon: "users",
         feaIconClass: "info",
         label: "Active Customers",
-        // badgeClass: "danger",
-        // icon: "ri-arrow-down-s-line",
-        // percentage: "",
         caption: "Served Today",
-        subCounter: [{ id: 1, counter: "214" }]
+        counter: "214",
+        decimals: 0,
+        subCounter: [{ id: 1, counter: "214", decimals: 0 }]
     },
     {
         id: 7,
-        feaIcon: "clock",
-        feaIconClass: "info",
+        feaIcon: "shopping-cart",
+        feaIconClass: "success",
         label: "Orders Placed",
         badgeClass: "success",
         icon: "ri-arrow-up-s-line",
         percentage: "24",
         caption: "VS avg",
-        subCounter: [{ id: 1, counter: "318" }]
+        counter: "318",
+        decimals: 0,
+        subCounter: [{ id: 1, counter: "318", decimals: 0 }]
     },
     {
         id: 8,
-        feaIcon: "clock",
-        feaIconClass: "info",
+        feaIcon: "rotate-ccw",
+        feaIconClass: "danger",
         label: "Cancelled/Returns",
-        // badgeClass: "danger",
-        // icon: "ri-arrow-down-s-line",
-        // percentage: "",
         caption: "90+ days",
-        subCounter: [{ id: 1, counter: "37" }]
+        counter: "37",
+        decimals: 0,
+        subCounter: [{ id: 1, counter: "37", decimals: 0 }]
     },
 ];
 
