@@ -32,19 +32,19 @@ const CustomTableOne = () => {
                                     </tr>
                                     <tr>
                                         <td>A.Ochieng</td>
-                                        <td>Kisumu</td>
+                                        <td>Nairobi</td>
                                         <td>298K</td>
                                         <td><span className="badge bg-success">88%</span></td>
                                     </tr>
                                     <tr>
                                         <td>F.Njoroge</td>
-                                        <td>Nakuru</td>
+                                        <td>Nairobi</td>
                                         <td>271K</td>
                                         <td><span className="badge bg-info">81%</span></td>
                                     </tr>
                                     <tr>
                                         <td>P.Kariuki</td>
-                                        <td>Thika</td>
+                                        <td>Nairobi</td>
                                         <td>244K</td>
                                         <td><span className="badge bg-danger">76%</span></td>
                                     </tr>
