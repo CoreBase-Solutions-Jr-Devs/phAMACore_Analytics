@@ -7,6 +7,9 @@ const AuthAPI = axios.create({
   baseURL: api.AUTH_API_URL,
 });
 
+const PowerBIAPI = axios.create({
+  baseURL: api.POWERBI_API_URL,
+});
 
 // content type
 axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -34,6 +37,23 @@ AuthAPI.interceptors.request.use((config) => {
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+PowerBIAPI.interceptors.request.use((config) => {
+  const user = JSON.parse(sessionStorage.getItem("authUser"));
+  const token = user?.token;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  const accessKey = process.env.REACT_APP_POWERBI_ACCESSKEY;
+
+  if (accessKey) {
+    config.headers.accesskey = accessKey;
   }
 
   return config;
@@ -140,4 +160,4 @@ const user = sessionStorage.getItem("authUser");
   }
 };
 
-export { APIClient, AuthAPI, getLoggedinUser };
+export { APIClient, AuthAPI, PowerBIAPI, getLoggedinUser };

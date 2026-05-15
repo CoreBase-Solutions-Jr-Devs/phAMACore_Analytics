@@ -10,25 +10,37 @@ import avatar1 from "../../assets/images/users/avatar-1.jpg";
 const ProfileDropdown = () => {
 
 
-    const profiledropdownData = createSelector(
-        (state) => state.Profile,
-        (state) => ({
-            user: state.user
-        })
-      );
-    // Inside your component
-    const {user} = useSelector(profiledropdownData);
+ const profiledropdownData = createSelector(
+    (state) => state.Profile,
+    (state) => ({
+        user: state?.user || null
+    })
+);
+
+const { user } = useSelector((state) => state.Profile || {});
 
     const [userName, setUserName] = useState("Admin");
 
-    // useEffect(() => {
-    //     if (sessionStorage.getItem("authUser")) {
-    //         const obj = JSON.parse(sessionStorage.getItem("authUser"));
-    //         setUserName(process.env.REACT_APP_DEFAULTAUTH === "fake" ? obj.username === undefined ? user.first_name ? user.first_name : obj.data.first_name : "Admin" || "Admin" :
-    //             process.env.REACT_APP_DEFAULTAUTH === "firebase" ? obj.email && obj.email : "Admin"
-    //         );
-    //     }
-    // }, [userName, user]);
+useEffect(() => {
+    const storedUser = sessionStorage.getItem("authUser");
+
+    let parsedUser = null;
+    try {
+        parsedUser = storedUser ? JSON.parse(storedUser) : null;
+    } catch (e) {
+        parsedUser = null;
+    }
+
+    const name =
+        user?.first_name ||
+        parsedUser?.data?.first_name ||
+        parsedUser?.first_name ||
+        parsedUser?.username ||
+        parsedUser?.email ||
+        "Admin";
+
+    setUserName(name);
+}, [user]);
 
     //Dropdown Toggle
     const [isProfileDropdown, setIsProfileDropdown] = useState(false);
