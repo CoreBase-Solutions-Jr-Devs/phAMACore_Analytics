@@ -1,4 +1,4 @@
-import { AuthAPI } from "./api_helper";
+import { AuthAPI, PowerBIAPI } from "./api_helper";
 
 //REGISTER
 export const POST_FAKE_REGISTER = "/auth/signup";
@@ -13,6 +13,16 @@ export const SOCIAL_LOGIN = "/social-login";
 export const loginUserAPI = (data) => {
   return AuthAPI.post("/Auth", data);
 };
+
+// Power BI APIs
+export const GET_POWERBI_SALES =
+  "/api/powerbi/PowerBISalesTransactions";
+
+export const GET_POWERBI_STOCK =
+  "/api/powerbi/PowerBIDailyClosingStock";
+
+export const GET_POWERBI_MOVEMENTS =
+  "/api/powerbi/PowerBIStockMovements";
 
 //PROFILE
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";

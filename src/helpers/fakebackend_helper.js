@@ -16,6 +16,17 @@ export const isUserAuthenticated = () => {
   return getLoggedInUser() !== null;
 };
 
+// Power BI APIs
+
+export const getSalesTransactions = (params) =>
+  api.get(url.GET_POWERBI_SALES, { params });
+
+export const getDailyClosingStock = (params) =>
+  api.get(url.GET_POWERBI_STOCK, { params });
+
+export const getStockMovements = (params) =>
+  api.get(url.GET_POWERBI_MOVEMENTS, { params });
+
 // Register Method
 export const postFakeRegister = data => api.create(url.POST_FAKE_REGISTER, data);
 
