@@ -45,8 +45,8 @@ const BarChartThree = ({ dataColors }) => {
             colors: ['#fff']
         },
         xaxis: {
-            categories: ['MedCare Mombasa', 'Pharmaplus Kiambu Rd', 'R.V. Dispensary', 'City Health Kisumu', 'Westlands Pharmacy',
-                'Eldoret Med Centre', 'Nakuru Dispensary', 'Thika General Pharmacy', 'Coast Pharma Ltd', 'Karen Chemist',
+            categories: [
+                'MedCare Westlands', 'Pharmaplus Ngong Rd', 'City Health Karen', 'HealthPlus Kilimani', 'Upperhill Pharmacy', 'Lavington Dispensary', 'Parklands Chemist', 'Hurlingham MedShop', 'South B Pharmacy', 'Eastleigh Health Ctr',
             ],
         },
         yaxis: {
@@ -55,7 +55,7 @@ const BarChartThree = ({ dataColors }) => {
             }
         },
         title: {
-            text: 'Our Top Earning Customers',
+            text: 'Top 10 Customers — Nairobi Branch',
             align: 'left',
             floating: true,
             style: {
@@ -63,7 +63,7 @@ const BarChartThree = ({ dataColors }) => {
             },
         },
         subtitle: {
-            text: 'Revenue Earned in Thousand(KES).',
+            text: 'Revenue Earned in Thousands(KES) - May.',
             align: 'left',
         },
         tooltip: {
