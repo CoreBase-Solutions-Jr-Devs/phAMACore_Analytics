@@ -23,6 +23,9 @@
 
     .horizontal-logo {
         padding-left: calc(#{$grid-gutter-width} * 0.5);
+        height: $header-height;
+        display: flex;
+        align-items: center;
 
         @media (max-width: 1024.98px) {
             padding-left: $grid-gutter-width;
