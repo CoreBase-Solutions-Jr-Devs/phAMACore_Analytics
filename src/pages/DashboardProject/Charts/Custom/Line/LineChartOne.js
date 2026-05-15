@@ -8,7 +8,7 @@ const LineChartOne = ({ dataColors }) => {
         name: "MTD Sales (KES '000)",
         data: [
             142, 156, 133, 158, 123, 122, 144, 117, 108, 131, 124,
-            null, null, null, null, null, null, null, null, null, null,
+            138, 155, 128, 179, 186, null, null, null, null, null,
             null, null, null, null, null, null, null, null, null, null
         ]
     }];
@@ -68,7 +68,7 @@ const LineChartOne = ({ dataColors }) => {
         },
         annotations: {
             xaxis: [{
-                x: '11',
+                x: '15',
                 borderColor: '#999',
                 borderWidth: 1,
                 strokeDashArray: 4,
