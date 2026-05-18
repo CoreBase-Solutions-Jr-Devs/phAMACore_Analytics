@@ -6,13 +6,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { getMarketChartsDatas } from '../../slices/thunks';
 
 // Import Chart
-import {ProgressiveSalesChart} from "./DashboardAnalyticsCharts";
+import {MonthToDateSalesChart} from "./DashboardAnalyticsCharts";
 import { Link } from 'react-router-dom';
 import { createSelector } from 'reselect';
 
-const ProgressiveSales = () => {
+const MonthToDateSales = () => {
     const dispatch = useDispatch();
-const [periodType, setPeriodType] = useState("all");
+const [periodType, setPeriodType] = useState("weeks");
+const [selectedWeek, setSelectedWeek] = useState(null);
     const [chartData, setchartData] = useState([]);
 
     const selectmarketData = createSelector(
@@ -22,6 +23,15 @@ const [periodType, setPeriodType] = useState("all");
     // Inside your component
     const marketplaceData = useSelector(selectmarketData);
 
+const handleWeekSelect = (week) => {
+    setSelectedWeek(week);
+    setPeriodType("days");
+};
+
+const handleBack = () => {
+    setPeriodType("weeks");
+    setSelectedWeek(null);
+};
 
     useEffect(() => {
         setchartData(marketplaceData);
@@ -63,22 +73,22 @@ const [periodType, setPeriodType] = useState("all");
                 <Col xxl={12}>
                     <Card>
                         <CardBody className="p-0">
-                            <Row className="g-0">
-                                <Col xxl={8}>
+                            <Row >
+                                <Col xxl={12}>
                                     <div className="">
                                         <CardHeader className="border-0 align-items-center d-flex">
                                             <h4 className="card-title mb-0 flex-grow-1"> Sales Performance Trend (MTD vs YTD)</h4>
                                             <div className='d-flex gap-1'>
-                                                <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => {  setPeriodType("all");
+                                                {/* <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => {  setPeriodType("all");
     onChangeChartPeriod("all"); }}>
                                                     ALL
-                                                </button>
-                                                {/* <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { setPeriodType("month"); onChangeChartPeriod("month"); }}>
-                                                    1M
                                                 </button> */}
-                                                <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { setPeriodType("halfyear"); onChangeChartPeriod("halfyear"); }}>
+                                                {/* <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { setPeriodType("month"); onChangeChartPeriod("month"); }}>
+                                                    1W
+                                                </button> */}
+                                                {/* <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { setPeriodType("halfyear"); onChangeChartPeriod("halfyear"); }}>
                                                     6M
-                                                </button>
+                                                </button> */}
                                               
                                             </div>
                                         </CardHeader>
@@ -114,8 +124,15 @@ const [periodType, setPeriodType] = useState("all");
                                                 </div>
                                             </Col>
                                         </Row> */}
-                                        <ProgressiveSalesChart series={chartData}   period={periodType} dataColors='["--vz-primary","--vz-success", "--vz-gray-300"]'  />
-                                    </div>
+<MonthToDateSalesChart
+    series={chartData}
+    period={periodType}
+    selectedWeek={selectedWeek}
+    dailyData={marketplaceData?.dailyData || {}}
+    dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
+    onWeekSelect={handleWeekSelect}
+    onBack={handleBack}
+/>                                    </div>
                                 </Col>
 
                                 {/* <Col xxl={4}>
@@ -183,4 +200,4 @@ const [periodType, setPeriodType] = useState("all");
     );
 };
 
-export default ProgressiveSales;
+export default MonthToDateSales;

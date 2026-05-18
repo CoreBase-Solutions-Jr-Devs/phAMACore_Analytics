@@ -12,14 +12,14 @@ const ReceivablesAgeing = () => {
                         Receivables ageing (KES '000)
                     </h4>
 
-                    <div className="flex-shrink-0">
+                    {/* <div className="flex-shrink-0">
                         <button
                             type="button"
                             className="btn btn-soft-primary btn-sm"
                         >
                             Export Report
                         </button>
-                    </div>
+                    </div> */}
                 </CardHeader>
 
                 <CardBody className="bg-white">

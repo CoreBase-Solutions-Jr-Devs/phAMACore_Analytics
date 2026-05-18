@@ -60,7 +60,19 @@ const halfyearData = [{
     name: 'Sessions',
 }];
 
+const allmonthToDateWeeksData = [
+    {
+        name: "Sales",
+        data: [4.2, 3.8, 5.1, 6.0] // Week 1 - Week 4
+    }
+];
 
+const monthToDateDailyData = {
+    "Week 1": [0.5, 0.8, 1.2, 0.9, 1.1, 0.7, 1.0],
+    "Week 2": [1.0, 1.3, 1.1, 1.5, 1.7, 1.2, 1.4],
+    "Week 3": [0.8, 1.0, 1.3, 1.1, 1.6, 1.2, 1.5],
+    "Week 4": [1.5, 1.8, 2.0, 1.7, 2.1, 1.9, 2.2]
+};
 
 // Audiences Metrics
 const allaudiencesMetricsData = [{
@@ -329,4 +341,4 @@ const currentyearaudiencesCountryData = [{
 
 
 
-export { topPages, allData, monthData, halfyearData, allaudiencesMetricsData, monthaudiencesMetricsData, halfyearaudiencesMetricsData, yaeraudiencesMetricsData, todayDeviceData, lastWeekDeviceData, lastMonthDeviceData, currentYearDeviceData, todayaudiencesCountryData, lastWeekaudiencesCountryData, lastMonthaudiencesCountryData, currentyearaudiencesCountryData };
+export { topPages, allData, monthData, halfyearData, monthToDateDailyData, allmonthToDateWeeksData,  allaudiencesMetricsData, monthaudiencesMetricsData, halfyearaudiencesMetricsData, yaeraudiencesMetricsData, todayDeviceData, lastWeekDeviceData, lastMonthDeviceData, currentYearDeviceData, todayaudiencesCountryData, lastWeekaudiencesCountryData, lastMonthaudiencesCountryData, currentyearaudiencesCountryData };

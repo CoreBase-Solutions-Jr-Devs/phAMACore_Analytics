@@ -12,7 +12,7 @@ const TopCustomers = () => {
                         Top Customers — revenue (KES)
                     </h4>
 
-                    <div className="flex-shrink-0">
+                    {/* <div className="flex-shrink-0">
                         <button
                             type="button"
                             className="btn btn-soft-primary btn-sm"
@@ -20,7 +20,7 @@ const TopCustomers = () => {
                             <i className="ri-bar-chart-line align-middle me-1"></i>
                             View Report
                         </button>
-                    </div>
+                    </div> */}
                 </CardHeader>
 
                 <CardBody className="bg-white">
@@ -28,7 +28,7 @@ const TopCustomers = () => {
                         <table className="table align-middle table-nowrap mb-0">
                             <thead className="table-light">
                                 <tr className="text-muted">
-                                    <th scope="col">CustomerName</th>
+                                    <th scope="col">Name</th>
                                     <th scope="col">Branch</th>
                                     <th scope="col">Revenue</th>
                                     <th scope="col" className="text-end">Rate</th>
@@ -39,7 +39,7 @@ const TopCustomers = () => {
                                 {(topCustomers || []).map((item, key) => (
                                     <tr key={key}>
                                         <td className="fw-semibold text-dark">
-                                            {item.customerName}
+                                            {item.name}
                                         </td>
 
                                         <td className="text-muted">

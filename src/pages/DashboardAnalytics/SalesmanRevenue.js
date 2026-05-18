@@ -12,7 +12,7 @@ const SalesmanRevenue = () => {
                         Salesman leaderboard — revenue (KES)
                     </h4>
 
-                    <div className="flex-shrink-0">
+                    {/* <div className="flex-shrink-0">
                         <button
                             type="button"
                             className="btn btn-soft-primary btn-sm"
@@ -20,7 +20,7 @@ const SalesmanRevenue = () => {
                             <i className="ri-bar-chart-line align-middle me-1"></i>
                             View Report
                         </button>
-                    </div>
+                    </div> */}
                 </CardHeader>
 
                 <CardBody className="bg-white">
