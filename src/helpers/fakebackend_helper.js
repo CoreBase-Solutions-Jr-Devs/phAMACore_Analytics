@@ -1,8 +1,9 @@
-import { APIClient } from "./api_helper";
+import { APIClient, PowerBIAPI } from "./api_helper";
 
 import * as url from "./url_helper";
 
 const api = new APIClient();
+// const powerBIApi = new PowerBIAPI();
 
 // Gets the logged in user data from local session
 export const getLoggedInUser = () => {
@@ -18,14 +19,17 @@ export const isUserAuthenticated = () => {
 
 // Power BI APIs
 
+// export const getSalesTransactions = (params) =>
+//   powerBIApi.get(url.GET_POWERBI_SALES, { params });
 export const getSalesTransactions = (params) =>
-  api.get(url.GET_POWERBI_SALES, { params });
-
+  PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
+console.log("POWER BI URL:", url.GET_POWERBI_SALES);
 export const getDailyClosingStock = (params) =>
-  api.get(url.GET_POWERBI_STOCK, { params });
+  PowerBIAPI.get(url.GET_POWERBI_STOCK, { params });
 
 export const getStockMovements = (params) =>
-  api.get(url.GET_POWERBI_MOVEMENTS, { params });
+  PowerBIAPI.get(url.GET_POWERBI_MOVEMENTS, { params });
+
 
 // Register Method
 export const postFakeRegister = data => api.create(url.POST_FAKE_REGISTER, data);

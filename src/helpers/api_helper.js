@@ -55,7 +55,7 @@ PowerBIAPI.interceptors.request.use((config) => {
   if (accessKey) {
     config.headers.accesskey = accessKey;
   }
-
+console.log("POWERBI ACCESS KEY:", accessKey);
   return config;
 });
 // content type
