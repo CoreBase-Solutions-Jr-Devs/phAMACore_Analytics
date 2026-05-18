@@ -9,50 +9,33 @@ import { setAuthorization } from "../../../helpers/api_helper";
 import { loginStart,loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
 import { loginUserAPI, logoutUserAPI  } from "../../../helpers/url_helper";
 
-export const loginUser = (user, history) => async (dispatch) => {
+export const loginUser = (user, navigate) => async (dispatch) => {
   try {
-    dispatch(loginStart());
 
-    const apiResponse = await loginUserAPI({
-      userName: user.username,
-      password: user.password,
-      clientPin: 0,
-      long: "",
-      latt: "",
-      machineCookie: "",
-      ipLocation: "",
-    });
+    // ❌ COMMENT THIS OUT
+    // const response = await AuthAPI.post("/Auth", user);
 
-    const response = apiResponse.data;
+    // ✅ FAKE RESPONSE
+    const response = {
+      data: {
+        user: {
+          username: user.username,
+          token: "fake-token",
+        },
+      },
+    };
 
-    console.log("LOGIN RESPONSE:", response);
+    sessionStorage.setItem(
+      "authUser",
+      JSON.stringify(response.data.user)
+    );
 
-    if (response?.token) {
+    dispatch(loginSuccess(response.data.user));
 
-      sessionStorage.setItem("authUser", JSON.stringify(response));
-
-      setAuthorization(response.token);
-
-      dispatch(loginSuccess(response));
-
-      history("/dashboard");
-
-    } else {
-      dispatch(apiError({ data: "Invalid credentials" }));
-    }
+    navigate("/dashboard");
 
   } catch (error) {
-
-    console.log("LOGIN ERROR:", error);
-
-    dispatch(
-      apiError({
-        data:
-          error?.response?.data?.message ||
-          error?.message ||
-          "Login failed",
-      })
-    );
+    dispatch(apiError(error));
   }
 };
 

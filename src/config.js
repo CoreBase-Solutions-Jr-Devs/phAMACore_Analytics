@@ -10,6 +10,6 @@ module.exports = {
   api: {
     API_URL: "https://api-node.themesbrand.website",
     AUTH_API_URL: "https://www.phamacoretraining.co.ke:81",
-    POWERBI_API_URL: "https://www.phamacoredev.co.ke:81/"
+    POWERBI_API_URL: "https://www.phamacoredev.co.ke:81"
   }
 };

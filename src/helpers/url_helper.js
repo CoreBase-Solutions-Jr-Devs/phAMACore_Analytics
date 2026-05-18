@@ -16,13 +16,13 @@ export const loginUserAPI = (data) => {
 
 // Power BI APIs
 export const GET_POWERBI_SALES =
-  "/api/powerbi/PowerBISalesTransactions";
+  "/api/PowerBi/PowerBISalesTransactions";
 
 export const GET_POWERBI_STOCK =
-  "/api/powerbi/PowerBIDailyClosingStock";
+  "/api/PowerBi/PowerBIDailyClosingStock";
 
 export const GET_POWERBI_MOVEMENTS =
-  "/api/powerbi/PowerBIStockMovements";
+  "/api/PowerBi/PowerBIStockMovements";
 
 //PROFILE
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";

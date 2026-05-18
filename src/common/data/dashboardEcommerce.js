@@ -273,7 +273,7 @@ const salesmanRevenue = [
 const topCustomers = [
   {
     id: 1,
-    customerName: "PharmaCare Ltd",
+    name: "J. Mwangi",
     branch: "Nairobi",
     revenue: "342K",
     rate: "94%",
@@ -281,7 +281,7 @@ const topCustomers = [
   },
   {
     id: 2,
-    customerName: "MediHealth Supplies",
+    name: "A. Wanjiku",
     branch: "Kisumu",
     revenue: "298K",
     rate: "88%",
@@ -289,7 +289,7 @@ const topCustomers = [
   },
   {
     id: 3,
-    customerName: "City Pharmacy Group",
+    name: "P. Ochieng",
     branch: "Nakuru",
     revenue: "271K",
     rate: "81%",
@@ -297,7 +297,7 @@ const topCustomers = [
   },
   {
     id: 4,
-    customerName: "Goodlife Chemists",
+    name: "G. Kariuki",
     branch: "Thika",
     revenue: "244K",
     rate: "76%",
@@ -305,7 +305,7 @@ const topCustomers = [
   },
   {
     id: 5,
-    customerName: "HealthPlus Distributors",
+    name: "S. Hassan",
     branch: "Mombasa",
     revenue: "189K",
     rate: "62%",
@@ -313,42 +313,10 @@ const topCustomers = [
   },
   {
     id: 6,
-    customerName: "Eldoret Medical Store",
+    name: "M. Wanjiku",
     branch: "Eldoret",
     revenue: "134K",
     rate: "48%",
-    rateClass: "danger",
-  },
-  {
-    id: 7,
-    customerName: "Kiambu Pharma Ltd",
-    branch: "Kiambu",
-    revenue: "176K",
-    rate: "55%",
-    rateClass: "warning",
-  },
-  {
-    id: 8,
-    customerName: "Meru Care Pharmacy",
-    branch: "Meru",
-    revenue: "162K",
-    rate: "52%",
-    rateClass: "danger",
-  },
-  {
-    id: 9,
-    customerName: "Machakos Health Ltd",
-    branch: "Machakos",
-    revenue: "150K",
-    rate: "50%",
-    rateClass: "danger",
-  },
-  {
-    id: 10,
-    customerName: "Nyeri Wellness Center",
-    branch: "Nyeri",
-    revenue: "145K",
-    rate: "49%",
     rateClass: "danger",
   },
 ];
