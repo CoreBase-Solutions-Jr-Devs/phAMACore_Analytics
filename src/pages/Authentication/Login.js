@@ -78,17 +78,24 @@ initialValues: {
       password: Yup.string().required("Please Enter Your Password"),
     }),
 
-    onSubmit: async (values) => {
-      dispatch(
-        loginUser(
-          {
-            username: values.username,
-            password: values.password,
-          },
-          navigate,
-        ),
-      );
-    },
+onSubmit: async (values) => {
+  const fakeUser = {
+    username: values.username,
+    email: "admin@themesbrand.com",
+    token: "fake-jwt-token",
+  };
+
+  // store user like real login
+  sessionStorage.setItem("authUser", JSON.stringify(fakeUser));
+
+  // dispatch fake success into redux (if you want state updated)
+  dispatch({
+    type: "login/success",
+    payload: fakeUser,
+  });
+
+  navigate("/dashboard");
+},
   });
 
   const signIn = (type) => {
