@@ -69,6 +69,8 @@ import JobReducer from "./jobs/reducer";
 // API Key
 import APIKeyReducer from "./apiKey/reducer";
 
+import PowerBIReducer from "./dashboardSales/reducer";
+
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
     Login: LoginReducer,
@@ -95,7 +97,8 @@ const rootReducer = combineReducers({
     FileManager: FileManagerReducer,
     Todos: TodosReducer,
     Jobs: JobReducer,
-    APIKey: APIKeyReducer
+    APIKey: APIKeyReducer,
+       powerbi: PowerBIReducer,
 });
 
 export default rootReducer;

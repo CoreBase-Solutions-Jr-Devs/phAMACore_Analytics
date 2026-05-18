@@ -14,20 +14,24 @@ const powerBISlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      
+      // LOADING
       .addCase(getSalesTransactions.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
 
+      // SUCCESS
       .addCase(getSalesTransactions.fulfilled, (state, action) => {
         state.loading = false;
+
+        // CLEAN DATA ASSIGNMENT
         state.sales = action.payload;
       })
 
+      // ERROR
       .addCase(getSalesTransactions.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message; // CRM style fallback
+        state.error = action.payload || action.error.message;
       });
   },
 });

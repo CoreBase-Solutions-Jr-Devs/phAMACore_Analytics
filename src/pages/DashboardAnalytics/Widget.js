@@ -5,7 +5,17 @@ import CountUp from "react-countup";
 //Import Icons
 import FeatherIcon from "feather-icons-react";
 
-const Widget = () => {
+const Widget =  ({ sales = [] }) => {
+    
+    const totalRevenue = sales.reduce(
+    (sum, item) => sum + (item.revenue || 0),
+    0
+);
+
+const cashSales = sales
+    .filter(item => item.transaction_Type === "CASHSALE")
+    .reduce((sum, item) => sum + (item.revenue || 0), 0);
+
     return (
        <React.Fragment>
   <div className="mb-3">
@@ -15,9 +25,7 @@ const Widget = () => {
     </div>
     <Row>
         <Col xl={3} md={6}>
-            <Card className="card-animate">
-
-      
+            <Card className="card-animate">     
                 <CardBody>
                     <div className="d-flex justify-content-between">
                         <div>
@@ -26,7 +34,7 @@ const Widget = () => {
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={4.2}
+                                        end={Number(totalRevenue || 0)}
                                         decimals={1}
                                         duration={3}
                                     />
@@ -57,7 +65,7 @@ const Widget = () => {
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={2.6}
+                                        end={Number(cashSales || 0)}
                                         decimals={1}
                                         duration={3}
                                     />
@@ -171,7 +179,7 @@ const Widget = () => {
                 <CardBody>
                     <div className="d-flex justify-content-between">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Active Customers</p>
+                            <p className="fw-medium text-muted mb-0">Cancelled Invoices</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-primary">
                                 <span className="counter-value">
                                     <CountUp
@@ -181,7 +189,7 @@ const Widget = () => {
                                     />
                                 </span>
                             </h2>
-                            <p className="mb-0 text-muted">Served today</p>
+                            <p className="mb-0 text-muted">Invoices reversed</p>
                         </div>
 
                         <div className="avatar-sm flex-shrink-0">
@@ -199,7 +207,7 @@ const Widget = () => {
                 <CardBody>
                     <div className="d-flex justify-content-between">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Orders Placed</p>
+                            <p className="fw-medium text-muted mb-0">Orders Received</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
                                     <CountUp

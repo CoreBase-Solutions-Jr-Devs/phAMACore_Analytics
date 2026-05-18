@@ -273,9 +273,22 @@ xaxis: {
 const ProgressiveSalesChart = ({ dataColors, series, period = "all" }) => {
 
     const periodLabels = {
-        month: ["Week 1", "Week 2", "Week 3", "Week 4"],
-        halfyear: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-        all: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        "6m": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+
+        all: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ]
     };
 
     const cleanPeriod = (period || "all").toLowerCase().trim();
@@ -285,15 +298,18 @@ const ProgressiveSalesChart = ({ dataColors, series, period = "all" }) => {
     var options = {
         chart: {
             height: 350,
-            type: 'line',
+            type: "line",
             zoom: { enabled: false },
             toolbar: { show: false }
         },
+
         dataLabels: { enabled: false },
+
         stroke: {
-            curve: 'smooth',
+            curve: "smooth",
             width: 3
         },
+
         colors: MarketplaceChartColors,
 
         yaxis: {
@@ -316,6 +332,99 @@ const ProgressiveSalesChart = ({ dataColors, series, period = "all" }) => {
             height="350"
             className="apex-charts"
         />
+    );
+};
+
+const MonthToDateSalesChart = ({
+    dataColors,
+    series,
+    dailyData = {},
+    period = "weeks",
+    selectedWeek = null,
+    onWeekSelect = () => {},
+    onBack = () => {}
+}) => {
+
+    const periodLabels = {
+        weeks: ["Week 1", "Week 2", "Week 3", "Week 4"],
+        days: {
+            "Week 1": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            "Week 2": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            "Week 3": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            "Week 4": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        }
+    };
+
+    const cleanPeriod = (period || "weeks").toLowerCase().trim();
+
+    const MarketplaceChartColors = getChartColorsArray(dataColors);
+
+    // 👉 same pattern as ProgressiveSalesChart
+    const labels =
+        cleanPeriod === "weeks"
+            ? periodLabels.weeks
+            : periodLabels.days[selectedWeek] || [];
+
+    const chartSeries =
+        cleanPeriod === "weeks"
+            ? series
+            : [
+                {
+                    name: "Sales",
+                    data: dailyData[selectedWeek] || []
+                }
+            ];
+
+    const options = {
+      chart: {
+    height: 350,
+    type: "line",
+    zoom: { enabled: false },
+    toolbar: { show: false },
+    parentHeightOffset: 0
+},
+
+        dataLabels: { enabled: false },
+
+        stroke: {
+            curve: "smooth",
+            width: 3
+        },
+
+        colors: MarketplaceChartColors,
+
+        yaxis: {
+            labels: {
+                formatter: (val) => `${val}K`
+            }
+        },
+
+xaxis: {
+    categories: labels
+}
+    };
+
+    return (
+        <div>
+
+            {cleanPeriod === "days" && (
+                <button
+                    className="btn btn-sm btn-soft-secondary mb-2"
+                    onClick={onBack}
+                >
+                    ← Back to Weeks
+                </button>
+            )}
+
+            <ReactApexChart
+                dir="ltr"
+                options={options}
+                series={chartSeries}
+                type="line"
+                height={350}
+                className="apex-charts"
+            />
+        </div>
     );
 };
 
@@ -463,4 +572,4 @@ const UsersByDeviceCharts = ({ dataColors, series }) => {
 };
 
 
-export { AudiencesCharts, AudiencesSessionsCharts, ProgressiveSalesChart, CountriesCharts, UsersByDeviceCharts, TopProductsCharts };
+export { AudiencesCharts, AudiencesSessionsCharts, ProgressiveSalesChart, MonthToDateSalesChart, CountriesCharts, UsersByDeviceCharts, TopProductsCharts };
