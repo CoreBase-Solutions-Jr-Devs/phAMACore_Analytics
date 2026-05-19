@@ -180,31 +180,28 @@ const AudiencesSessionsCharts = ({ dataColors, series }) => {
     );
 };
 
-const TopProductsCharts = ({ dataColors, series }) => {
-    let barchartCountriesColors = [];
-    try {
-        barchartCountriesColors = dataColors ? getChartColorsArray(dataColors) : [];
-    } catch (error) {
-        console.warn('Chart colors parsing failed:', error);
-        barchartCountriesColors = ['#f06548'];
-    }
+// ============================
+// TopProductsCharts
+// ============================
 
-    // Ensure series data is mutable
-    const validSeries = React.useMemo(() => {
-        if (!series || !Array.isArray(series)) return [{ data: [] }];
-        return series.map((s) => ({ ...s }));
-    }, [series]);
+const TopProductsCharts = ({
+  dataColors,
+  series,
+  categories = []
+}) => {
 
-    var options = {
-        chart: {
-            type: 'bar',
-            height: 300,
-            toolbar: {
-                show: false,
-            }
-        },
-        plotOptions: {
-            bar: {
+  const colors = getChartColorsArray(dataColors);
+
+  const options = {
+  chart: {
+    type: "bar",
+    height: 350,
+    toolbar: { show: false },
+    // offsetX: 0,
+  },
+
+  plotOptions: {
+  bar: {
                 borderRadius: 4,
                 horizontal: true,
                 distributed: true,
@@ -212,41 +209,46 @@ const TopProductsCharts = ({ dataColors, series }) => {
                     position: 'top',
                 },
             }
-        },
-        colors: barchartCountriesColors,
- dataLabels: {
-    enabled: true,
-    offsetX: 32,
-    formatter: (val) => `${(val * 1000).toFixed(0)}`,
-    style: {
-        fontSize: '12px',
-        fontWeight: 400,
-        colors: ['#adb5bd']
-    }
-},
+  },
 
-tooltip: {
-    y: {
-        formatter: (val) => `${(val * 1000).toFixed(0)}`
-    }
-},
-        legend: {
-            show: false,
-        },
-        grid: {
-            show: false,
-        },
-xaxis: {
-    categories: [
-           'Amoxicillin 500mg',
-        'Paracetamol 500mg',
-        'Metformin 500mg',
-        'Omeprazole 20mg',
-        'Ciprofloxacin 500mg',
-        'Co-Arten 20/120',
-        'Ibuprofen 400mg'
-    ],
+//   grid: {
+//     padding: {
+//       left: 0,
+//       right: 0,
+//       top: 0,
+//       bottom: 0,
+//     },
+//   },
+
+//   stroke: {
+//     show: false,
+//   },
+
+  colors,
+
+  dataLabels: {
+    enabled: true,
+       offsetX: 32,
+    formatter: (val) => (isNaN(val) ? "0" : Number(val).toFixed(0)),
+  },
+
+  xaxis: {
+    categories,
+  },
+
+  yaxis: {
     labels: {
+      formatter: (val) => val,
+      style: {
+        fontSize: "12px",
+      },
+    },
+  },
+
+  legend: {
+    show: false,
+  },
+  labels: {
         show: false
     },
     axisTicks: {
@@ -254,178 +256,126 @@ xaxis: {
     },
     axisBorder: {
         show: false
-    }
-},
-    };
-    return (
-        <React.Fragment>
-            <ReactApexChart dir="ltr"
-                options={options}
-                series={validSeries}
-                type="bar"
-                height={350}
-                className="apex-charts"
-            />
-        </React.Fragment>
-    );
+    },
+       grid: {
+            show: false,
+        },
 };
 
-const ProgressiveSalesChart = ({ dataColors, series, period = "all" }) => {
-
-    const periodLabels = {
-        "6m": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-
-        all: [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
-        ]
-    };
-
-    const cleanPeriod = (period || "all").toLowerCase().trim();
-
-    var MarketplaceChartColors = getChartColorsArray(dataColors);
-
-    var options = {
-        chart: {
-            height: 350,
-            type: "line",
-            zoom: { enabled: false },
-            toolbar: { show: false }
-        },
-
-        dataLabels: { enabled: false },
-
-        stroke: {
-            curve: "smooth",
-            width: 3
-        },
-
-        colors: MarketplaceChartColors,
-
-        yaxis: {
-            labels: {
-                formatter: (val) => `${val}K`
-            }
-        },
-
-        xaxis: {
-            categories: periodLabels[cleanPeriod] || periodLabels.all
-        }
-    };
-
-    return (
-        <ReactApexChart
-            dir="ltr"
-            options={options}
-            series={series}
-            type="line"
-            height="350"
-            className="apex-charts"
-        />
-    );
+  return (
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="bar"
+      height={350}
+    />
+  );
 };
+
+const ProgressiveSalesChart = ({ dataColors, series, categories = [] }) => {
+    
+  const colors = getChartColorsArray(dataColors);
+
+  const options = {
+    chart: {
+      height: 350,
+      type: "line",
+      toolbar: { show: false },
+      zoom: { enabled: false },
+    },
+
+    stroke: {
+      curve: "smooth",
+      width: 3,
+    },
+
+    dataLabels: {
+      enabled: false,
+    },
+
+    colors,
+
+    xaxis: {
+      categories,
+    },
+
+yaxis: {
+  min: 0,
+  forceNiceScale: true,
+  tickAmount: 5,
+  labels: {
+    formatter: (val) => `${val.toFixed(0)}K`
+  }
+}
+
+    // grid: {
+    //   yaxis: {
+    //     lines: {
+    //       show: true,
+    //     },
+    //   },
+    // },
+  };
+
+  return (
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="line"
+      height={350}
+    />
+  );
+};
+
 
 const MonthToDateSalesChart = ({
-    dataColors,
-    series,
-    dailyData = {},
-    period = "weeks",
-    selectedWeek = null,
-    onWeekSelect = () => {},
-    onBack = () => {}
+  dataColors,
+  series,
+  categories = [],
 }) => {
+  const colors = getChartColorsArray(dataColors);
 
-    const periodLabels = {
-        weeks: ["Week 1", "Week 2", "Week 3", "Week 4"],
-        days: {
-            "Week 1": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            "Week 2": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            "Week 3": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            "Week 4": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        }
-    };
+  const options = {
+    chart: {
+      height: 350,
+      type: "line",
+      zoom: { enabled: false },
+      toolbar: { show: false },
+    },
 
-    const cleanPeriod = (period || "weeks").toLowerCase().trim();
+    dataLabels: {
+      enabled: false,
+    },
 
-    const MarketplaceChartColors = getChartColorsArray(dataColors);
+    stroke: {
+      curve: "smooth",
+      width: 3,
+    },
 
-    // 👉 same pattern as ProgressiveSalesChart
-    const labels =
-        cleanPeriod === "weeks"
-            ? periodLabels.weeks
-            : periodLabels.days[selectedWeek] || [];
+    colors,
 
-    const chartSeries =
-        cleanPeriod === "weeks"
-            ? series
-            : [
-                {
-                    name: "Sales",
-                    data: dailyData[selectedWeek] || []
-                }
-            ];
+    xaxis: {
+      categories,
+    },
 
-    const options = {
-      chart: {
-    height: 350,
-    type: "line",
-    zoom: { enabled: false },
-    toolbar: { show: false },
-    parentHeightOffset: 0
-},
-
-        dataLabels: { enabled: false },
-
-        stroke: {
-            curve: "smooth",
-            width: 3
-        },
-
-        colors: MarketplaceChartColors,
-
-        yaxis: {
-            labels: {
-                formatter: (val) => `${val}K`
-            }
-        },
-
-xaxis: {
-    categories: labels
+  yaxis: {
+  min: 0,
+  forceNiceScale: true,
+  tickAmount: 5,
+  labels: {
+    formatter: (val) => `${val.toFixed(0)}K`
+  }
 }
-    };
+  };
 
-    return (
-        <div>
-
-            {cleanPeriod === "days" && (
-                <button
-                    className="btn btn-sm btn-soft-secondary mb-2"
-                    onClick={onBack}
-                >
-                    ← Back to Weeks
-                </button>
-            )}
-
-            <ReactApexChart
-                dir="ltr"
-                options={options}
-                series={chartSeries}
-                type="line"
-                height={350}
-                className="apex-charts"
-            />
-        </div>
-    );
+  return (
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="line"
+      height={350}
+    />
+  );
 };
 
 const CountriesCharts = ({ dataColors, series }) => {
