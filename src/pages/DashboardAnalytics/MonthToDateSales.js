@@ -10,7 +10,7 @@ import {MonthToDateSalesChart} from "./DashboardAnalyticsCharts";
 import { Link } from 'react-router-dom';
 import { createSelector } from 'reselect';
 
-const MonthToDateSales = () => {
+const MonthToDateSales = ({ series, categories }) => {
     const dispatch = useDispatch();
 const [periodType, setPeriodType] = useState("weeks");
 const [selectedWeek, setSelectedWeek] = useState(null);
@@ -77,7 +77,7 @@ const handleBack = () => {
                                 <Col xxl={12}>
                                     <div className="">
                                         <CardHeader className="border-0 align-items-center d-flex">
-                                            <h4 className="card-title mb-0 flex-grow-1"> Sales Performance Trend (MTD vs YTD)</h4>
+                                            <h4 className="card-title mb-0 flex-grow-1"> Month To Date Sales Performance Trend (MTD)</h4>
                                             <div className='d-flex gap-1'>
                                                 {/* <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => {  setPeriodType("all");
     onChangeChartPeriod("all"); }}>
@@ -125,14 +125,10 @@ const handleBack = () => {
                                             </Col>
                                         </Row> */}
 <MonthToDateSalesChart
-    series={chartData}
-    period={periodType}
-    selectedWeek={selectedWeek}
-    dailyData={marketplaceData?.dailyData || {}}
-    dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
-    onWeekSelect={handleWeekSelect}
-    onBack={handleBack}
-/>                                    </div>
+  series={series}
+  categories={categories}
+  dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
+/>                                  </div>
                                 </Col>
 
                                 {/* <Col xxl={4}>
