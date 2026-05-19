@@ -2,68 +2,83 @@ import React from 'react';
 import { Card, CardBody, CardHeader } from 'reactstrap';
 import { topCustomers } from '../../common/data/dashboardEcommerce';
 
-const TopCustomers = () => {
+const TopCustomers = ({ data = [], formatAmount }) => {
+    const sorted = [...data].sort((a, b) => b.revenue - a.revenue);
+    const shortenName = (name, max = 10) => {
+  if (!name) return "";
+  return name.length > max ? name.slice(0, max) + "..." : name;
+};
     return (
         <React.Fragment>
 
-            <Card className="border-0 shadow-sm">
-                <CardHeader className="align-items-center d-flex bg-white border-0">
-                    <h4 className="card-title mb-0 flex-grow-1 text-dark">
-                        Top Customers — revenue (KES)
-                    </h4>
+          <Card className="border-0 shadow-sm">
 
-                    {/* <div className="flex-shrink-0">
-                        <button
-                            type="button"
-                            className="btn btn-soft-primary btn-sm"
-                        >
-                            <i className="ri-bar-chart-line align-middle me-1"></i>
-                            View Report
-                        </button>
-                    </div> */}
-                </CardHeader>
+  <CardHeader className="align-items-center d-flex border-0">
+    <h4 className="card-title mb-0 flex-grow-1">
+      Top Customers — revenue (KES)
+    </h4>
+  </CardHeader>
 
-                <CardBody className="bg-white">
-                    <div className="table-responsive table-card">
-                        <table className="table align-middle table-nowrap mb-0">
-                            <thead className="table-light">
-                                <tr className="text-muted">
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Branch</th>
-                                    <th scope="col">Revenue</th>
-                                    <th scope="col" className="text-end">Rate</th>
-                                </tr>
-                            </thead>
+  <CardBody>
 
-                            <tbody>
-                                {(topCustomers || []).map((item, key) => (
-                                    <tr key={key}>
-                                        <td className="fw-semibold text-dark">
-                                            {item.name}
-                                        </td>
+    {data.length === 0 ? (
+      <div className="text-center py-5">
+        <p className="text-muted mb-2">
+          No customer revenue data available
+        </p>
+      </div>
+    ) : (
 
-                                        <td className="text-muted">
-                                            {item.branch}
-                                        </td>
+      <div className="table-responsive table-card">
 
-                                        <td className="fw-medium text-dark">
-                                            {item.revenue}
-                                        </td>
+        <table className="table align-middle table-nowrap mb-0">
 
-                                        <td className="text-end">
-                                            <span
-                                                className={`badge rounded-pill bg-${item.rateClass}-subtle text-${item.rateClass} px-3 py-2`}
-                                            >
-                                                {item.rate}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </CardBody>
-            </Card>
+          <thead>
+            <tr className="text-muted">
+              <th>Name</th>
+              <th>Branch</th>
+              <th>Revenue</th>
+              <th className="text-end">Rate</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {sorted.map((item, i) => (
+              <tr key={i}>
+
+                <td className="fw-semibold">
+                  {shortenName(item.name, 10)}
+                </td>
+
+                <td className="text-muted">
+                  {item.branch}
+                </td>
+
+                <td className="fw-medium">
+                  {formatAmount(item.revenue)}
+                </td>
+
+                <td className="text-end">
+                  <span
+                    className={`badge rounded-pill bg-${item.rateClass}-subtle text-${item.rateClass} px-3 py-2`}
+                  >
+                    {item.rate}
+                  </span>
+                </td>
+
+              </tr>
+            ))}
+          </tbody>
+
+        </table>
+
+      </div>
+
+    )}
+
+  </CardBody>
+
+</Card>
 
         </React.Fragment>
     );
