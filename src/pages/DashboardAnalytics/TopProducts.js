@@ -1,108 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Col } from 'reactstrap';
-import classNames from "classnames";
-import { useSelector, useDispatch } from "react-redux";
-import { TopProductsCharts } from './DashboardAnalyticsCharts';
-import { getAllData } from "../../slices/thunks";
-import { createSelector } from 'reselect';
+import React from "react";
+import { Card, CardBody, CardHeader } from "reactstrap";
 
-const TopProducts = () => {
-    const dispatch = useDispatch();
+const TopProducts = ({ data = [] }) => {
+  return (
+    <Card className="card-height-100">
+      <CardHeader className="align-items-center d-flex">
+        <h4 className="card-title mb-0 flex-grow-1">
+          Top Products - Units Sold
+        </h4>
+      </CardHeader>
 
-    const [periodType, setPeriodType] = useState("halfyearly");
+      <CardBody>
+        {data.length === 0 ? (
+    <div className="text-center py-5">
+              <h6 className="text-muted mb-2">
+                No product sales data available
+              </h6>
+            
+            </div>
+              
+                        ) : (
+          data.map((product, index) => {
+            const max = data[0]?.qty || 1;
+            const percentage = (product.qty / max) * 100;
+ const barColor =
+      percentage >= 80
+        ? "bg-primary"
+        : percentage >= 60
+        ? "bg-success"
+        : percentage >= 40
+        ? "bg-warning"
+        : "bg-danger";
+            return (
+              <div key={index} className="mb-3">
 
-    const liveuserData = createSelector(
-        (state) => state.DashboardAnalytics,
-        (chartData) => chartData.chartData
-    );
+                <div className="d-flex justify-content-between">
+                  <strong>{product.name}</strong>
+                  <span>{product.qty}</span>
+                </div>
 
-    const chartData = useSelector(liveuserData);
+                <div className="progress mt-2" style={{ height: "20px" }}>
+                  <div
+                    className={`progress-bar ${barColor}`}
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
 
-    const onChangeChartPeriod = (pType) => {
-        setPeriodType(pType);
-        dispatch(getAllData(pType));
-    };
-
-    useEffect(() => {
-        dispatch(getAllData("halfyearly"));
-    }, [dispatch]);
-
-    return (
-        <React.Fragment>
-      
-                <Card className="card-height-100">
-
-                    <div className="card-header align-items-center d-flex">
-                        <h4 className="card-title mb-0 flex-grow-1">
-                           Top products-units sold today
-                        </h4>
-
-                        <div className="d-flex gap-1">
-                            <button
-                                type="button"
-                                className={classNames(
-                                    { active: periodType === "all" },
-                                    "btn btn-soft-secondary btn-sm"
-                                )}
-                                onClick={() => onChangeChartPeriod("all")}
-                            >
-                                ALL
-                            </button>
-
-                            <button
-                                type="button"
-                                className={classNames(
-                                    { active: periodType === "monthly" },
-                                    "btn btn-soft-primary btn-sm"
-                                )}
-                                onClick={() => onChangeChartPeriod("monthly")}
-                            >
-                                1M
-                            </button>
-
-                            <button
-                                type="button"
-                                className={classNames(
-                                    { active: periodType === "halfyearly" },
-                                    "btn btn-soft-secondary btn-sm"
-                                )}
-                                onClick={() => onChangeChartPeriod("halfyearly")}
-                            >
-                                6M
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="card-body p-3">
-    
-                        <TopProductsCharts
-                            series={chartData}
-                            dataColors='[
-                                "--vz-info",
-                                "--vz-info",
-                                "--vz-warning",
-                                "--vz-danger",
-                                "--vz-danger"
-                            ]'
-                        />
-                        {/* <hr className="my-2" />
-                        <div>
-
-  <p className="mb-2 text-muted ">
-    Cosmos + Biodeal = <strong>66%</strong> of spend concentration within safe range (&lt;70%).
-  </p>
-
-  <p className="mb-0 text-danger fw-semibold">
-    Universal + PharmaChem = <strong>KES 1.6M</strong> with C/D rated suppliers.
-  </p>
-
-</div> */}
-                    </div>
-
-                </Card>
-       
-        </React.Fragment>
-    );
+              </div>
+            );
+          })
+        )}
+      </CardBody>
+    </Card>
+  );
 };
 
 export default TopProducts;
