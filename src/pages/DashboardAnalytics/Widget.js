@@ -5,30 +5,30 @@ import CountUp from "react-countup";
 //Import Icons
 import FeatherIcon from "feather-icons-react";
 
-const Widget =  ({ sales = [] }) => {
-    
-    const totalRevenue = sales.reduce(
-    (sum, item) => sum + (item.revenue || 0),
-    0
-);
-
-const cashSales = sales
-    .filter(item => item.transaction_Type === "CASHSALE")
-    .reduce((sum, item) => sum + (item.revenue || 0), 0);
-
+const Widget = ({
+  totalRevenue = 0,
+  cashSales = 0,
+  creditSales = 0,
+  ordersReceived = 0,
+  formatAmount,
+  cashPercentage = 0,
+  creditPercentage = 0,
+  
+}) => {    
+  
     return (
        <React.Fragment>
-  <div className="mb-3">
+  <div className="mb-2">
         <h4 className="card-title mb-0 text-start ">
             KEY METRICS - TODAY
         </h4>
     </div>
-    <Row>
-        <Col xl={3} md={6}>
-            <Card className="card-animate">     
-                <CardBody>
-                    <div className="d-flex justify-content-between">
-                        <div>
+<Row className="g-2 mb-2">
+    <Col xl={3} lg={4} md={6} sm={6} xs={12}>
+            <Card className="card-animate h-100">     
+<CardBody className="p-2">
+<div className="d-flex justify-content-between align-items-center">
+                            <div>
                             <p className="fw-medium text-muted mb-0">Total Revenue</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
@@ -37,11 +37,13 @@ const cashSales = sales
                                         end={Number(totalRevenue || 0)}
                                         decimals={1}
                                         duration={3}
+                                        duration={3}
+  formattingFn={(value) => formatAmount(value)}
                                     />
-                                </span>M
+                                </span>
                             </h2>
                             <p className="mb-0 text-success">
-                                <i className="ri-arrow-up-line align-middle"></i> 11% vs yesterday
+                                <i className="ri-arrow-up-line align-middle"></i> 0% vs yesterday
                             </p>
                         </div>
 
@@ -55,11 +57,11 @@ const cashSales = sales
             </Card>
         </Col>
 
-        <Col xl={3} md={6}>
-            <Card className="card-animate">
-                <CardBody>
-                    <div className="d-flex justify-content-between">
-                        <div>
+<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+<div className="d-flex justify-content-between align-items-center">
+                            <div>
                             <p className="fw-medium text-muted mb-0">Cash Sales</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
@@ -68,10 +70,11 @@ const cashSales = sales
                                         end={Number(cashSales || 0)}
                                         decimals={1}
                                         duration={3}
+                                        formattingFn={(value) => formatAmount(value)}
                                     />
-                                </span>M
+                                </span>
                             </h2>
-                            <p className="mb-0 text-muted">62% of total</p>
+                            <p className="mb-0 text-muted">{cashPercentage.toFixed(1)}% of total</p>
                         </div>
 
                         <div className="avatar-sm flex-shrink-0">
@@ -84,23 +87,24 @@ const cashSales = sales
             </Card>
         </Col>
 
-        <Col xl={3} md={6}>
-            <Card className="card-animate">
-                <CardBody>
-                    <div className="d-flex justify-content-between">
+<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+                    <div className="d-flex justify-content-between align-items-center">
                         <div>
                             <p className="fw-medium text-muted mb-0">Credit Sales</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-info">
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={1.6}
+                                        end={Number(creditSales || 0)}
                                         decimals={1}
                                         duration={3}
+                                        formattingFn={(value) => formatAmount(value)}
                                     />
-                                </span>M
+                                </span>
                             </h2>
-                            <p className="mb-0 text-muted">38% of total</p>
+                            <p className="mb-0 text-muted">  {creditPercentage.toFixed(1)}% of total</p>
                         </div>
 
                         <div className="avatar-sm flex-shrink-0">
@@ -113,23 +117,23 @@ const cashSales = sales
             </Card>
         </Col>
 
-        <Col xl={3} md={6}>
-            <Card className="card-animate">
-                <CardBody>
-                    <div className="d-flex justify-content-between">
+<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+                    <div className="d-flex justify-content-between align-items-center">
                         <div>
                             <p className="fw-medium text-muted mb-0">Collections</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-warning">
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={1.1}
+                                        end={0.0}
                                         decimals={1}
                                         duration={3}
                                     />
                                 </span>M
                             </h2>
-                            <p className="mb-0 text-warning">68% collection rate</p>
+                            <p className="mb-0 text-warning">0% collection rate</p>
                         </div>
 
                         <div className="avatar-sm flex-shrink-0">
@@ -144,18 +148,18 @@ const cashSales = sales
     </Row>
 
     {/* Bottom Row */}
-    <Row>
-        <Col xl={3} md={6}>
-            <Card className="card-animate">
-                <CardBody>
-                    <div className="d-flex justify-content-between">
+<Row className="g-2 mb-2">
+    <Col xl={3} lg={4} md={6} sm={6} xs={12}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+<div className="d-flex justify-content-between align-items-center">
                         <div>
                             <p className="fw-medium text-muted mb-0">Outstanding</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-danger">
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={8.4}
+                                        end={0.0}
                                         decimals={1}
                                         duration={3}
                                     />
@@ -174,17 +178,17 @@ const cashSales = sales
             </Card>
         </Col>
 
-        <Col xl={3} md={6}>
-            <Card className="card-animate">
-                <CardBody>
-                    <div className="d-flex justify-content-between">
+<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+<div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Cancelled Invoices</p>
+                            <p className="fw-medium text-muted mb-0">Cancelled </p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-primary">
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={214}
+                                        end={0}
                                         duration={3}
                                     />
                                 </span>
@@ -202,23 +206,23 @@ const cashSales = sales
             </Card>
         </Col>
 
-        <Col xl={3} md={6}>
-            <Card className="card-animate">
-                <CardBody>
-                    <div className="d-flex justify-content-between">
+<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+                    <div className="d-flex justify-content-between align-items-center">
                         <div>
                             <p className="fw-medium text-muted mb-0">Orders Received</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={318}
+                                        end={Number(ordersReceived || 0)}
                                         duration={3}
                                     />
                                 </span>
                             </h2>
                             <p className="mb-0 text-success">
-                                <i className="ri-arrow-up-line align-middle"></i> +24 vs avg
+                                <i className="ri-arrow-up-line align-middle"></i> +0 vs avg
                             </p>
                         </div>
 
@@ -232,22 +236,22 @@ const cashSales = sales
             </Card>
         </Col>
 
-        <Col xl={3} md={6}>
-            <Card className="card-animate">
-                <CardBody>
-                    <div className="d-flex justify-content-between">
+<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+<div className="d-flex justify-content-between align-items-center">
                         <div>
                             <p className="fw-medium text-muted mb-0">Overdue Accounts</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-danger">
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={37}
+                                        end={0}
                                         duration={3}
                                     />
                                 </span>
                             </h2>
-                            <p className="mb-0 text-muted">90+ days</p>
+                            <p className="mb-0 text-muted">0+ days</p>
                         </div>
 
                         <div className="avatar-sm flex-shrink-0">
