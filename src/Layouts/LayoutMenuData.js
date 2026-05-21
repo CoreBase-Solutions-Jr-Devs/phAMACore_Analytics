@@ -178,12 +178,12 @@ const Navdata = () => {
         //   link: "/dashboard-crypto",
         //   parentId: "dashboard",
         // },
-        {
-          id: "projects",
-          label: "Branch ",
-          link: "/dashboard-projects",
-          parentId: "dashboard",
-        },
+        // {
+        //   id: "projects",
+        //   label: "Branch ",
+        //   link: "/dashboard-projects",
+        //   parentId: "dashboard",
+        // },
         // {
         //   id: "nft",
         //   label: "NFT",
@@ -1258,7 +1258,7 @@ const Navdata = () => {
     //     },
     //     {
     //       id: "formlayouts",
-    //       label: "Form Layouts",
+    //       label: "Form ts",
     //       link: "/forms-layouts",
     //       parentId: "forms",
     //     },

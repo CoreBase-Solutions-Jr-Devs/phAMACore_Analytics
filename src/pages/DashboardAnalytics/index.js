@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Col, Container, Row } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
-
-// Components
+import {
+formatToApiDate,
+} from "../../pages/utils/dateHelper";
 import Widget from "./Widget";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
+import OrderPipeline from "./Order Pipeline";
 import BranchPerformance from "./BranchPerfomance";
 import TopProducts from "./TopProducts";
 import SalesmanRevenue from "./SalesmanRevenue";
@@ -13,60 +15,19 @@ import TopCustomers from "./TopCustomers";
 import ProgressiveSales from "./ProgressiveSales";
 import MonthToDateSales from "./MonthToDateSales";
 import BranchDropdown from "./BranchDropdown";
-
-// API
 import { getSalesTransactions } from "../../slices/dashboardSales/thunk";
 
 const DashboardAnalytics = () => {
 
-  /* =========================================================
-   🔹 UTILITIES
-  ========================================================= */
-
-  const formatAmount = (value) => {
-    if (value === null || value === undefined) return "0";
-
-    const abs = Math.abs(value);
-
-    if (abs >= 1_000_000_000) return (value / 1_000_000_000).toFixed(1) + "B";
-    if (abs >= 1_000_000) return (value / 1_000_000).toFixed(1) + "M";
-    if (abs >= 1_000) return (value / 1_000).toFixed(1) + "K";
-
-    return value.toFixed(0);
-  };
-
-  const getDateOnly = (dateStr) => new Date(dateStr).toDateString();
-
-  const getMonths = () =>
-    Array.from({ length: 12 }, (_, i) =>
-      new Date(2000, i, 1).toLocaleString("default", { month: "short" })
-    );
-
-  const normalizeProductName = (name = "") =>
-    name
-      .toLowerCase()
-      .trim()
-      .replace(/\b(tabs?|tablets?)\b/g, "tab")
-      .replace(/\s+/g, " ");
-
-  document.title = "Analytics | Velzon - React Admin & Dashboard Template";
-
   const dispatch = useDispatch();
 
-  /* =========================================================
-   🔹 REDUX STATE
-  ========================================================= */
-
-  const { sales = [], loading, error, filters } = useSelector(
+ const { sales = [], filters } = useSelector(
     (state) => state.powerbi
   );
 
-  /* =========================================================
-   🔹 FILTER ACTION
-  ========================================================= */
-
-  const handleApplyFilters = () => {
-    dispatch(
+const handleApplyFilters = () => {
+    console.log("APPLY CLICKED");
+   dispatch(
       getSalesTransactions({
         clientid: 1,
         startDate: filters.startDate,
@@ -77,267 +38,319 @@ const DashboardAnalytics = () => {
     );
   };
 
-  /* =========================================================
-   🔹 CORE KPI CALCULATIONS
-  ========================================================= */
+useEffect(() => {
+  dispatch(
+    getSalesTransactions({
+      clientid: 1,
+  startDate: filters.startDate,
+        endDate: filters.endDate,
+      branchcode:
+        filters.branch === "All Branches"
+          ? null
+          : filters.branch,
+    })
+  );
+}, []);
+
+const formatAmount = (value) => {
+  if (value === null || value === undefined) return "0";
+
+  const abs = Math.abs(value);
+
+  if (abs >= 1_000_000_000) {
+    return (value / 1_000_000_000).toFixed(1) + "B";
+  }
+
+  if (abs >= 1_000_000) {
+    return (value / 1_000_000).toFixed(1) + "M";
+  }
+
+  if (abs >= 1_000) {
+    return (value / 1_000).toFixed(1) + "K";
+  }
+
+  return value % 1 === 0 ? value.toFixed(0) : value.toFixed(2);
+};
+
 
   const totalRevenue = sales.reduce(
     (sum, item) => sum + (item.revenue || 0),
     0
-  );
+);
 
-  // TODAY / YESTERDAY REVENUE
-  const today = new Date().toDateString();
+const getDateOnly = (dateStr) =>
+  new Date(dateStr).toDateString();
+const today = new Date().toDateString();
 
-  const todayRevenue = sales
-    .filter((i) => getDateOnly(i.transaction_Date) === today)
-    .reduce((s, i) => s + (i.revenue || 0), 0);
-
+const todayRevenue = sales
+  .filter(item => getDateOnly(item.transaction_Date) === today)
+  .reduce((sum, item) => sum + (item.revenue || 0), 0);
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+yesterday.setDate(yesterday.getDate() - 1);
 
-  const yesterdayRevenue = sales
-    .filter((i) => getDateOnly(i.transaction_Date) === yesterday.toDateString())
-    .reduce((s, i) => s + (i.revenue || 0), 0);
+const yesterdayRevenue = sales
+  .filter(item => getDateOnly(item.transaction_Date) === yesterday.toDateString())
+  .reduce((sum, item) => sum + (item.revenue || 0), 0);
 
   const revenueChange =
-    yesterdayRevenue > 0
-      ? ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100
-      : 0;
+  yesterdayRevenue > 0
+    ? ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100
+    : 0;
 
-  // CASH vs CREDIT
-  const cashSales = sales
-    .filter((i) => i.transaction_Type === "CASHSALE")
-    .reduce((s, i) => s + (i.revenue || 0), 0);
+    const cashSales = sales
+    .filter(item => item.client_ID === "CSC999")
+    .reduce((sum, item) => sum + (item.revenue || 0), 0);
 
-  const creditSales = totalRevenue - cashSales;
+    const creditSales = sales
+    .filter(item => item.client_ID !== "CSC999")
+    .reduce((sum, item) => sum + (item.revenue || 0), 0);
 
-  const cashPercentage =
+    const cashPercentage =
     totalRevenue > 0 ? (cashSales / totalRevenue) * 100 : 0;
 
-  const creditPercentage =
+    const creditPercentage =
     totalRevenue > 0 ? (creditSales / totalRevenue) * 100 : 0;
 
-  // ORDERS
-  const ordersReceived = new Set(
-    sales.filter((i) => i.invoice_Number).map((i) => i.invoice_Number)
-  ).size;
+    const ordersReceived = new Set(
+      sales
+    .filter(item => item.invoice_Number) 
+    .map(item => item.invoice_Number)
+      ).size;   
 
-  /* =========================================================
-   🔹 BRANCH ANALYTICS
-  ========================================================= */
-
-  const branchTotals = sales.reduce((acc, item) => {
-    const branch = item.brancch_Name || "UNKNOWN BRANCH";
-    acc[branch] = (acc[branch] || 0) + Number(item.revenue || 0);
+    const branchTotals = sales.reduce((acc, item) => {
+    const branchName = item.brancch_Name || "UNKNOWN BRANCH";
+    const revenue = Number(item.revenue || 0);
+    acc[branchName] = (acc[branchName] || 0) + revenue;
     return acc;
-  }, {});
+    }, {});
 
-  const branchData = Object.keys(branchTotals).map((b) => ({
-    name: b,
-    amount: branchTotals[b],
-  }));
+    const branchData = Object.keys(branchTotals).map((branch) => ({
+    name: branch,
+    amount: branchTotals[branch],
+    }));
+    console.log(branchTotals);
 
-  /* =========================================================
-   🔹 SALESMAN ANALYTICS
-  ========================================================= */
-
-  const salesmanTotals = sales.reduce((acc, item) => {
+    const salesmanTotals = sales.reduce((acc, item) => {
     const rep = item.staff_Name || "UNKNOWN REP";
     const branch = item.brancch_Name || "UNKNOWN BRANCH";
+    const revenue = Number(item.revenue || 0);
+
     const key = `${rep}__${branch}`;
 
     if (!acc[key]) {
-      acc[key] = { rep, branch, revenue: 0 };
+    acc[key] = { rep, branch, revenue: 0 };
     }
 
-    acc[key].revenue += Number(item.revenue || 0);
+    acc[key].revenue += revenue;
+
+    return acc;
+    }, {});
+
+const salesmanData = Object.values(salesmanTotals);
+const customerTotals = sales.reduce((acc, item) => {
+  const name = item.client_Name || "UNKNOWN CUSTOMER";
+  const branch = item.brancch_Name || "UNKNOWN BRANCH";
+  const revenue = Number(item.revenue || 0);
+
+  const key = `${name}__${branch}`;
+
+  if (!acc[key]) {
+    acc[key] = { name, branch, revenue: 0 };
+  }
+
+  acc[key].revenue += revenue;
+
+  return acc;
+}, {});
+
+const topCustomersData = Object.values(customerTotals)
+  .sort((a, b) => b.revenue - a.revenue)
+  .slice(0, 5);
+  
+const getMonths = () => {
+  return Array.from({ length: 12 }, (_, i) =>
+    new Date(2000, i, 1).toLocaleString("default", { month: "short" })
+  );
+};
+
+const monthlyChart = useMemo(() => {
+  const MONTHS = getMonths();
+
+  const map = MONTHS.reduce((acc, m) => {
+    acc[m] = 0;
     return acc;
   }, {});
 
-  const salesmanData = Object.values(salesmanTotals);
+  sales.forEach((s) => {
+    const date = new Date(s.transaction_Date);
+    const month = date.toLocaleString("default", { month: "short" });
 
-  /* =========================================================
-   🔹 CUSTOMER ANALYTICS
-  ========================================================= */
-
-  const customerTotals = sales.reduce((acc, item) => {
-    const name = item.client_Name || "UNKNOWN CUSTOMER";
-    const branch = item.brancch_Name || "UNKNOWN BRANCH";
-    const key = `${name}__${branch}`;
-
-    if (!acc[key]) {
-      acc[key] = { name, branch, revenue: 0 };
+    if (map.hasOwnProperty(month)) {
+      map[month] += Number(s.revenue || 0);
     }
+  });
 
-    acc[key].revenue += Number(item.revenue || 0);
+  const totals = MONTHS.map((m) => map[m]);
+
+  console.log("📊 Monthly Sales Totals:", map);
+
+  return {
+    categories: MONTHS,
+    series: [
+      {
+        name: "Revenue",
+        data: totals,
+      },
+    ],
+  };
+}, [sales]);
+
+const monthToDateChart = useMemo(() => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const today = now.getDate();
+
+  const DAYS = Array.from({ length: today }, (_, i) => i + 1);
+
+  const map = DAYS.reduce((acc, d) => {
+    acc[d] = 0;
     return acc;
   }, {});
 
-  const topCustomersData = Object.values(customerTotals)
-    .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 8);
+  sales.forEach((s) => {
+    const date = new Date(s.transaction_Date);
 
-  /* =========================================================
-   🔹 MONTHLY CHART
-  ========================================================= */
+    if (
+      date.getFullYear() !== currentYear ||
+      date.getMonth() !== currentMonth
+    ) return;
 
-  const monthlyChart = useMemo(() => {
-    const MONTHS = getMonths();
+    const day = date.getDate();
 
-    const map = MONTHS.reduce((a, m) => ((a[m] = 0), a), {});
+    if (map[day] !== undefined) {
+      map[day] += Number(s.revenue || 0);
+    }
+  });
 
-    sales.forEach((s) => {
-      const month = new Date(s.transaction_Date).toLocaleString(
-        "default",
-        { month: "short" }
-      );
+  console.log("📊 MTD DAILY MAP:", map);
 
-      if (map[month] !== undefined) {
-        map[month] += Number(s.revenue || 0);
-      }
-    });
+  return {
+    categories: DAYS.map(String),
+    series: [
+      {
+        name: "Revenue",
+        data: DAYS.map((d) => map[d] ),
+      },
+    ],
+  };
+}, [sales]);
 
-    return {
-      categories: MONTHS,
-      series: [{ name: "Revenue", data: MONTHS.map((m) => map[m]) }],
+const normalizeProductName = (name = "") => {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/\b(tabs?|tablets?)\b/g, "tab")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const topProductsData = sales.reduce((acc, item) => {
+  const rawName = item.item_Name || "UNKNOWN PRODUCT";
+  const name = normalizeProductName(rawName);
+
+  const qty = Number(item.quantity_Sold || 0);
+
+  if (!acc[name]) {
+    acc[name] = {
+      name: rawName,
+      qty: 0,
     };
-  }, [sales]);
+  }
 
-  /* =========================================================
-   🔹 MONTH-TO-DATE CHART
-  ========================================================= */
+  acc[name].qty += qty;
 
-  const monthToDateChart = useMemo(() => {
-    const now = new Date();
-    const days = now.getDate();
+  return acc;
+}, {});
 
-    const DAYS = Array.from({ length: days }, (_, i) => i + 1);
-    const map = DAYS.reduce((a, d) => ((a[d] = 0), a), {});
+const topProducts = Object.values(topProductsData)
+  .sort((a, b) => b.qty - a.qty)
+  .slice(0, 5);
 
-    sales.forEach((s) => {
-      const d = new Date(s.transaction_Date);
-
-      if (
-        d.getMonth() !== now.getMonth() ||
-        d.getFullYear() !== now.getFullYear()
-      )
-        return;
-
-      map[d.getDate()] += Number(s.revenue || 0);
-    });
-
-    return {
-      categories: DAYS.map(String),
-      series: [
-        {
-          name: "Revenue",
-          data: DAYS.map((d) => map[d] / 1000),
-        },
-      ],
-    };
-  }, [sales]);
-
-  /* =========================================================
-   🔹 TOP PRODUCTS
-  ========================================================= */
-
-  const topProducts = Object.values(
-    sales.reduce((acc, item) => {
-      const name = normalizeProductName(item.item_Name);
-
-      const qty = Math.round(Number(item.quantity_Sold || 0));
-
-      if (!acc[name]) {
-        acc[name] = { name: item.item_Name, qty: 0 };
-      }
-
-      acc[name].qty += qty;
-      return acc;
-    }, {})
-  )
-    .sort((a, b) => b.qty - a.qty)
-    .slice(0, 5);
-
-  /* =========================================================
-   🔹 RENDER
-  ========================================================= */
+console.log(topProducts);
 
   return (
-    <div className="page-content">
-      <Container fluid>
-        <BreadCrumb title="Sales" pageTitle="Dashboards" />
+    <React.Fragment>
+      <div className="page-content">
+        <Container fluid>
 
-        {loading && <p>Loading analytics...</p>}
-        {error && <p className="text-danger">{error}</p>}
+          <BreadCrumb title="Sales" pageTitle="Dashboards" />
 
-        <Row>
-          <Col xl={12}>
-            <BranchDropdown onApply={handleApplyFilters} />
-          </Col>
-        </Row>
+          {/* STATUS */}
+          {/* {loading && <p>Loading analytics...</p>}
+          {error && <p className="text-danger">{error}</p>} */}
+<Row>
+  <Col xl={12}>
+  <BranchDropdown  onApply={handleApplyFilters} />
+  </Col>
+</Row>
+          <Row>
+            <Col xxl={5}>
+              <Widget sales={sales}  totalRevenue={totalRevenue}
+  cashSales={cashSales}
+  creditSales={creditSales}
+  ordersReceived={sales.length}
+  formatAmount={formatAmount}
+    cashPercentage ={cashPercentage}
+  creditPercentage={creditPercentage}
+revenueChange={revenueChange}
+  />
+            </Col>
+          </Row>
 
-        <Row>
-          <Col xxl={5}>
-            <Widget
-              sales={sales}
-              totalRevenue={totalRevenue}
-              cashSales={cashSales}
-              creditSales={creditSales}
-              cashPercentage={cashPercentage}
-              creditPercentage={creditPercentage}
-              revenueChange={revenueChange}
-              ordersReceived={ordersReceived}
-              formatAmount={formatAmount}
-            />
-          </Col>
-        </Row>
+          <Row>
+            <Col xl={6}>
+<BranchPerformance
+  sales={sales}
+  totalRevenue={totalRevenue}
+  branchData={branchData}
+  formatAmount={formatAmount}
+/>            </Col>
 
-        <Row>
-          <Col xl={6}>
-            <BranchPerformance
-              sales={sales}
-              branchData={branchData}
-              formatAmount={formatAmount}
-            />
-          </Col>
+            <Col xl={6}>
+<TopProducts data={topProducts} />
+            </Col>
+          </Row>
 
-          <Col xl={6}>
-            <TopProducts data={topProducts} />
-          </Col>
-        </Row>
+          <Row>
+            <Col xl={4}>
+              <SalesmanRevenue sales={sales} data={salesmanData} formatAmount={formatAmount} />
+            </Col>
 
-        <Row>
-          <Col xl={4}>
-            <SalesmanRevenue sales={sales} data={salesmanData} />
-          </Col>
+            <Col xl={4}>
+              <ReceivablesAgeing sales={sales} />
+            </Col>
 
-          <Col xl={4}>
-            <ReceivablesAgeing sales={sales} />
-          </Col>
+            <Col xl={4}> 
+            <TopCustomers sales={sales} data={topCustomersData} formatAmount={formatAmount} /> 
+            </Col>
+          </Row>
 
-          <Col xl={4}>
-            <TopCustomers data={topCustomersData} />
-          </Col>
-        </Row>
-
-        <Row>
-          <Col xl={6}>
-            <ProgressiveSales
-              series={monthlyChart.series}
-              categories={monthlyChart.categories}
-            />
-          </Col>
-
-          <Col xl={6}>
-            <MonthToDateSales
-              series={monthToDateChart.series}
-              categories={monthToDateChart.categories}
-            />
-          </Col>
-        </Row>
-      </Container>
-    </div>
+          <Row>
+           
+          </Row>
+ <Row>
+  <Col xl={6}>
+            <ProgressiveSales     series={monthlyChart.series}
+              categories={monthlyChart.categories}  formatAmount={formatAmount}/>
+            </Col>
+            <Col xl={6}>
+            <MonthToDateSales series={monthToDateChart.series} categories={monthToDateChart.categories} formatAmount={formatAmount}/>  
+            </Col>
+          </Row>
+        </Container>
+      </div>
+    </React.Fragment>
   );
 };
 
