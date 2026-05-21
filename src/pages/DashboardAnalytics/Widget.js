@@ -1,9 +1,15 @@
 import React from 'react';
 import { Card, CardBody, CardHeader, Col, Row } from 'reactstrap';
 import CountUp from "react-countup";
-
-//Import Icons
 import FeatherIcon from "feather-icons-react";
+import {
+  setBranch,
+  setDateRange,
+  setStartDate,
+  setEndDate,
+} from "../../slices/dashboardSales/reducer";
+import { useDispatch, useSelector } from "react-redux";
+
 
 const Widget = ({
   totalRevenue = 0,
@@ -16,11 +22,16 @@ const Widget = ({
   
 }) => {    
   
+       const { branch, dateRange, startDate, endDate } = useSelector(
+        (state) => state.powerbi.filters
+      );
+  const dispatch = useDispatch();
+
     return (
        <React.Fragment>
   <div className="mb-2">
         <h4 className="card-title mb-0 text-start ">
-            KEY METRICS - TODAY
+    KEY METRICS - {dateRange}
         </h4>
     </div>
 <Row className="g-2 mb-2">
@@ -145,10 +156,7 @@ const Widget = ({
                 </CardBody>
             </Card>
         </Col>
-    </Row>
-
-    {/* Bottom Row */}
-<Row className="g-2 mb-2">
+   
     <Col xl={3} lg={4} md={6} sm={6} xs={12}>
             <Card className="card-animate h-100">
                 <CardBody className="p-2">

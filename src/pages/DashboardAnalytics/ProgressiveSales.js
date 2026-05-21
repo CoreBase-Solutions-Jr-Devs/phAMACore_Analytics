@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardBody, CardHeader, Row, Col } from "reactstrap";
 import { ProgressiveSalesChart } from "./DashboardAnalyticsCharts";
 
-const ProgressiveSales = ({ series, categories }) => {
+const ProgressiveSales = ({ series, categories, formatAmount }) => {
   return (
     <Row>
       <Col xxl={12}>
@@ -17,6 +17,7 @@ const ProgressiveSales = ({ series, categories }) => {
             <ProgressiveSalesChart
               series={series}
               categories={categories}
+              formatAmount={formatAmount}
               dataColors='["--vz-primary","--vz-success"]'
             />
           </CardBody>
