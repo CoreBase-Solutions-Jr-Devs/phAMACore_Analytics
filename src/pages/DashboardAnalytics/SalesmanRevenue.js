@@ -10,7 +10,7 @@ const SalesmanRevenue = ({ data = [], formatAmount }) => {
       <Card className="card-height-100">
         <CardHeader className="align-items-center d-flex">
           <h4 className="card-title mb-0 flex-grow-1">
-            Top Salesman — revenue (KES)
+            Top 5 Salesman — revenue (KES)
           </h4>
         </CardHeader>
 
@@ -24,7 +24,7 @@ const SalesmanRevenue = ({ data = [], formatAmount }) => {
           ) : (
             <div className="table-responsive table-card">
               <table className="table align-middle table-nowrap mb-0">
-                <thead>
+                <thead className="table-light">
                   <tr className="text-muted">
                     <th>Rep</th>
                     <th>Branch</th>
@@ -36,11 +36,11 @@ const SalesmanRevenue = ({ data = [], formatAmount }) => {
                 <tbody>
                   {sorted.map((item, i) => (
                     <tr key={i}>
-                      <td className="fw-medium">{item.rep}</td>
+                      <td >{item.rep}</td>
 
-                      <td className="text-muted">{item.branch}</td>
+                      <td className="text-muted font-semibold">{item.branch}</td>
 
-                      <td className="fw-medium">
+                      <td >
                         {formatAmount(item.revenue)}
                       </td>
 
