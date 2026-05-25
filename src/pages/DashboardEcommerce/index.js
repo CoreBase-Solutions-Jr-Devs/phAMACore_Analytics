@@ -12,7 +12,7 @@ import TopSellers from "./TopSellers";
 import SupplierSpend from "./SupplierSpend";
 
 const DashboardEcommerce = () => {
-  document.title = "Dashboard | Velzon - React Admin & Dashboard Template";
+  document.title = "Purchases Dashboard | phAMACore Analytics";
 
   const [rightColumn, setRightColumn] = useState(true);
   const toggleRightColumn = () => {
