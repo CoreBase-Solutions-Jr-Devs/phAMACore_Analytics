@@ -340,6 +340,144 @@ const ProgressiveSalesChart = ({
   );
 };
 
+// const BranchPerformanceChart = ({ dataColors, series, categories = [] }) => {
+//     let barchartCountriesColors = [];
+//     try {
+//         barchartCountriesColors = dataColors ? getChartColorsArray(dataColors) : [];
+//     } catch (error) {
+//         console.warn('Chart colors parsing failed:', error);
+//         barchartCountriesColors = ['#f06548'];
+//     }
+
+//     // Ensure series data is mutable
+//     const validSeries = React.useMemo(() => {
+//         if (!series || !Array.isArray(series)) return [{ data: [] }];
+//         return series.map((s) => ({ ...s }));
+//     }, [series]);
+
+//     var options = {
+//         chart: {
+//             type: 'bar',
+//             height: 400,
+//             toolbar: {
+//                 show: false,
+//             }
+//         },
+//         plotOptions: {
+//             bar: {
+//                 borderRadius: 4,
+//                 horizontal: true,
+//                 distributed: true,
+//                 dataLabels: {
+//                     position: 'top',
+//                 },
+//             }
+//         },
+//         colors: barchartCountriesColors,
+//         dataLabels: {
+//             enabled: true,
+//             offsetX: 32,
+//              formatter: (val) => `${val}M`,
+//             style: {
+//                 fontSize: '12px',
+//                 fontWeight: 400,
+//                 colors: ['#adb5bd']
+//                 // colors:['#878a99']
+//             }
+//         },
+// tooltip: {
+//     y: {
+//         formatter: (val) => `${val}M`
+//     }
+// },
+//         legend: {
+//             show: false,
+//         },
+//         grid: {
+//             show: false,
+//         },
+// xaxis: {
+//   categories,
+//     labels: {
+//         show: false
+//     },
+//     axisTicks: {
+//         show: false
+//     },
+//     axisBorder: {
+//         show: false
+//     }
+// },
+//     };
+//     return (
+//         <React.Fragment>
+//             <ReactApexChart dir="ltr"
+//                 options={options}
+//                 series={validSeries}
+//                 type="bar"
+//                 height={300}
+//                 className="apex-charts"
+//             />
+//         </React.Fragment>
+//     );
+// };
+
+const BranchPerformanceChart = ({
+  dataColors,
+  series = [],
+  categories = [],
+  formatAmount,
+}) => {
+  const chartDonutBasicColors =
+    getChartColorsArray(dataColors);
+
+  const options = {
+    labels: categories,
+
+    chart: {
+      height: 333,
+      type: "donut",
+    },
+
+   legend: {
+  position: "bottom",
+  formatter: (seriesName, opts) => {
+    const value = opts.w.globals.series[opts.seriesIndex];
+    return `${seriesName}: ${formatAmount(value)}`;
+  },
+},
+
+    stroke: {
+      show: false,
+    },
+
+    dataLabels: {
+      enabled: true,
+      formatter: (val) => `${formatAmount(val)}`,
+      dropShadow: {
+        enabled: false,
+      },
+    },
+
+    tooltip: {
+      y: {
+        formatter: (val) => `${formatAmount(val)}`,
+      },
+    },
+
+    colors: chartDonutBasicColors,
+  };
+
+  return (
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="donut"
+      height={333}
+    />
+  );
+};
+
 const MonthToDateSalesChart = ({
   dataColors,
   series,
@@ -554,6 +692,7 @@ export {
   AudiencesSessionsCharts,
   ProgressiveSalesChart,
   MonthToDateSalesChart,
+  BranchPerformanceChart,
   CountriesCharts,
   UsersByDeviceCharts,
   TopProductsCharts,
