@@ -1,40 +1,49 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getBalanceChartsData, getDialChartsData, getSalesChartsData } from './thunk';
+import { fetchDailyClosingStock, fetchStockMovements } from './thunk';
+
 export const initialState = {
-  balanceOverviewData: [],
-  dialTypeData: [],
-  salesForecastData: [],
-  error: {}
+  dailyClosingStock: [],
+  stockMovements: [],
+  loadingStock: false,
+  loadingMovements: false,
+  errorStock: null,
+  errorMovements: null,
 };
 
-
-const DashboardCRMSlice = createSlice({
-  name: 'DashboardCRM',
+const StockInventorySlice = createSlice({
+  name: 'StockInventory',
   initialState,
-  reducers: {},
+  reducers: {
+    resetInventoryState: () => initialState,
+  },
   extraReducers: (builder) => {
-    builder.addCase(getBalanceChartsData.fulfilled, (state, action) => {
-      state.balanceOverviewData = action.payload;
+    builder.addCase(fetchDailyClosingStock.pending, (state) => {
+      state.loadingStock= true;
+      state.errorStock = null;
     });
-    builder.addCase(getBalanceChartsData.rejected, (state, action) => {
-      state.error = action.payload.error || null;
+    builder.addCase(fetchDailyClosingStock.fulfilled, (state, action) => {
+      state.loadingStock = false;
+      state.dailyClosingStock = action.payload;
     });
-
-    builder.addCase(getDialChartsData.fulfilled, (state, action) => {
-      state.dialTypeData = action.payload;
+    builder.addCase(fetchDailyClosingStock.rejected, (state, action) => {
+      state.loadingStock = false;
+      state.errorStock = action.payload || action.payload.error || action.error || null;
     });
-    builder.addCase(getDialChartsData.rejected, (state, action) => {
-      state.error = action.payload.error || null;
+    builder.addCase(fetchStockMovements.pending, (state) => {
+      state.loadingMovements = true;
+      state.errorMovements = null;
     });
-
-    builder.addCase(getSalesChartsData.fulfilled, (state, action) => {
-      state.salesForecastData = action.payload;
+    builder.addCase(fetchStockMovements.fulfilled, (state, action) => {
+      state.loadingMovements = false;
+      state.stockMovements = action.payload;
     });
-    builder.addCase(getSalesChartsData.rejected, (state, action) => {
-      state.error = action.payload.error || null;
-    });
-
+    builder.addCase(fetchStockMovements.rejected, (state, action) => {
+      state.loadingMovements = false;
+      state.errorMovements = action.payload || action.payload.error || action.error || null;
+    })
   }
 });
 
-export default DashboardCRMSlice.reducer;
+export const { resetInventoryState } = StockInventorySlice.actions;
+
+export default StockInventorySlice.reducer;
