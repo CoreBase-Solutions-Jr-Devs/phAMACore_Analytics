@@ -14,8 +14,9 @@ import ReceivablesAgeing from "./ReceivablesAgeing";
 import TopCustomers from "./TopCustomers";
 import ProgressiveSales from "./ProgressiveSales";
 import MonthToDateSales from "./MonthToDateSales";
-import BranchDropdown from "./BranchDropdown";
+// import BranchDropdown from "./BranchDropdown";
 import { getSalesTransactions } from "../../slices/dashboardSales/thunk";
+import FilterActions from "./FilterActions";
 
 const DashboardAnalytics = () => {
 
@@ -30,7 +31,7 @@ const handleApplyFilters = () => {
    dispatch(
       getSalesTransactions({
         clientid: 1,
-        startDate: filters.startDate,
+        startDate: filters.startDate  ,
         endDate: filters.endDate,
         branchcode:
           filters.branch === "All Branches" ? null : filters.branch,
@@ -130,6 +131,14 @@ const yesterdayRevenue = sales
     }));
     console.log(branchTotals);
 
+const branchChartSeries = branchData.map(
+  (branch) => Number(branch.amount || 0)
+);
+
+const branchCategories = branchData.map(
+  (branch) => branch.name
+);
+  
     const salesmanTotals = sales.reduce((acc, item) => {
     const rep = item.staff_Name || "UNKNOWN REP";
     const branch = item.brancch_Name || "UNKNOWN BRANCH";
@@ -286,12 +295,9 @@ console.log(topProducts);
 
           <BreadCrumb title="Sales" pageTitle="Dashboards" />
 
-          {/* STATUS */}
-          {/* {loading && <p>Loading analytics...</p>}
-          {error && <p className="text-danger">{error}</p>} */}
 <Row>
   <Col xl={12}>
-  <BranchDropdown  onApply={handleApplyFilters} />
+  <FilterActions  onApply={handleApplyFilters} />
   </Col>
 </Row>
           <Row>
@@ -308,14 +314,15 @@ revenueChange={revenueChange}
             </Col>
           </Row>
 
-          <Row>
+          <Row className="mt-4">
             <Col xl={6}>
 <BranchPerformance
-  sales={sales}
-  totalRevenue={totalRevenue}
   branchData={branchData}
+  totalRevenue={totalRevenue}
+  chartSeries={branchChartSeries}
+  categories={branchCategories}
   formatAmount={formatAmount}
-/>            </Col>
+/>     </Col>
 
             <Col xl={6}>
 <TopProducts data={topProducts} />
