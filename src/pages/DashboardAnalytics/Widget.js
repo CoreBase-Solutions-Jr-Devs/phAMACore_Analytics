@@ -35,12 +35,12 @@ const Widget = ({
         </h4>
     </div>
 <Row className="g-2 mb-2">
-    <Col xl={3} lg={4} md={6} sm={6} xs={12}>
+<Col xl={3} lg={4} md={6} sm={12}>
             <Card className="card-animate h-100">     
 <CardBody className="p-2">
 <div className="d-flex justify-content-between align-items-center">
                             <div>
-                            <p className="fw-medium text-muted mb-0">Total Revenue</p>
+                            <p className="font-medium  mb-0">Total Revenue</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
                                     <CountUp
@@ -53,7 +53,7 @@ const Widget = ({
                                     />
                                 </span>
                             </h2>
-                            <p className="mb-0 text-success">
+                            <p className="mb-0 text-muted">
                                 <i className="ri-arrow-up-line align-middle"></i> 0% vs yesterday
                             </p>
                         </div>
@@ -68,12 +68,12 @@ const Widget = ({
             </Card>
         </Col>
 
-<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+<Col xl={3} lg={4} md={6} sm={12} xs={12}>
             <Card className="card-animate h-100">
                 <CardBody className="p-2">
 <div className="d-flex justify-content-between align-items-center">
                             <div>
-                            <p className="fw-medium text-muted mb-0">Cash Sales</p>
+                            <p className="font-medium  mb-0">Cash Sales</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
                                     <CountUp
@@ -98,12 +98,12 @@ const Widget = ({
             </Card>
         </Col>
 
-<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+<Col xl={3} lg={4} md={6} sm={12} xs={12}>
             <Card className="card-animate h-100">
                 <CardBody className="p-2">
                     <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Credit Sales</p>
+                            <p className="font-medium  mb-0">Credit Sales</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-info">
                                 <span className="counter-value">
                                     <CountUp
@@ -128,12 +128,12 @@ const Widget = ({
             </Card>
         </Col>
 
-<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+<Col xl={3} lg={4} md={6} sm={12} xs={12}>
             <Card className="card-animate h-100">
                 <CardBody className="p-2">
                     <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Collections</p>
+                            <p className="font-medium  mb-0">Collections</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-warning">
                                 <span className="counter-value">
                                     <CountUp
@@ -144,7 +144,7 @@ const Widget = ({
                                     />
                                 </span>M
                             </h2>
-                            <p className="mb-0 text-warning">0% collection rate</p>
+                            <p className="mb-0 text-muted">0% collection rate</p>
                         </div>
 
                         <div className="avatar-sm flex-shrink-0">
@@ -157,12 +157,12 @@ const Widget = ({
             </Card>
         </Col>
    
-    <Col xl={3} lg={4} md={6} sm={6} xs={12}>
+    <Col xl={3} lg={4} md={6} sm={12} xs={12}>
             <Card className="card-animate h-100">
                 <CardBody className="p-2">
 <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Outstanding</p>
+                            <p className="font-medium  mb-0">Outstanding</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-danger">
                                 <span className="counter-value">
                                     <CountUp
@@ -186,12 +186,12 @@ const Widget = ({
             </Card>
         </Col>
 
-<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+<Col xl={3} lg={4} md={6} sm={12} xs={12}>
             <Card className="card-animate h-100">
                 <CardBody className="p-2">
 <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Cancelled </p>
+                            <p className="font-medium  mb-0">Cancelled </p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-primary">
                                 <span className="counter-value">
                                     <CountUp
@@ -214,12 +214,12 @@ const Widget = ({
             </Card>
         </Col>
 
-<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+<Col xl={3} lg={4} md={6} sm={12} xs={12}>
             <Card className="card-animate h-100">
                 <CardBody className="p-2">
                     <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Orders Received</p>
+                            <p className="font-medium  mb-0">Orders Received</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
                                     <CountUp
@@ -229,7 +229,7 @@ const Widget = ({
                                     />
                                 </span>
                             </h2>
-                            <p className="mb-0 text-success">
+                            <p className="mb-0 text-muted">
                                 <i className="ri-arrow-up-line align-middle"></i> +0 vs avg
                             </p>
                         </div>
@@ -244,12 +244,12 @@ const Widget = ({
             </Card>
         </Col>
 
-<Col xl={3} lg={4} md={6} sm={6} xs={12}>
+<Col xl={3} lg={4} md={6} sm={12} xs={12}>
             <Card className="card-animate h-100">
                 <CardBody className="p-2">
 <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="fw-medium text-muted mb-0">Overdue Accounts</p>
+                            <p className="font-medium  mb-0">Overdue Accounts</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-danger">
                                 <span className="counter-value">
                                     <CountUp
