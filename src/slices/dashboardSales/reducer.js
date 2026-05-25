@@ -1,23 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getSalesTransactions } from "./thunk";
-import {
-  getTodayApi,
-  getYesterdayApi,
-  getLast7DaysApi,
-} from "../../pages/utils/dateHelper";
-const today = getTodayApi();
- 
+
+  const formatDMY = (date) =>
+  date.toLocaleDateString("en-GB");
+  
 const initialState = {
   sales: [],
   loading: false,
   error: null,
 
-filters: {
-  branch: "All Branches",
-  dateRange: "Today",
-  startDate: today,
-  endDate: today,
-},
+  filters: {
+    branch: "All Branches",
+    dateRange: "Today",
+   startDate: new Date().toLocaleDateString("en-GB"),
+endDate: new Date().toLocaleDateString("en-GB"),
+  },
 };
 
 const powerBISlice = createSlice({
@@ -28,47 +25,48 @@ const powerBISlice = createSlice({
     setBranch: (state, action) => {
       state.filters.branch = action.payload;
     },
-    
-  setDateRange: (state, action) => {
-  const type = action.payload;
-  state.filters.dateRange = type;
 
-  switch (type) {
-    case "Today": {
-      const today = getTodayApi();
-      state.filters.startDate = today;
-      state.filters.endDate = today;
-      break;
-    }
+    setDateRange: (state, action) => {
+      const type = action.payload;
+      state.filters.dateRange = type;
 
-    case "Yesterday": {
-      const y = getYesterdayApi();
-      state.filters.startDate = y;
-      state.filters.endDate = y;
-      break;
-    }
+      switch (type) {
+        case "Today": {
+          const today = new Date();
+          state.filters.startDate = formatDMY(today);
+          state.filters.endDate = formatDMY(today);
+          break;
+        }
 
-    case "Last 7 Days": {
-      const range = getLast7DaysApi();
-      state.filters.startDate = range.startDate;
-      state.filters.endDate = range.endDate;
-      break;
-    }
+        case "Yesterday": {
+          const y = new Date();
+          y.setDate(y.getDate() - 1);
+          state.filters.startDate = formatDMY(y);
+          state.filters.endDate = formatDMY(y);
+          break;
+        }
 
-    case "Custom":
-   
-      break;
+        case "Last 7 Days": {
+          const end = new Date();
+          const start = new Date();
+          start.setDate(end.getDate() - 7);
 
-    default: {
-      const today = getTodayApi();
-      state.filters.startDate = today;
-      state.filters.endDate = today;
-    }
-  }
-},
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
+
+case "Custom":
+  state.filters.dateRange = "Custom";
+  // DO NOT reset dates
+  break;
+      }
+    },
+
     setStartDate: (state, action) => {
       state.filters.startDate = action.payload;
     },
+
     setEndDate: (state, action) => {
       state.filters.endDate = action.payload;
     },
@@ -76,21 +74,16 @@ const powerBISlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      // LOADING
       .addCase(getSalesTransactions.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
 
-      // SUCCESS
       .addCase(getSalesTransactions.fulfilled, (state, action) => {
         state.loading = false;
-
-        // ✅ SAFE RESPONSE HANDLING
         state.sales = action.payload?.result || action.payload || [];
       })
 
-      // ERROR
       .addCase(getSalesTransactions.rejected, (state, action) => {
         state.loading = false;
         state.error =
