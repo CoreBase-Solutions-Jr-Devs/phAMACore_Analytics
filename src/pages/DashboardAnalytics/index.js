@@ -288,6 +288,8 @@ const topProducts = Object.values(topProductsData)
 
 console.log(topProducts);
 
+document.title = "Sales Dashboard | phAMACore Analytics";
+
   return (
     <React.Fragment>
       <div className="page-content">

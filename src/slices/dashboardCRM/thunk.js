@@ -12,9 +12,38 @@ import {
   getOctSalesData as getOctSalesDataApi,
   getNovSalesData as getNovSalesDataApi,
   getDecSalesData as getDecSalesDataApi,
-  getJanSalesData as getJanSalesDataApi
+  getJanSalesData as getJanSalesDataApi,
+  getDailyClosingStock as getDailyClosingStockApi,
+  getStockMovements as getStockMovementsApi,
 }
   from "../../helpers/fakebackend_helper";
+
+export const fetchDailyClosingStock = createAsyncThunk(
+  "stockInventory/fetchDailyClosingStock",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getDailyClosingStockApi(params);
+      return response.data ?? response;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data?.message 
+        || error?.response?.data || error.message ||
+        "Failed to fetch daily closing stock!");
+    }
+  }
+);
+
+export const fetchStockMovements = createAsyncThunk(
+  "stockInventory/fetchStockMovements",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getStockMovementsApi(params);
+    } catch (error) {
+      return rejectWithValue(error?.response?.data?.message 
+        || error?.response?.data || error.message ||
+        "Failed to fetch stock movements!");
+    }
+  }
+);
 
 export const getBalanceChartsData = createAsyncThunk("dashboardCrm/getBalanceChartsData", async (data) => {
   try {
