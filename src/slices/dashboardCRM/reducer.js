@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchDailyClosingStock, fetchStockMovements } from './thunk';
+import { fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from './thunk';
 
 export const initialState = {
   dailyClosingStock: [],
@@ -29,6 +29,8 @@ const StockInventorySlice = createSlice({
       state.loadingStock = false;
       state.errorStock = action.payload || action.payload.error || action.error || null;
     });
+
+
     builder.addCase(fetchStockMovements.pending, (state) => {
       state.loadingMovements = true;
       state.errorMovements = null;
@@ -40,7 +42,13 @@ const StockInventorySlice = createSlice({
     builder.addCase(fetchStockMovements.rejected, (state, action) => {
       state.loadingMovements = false;
       state.errorMovements = action.payload || action.payload.error || action.error || null;
-    })
+    });
+
+
+    builder.addCase(fetchStockInventoryKPIs.rejected, (state, action) => {
+      state.errorStock = action.payload || "Failed to fetch stock/inventory KPIs!";
+      state.errorMovements = action.payload || "Failed to fetch inventory/stock KPIs!";
+    });
   }
 });
 
