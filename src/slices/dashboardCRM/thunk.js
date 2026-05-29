@@ -45,6 +45,32 @@ export const fetchStockMovements = createAsyncThunk(
   }
 );
 
+export const fetchStockInventoryKPIs = createAsyncThunk(
+  "stockInventory/fetchStockInventoryKPIs",
+  async (params, { dispatch, rejectWithValue }) => {
+    try {
+      const [stockResult, movementsResult] = await Promise.all(
+        [
+          dispatch(fetchDailyClosingStock(params)),
+          dispatch(fetchStockMovements({
+              clientid: params.clientid,
+              startDate: params.startDate,
+              endDate: params.endDate,
+              branchcode: params.branchcode,
+              itemcode: params.itemcode,
+            })
+          ),
+        ]);
+      return {
+        stockData: stockResult.payload,
+        movementsData: movementsResult.payload,
+      };
+    } catch (error) {
+      return rejectWithValue(error?.response?.data || error.message);
+    }
+  }
+);
+
 export const getBalanceChartsData = createAsyncThunk("dashboardCrm/getBalanceChartsData", async (data) => {
   try {
     var response;

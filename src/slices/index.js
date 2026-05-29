@@ -40,7 +40,7 @@ import MailboxReducer from "./mailbox/reducer";
 import DashboardAnalyticsReducer from "./dashboardAnalytics/reducer";
 
 // Dashboard CRM
-import DashboardCRMReducer from "./dashboardCRM/reducer";
+// import DashboardCRMReducer from "./dashboardCRM/reducer";
 
 // Dashboard Ecommerce
 import DashboardEcommerceReducer from "./dashboardEcommerce/reducer";
@@ -69,7 +69,11 @@ import JobReducer from "./jobs/reducer";
 // API Key
 import APIKeyReducer from "./apiKey/reducer";
 
+// Power BI
 import PowerBIReducer from "./dashboardSales/reducer";
+
+// Stock/Inventory
+import StockInventoryReducer from "./dashboardCRM/reducer";
 
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
@@ -88,7 +92,7 @@ const rootReducer = combineReducers({
     Invoice: InvoiceReducer,
     Mailbox: MailboxReducer,
     DashboardAnalytics: DashboardAnalyticsReducer,
-    DashboardCRM: DashboardCRMReducer,
+    // DashboardCRM: DashboardCRMReducer,
     DashboardEcommerce: DashboardEcommerceReducer,
     DashboardCrypto: DashboardCryptoReducer,
     DashboardProject: DashboardProjectReducer,
@@ -98,7 +102,8 @@ const rootReducer = combineReducers({
     Todos: TodosReducer,
     Jobs: JobReducer,
     APIKey: APIKeyReducer,
-       powerbi: PowerBIReducer,
+    powerbi: PowerBIReducer,
+    StockInventory: StockInventoryReducer,
 });
 
 export default rootReducer;

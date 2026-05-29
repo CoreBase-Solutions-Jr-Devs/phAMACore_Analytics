@@ -65,3 +65,9 @@ export * from "./jobs/thunk";
 
 // API Key
 export * from "./apiKey/thunk";
+
+// Sales Dashboard
+// export * from "./dashboardSales";
+
+// Stock/Inventory
+export * from "./dashboardCRM/thunk";
