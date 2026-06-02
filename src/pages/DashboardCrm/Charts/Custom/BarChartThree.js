@@ -3,41 +3,27 @@ import ReactApexChart from 'react-apexcharts';
 
 /**
  * BarChartThree — Stock VS Sales Velocity (Branch Coverage Ratio)
- *
- * Props:
- *   categories {string[]}  Branch names (sorted descending by days cover)
- *   data       {number[]}  Days of stock cover per branch
- *   colors     {string[]}  Per-bar zone colors (red/amber/green/blue)
- *   height     {number}    Chart height in px (default 350)
- *
- * Zone logic (matches subtitle):
- *   < 10 days  → red   (critical replenishment)
- *   10–20 days → amber (warning)
- *   21–30 days → green (target)
- *   > 30 days  → blue  (overstocked risk)
  */
-const BarChartThree = ({
-    categories = [],
-    data = [],
-    colors = [],
-    height = 350,
-}) => {
-    // Fallback static data — mirrors screenshot
-    const resolvedCategories = categories.length
-        ? categories
-        : ['Thika', 'Nairobi CBD', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret'];
-    const resolvedData = data.length
-        ? data
-        : [31, 28, 25, 17, 13, 5];
 
-    const resolvedColors = colors.length
-        ? colors
-        : resolvedData.map((v) => {
-            if (v < 10) return '#f06548';
-            if (v < 21) return '#f7b84b';
-            if (v <= 30) return '#0ab39c';
-            return '#405189';
-        });
+// Sorted DESCENDING manually (by value)
+const BRANCHES = ['WAREHOUSE','TESTING','MAIN','KAMPALA','CENTRAL','WESTLANDS','MOMBASA','WAJIR','KAKAMEGA','TEST BRANCH'];
+
+// Matching data (same order as branches above)
+const DEFAULT_DATA = [34,31,28,27,22,19,15,12,9,6];
+
+// Zone coloring (still dynamic, but simple)
+const ZONE_COLOR = (v) => {
+    if (v < 10) return '#f06548';
+    if (v < 21) return '#f7b84b';
+    if (v <= 30) return '#0ab39c';
+    return '#405189';
+};
+
+const BarChartThree = ({ height = 350 }) => {
+
+    const resolvedCategories = BRANCHES;
+    const resolvedData = DEFAULT_DATA;
+    const resolvedColors = resolvedData.map(ZONE_COLOR);
 
     const series = [{ data: resolvedData }];
 
@@ -53,24 +39,24 @@ const BarChartThree = ({
                 barHeight: '80%',
                 distributed: true,
                 horizontal: true,
-                dataLabels: { position: 'bottom' },
             },
         },
         colors: resolvedColors,
         dataLabels: {
             enabled: true,
             textAnchor: 'start',
-            style: { colors: ['#fff'], fontWeight: 600, fontSize: '12px' },
+            style: {
+                colors: ['#fff'],
+                fontWeight: 600,
+                fontSize: '12px',
+            },
             formatter: (val, opt) =>
-                `${opt.w.globals.labels[opt.dataPointIndex]}:  ${val}`,
-            offsetX: 0,
-            dropShadow: { enabled: false },
+                `${opt.w.globals.labels[opt.dataPointIndex]}: ${val}`,
         },
         stroke: {
             width: 1,
             colors: ['#fff'],
         },
-        // Target zone shading — highlight the 21–30 day band
         annotations: {
             xaxis: [
                 {
@@ -79,15 +65,12 @@ const BarChartThree = ({
                     fillColor: '#0ab39c',
                     opacity: 0.07,
                     label: {
-                        borderColor: 'transparent',
+                        text: 'Target zone',
                         style: {
                             color: '#0ab39c',
-                            background: 'transparent',
                             fontSize: '10px',
+                            background: 'transparent',
                         },
-                        text: 'Target zone',
-                        position: 'top',
-                        orientation: 'horizontal',
                     },
                 },
                 {
@@ -96,15 +79,12 @@ const BarChartThree = ({
                     borderWidth: 2,
                     strokeDashArray: 4,
                     label: {
-                        borderColor: '#f06548',
+                        text: 'Critical',
                         style: {
                             color: '#fff',
                             background: '#f06548',
                             fontSize: '10px',
                         },
-                        text: 'Critical',
-                        position: 'top',
-                        orientation: 'horizontal',
                     },
                 },
             ],
@@ -122,7 +102,6 @@ const BarChartThree = ({
         title: {
             text: 'Stock Value by Sales Velocity',
             align: 'left',
-            floating: false,
             style: { fontWeight: 500, fontSize: '13px' },
         },
         subtitle: {
@@ -135,7 +114,6 @@ const BarChartThree = ({
             x: { show: false },
             y: {
                 formatter: (val) => `${val} days of cover`,
-                title: { formatter: () => '' },
             },
         },
     };
