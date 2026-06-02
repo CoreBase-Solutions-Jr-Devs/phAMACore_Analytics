@@ -1,13 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody, ListGroup, ListGroupItem, Badge } from 'reactstrap';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
-import BalanceOverview from './BalanceOverview';
-import ClosingDeals from './ClosingDeals';
-import DealsStatus from './DealsStatus';
-import DealType from './DealType';
-import MyTasks from './MyTasks';
-import SalesForecast from './SalesForecast';
-import UpcomingActivities from './UpcomingActivities';
 import Widgets from './Widgets';
 import { CustomDataLabel } from '../Charts/ApexCharts/BarCharts/BarCharts';
 import { PaginationTable } from '../Tables/ReactTables/ReactTable';
@@ -265,19 +258,6 @@ const DashboardCrm = () => {
                             </Card>
                         </Col>
                     </Row>
-                    {/* <Row>
-                        <SalesForecast />
-                        <DealType />
-                        <BalanceOverview />
-                    </Row>
-                    <Row>
-                        <DealsStatus />
-                        <MyTasks />
-                    </Row>
-                    <Row>
-                        <UpcomingActivities />
-                        <ClosingDeals />
-                    </Row> */}
                 </Container>
             </div>
         </React.Fragment>
