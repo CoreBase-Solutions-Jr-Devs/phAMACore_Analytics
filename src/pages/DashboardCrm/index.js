@@ -44,7 +44,7 @@ const DashboardCrm = () => {
                         </Col>
                     </Row>
                     <Row>
-                        <Col>
+                        <Col lg={6} xl={6}>
                             <Card>
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Stock Value By Branch</h4>
@@ -54,7 +54,7 @@ const DashboardCrm = () => {
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col>
+                        <Col lg={6} xl={6}>
                             <Card>
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Stock VS Sales Velocity - Branch Coverage Ratio</h4>
