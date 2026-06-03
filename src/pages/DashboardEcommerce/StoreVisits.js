@@ -9,7 +9,7 @@ const StoreVisits = () => {
                 <Card className="card-height-100">
                     <CardHeader className="align-items-center d-flex">
                         <h4 className="card-title mb-0 flex-grow-1">Spend by product category</h4>
-                        <div className="flex-shrink-0">
+                        {/* <div className="flex-shrink-0">
                             <UncontrolledDropdown className="card-header-dropdown" >
                                 <DropdownToggle tag="a" className="text-reset dropdown-btn" role="button">
                                     <span className="text-muted">Report<i className="mdi mdi-chevron-down ms-1"></i></span>
@@ -20,7 +20,7 @@ const StoreVisits = () => {
                                     <DropdownItem>Import</DropdownItem>
                                 </DropdownMenu>
                             </UncontrolledDropdown>
-                        </div>
+                        </div> */}
                     </CardHeader>
 
                     <div className="card-body">

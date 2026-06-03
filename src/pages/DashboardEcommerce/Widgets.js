@@ -1,47 +1,238 @@
-import React from 'react';
+import React from "react";
 import CountUp from "react-countup";
-import { Link } from 'react-router-dom';
-import { Card, CardBody, Col } from 'reactstrap';
-import { ecomWidgets } from "../../common/data";
+import FeatherIcon from "feather-icons-react";
+import { Card, CardBody, Col, Row } from "reactstrap";
+import { useDispatch, useSelector } from "react-redux";
 
-const Widgets = () => {
-    return (
+const Widgets = ({
+  totalSpend = 0,
+  budgetLeft = 0,
+  activeSuppliers = 0,
+  priceAlerts = 0,
+  maverickSpend = 0,
+  avgLeadTime = 0,
+    formatAmount,
+    branchMap = {},
+}) => {
+   const { branch, dateRange, startDate, endDate } = useSelector(
+          (state) => state.PurchaseOrders.filters
+        );
+       const branchName =
+  !branch || branch === "All Branches"
+    ? "All Branches"
+    : branchMap?.[branch] || "Unknown Branch";
+  return (
     <React.Fragment>
-  {ecomWidgets.map((item, key) => (
-    <Col xl={2} lg={4} md={6} sm={6} key={key} className="d-flex">
-      <Card className="card-animate w-100 h-80">
-        <CardBody className="d-flex flex-column justify-content-between">
-
-          <div className="flex-grow-1">
-            <p className="text-uppercase fw-medium text-muted text-truncate mb-2">
-              {item.label}
+     <div className="mb-2">
+        <h4 className="card-title mb-0 text-start ">
+    KEY METRICS 
+      {branchName !== "All Branches" && ` - ${branchName}`}        
+        </h4>
+    </div>
+ <Row className="g-2 mb-2">
+      {/* Total Spend */}
+      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+        <Card className="card-animate w-100 h-80">     
+        <CardBody className="p-2">
+        <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+            <p className=" font-medium mb-0">
+              Total Spend
             </p>
 
-            <h4 className="fs-22 fw-semibold ff-secondary mb-2">
-              <span className="counter-value">
-                <CountUp
-                  start={0}
-                  prefix={item.prefix}
-                  suffix={item.suffix}
-                  separator={item.separator}
-                  end={item.counter}
-                  decimals={item.decimals}
-                  duration={4}
-                />
+            <h2 className="mt-4 ff-secondary fw-semibold text-success">
+                                              <span className="counter-value">
+              <CountUp
+                end={Number(totalSpend)}
+                start={0}
+                decimals={1}
+                duration={4}
+                formattingFn={(value) => formatAmount(value)}
+              />
               </span>
-            </h4>
+            </h2>
 
-            <p className="text-muted mb-0 fs-12">
-              {item.link}
+            <p className="text-muted mb-0 ">
+              Budgeted:0
             </p>
-          </div>
+            </div>
 
-        </CardBody>
-      </Card>
-    </Col>
-  ))}
+                <div className="avatar-sm flex-shrink-0">
+                            <span className="avatar-title bg-success-subtle rounded-circle fs-2">
+                                <FeatherIcon icon="dollar-sign" className="text-success" />
+                            </span>
+                        </div>
+                    </div>
+          </CardBody>
+        </Card>
+      </Col>
+
+      {/* Budget Left */}
+      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+        <Card className="card-animate w-100 h-80">     
+        <CardBody className="p-2">
+        <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+            <p className=" font-medium mb-0">
+              Budget Left
+            </p>
+
+            <h2 className="mt-4 ff-secondary fw-semibold text-secondary">
+              <CountUp
+                end={Number(budgetLeft || 0)}
+                 start={0}
+                decimals={1}
+                duration={4}
+                formattingFn={(value) => formatAmount(value)}
+              />
+            </h2>
+
+                        <p className="text-muted mb-0 ">
+0% unused
+</p>
+            </div>
+
+                <div className="avatar-sm flex-shrink-0">
+                            <span className="avatar-title bg-secondary-subtle rounded-circle fs-2">
+                                <FeatherIcon icon="pie-chart" className="text-secondary" />
+                            </span>
+                        </div>
+                    </div>
+          </CardBody>
+        </Card>
+      </Col>
+
+      {/* Active Suppliers */}
+      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+        <Card className="card-animate w-100 h-80">     
+        <CardBody className="p-2">
+        <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+            <p className=" font-medium mb-0">
+              Active Suppliers
+            </p>
+
+            <h2 className="mt-4 ff-secondary fw-semibold text-info">
+              <CountUp end={Number(activeSuppliers || 0)} start={0} duration={2} />
+            </h2>
+
+ <p className="text-muted mb-0 ">
+                0 approved, 0 secondary
+            </p>
+             </div>
+
+                <div className="avatar-sm flex-shrink-0">
+                            <span className="avatar-title bg-info-subtle rounded-circle fs-2">
+                                <FeatherIcon icon="users" className="text-info" />
+                            </span>
+                        </div>
+                    </div>
+          </CardBody>
+        </Card>
+      </Col>
+
+      {/* Price Alerts */}
+      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+         <Card className="card-animate h-80 w-100">     
+        <CardBody className="p-2">
+        <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+ <p className=" font-medium mb-0">
+                Price Alerts
+            </p>
+
+            <h2 className="mt-4 ff-secondary fw-semibold text-danger">
+              <CountUp end={Number(priceAlerts || 0)} start={0} duration={2} />
+            </h2>
+
+ <p className="text-muted mb-0 ">
+              Products up &gt;0%
+            </p>
+            
+             </div>
+
+                <div className="avatar-sm flex-shrink-0">
+                            <span className="avatar-title bg-danger-subtle rounded-circle fs-2">
+                                <FeatherIcon icon="alert-triangle" className="text-danger" />
+                            </span>
+                        </div>
+                    </div>
+          </CardBody>
+        </Card>
+      </Col>
+
+      {/* Maverick Spend */}
+      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+        <Card className="card-animate w-100 h-80">     
+        <CardBody className="p-2">
+        <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+ <p className=" font-medium mb-0">
+              Maverick Spend
+            </p>
+
+            <h2 className="mt-4 ff-secondary fw-semibold text-warning">
+              <CountUp
+                end={Number(maverickSpend || 0)}
+                start={0}
+                decimals={1}
+                duration={4}
+              
+              />
+            </h2>
+
+ <p className="text-muted mb-0 ">
+              0% of total
+            </p>
+            </div>
+
+                <div className="avatar-sm flex-shrink-0">
+                            <span className="avatar-title bg-warning-subtle rounded-circle fs-2">
+                                <FeatherIcon icon="trending-up" className="text-warning" />
+                            </span>
+                        </div>
+                    </div>
+          </CardBody>
+        </Card>
+      </Col>
+
+      {/* Avg Lead Time */}
+      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+        <Card className="card-animate w-100 h-80">     
+        <CardBody className="p-2">
+        <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+ <p className=" font-medium mb-0">
+                Avg Lead Time
+            </p>
+
+            <h2 className="mt-4 ff-secondary fw-semibold text-success">
+              <CountUp
+                end={Number(avgLeadTime || 0)}
+                start={0}
+                // suffix=" days"
+                decimals={1}
+                duration={3}
+              />
+            </h2>
+
+ <p className="text-muted mb-0 ">
+              Target: 0 days
+            </p>
+                </div>
+
+                <div className="avatar-sm flex-shrink-0">
+                            <span className="avatar-title bg-success-subtle rounded-circle fs-2">
+                                <FeatherIcon icon="clock" className="text-success" />
+                            </span>
+                        </div>
+                    </div>
+          </CardBody>
+        </Card>
+      </Col>
+    </Row>
 </React.Fragment>
-    );
+  );
 };
 
 export default Widgets;
