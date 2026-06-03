@@ -18,6 +18,9 @@ export const loginUserAPI = (data) => {
 export const GET_POWERBI_SALES =
   "/api/PowerBi/PowerBISalesTransactions";
 
+  export const GET_POWERBI_PURCHASE_ORDERS =
+  "/api/PowerBi/PowerBIPurchaseOrders";
+
 export const GET_POWERBI_STOCK =
   "/api/PowerBi/PowerBIDailyClosingStock";
 

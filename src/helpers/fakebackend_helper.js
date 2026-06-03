@@ -24,6 +24,9 @@ export const isUserAuthenticated = () => {
 export const getSalesTransactions = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
 console.log("POWER BI URL:", url.GET_POWERBI_SALES);
+export const getPurchaseOrders = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_PURCHASE_ORDERS, { params });
+console.log("POWER BI URL:", url.GET_POWERBI_PURCHASE_ORDERS);
 export const getDailyClosingStock = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_STOCK, { params });
 
