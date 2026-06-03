@@ -19,20 +19,24 @@ const Widget = ({
   formatAmount,
   cashPercentage = 0,
   creditPercentage = 0,
-  
+  branchMap = {},
 }) => {    
   
        const { branch, dateRange, startDate, endDate } = useSelector(
         (state) => state.powerbi.filters
       );
-  const dispatch = useDispatch();
+      const branchName =
+  !branch || branch === "All Branches"
+    ? "All Branches"
+    : branchMap?.[branch] || "Unknown Branch";
 
     return (
        <React.Fragment>
   <div className="mb-2">
         <h4 className="card-title mb-0 text-start ">
-    KEY METRICS - {dateRange}
-        </h4>
+    KEY METRICS 
+  {branchName !== "All Branches" && ` - ${branchName}`}        
+   </h4>
     </div>
 <Row className="g-2 mb-2">
 <Col xl={3} lg={4} md={6} sm={12}>
@@ -47,7 +51,6 @@ const Widget = ({
                                         start={0}
                                         end={Number(totalRevenue || 0)}
                                         decimals={1}
-                                        duration={3}
                                         duration={3}
   formattingFn={(value) => formatAmount(value)}
                                     />

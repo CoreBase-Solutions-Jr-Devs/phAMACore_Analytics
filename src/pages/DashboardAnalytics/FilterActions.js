@@ -38,6 +38,8 @@ const {
     return Object.values(map);
   })();
 
+  const selectedBranchName =
+  branches.find(b => b.branchCode === branch)?.branchName || "All Branches";
   
   const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Custom"];
   
@@ -147,7 +149,7 @@ const formatDisplay = (date) => date || "";
         <div className="d-flex flex-wrap align-items-center justify-content-between small ">
           <div className="row w-100 align-items-center mx-0">
             <div className="col-md-4 d-flex align-items-center gap-1">
-              <span className="font-muted">Selected Branch:</span> <strong>{branch}</strong>
+              <span className="font-muted">Selected Branch:</span> <strong>{selectedBranchName}</strong>
             </div>
             <div className="col-md-4 d-flex align-items-center gap-1">
               <span className="font-muted">Filtered From:</span>

@@ -1,8 +1,8 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 import { topCustomers } from "../../common/data/dashboardEcommerce";
-
 const TopCustomers = ({ data = [], formatAmount }) => {
+
   const sorted = [...data].sort((a, b) => b.revenue - a.revenue);
   // const shortenName = (name, max = 10) => {
   //   if (!name) return "";
@@ -13,7 +13,9 @@ const TopCustomers = ({ data = [], formatAmount }) => {
       <Card className="card-height-100">
         <CardHeader className="align-items-center d-flex">
           <h4 className="card-title mb-0 flex-grow-1">
-            Top 5 Customers — revenue (KES)
+            Top Customers — revenue (KES)
+                        
+
           </h4>
         </CardHeader>
 

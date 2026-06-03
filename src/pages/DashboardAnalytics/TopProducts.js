@@ -1,18 +1,19 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 
-const TopProducts = ({ data = [] }) => {
-
+const TopProducts = ({ data = [], }) => {
+ 
   const topProduct = data.length
     ? [...data].sort((a, b) => b.qty - a.qty)[0]
     : null;
-
+   
   return (
     <Card className="card-height-100">
       <CardHeader className="align-items-center d-flex">
         <h4 className="card-title mb-0 flex-grow-1">
-          Top Products - Units Sold
-        </h4>
+        Top Products - Units Sold   
+           </h4>
+
       </CardHeader>
 
       <CardBody>

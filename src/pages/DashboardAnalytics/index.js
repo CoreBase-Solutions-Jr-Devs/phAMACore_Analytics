@@ -53,6 +53,15 @@ useEffect(() => {
   );
 }, []);
 
+const branchMap = useMemo(() => {
+   if (!filters.branch) return null;
+  const map = {};
+  sales.forEach((item) => {
+    map[item.branch_ID] = item.brancch_Name;
+  });
+  return map;
+}, [sales]);
+
 const formatAmount = (value) => {
   if (value === null || value === undefined) return "0";
 
@@ -229,7 +238,7 @@ const monthToDateChart = useMemo(() => {
 
   sales.forEach((s) => {
     const date = new Date(s.transaction_Date);
-
+  
     if (
       date.getFullYear() !== currentYear ||
       date.getMonth() !== currentMonth
@@ -241,7 +250,8 @@ const monthToDateChart = useMemo(() => {
       map[day] += Number(s.revenue || 0);
     }
   });
-
+  
+console.log("FINAL SERIES:", DAYS.map((d) => map[d]));
   console.log("📊 MTD DAILY MAP:", map);
 
   return {
@@ -249,7 +259,7 @@ const monthToDateChart = useMemo(() => {
     series: [
       {
         name: "Revenue",
-        data: DAYS.map((d) => map[d] ),
+data: DAYS.map((d) => Number(map[d] || 0)),
       },
     ],
   };
@@ -284,7 +294,11 @@ const topProductsData = sales.reduce((acc, item) => {
 
 const topProducts = Object.values(topProductsData)
   .sort((a, b) => b.qty - a.qty)
-  .slice(0, 5);
+  .slice(0, 5)
+  .map(item => ({
+    ...item,
+    qty: Math.round(item.qty),
+  }));
 
 console.log(topProducts);
 
@@ -312,6 +326,7 @@ document.title = "Sales Dashboard | phAMACore Analytics";
     cashPercentage ={cashPercentage}
   creditPercentage={creditPercentage}
 revenueChange={revenueChange}
+  branchMap={branchMap}
   />
             </Col>
           </Row>
@@ -333,15 +348,15 @@ revenueChange={revenueChange}
 
           <Row>
             <Col xl={4}>
-              <SalesmanRevenue sales={sales} data={salesmanData} formatAmount={formatAmount} />
+              <SalesmanRevenue sales={sales} data={salesmanData}  formatAmount={formatAmount} />
             </Col>
 
             <Col xl={4}>
-              <ReceivablesAgeing sales={sales} />
+              <ReceivablesAgeing sales={sales}  />
             </Col>
 
             <Col xl={4}> 
-            <TopCustomers sales={sales} data={topCustomersData} formatAmount={formatAmount} /> 
+            <TopCustomers sales={sales} data={topCustomersData}  formatAmount={formatAmount} /> 
             </Col>
           </Row>
 
