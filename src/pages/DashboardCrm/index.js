@@ -1,13 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody, ListGroup, ListGroupItem, Badge } from 'reactstrap';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
-import BalanceOverview from './BalanceOverview';
-import ClosingDeals from './ClosingDeals';
-import DealsStatus from './DealsStatus';
-import DealType from './DealType';
-import MyTasks from './MyTasks';
-import SalesForecast from './SalesForecast';
-import UpcomingActivities from './UpcomingActivities';
 import Widgets from './Widgets';
 import { CustomDataLabel } from '../Charts/ApexCharts/BarCharts/BarCharts';
 import { PaginationTable } from '../Tables/ReactTables/ReactTable';
@@ -51,7 +44,7 @@ const DashboardCrm = () => {
                         </Col>
                     </Row>
                     <Row>
-                        <Col>
+                        <Col lg={6} xl={6}>
                             <Card>
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Stock Value By Branch</h4>
@@ -61,7 +54,7 @@ const DashboardCrm = () => {
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col>
+                        <Col lg={6} xl={6}>
                             <Card>
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Stock VS Sales Velocity - Branch Coverage Ratio</h4>
@@ -265,19 +258,6 @@ const DashboardCrm = () => {
                             </Card>
                         </Col>
                     </Row>
-                    {/* <Row>
-                        <SalesForecast />
-                        <DealType />
-                        <BalanceOverview />
-                    </Row>
-                    <Row>
-                        <DealsStatus />
-                        <MyTasks />
-                    </Row>
-                    <Row>
-                        <UpcomingActivities />
-                        <ClosingDeals />
-                    </Row> */}
                 </Container>
             </div>
         </React.Fragment>

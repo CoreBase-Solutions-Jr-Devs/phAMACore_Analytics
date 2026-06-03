@@ -1,94 +1,104 @@
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
-import getChartColorsArray from '../../../../Components/Common/ChartsDynamicColor';
 
-const BarChartTwo = ({ dataColors }) => {
-    var chartDatalabelsBarColors = getChartColorsArray(dataColors);
-    const series = [{
-        data: [14.2, 8.8, 6.0, 4.6, 3.7, 1.1]
-    }];
-    var options = {
+const BRANCHES = [ 'MAIN', 'CENTRAL', 'MOMBASA', 'WESTLANDS', 'KAMPALA', 'WAREHOUSE', 'KAKAMEGA', 'WAJIR', 'TEST BRANCH', 'TESTING'];
+
+// Matching sorted values
+const DEFAULT_DATA = [ 14.2, 10.5, 8.8, 7.8, 6.1, 5.4, 3.6, 2.9, 1.7, 1.2];
+
+// Branch color mapping
+const BRANCH_COLORS = {
+    MAIN: '#405189',
+    CENTRAL: '#4b9fd4',
+    WESTLANDS: '#0ab39c',
+    WAREHOUSE: '#299cdb',
+    MOMBASA: '#2a9d8f',
+    KAKAMEGA: '#e76f51',
+    WAJIR: '#f4a261',
+    KAMPALA: '#8e44ad',
+    'TEST BRANCH': '#f7b84b',
+    TESTING: '#f06548',
+};
+
+const FALLBACK_PALETTE = ['#405189', '#4b9fd4', '#0ab39c', '#299cdb', '#f7b84b', '#f06548'];
+
+const BarChartTwo = () => {
+
+    const series = [{ data: DEFAULT_DATA }];
+
+    const colors = BRANCHES.map((name, i) => {
+        const key = name.toUpperCase().trim();
+        return BRANCH_COLORS[key] || FALLBACK_PALETTE[i % FALLBACK_PALETTE.length];
+    });
+
+    const options = {
         chart: {
             type: 'bar',
             height: 350,
-            toolbar: {
-                show: false,
-            }
+            toolbar: { show: false },
+            animations: { enabled: true },
         },
         plotOptions: {
             bar: {
-                barHeight: '100%',
+                barHeight: '80%',
                 distributed: true,
                 horizontal: true,
-                dataLabels: {
-                    position: 'bottom'
-                },
-            }
+            },
         },
-        colors: chartDatalabelsBarColors,
+        colors,
         dataLabels: {
             enabled: true,
             textAnchor: 'start',
             style: {
-                colors: ['#fff']
+                colors: ['#fff'],
+                fontWeight: 600,
+                fontSize: '12px',
             },
-            formatter: function (val, opt) {
-                return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val;
-            },
-            offsetX: 0,
-            dropShadow: {
-                enabled: false
-            }
+            formatter: (val, opt) =>
+                `${opt.w.globals.labels[opt.dataPointIndex]}: ${val}`,
         },
         stroke: {
             width: 1,
-            colors: ['#fff']
+            colors: ['#fff'],
         },
         xaxis: {
-            categories: ['Nairobi CBD', 'Mombasa', 'Thika', 'Nakuru', 'Kisumu', 'Eldoret'],
+            categories: BRANCHES,
+            labels: {
+                formatter: (val) => `${val}M`,
+            },
         },
         yaxis: {
-            labels: {
-                show: false
-            }
+            labels: { show: false },
         },
+        legend: { show: false },
         title: {
             text: 'Value of Stock by Branch (KES Millions)',
             align: 'left',
-            floating: true,
-            style: {
-                fontWeight: 500,
-            },
+            style: { fontWeight: 500, fontSize: '13px' },
         },
         subtitle: {
-            text: 'Eldoret critically undercapitalised VS its sales territory size.',
+            text: 'Branch stock distribution overview across all operational locations.',
             align: 'left',
+            style: { fontSize: '11px', color: '#878a99' },
         },
         tooltip: {
             theme: 'dark',
-            x: {
-                show: false
-            },
+            x: { show: false },
             y: {
-                title: {
-                    formatter: function () {
-                        return '';
-                    }
-                }
-            }
-        }
+                formatter: (val) => `KES ${val}M`,
+            },
+        },
     };
+
     return (
-        <React.Fragment>
-            <ReactApexChart dir="ltr"
-                className="apex-charts"
-                options={options}
-                series={series}
-                type="bar"
-                height={350}
-            />
-        </React.Fragment>
+        <ReactApexChart
+            className="apex-charts"
+            options={options}
+            series={series}
+            type="bar"
+            height={350}
+        />
     );
-}
+};
 
 export default BarChartTwo;
