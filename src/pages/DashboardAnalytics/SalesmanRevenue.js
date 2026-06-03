@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 import { salesmanRevenue } from "../../common/data/dashboardEcommerce";
 
-const SalesmanRevenue = ({ data = [], formatAmount }) => {
+const SalesmanRevenue = ({ data = [], formatAmount  }) => {
   const sorted = [...data].sort((a, b) => b.revenue - a.revenue).slice(0, 5);
 
   return (
@@ -10,7 +10,8 @@ const SalesmanRevenue = ({ data = [], formatAmount }) => {
       <Card className="card-height-100">
         <CardHeader className="align-items-center d-flex">
           <h4 className="card-title mb-0 flex-grow-1">
-            Top 5 Salesman — revenue (KES)
+            Top Salesman — revenue (KES)
+        
           </h4>
         </CardHeader>
 

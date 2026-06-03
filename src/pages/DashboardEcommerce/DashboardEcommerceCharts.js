@@ -2,7 +2,7 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 
-const RevenueCharts = ({ dataColors, series }) => {
+const RevenueCharts = ({ dataColors, series, categories }) => {
   var linechartcustomerColors = getChartColorsArray(dataColors);
 
   var options = {
@@ -13,11 +13,11 @@ const RevenueCharts = ({ dataColors, series }) => {
         show: false,
       },
     },
-    stroke: {
-      curve: "straight",
-     dashArray: [0, 8],
-  width: [2, 2],
-    },
+   stroke: {
+  curve: "smooth",
+  dashArray: [0, 8],
+  width: [0, 3],
+},
   fill: {
   opacity: 1,
 },
@@ -29,20 +29,7 @@ const RevenueCharts = ({ dataColors, series }) => {
       },
     },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+     categories: categories,
       axisTicks: {
         show: false,
       },
@@ -52,7 +39,7 @@ const RevenueCharts = ({ dataColors, series }) => {
     },
 yaxis: {
   min: 0,
-  max: 25,
+forceNiceScale: true,
   tickAmount: 5,
 
   labels: {
@@ -137,105 +124,132 @@ tooltip: {
 };
 
 
-const SpendCharts = ({ dataColors, series }) => {
-    let barchartCountriesColors = [];
-    try {
-        barchartCountriesColors = dataColors ? getChartColorsArray(dataColors) : [];
-    } catch (error) {
-        console.warn('Chart colors parsing failed:', error);
-        barchartCountriesColors = ['#f06548'];
-    }
+const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
+  let barchartCountriesColors = [];
 
-    // Ensure series data is mutable
-    const validSeries = React.useMemo(() => {
-        if (!series || !Array.isArray(series)) return [{ data: [] }];
-        return series.map((s) => ({ ...s }));
-    }, [series]);
+  try {
+    barchartCountriesColors = dataColors
+      ? getChartColorsArray(dataColors)
+      : [];
+  } catch (error) {
+    console.warn("Chart colors parsing failed:", error);
+    barchartCountriesColors = ["#f06548"];
+  }
 
-    var options = {
-        chart: {
-            type: 'bar',
-            height: 400,
-            toolbar: {
-                show: false,
-            }
-        },
-        plotOptions: {
-            bar: {
-                borderRadius: 4,
-                horizontal: true,
-                distributed: true,
-                dataLabels: {
-                    position: 'top',
-                },
-            }
-        },
-        colors: barchartCountriesColors,
+  const validSeries = React.useMemo(() => {
+    if (!series || !Array.isArray(series)) return [{ data: [] }];
+
+    return series.map((s) => ({
+      ...s,
+    }));
+  }, [series]);
+
+  const options = {
+    chart: {
+      type: "bar",
+      height: 300,
+      toolbar: {
+        show: false,
+      },
+    },
+
+    plotOptions: {
+      bar: {
+        borderRadius: 2,
+        horizontal: true,
+        distributed: true,
+        barHeight: "65%", 
         dataLabels: {
-            enabled: true,
-            offsetX: 32,
-             formatter: (val) => `${val}M`,
-            style: {
-                fontSize: '12px',
-                fontWeight: 400,
-                colors: ['#adb5bd']
-                // colors:['#878a99']
-            }
+          position: "right", 
         },
-tooltip: {
-    y: {
-        formatter: (val) => `${val}M`
-    }
-},
-        legend: {
-            show: false,
-        },
-        grid: {
-            show: false,
-        },
-xaxis: {
-    categories: [
-        'Cosmos Ltd',
-        'Biodeal Ltd',
-        'Elys Chemicals',
-        'Universal Corp',
-        'PharmaChem EA'
-    ],
-    labels: {
-        show: false
+      },
     },
-    axisTicks: {
-        show: false
+
+    colors: barchartCountriesColors,
+
+    dataLabels: {
+      enabled: true,
+      textAnchor: "start",
+      offsetX: 15, 
+      formatter: (val) => formatAmount(val),
+
+      style: {
+        // fontSize: "12px",
+        fontWeight: 300,
+        padding: "10px",
+        colors: ["#495057"],
+      },
     },
-    axisBorder: {
-        show: false
-    }
+
+    tooltip: {
+      y: {
+        formatter: (val) => `KES ${formatAmount(val)}`,
+      },
+    },
+
+    legend: {
+      show: false,
+    },
+
+grid: {
+  show: false,
+  padding: {
+    left: 50, // increase if names are still cut off
+  },
 },
-    };
-    return (
-        <React.Fragment>
-            <ReactApexChart dir="ltr"
-                options={options}
-                series={validSeries}
-                type="bar"
-                height={300}
-                className="apex-charts"
-            />
-        </React.Fragment>
-    );
+
+    xaxis: {
+      categories: categories || [],
+
+      labels: {
+        show: false,
+      },
+
+      axisTicks: {
+        show: false,
+      },
+
+      axisBorder: {
+        show: false,
+      },
+    },
+
+ yaxis: {
+  labels: {
+    maxWidth: 250,
+    style: {
+      fontSize: "13px",
+      fontWeight: 600,
+      colors: ["#495057"], // dark gray
+      // fontFamily: "inherit", // optional
+    },
+  },
+},
+  };
+
+  return (
+    <ReactApexChart
+      dir="ltr"
+      options={options}
+      series={validSeries}
+      type="bar"
+height={500}
+      className="apex-charts"
+    />
+  );
 };
 
 const StoreVisitsCharts = ({ dataColors }) => {
   var chartDonutBasicColors = getChartColorsArray(dataColors);
   const series = [44, 55, 41, 17, 15];
   var options = {
-   labels: [
-  "Antibiotics",
-  "ARVs",
-  "Antimalarials",
-  "Chronic Disease",
-  "OTC/Supp"
-],
+//    labels: [
+//   "Antibiotics",
+//   "ARVs",
+//   "Antimalarials",
+//   "Chronic Disease",
+//   "OTC/Supp"
+// ],
 
 dataLabels: {
   enabled: true,
@@ -259,7 +273,7 @@ dataLabels: {
         enabled: false,
       },
     },
-    colors: chartDonutBasicColors,
+    // colors: chartDonutBasicColors,
   };
   return (
     <React.Fragment>

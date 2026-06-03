@@ -6,7 +6,7 @@ import {
   setDateRange,
   setStartDate,
   setEndDate,
-} from "../../slices/dashboardSales/reducer";
+} from "../../slices/dashboardPurchase/reducer";
 import { useRef } from "react";
 import Flatpickr from "react-flatpickr";
 
@@ -15,18 +15,18 @@ const FilterActions = ({ onApply }) => {
   const startRef = useRef(null);
 const endRef = useRef(null);
 const {
-  sales,
+  PurchaseOrders,
   loading,
   error,
   filters: { branch, dateRange, startDate, endDate },
-} = useSelector((state) => state.powerbi);
+} = useSelector((state) => state.PurchaseOrders);
   
   const branches = (() => {
     const map = {};
 
-    (sales || []).forEach((item) => {
+    (PurchaseOrders || []).forEach((item) => {
       const code = item.branch_ID;
-      const name = item.brancch_Name;
+      const name = item.branch_name;
 
       if (code == null) return;
 
@@ -38,9 +38,9 @@ const {
     return Object.values(map);
   })();
 
-  const selectedBranchName =
+  const selectedBranch =
   branches.find(b => b.branchCode === branch)?.branchName || "All Branches";
-  
+
   const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Custom"];
   
 const formatDisplay = (date) => date || "";
@@ -149,8 +149,8 @@ const formatDisplay = (date) => date || "";
         <div className="d-flex flex-wrap align-items-center justify-content-between small ">
           <div className="row w-100 align-items-center mx-0">
             <div className="col-md-4 d-flex align-items-center gap-1">
-              <span className="font-muted">Selected Branch:</span> <strong>{selectedBranchName}</strong>
-            </div>
+<span className="font-muted">Selected Branch:</span>{" "}
+<strong>{selectedBranch}</strong>            </div>
             <div className="col-md-4 d-flex align-items-center gap-1">
               <span className="font-muted">Filtered From:</span>
               <strong >

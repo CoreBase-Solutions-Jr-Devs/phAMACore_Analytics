@@ -1,86 +1,98 @@
-import React from 'react';
-import { Card, CardBody, CardHeader, Col } from 'reactstrap';
-// import Vector from './VectorMap';
-import { VectorMap } from '@south-paw/react-vector-maps'
-import world from '../../common/world.svg.json';
+import React from "react";
+import { Card, CardBody, CardHeader } from "reactstrap";
 
-const SalesByLocations = () => {
-    return (
-        <React.Fragment>
-          
-                <Card className="card-height-100">
-                    <CardHeader className="align-items-center d-flex">
-                        <h4 className="card-title mb-0 flex-grow-1">Spend by branch-April 2026</h4>
-                        <div className="flex-shrink-0">
-                            <button type="button" className="btn btn-soft-primary btn-sm">
-                                Export Report
-                            </button>
-                        </div>
-                    </CardHeader>
+const getColor = (percent) => {
+  if (percent >= 90) return "bg-caramel";
+  if (percent >= 75) return "bg-success";
+  if (percent >= 60) return "bg-info";
+  if (percent >= 45) return "bg-primary";
+  if (percent >= 30) return "bg-warning";
+  // if (percent >= 10) return "bg-secondary";
+  if (percent >= 1) return "bg-secondary";  
+  if (percent <= 0) return "bg-danger";
+ 
+};
 
-                    <CardBody>
-{/* 
-                        <div
-                            data-colors='["--vz-light", "--vz-success", "--vz-primary"]'
-                            style={{ height: "50px" }} dir="ltr">
-                             <div id="world_map_line_markers" className="custom-vector-map">
-                                        <VectorMap {...world} />
-                                    </div>
-                        </div> */}
 
-                        <div className="px-2 mt-1">
-                            <p className="mb-1">Nairobi CBD <span className="float-end">4.20M</span></p>
-                            <div className="progress mt-2" style={{ height: "20px" }}>
-                                <div className="progress-bar progress-bar-striped bg-primary" role="progressbar"
-                                    style={{ width: "75%" }} aria-valuenow="75" aria-valuemin="0" aria-valuemax="75">
-                                </div>
-                            </div>
+const SalesByLocations = ({ data = [], totalSpend=0, formatAmount }) => {
+const topBranch = data.length
+    ? [...data].sort((a, b) => b.value - a.value)[0]
+    : null;
+  return (
+    <Card className="card-height-100">
+      <CardHeader className="align-items-center d-flex">
+        <h4 className="card-title mb-0 flex-grow-1">
+          Spend by branch - 
+        </h4>
 
-                            <p className="mt-3 mb-1">Mombasa <span className="float-end">2.52M</span></p>
-                            <div className="progress mt-2" style={{ height: "20px" }}>
-                                <div className="progress-bar progress-bar-striped bg-primary" role="progressbar"
-                                    style={{ width: "65%" }} aria-valuenow="47" aria-valuemin="0" aria-valuemax="47">
-                                </div>
-                            </div>
+        {/* <div className="flex-shrink-0">
+          <button type="button" className="btn btn-soft-primary btn-sm">
+            Export Report
+          </button>
+        </div> */}
+      </CardHeader>
 
-                            <p className="mt-3 mb-1">Thika <span className="float-end">1.88M</span></p>
-                            <div className="progress mt-2" style={{ height: "20px" }}>
-                                <div className="progress-bar progress-bar-striped bg-danger" role="progressbar"
-                                    style={{ width: "55%" }} aria-valuenow="82" aria-valuemin="0" aria-valuemax="82">
-                                </div>
-                            </div>
+      <CardBody>
+        {data.length === 0 ? (
+          <div className="text-center py-5">
+            <h6 className="text-muted mb-2">
+            No branch data available
+            </h6>
+          </div>
+        ) : (
+          <>
+            {data.map((item) => {
 
-                               <p className="mt-3 mb-1">Nakuru <span className="float-end">1.48M</span></p>
-                            <div className="progress mt-2" style={{ height: "20px" }}>
-                                <div className="progress-bar progress-bar-striped bg-danger" role="progressbar"
-                                    style={{ width: "45%" }} aria-valuenow="72" aria-valuemin="0" aria-valuemax="72">
-                                </div>
-                            </div>
+const percent = totalSpend
+  ? (item.value / totalSpend) * 100
 
-                               <p className="mt-3 mb-1">Kisumu <span className="float-end">1.18M</span></p>
-                            <div className="progress mt-2" style={{ height: "20px" }}>
-                                <div className="progress-bar progress-bar-striped bg-warning" role="progressbar"
-                                    style={{ width: "35%" }} aria-valuenow="62" aria-valuemin="0" aria-valuemax="62">
-                                </div>
-                            </div>
+  : 0;
+              const color = getColor(percent);
 
-                                   <p className="mt-3 mb-1">Eldoret <span className="float-end">0.59M</span></p>
-                            <div className="progress mt-2" style={{ height: "20px" }}>
-                                <div className="progress-bar progress-bar-striped bg-warning" role="progressbar"
-                                    style={{ width: "25%" }} ariavaluenow="52" aria-valuemin="0" aria-valuemax="52">
-                                </div>
-                            </div>
-                        </div>
-                          <hr className="my-2" />
-                        <p className="mb-2 text-muted ">
-    Eldoret spend (Kes 0.99M) is critically low relative to territory size,
-    signaling chronic under-ordering.
-</p>
-                    </CardBody>
-                </Card>
-        
-        </React.Fragment>
-    );
+            return (
+              <div key={item.name} className="mb-3">
+                <div className="d-flex justify-content-between">
+                    <span className="text-uppercase">
+                      {item.name}
+                    </span>
+                  <span className="text-muted">
+                    {formatAmount(item.value)}
+                  </span>
+               </div>
+
+                <div className="progress mt-2" style={{ height: "20px" }}>
+                  <div
+                    className={`progress-bar progress-bar-striped ${color}`}
+                    role="progressbar"
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+              <hr className="my-2" />
+
+ {topBranch && (
+          <div className="d-flex flex-row align-items-center justify-content-center mb-2 gap-3">
+            <p>
+              Top performing branch:
+              <strong> {topBranch.name}</strong>
+            </p>
+
+            <p >
+              Revenue:
+              <strong> KES {formatAmount(Number(topBranch.amount))}</strong>
+            </p>
+          </div>
+        )}
+        </>
+        )}
+
+    
+       
+      </CardBody>
+    </Card>
+  );
 };
 
 export default SalesByLocations;

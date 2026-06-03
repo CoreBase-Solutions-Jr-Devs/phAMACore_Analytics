@@ -75,6 +75,8 @@ import PowerBIReducer from "./dashboardSales/reducer";
 // Stock/Inventory
 import StockInventoryReducer from "./dashboardCRM/reducer";
 
+ import PurchaseOrdersReducer from "./dashboardPurchase/reducer";
+
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
     Login: LoginReducer,
@@ -103,6 +105,7 @@ const rootReducer = combineReducers({
     Jobs: JobReducer,
     APIKey: APIKeyReducer,
     powerbi: PowerBIReducer,
+    PurchaseOrders: PurchaseOrdersReducer,
     StockInventory: StockInventoryReducer,
 });
 
