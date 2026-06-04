@@ -1,17 +1,13 @@
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
+import { Badge } from 'reactstrap';
 
-/**
- * BarChartThree — Stock VS Sales Velocity (Branch Coverage Ratio)
- */
+const BRANCHES = [
+    'WAREHOUSE', 'TESTING', 'MAIN', 'KAMPALA', 'CENTRAL',
+    'WESTLANDS', 'MOMBASA', 'WAJIR', 'KAKAMEGA', 'TEST BRANCH',
+];
+const DEFAULT_DATA = [34, 31, 28, 27, 22, 19, 15, 12, 9, 6];
 
-// Sorted DESCENDING manually (by value)
-const BRANCHES = ['WAREHOUSE','TESTING','MAIN','KAMPALA','CENTRAL','WESTLANDS','MOMBASA','WAJIR','KAKAMEGA','TEST BRANCH'];
-
-// Matching data (same order as branches above)
-const DEFAULT_DATA = [34,31,28,27,22,19,15,12,9,6];
-
-// Zone coloring (still dynamic, but simple)
 const ZONE_COLOR = (v) => {
     if (v < 10) return '#f06548';
     if (v < 21) return '#f7b84b';
@@ -19,13 +15,17 @@ const ZONE_COLOR = (v) => {
     return '#405189';
 };
 
-const BarChartThree = ({ height = 350 }) => {
+const BADGE_BG = (v) => {
+    if (v < 10) return 'rgba(240,101,72,0.18)';
+    if (v < 21) return 'rgba(247,184,75,0.18)';
+    if (v <= 30) return 'rgba(10,179,156,0.18)';
+    return 'rgba(64,81,137,0.18)';
+};
 
-    const resolvedCategories = BRANCHES;
-    const resolvedData = DEFAULT_DATA;
-    const resolvedColors = resolvedData.map(ZONE_COLOR);
+const BarChartThree = ({ height = 420 }) => {
+    const resolvedColors = DEFAULT_DATA.map(ZONE_COLOR);
 
-    const series = [{ data: resolvedData }];
+    const series = [{ data: DEFAULT_DATA }];
 
     const options = {
         chart: {
@@ -36,26 +36,41 @@ const BarChartThree = ({ height = 350 }) => {
         },
         plotOptions: {
             bar: {
-                barHeight: '80%',
+                barHeight: '45%',
                 distributed: true,
                 horizontal: true,
+                dataLabels: {
+                    position: 'top',
+                    hideOverflowingLabels: false,
+                },
             },
         },
         colors: resolvedColors,
         dataLabels: {
             enabled: true,
             textAnchor: 'start',
+            formatter: (val) => `${val} days`,
             style: {
-                colors: ['#fff'],
-                fontWeight: 600,
-                fontSize: '12px',
+                colors: DEFAULT_DATA.map(ZONE_COLOR),
+                fontWeight: 700,
+                fontSize: '11px',
             },
-            formatter: (val, opt) =>
-                `${opt.w.globals.labels[opt.dataPointIndex]}: ${val}`,
+            background: {
+                enabled: true,
+                foreColor: undefined, // uses style.colors
+                padding: 4,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: undefined, // set per-bar via colors trick below
+                opacity: 0.15,
+                dropShadow: { enabled: false },
+            },
+            offsetX: 8,
+            dropShadow: { enabled: false },
         },
         stroke: {
             width: 1,
-            colors: ['#fff'],
+            colors: ['transparent'],
         },
         annotations: {
             xaxis: [
@@ -66,11 +81,14 @@ const BarChartThree = ({ height = 350 }) => {
                     opacity: 0.07,
                     label: {
                         text: 'Target zone',
+                        position: 'top',
                         style: {
                             color: '#0ab39c',
                             fontSize: '10px',
                             background: 'transparent',
+                            border: 'none',
                         },
+                        offsetY: 4,
                     },
                 },
                 {
@@ -85,24 +103,47 @@ const BarChartThree = ({ height = 350 }) => {
                             background: '#f06548',
                             fontSize: '10px',
                         },
+                        position: 'top',
+                        orientation: 'horizontal',
+                        offsetY: -4,
                     },
                 },
             ],
         },
         xaxis: {
-            categories: resolvedCategories,
+            min: 0,
+            // Extra headroom so pill badges aren't clipped
+            max: Math.max(...DEFAULT_DATA) * 1.40,
+            categories: BRANCHES,
             labels: {
                 formatter: (val) => `${val}d`,
+                style: { fontSize: '11px' },
             },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
         },
         yaxis: {
-            labels: { show: false },
+            labels: {
+                show: true,
+                align: 'left',
+                maxWidth: 130,
+                style: {
+                    fontSize: '12px',
+                    fontWeight: 500,
+                },
+                offsetX: -10,
+            },
+        },
+        grid: {
+            borderColor: 'rgba(255,255,255,0.06)',
+            xaxis: { lines: { show: true } },
+            yaxis: { lines: { show: false } },
         },
         legend: { show: false },
         title: {
-            text: 'Stock Value by Sales Velocity',
+            text: 'Stock vs. sales velocity — branch coverage ratio',
             align: 'left',
-            style: { fontWeight: 500, fontSize: '13px' },
+            style: { fontWeight: 600, fontSize: '13px' },
         },
         subtitle: {
             text: 'Target: 21–30 days cover. Below 10 = critical replenishment needed.',
@@ -111,9 +152,13 @@ const BarChartThree = ({ height = 350 }) => {
         },
         tooltip: {
             theme: 'dark',
-            x: { show: false },
+            x: { show: true },
             y: {
                 formatter: (val) => `${val} days of cover`,
+                title: {
+                    formatter: (seriesName, opts) =>
+                        BRANCHES[opts?.dataPointIndex] ?? seriesName,
+                },
             },
         },
     };

@@ -1,34 +1,22 @@
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
 
-/**
- * BarChartOne — Critical Stock Levels (MUST-NOT STOCKOUT items)
- *
- * Props:
- *   categories  {string[]}  Item names (sorted ascending by days cover)
- *   data        {number[]}  Days of cover per item
- *   colors      {string[]}  Per-bar hex colors (zone-coded: red/amber/green)
- *   reorderLine {number}    X-axis annotation value (default 6)
- *   height      {number}    Chart height in px (default 350)
- */
 const BarChartOne = ({
     categories = [],
     data = [],
     colors = [],
     reorderLine = 6,
-    height = 350,
+    height = 380,
 }) => {
-    // Fallback static data — mirrors the screenshot for dev/preview
     const resolvedCategories = categories.length ? categories : [
-        'ARVs(Tenofovir)', 'Amoxicillin 500mg', 'Co-Artem 20/120 mg',
-        'ORS Satchets', 'Metformin 500mg', 'Insulin Actrapid',
-        'Paracetamol 500mg', 'Omeprazole 20mg', 'Ciproflaxin 250', 'Brufen',
+        'ARVs (Tenofovir)', 'Amoxicillin 500mg', 'Co-Artem 20/120mg',
+        'ORS Sachets', 'Metformin 500mg', 'Insulin Actrapid',
+        'Paracetamol 500mg', 'Omeprazole 20mg', 'Ciprofloxacin 250', 'Brufen',
     ];
     const resolvedData = data.length
         ? data
         : [2.2, 3.4, 4.1, 5.6, 6.3, 7.7, 11.9, 14.2, 18.9, 22.6];
 
-    // Zone-coded colors — fallback derives from data values
     const resolvedColors = colors.length
         ? colors
         : resolvedData.map((v) => {
@@ -48,27 +36,32 @@ const BarChartOne = ({
         },
         plotOptions: {
             bar: {
-                barHeight: '80%',
+                barHeight: '45%',
                 distributed: true,
                 horizontal: true,
-                dataLabels: { position: 'bottom' },
+                dataLabels: {
+                    position: 'top',
+                    hideOverflowingLabels: false,
+                },
             },
         },
         colors: resolvedColors,
         dataLabels: {
             enabled: true,
             textAnchor: 'start',
-            style: { colors: ['#fff'], fontWeight: 600, fontSize: '12px' },
-            formatter: (val, opt) =>
-                `${opt.w.globals.labels[opt.dataPointIndex]}:  ${val}`,
-            offsetX: 0,
+            formatter: (val) => `${val} days`,
+            style: {
+                colors: resolvedColors,
+                fontWeight: 600,
+                fontSize: '12px',
+            },
+            offsetX: 8,
             dropShadow: { enabled: false },
         },
         stroke: {
             width: 1,
-            colors: ['#fff'],
+            colors: ['transparent'],
         },
-        // Reorder threshold vertical line annotation
         annotations: {
             xaxis: [
                 {
@@ -81,42 +74,65 @@ const BarChartOne = ({
                         style: {
                             color: '#fff',
                             background: '#c58c4f',
-                            fontSize: '11px',
+                            fontSize: '10px',
                         },
                         text: `Reorder @ ${reorderLine}d`,
                         position: 'top',
                         orientation: 'horizontal',
+                        offsetY: -4,
                     },
                 },
             ],
         },
         xaxis: {
+            min: 0,
+            max: Math.max(...resolvedData) * 1.1,
             categories: resolvedCategories,
             labels: {
                 formatter: (val) => `${val}d`,
+                style: { fontSize: '11px' },
             },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
         },
         yaxis: {
-            labels: { show: false },
+            labels: {
+                show: true,
+                align: 'left',
+                maxWidth: 160,
+                style: {
+                    fontSize: '12px',
+                    fontWeight: 500,
+                },
+                offsetX: 0,
+            },
+        },
+        grid: {
+            borderColor: 'rgba(255,255,255,0.06)',
+            xaxis: { lines: { show: true } },
+            yaxis: { lines: { show: false } },
         },
         legend: { show: false },
         title: {
-            text: 'Live stock VS Safety Minimum - Days of Cover Remaining',
+            text: 'Live stock vs. safety minimum — days of cover remaining',
             align: 'left',
             floating: false,
-            style: { fontWeight: 500, fontSize: '13px' },
+            style: { fontWeight: 600, fontSize: '13px' },
         },
         subtitle: {
-            text: 'Vertical line - reorder threshold(25% = 6 days of cover.) Red zone - stockout risk. Amber zone - stockout warning. Green zone - safe stock levels.',
+            text: 'Vertical line = reorder threshold (25% = 6-day cover). Red zone = critical. Amber = reorder now.',
             align: 'left',
             style: { fontSize: '11px', color: '#878a99' },
         },
         tooltip: {
             theme: 'dark',
-            x: { show: false },
+            x: { show: true },
             y: {
                 formatter: (val) => `${val} days of cover`,
-                title: { formatter: () => '' },
+                title: {
+                    formatter: (seriesName, opts) =>
+                        resolvedCategories[opts?.dataPointIndex] ?? seriesName,
+                },
             },
         },
     };
