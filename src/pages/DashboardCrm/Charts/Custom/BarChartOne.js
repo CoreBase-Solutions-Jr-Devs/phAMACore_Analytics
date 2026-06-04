@@ -118,7 +118,7 @@ const BarChartOne = ({
             style: { fontWeight: 600, fontSize: '13px' },
         },
         subtitle: {
-            text: 'Vertical line = reorder threshold (25% = 6-day cover). Red zone = critical. Amber = reorder now.',
+            text: 'Vertical line = reorder threshold (25% = 6-day cover). Red zone = critical. Amber = reorder now. Green = safe stock.',
             align: 'left',
             style: { fontSize: '11px', color: '#878a99' },
         },
