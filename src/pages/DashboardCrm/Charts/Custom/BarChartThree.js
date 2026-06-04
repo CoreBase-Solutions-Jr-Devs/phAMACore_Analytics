@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
-import { Badge } from 'reactstrap';
 
 const BRANCHES = [
     'WAREHOUSE', 'TESTING', 'MAIN', 'KAMPALA', 'CENTRAL',
@@ -15,15 +14,32 @@ const ZONE_COLOR = (v) => {
     return '#405189';
 };
 
-const BADGE_BG = (v) => {
-    if (v < 10) return 'rgba(240,101,72,0.18)';
-    if (v < 21) return 'rgba(247,184,75,0.18)';
-    if (v <= 30) return 'rgba(10,179,156,0.18)';
-    return 'rgba(64,81,137,0.18)';
-};
-
 const BarChartThree = ({ height = 420 }) => {
     const resolvedColors = DEFAULT_DATA.map(ZONE_COLOR);
+
+    const axisMax = Math.ceil(Math.max(...DEFAULT_DATA) * 1.30);
+
+    const pointAnnotations = DEFAULT_DATA.map((val, i) => ({
+        x: axisMax,
+        y: BRANCHES[i],
+        marker: { size: 0 },
+        label: {
+            text: `${Math.round(val)} days`,
+            textAnchor: 'end',
+            offsetX: -4,
+            offsetY: 5,
+            borderWidth: 1,
+            borderRadius: 10,
+            borderColor: ZONE_COLOR(val),
+            style: {
+                background: 'transparent',
+                color: ZONE_COLOR(val),
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: { top: 3, bottom: 3, left: 8, right: 8 },
+            },
+        },
+    }));
 
     const series = [{ data: DEFAULT_DATA }];
 
@@ -39,39 +55,12 @@ const BarChartThree = ({ height = 420 }) => {
                 barHeight: '45%',
                 distributed: true,
                 horizontal: true,
-                dataLabels: {
-                    position: 'top',
-                    hideOverflowingLabels: false,
-                },
+                dataLabels: { position: 'top' },
             },
         },
         colors: resolvedColors,
-        dataLabels: {
-            enabled: true,
-            textAnchor: 'start',
-            formatter: (val) => `${val} days`,
-            style: {
-                colors: DEFAULT_DATA.map(ZONE_COLOR),
-                fontWeight: 700,
-                fontSize: '11px',
-            },
-            background: {
-                enabled: true,
-                foreColor: undefined, // uses style.colors
-                padding: 4,
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: undefined, // set per-bar via colors trick below
-                opacity: 0.15,
-                dropShadow: { enabled: false },
-            },
-            offsetX: 8,
-            dropShadow: { enabled: false },
-        },
-        stroke: {
-            width: 1,
-            colors: ['transparent'],
-        },
+        dataLabels: { enabled: false },
+        stroke: { width: 1, colors: ['transparent'] },
         annotations: {
             xaxis: [
                 {
@@ -98,25 +87,21 @@ const BarChartThree = ({ height = 420 }) => {
                     strokeDashArray: 4,
                     label: {
                         text: 'Critical',
-                        style: {
-                            color: '#fff',
-                            background: '#f06548',
-                            fontSize: '10px',
-                        },
+                        style: { color: '#fff', background: '#f06548', fontSize: '10px' },
                         position: 'top',
                         orientation: 'horizontal',
                         offsetY: -4,
                     },
                 },
             ],
+            points: pointAnnotations,
         },
         xaxis: {
             min: 0,
-            // Extra headroom so pill badges aren't clipped
-            max: Math.max(...DEFAULT_DATA) * 1.40,
+            max: axisMax,
             categories: BRANCHES,
             labels: {
-                formatter: (val) => `${val}d`,
+                formatter: (val) => `${Math.round(val)}d`,
                 style: { fontSize: '11px' },
             },
             axisBorder: { show: false },
@@ -127,15 +112,12 @@ const BarChartThree = ({ height = 420 }) => {
                 show: true,
                 align: 'left',
                 maxWidth: 130,
-                style: {
-                    fontSize: '12px',
-                    fontWeight: 500,
-                },
+                style: { fontSize: '12px', fontWeight: 500 },
                 offsetX: -10,
             },
         },
         grid: {
-            borderColor: 'rgba(255,255,255,0.06)',
+            borderColor: 'rgba(0,0,0,0.08)',
             xaxis: { lines: { show: true } },
             yaxis: { lines: { show: false } },
         },
@@ -154,7 +136,7 @@ const BarChartThree = ({ height = 420 }) => {
             theme: 'dark',
             x: { show: true },
             y: {
-                formatter: (val) => `${val} days of cover`,
+                formatter: (val) => `${Math.round(val)} days of cover`,
                 title: {
                     formatter: (seriesName, opts) =>
                         BRANCHES[opts?.dataPointIndex] ?? seriesName,

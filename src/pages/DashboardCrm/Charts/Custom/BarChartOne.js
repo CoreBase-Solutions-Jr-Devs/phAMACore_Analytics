@@ -25,6 +25,28 @@ const BarChartOne = ({
             return '#0ab39c';
         });
 
+    const axisMax = Math.ceil(Math.max(...resolvedData) * 1.30);
+
+    const pointAnnotations = resolvedData.map((val, i) => ({
+        x: axisMax,
+        y: resolvedCategories[i],
+        marker: { size: 0 },
+        label: {
+            text: `${parseFloat(val).toFixed(2)}d`,
+            textAnchor: 'end',
+            offsetX: -4,
+            offsetY: 5,
+            borderWidth: 0,
+            style: {
+                background: 'transparent',
+                color: resolvedColors[i],
+                fontSize: '12px',
+                fontWeight: 700,
+                padding: { top: 0, bottom: 0, left: 0, right: 0 },
+            },
+        },
+    }));
+
     const series = [{ data: resolvedData }];
 
     const options = {
@@ -39,29 +61,12 @@ const BarChartOne = ({
                 barHeight: '45%',
                 distributed: true,
                 horizontal: true,
-                dataLabels: {
-                    position: 'top',
-                    hideOverflowingLabels: false,
-                },
+                dataLabels: { position: 'top' },
             },
         },
         colors: resolvedColors,
-        dataLabels: {
-            enabled: true,
-            textAnchor: 'start',
-            formatter: (val) => `${val} days`,
-            style: {
-                colors: resolvedColors,
-                fontWeight: 600,
-                fontSize: '12px',
-            },
-            offsetX: 8,
-            dropShadow: { enabled: false },
-        },
-        stroke: {
-            width: 1,
-            colors: ['transparent'],
-        },
+        dataLabels: { enabled: false },
+        stroke: { width: 1, colors: ['transparent'] },
         annotations: {
             xaxis: [
                 {
@@ -71,11 +76,7 @@ const BarChartOne = ({
                     strokeDashArray: 4,
                     label: {
                         borderColor: '#c58c4f',
-                        style: {
-                            color: '#fff',
-                            background: '#c58c4f',
-                            fontSize: '10px',
-                        },
+                        style: { color: '#fff', background: '#c58c4f', fontSize: '10px' },
                         text: `Reorder @ ${reorderLine}d`,
                         position: 'top',
                         orientation: 'horizontal',
@@ -83,13 +84,14 @@ const BarChartOne = ({
                     },
                 },
             ],
+            points: pointAnnotations,
         },
         xaxis: {
             min: 0,
-            max: Math.max(...resolvedData) * 1.1,
+            max: axisMax,
             categories: resolvedCategories,
             labels: {
-                formatter: (val) => `${val}d`,
+                formatter: (val) => `${Math.round(val)}d`,
                 style: { fontSize: '11px' },
             },
             axisBorder: { show: false },
@@ -100,15 +102,12 @@ const BarChartOne = ({
                 show: true,
                 align: 'left',
                 maxWidth: 160,
-                style: {
-                    fontSize: '12px',
-                    fontWeight: 500,
-                },
-                offsetX: 0,
+                style: { fontSize: '12px', fontWeight: 500 },
+                offsetX: -5,
             },
         },
         grid: {
-            borderColor: 'rgba(255,255,255,0.06)',
+            borderColor: 'rgba(0,0,0,0.08)',
             xaxis: { lines: { show: true } },
             yaxis: { lines: { show: false } },
         },
@@ -116,7 +115,6 @@ const BarChartOne = ({
         title: {
             text: 'Live stock vs. safety minimum — days of cover remaining',
             align: 'left',
-            floating: false,
             style: { fontWeight: 600, fontSize: '13px' },
         },
         subtitle: {
@@ -128,7 +126,7 @@ const BarChartOne = ({
             theme: 'dark',
             x: { show: true },
             y: {
-                formatter: (val) => `${val} days of cover`,
+                formatter: (val) => `${parseFloat(val).toFixed(2)} days of cover`,
                 title: {
                     formatter: (seriesName, opts) =>
                         resolvedCategories[opts?.dataPointIndex] ?? seriesName,
