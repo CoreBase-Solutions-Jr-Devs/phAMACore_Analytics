@@ -71,18 +71,13 @@ const DashboardCrm = () => {
                                 <CardHeader>
                                     <h4 className="card-title mb-0">EXPIRY WATCH - Products at WRITE-OFF Risk</h4>
                                 </CardHeader>
+                                <div className="card-body p-0 border-top">
+                                    <WidgetsTwo />
+                                </div>
+                                <CardBody className="border-top">
+                                    <CustomTableOne />
+                                </CardBody>
                             </Card>
-                            <WidgetsTwo />
-                            <Col lg={12}>
-                                <Card>
-                                    {/* <CardHeader>
-                                        <h5 className="card-title mb-0">Pagination</h5>
-                                    </CardHeader> */}
-                                    <CardBody>
-                                        <CustomTableOne />
-                                    </CardBody>
-                                </Card>
-                            </Col>
                         </Col>
                     </Row>
                     <Row>
