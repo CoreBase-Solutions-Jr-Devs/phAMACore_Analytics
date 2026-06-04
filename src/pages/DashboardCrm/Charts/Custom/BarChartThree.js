@@ -1,17 +1,12 @@
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
 
-/**
- * BarChartThree — Stock VS Sales Velocity (Branch Coverage Ratio)
- */
+const BRANCHES = [
+    'WAREHOUSE', 'TESTING', 'MAIN', 'KAMPALA', 'CENTRAL',
+    'WESTLANDS', 'MOMBASA', 'WAJIR', 'KAKAMEGA', 'TEST BRANCH',
+];
+const DEFAULT_DATA = [34, 31, 28, 27, 22, 19, 15, 12, 9, 6];
 
-// Sorted DESCENDING manually (by value)
-const BRANCHES = ['WAREHOUSE','TESTING','MAIN','KAMPALA','CENTRAL','WESTLANDS','MOMBASA','WAJIR','KAKAMEGA','TEST BRANCH'];
-
-// Matching data (same order as branches above)
-const DEFAULT_DATA = [34,31,28,27,22,19,15,12,9,6];
-
-// Zone coloring (still dynamic, but simple)
 const ZONE_COLOR = (v) => {
     if (v < 10) return '#f06548';
     if (v < 21) return '#f7b84b';
@@ -19,13 +14,34 @@ const ZONE_COLOR = (v) => {
     return '#405189';
 };
 
-const BarChartThree = ({ height = 350 }) => {
+const BarChartThree = ({ height = 420 }) => {
+    const resolvedColors = DEFAULT_DATA.map(ZONE_COLOR);
 
-    const resolvedCategories = BRANCHES;
-    const resolvedData = DEFAULT_DATA;
-    const resolvedColors = resolvedData.map(ZONE_COLOR);
+    const axisMax = Math.ceil(Math.max(...DEFAULT_DATA) * 1.30);
 
-    const series = [{ data: resolvedData }];
+    const pointAnnotations = DEFAULT_DATA.map((val, i) => ({
+        x: axisMax,
+        y: BRANCHES[i],
+        marker: { size: 0 },
+        label: {
+            text: `${Math.round(val)} days`,
+            textAnchor: 'end',
+            offsetX: -4,
+            offsetY: 5,
+            borderWidth: 1,
+            borderRadius: 10,
+            borderColor: ZONE_COLOR(val),
+            style: {
+                background: 'transparent',
+                color: ZONE_COLOR(val),
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: { top: 3, bottom: 3, left: 8, right: 8 },
+            },
+        },
+    }));
+
+    const series = [{ data: DEFAULT_DATA }];
 
     const options = {
         chart: {
@@ -36,27 +52,15 @@ const BarChartThree = ({ height = 350 }) => {
         },
         plotOptions: {
             bar: {
-                barHeight: '80%',
+                barHeight: '45%',
                 distributed: true,
                 horizontal: true,
+                dataLabels: { position: 'top' },
             },
         },
         colors: resolvedColors,
-        dataLabels: {
-            enabled: true,
-            textAnchor: 'start',
-            style: {
-                colors: ['#fff'],
-                fontWeight: 600,
-                fontSize: '12px',
-            },
-            formatter: (val, opt) =>
-                `${opt.w.globals.labels[opt.dataPointIndex]}: ${val}`,
-        },
-        stroke: {
-            width: 1,
-            colors: ['#fff'],
-        },
+        dataLabels: { enabled: false },
+        stroke: { width: 1, colors: ['transparent'] },
         annotations: {
             xaxis: [
                 {
@@ -66,11 +70,14 @@ const BarChartThree = ({ height = 350 }) => {
                     opacity: 0.07,
                     label: {
                         text: 'Target zone',
+                        position: 'top',
                         style: {
                             color: '#0ab39c',
                             fontSize: '10px',
                             background: 'transparent',
+                            border: 'none',
                         },
+                        offsetY: 4,
                     },
                 },
                 {
@@ -80,29 +87,45 @@ const BarChartThree = ({ height = 350 }) => {
                     strokeDashArray: 4,
                     label: {
                         text: 'Critical',
-                        style: {
-                            color: '#fff',
-                            background: '#f06548',
-                            fontSize: '10px',
-                        },
+                        style: { color: '#fff', background: '#f06548', fontSize: '10px' },
+                        position: 'top',
+                        orientation: 'horizontal',
+                        offsetY: -4,
                     },
                 },
             ],
+            points: pointAnnotations,
         },
         xaxis: {
-            categories: resolvedCategories,
+            min: 0,
+            max: axisMax,
+            categories: BRANCHES,
             labels: {
-                formatter: (val) => `${val}d`,
+                formatter: (val) => `${Math.round(val)}d`,
+                style: { fontSize: '11px' },
             },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
         },
         yaxis: {
-            labels: { show: false },
+            labels: {
+                show: true,
+                align: 'left',
+                maxWidth: 130,
+                style: { fontSize: '12px', fontWeight: 500 },
+                offsetX: -10,
+            },
+        },
+        grid: {
+            borderColor: 'rgba(0,0,0,0.08)',
+            xaxis: { lines: { show: true } },
+            yaxis: { lines: { show: false } },
         },
         legend: { show: false },
         title: {
-            text: 'Stock Value by Sales Velocity',
+            text: 'Stock vs. sales velocity — branch coverage ratio',
             align: 'left',
-            style: { fontWeight: 500, fontSize: '13px' },
+            style: { fontWeight: 600, fontSize: '13px' },
         },
         subtitle: {
             text: 'Target: 21–30 days cover. Below 10 = critical replenishment needed.',
@@ -111,9 +134,13 @@ const BarChartThree = ({ height = 350 }) => {
         },
         tooltip: {
             theme: 'dark',
-            x: { show: false },
+            x: { show: true },
             y: {
-                formatter: (val) => `${val} days of cover`,
+                formatter: (val) => `${Math.round(val)} days of cover`,
+                title: {
+                    formatter: (seriesName, opts) =>
+                        BRANCHES[opts?.dataPointIndex] ?? seriesName,
+                },
             },
         },
     };
