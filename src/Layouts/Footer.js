@@ -8,11 +8,13 @@ const Footer = () => {
                 <Container fluid>
                     <Row>
                         <Col sm={6}>
-                            {new Date().getFullYear()} © Velzon.
+                            {new Date().getFullYear()} © 
+                            <span style={{color: "#c58c4f"}}>{" "}phAMACore Analytics.</span>
                         </Col>
                         <Col sm={6}>
                             <div className="text-sm-end d-none d-sm-block">
-                                Design & Develop by Themesbrand
+                                Designed & Developed by 
+                                <span style={{color: "#c58c4f"}}>{" "}CoreBase Solutions.</span>
                             </div>
                         </Col>
                     </Row>
