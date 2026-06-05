@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CountUp from 'react-countup';
-import { fetchDailyClosingStock, fetchStockMovements } from '../../slices/dashboardCRM/thunk';
+import { fetchDailyClosingStock, fetchStockMovements, fetchBatchExpiry } from '../../slices/dashboardCRM/thunk';
 import { KPI_META, computeKPIs, getTodayApi, getNDaysAgoApi } from '../utils/StockInventoryUtils';
 
 const WidgetsOne = () => {
@@ -10,6 +10,7 @@ const WidgetsOne = () => {
     const { 
             dailyClosingStock = [], 
             stockMovements = [], 
+            batchExpiry = [],
             loadingStock, loadingMovements, errorStock 
         } = useSelector((state) => state.StockInventory ?? {});
 
@@ -30,9 +31,20 @@ const WidgetsOne = () => {
             branchcode: 1,
             itemcode: 20007,
         }));
+
+        // Batch Expiry data - Near Expiry KPI
+        dispatch(fetchBatchExpiry({
+            clientid:  1,
+            startDate: "01/01/2026",
+            endDate:   getTodayApi(),
+            // branchcode: 1,
+        }))
     }, [dispatch]);
 
-    const kpis      = useMemo(() => computeKPIs(dailyClosingStock, stockMovements), [dailyClosingStock, stockMovements]);
+    const kpis      = useMemo(() => 
+        computeKPIs(dailyClosingStock, stockMovements, batchExpiry), 
+            [dailyClosingStock, stockMovements, batchExpiry]
+        );
     const isLoading = loadingStock || loadingMovements;
 
     return (

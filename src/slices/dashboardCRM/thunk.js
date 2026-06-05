@@ -3,6 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getDailyClosingStock as getDailyClosingStockApi,
   getStockMovements as getStockMovementsApi,
+  getBatchExpiry as getBatchExpiryApi,
 }
   from "../../helpers/fakebackend_helper";
 
@@ -55,6 +56,22 @@ export const fetchStockInventoryKPIs = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue(error?.response?.data || error.message);
+    }
+  }
+);
+
+export const fetchBatchExpiry = createAsyncThunk(
+  "stockInventory/fetchBatchExpireDetails",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getBatchExpiryApi(params);
+      return response.data ?? response;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data || error.message ||
+        "Failed to fetch batch expiry data!"
+      );
     }
   }
 );

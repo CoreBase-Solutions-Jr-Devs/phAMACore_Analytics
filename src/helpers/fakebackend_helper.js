@@ -19,8 +19,6 @@ export const isUserAuthenticated = () => {
 
 // Power BI APIs
 
-// export const getSalesTransactions = (params) =>
-//   powerBIApi.get(url.GET_POWERBI_SALES, { params });
 export const getSalesTransactions = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
 console.log("POWER BI URL:", url.GET_POWERBI_SALES);
@@ -29,9 +27,10 @@ export const getPurchaseOrders = (params) =>
 console.log("POWER BI URL:", url.GET_POWERBI_PURCHASE_ORDERS);
 export const getDailyClosingStock = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_STOCK, { params });
-
 export const getStockMovements = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_MOVEMENTS, { params });
+export const getBatchExpiry = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_BATCH_EXPIRY, { params });
 
 
 // Register Method
