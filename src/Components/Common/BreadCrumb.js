@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Col, Row } from 'reactstrap';
 
-const BreadCrumb = ({ title, pageTitle }) => {
+const BreadCrumb = ({ title, pageTitle, subtitle }) => {
     return (
         <React.Fragment>
             <Row>
@@ -13,8 +13,12 @@ const BreadCrumb = ({ title, pageTitle }) => {
                         <div className="page-title-right">
                             <ol className="breadcrumb m-0">
                                 <li className="breadcrumb-item"><Link to="#">{pageTitle}</Link></li>
-                                <li className="breadcrumb-item active">{title}</li>
-                            </ol>
+                                <li className="breadcrumb-item active" to="#">{title}</li>
+   {subtitle && (
+        <li className="breadcrumb-item active">
+          {subtitle}
+        </li>
+      )}                            </ol>
                         </div>
 
                     </div>
