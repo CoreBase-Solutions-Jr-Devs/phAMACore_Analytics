@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Col, Container, Row } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -22,6 +22,11 @@ const DashboardAnalytics = () => {
 
   const dispatch = useDispatch();
 
+    const [rightColumn, setRightColumn] = useState(false);
+    const toggleRightColumn = () => {
+      setRightColumn(!rightColumn);
+    };
+
  const { sales = [], filters } = useSelector(
     (state) => state.powerbi
   );
@@ -33,9 +38,8 @@ const handleApplyFilters = () => {
         clientid: 1,
         startDate: filters.startDate  ,
         endDate: filters.endDate,
-        branchcode:
-          filters.branch === "All Branches" ? null : filters.branch,
-      })
+branchcode: filters.branch === "All Branches" ? null : filters.branch,
+              })
     );
   };
 
@@ -121,6 +125,10 @@ const yesterdayRevenue = sales
     const creditPercentage =
     totalRevenue > 0 ? (creditSales / totalRevenue) * 100 : 0;
 
+    const cashInvoices = sales.filter(
+  item => item.client_ID === "CSC999"
+).length;
+
     const ordersReceived = new Set(
       sales
     .filter(item => item.invoice_Number) 
@@ -192,32 +200,29 @@ const getMonths = () => {
 };
 
 const monthlyChart = useMemo(() => {
-  const MONTHS = getMonths();
+  const now = new Date();
+  const currentMonthIndex = now.getMonth();
 
-  const map = MONTHS.reduce((acc, m) => {
-    acc[m] = 0;
-    return acc;
-  }, {});
+  const MONTHS = getMonths().slice(0, currentMonthIndex + 1);
+
+  const map = Object.fromEntries(MONTHS.map(m => [m, 0]));
 
   sales.forEach((s) => {
     const date = new Date(s.transaction_Date);
+
     const month = date.toLocaleString("default", { month: "short" });
 
-    if (map.hasOwnProperty(month)) {
+    if (map[month] !== undefined) {
       map[month] += Number(s.revenue || 0);
     }
   });
-
-  const totals = MONTHS.map((m) => map[m]);
-
-  console.log("📊 Monthly Sales Totals:", map);
 
   return {
     categories: MONTHS,
     series: [
       {
         name: "Revenue",
-        data: totals,
+        data: MONTHS.map(m => map[m]),
       },
     ],
   };
@@ -313,7 +318,6 @@ document.title = "Sales Dashboard | phAMACore Analytics";
 
 <Row>
   <Col xl={12}>
-  <FilterActions  onApply={handleApplyFilters} />
   </Col>
 </Row>
           <Row>
@@ -326,7 +330,9 @@ document.title = "Sales Dashboard | phAMACore Analytics";
     cashPercentage ={cashPercentage}
   creditPercentage={creditPercentage}
 revenueChange={revenueChange}
+cashInvoices={cashInvoices}
   branchMap={branchMap}
+  rightClickBtn={toggleRightColumn}
   />
             </Col>
           </Row>
@@ -371,6 +377,8 @@ revenueChange={revenueChange}
             <Col xl={6}>
             <MonthToDateSales series={monthToDateChart.series} categories={monthToDateChart.categories} formatAmount={formatAmount}/>  
             </Col>
+              <FilterActions  onApply={handleApplyFilters}  rightColumn={rightColumn} hideRightColumn={toggleRightColumn}/>
+
           </Row>
         </Container>
       </div>

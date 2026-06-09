@@ -13,11 +13,12 @@ import TopSellers from "./TopSellers";
 import SupplierSpend from "./SupplierSpend";
 import FilterActions from "./FilterActions";
 import { getPurchaseOrders } from "../../slices/dashboardPurchase/thunk";
+import BreadCrumb from "../../Components/Common/BreadCrumb";
 
 const DashboardEcommerce = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
-  const [rightColumn, setRightColumn] = useState(true);
+  const [rightColumn, setRightColumn] = useState(false);
   const toggleRightColumn = () => {
     setRightColumn(!rightColumn);
   };
@@ -47,9 +48,7 @@ const DashboardEcommerce = () => {
     startDate: filters.startDate,
           endDate: filters.endDate,
         branchcode:
-          filters.branch === "All Branches"
-            ? null
-            : filters.branch,
+      filters.branch === "All Branches" ? null : filters.branch,
       })
     );
   }, []);
@@ -92,29 +91,44 @@ const activeSuppliers = new Set(
   PurchaseOrders.map((item) => item.supplier_id)
 ).size;
 
-const avgLeadTime = PurchaseOrders.reduce((sum, item) => {
-  const start = new Date(item.lpo_date);
-  const end = new Date(item.expected_date);
+const avgLeadTime =
+  Math.round(
+    PurchaseOrders.reduce((sum, item) => {
+      const start = new Date(item.lpo_date);
+      const end = new Date(item.expected_date);
 
-  const diff = (end - start) / (1000 * 60 * 60 * 24);
+      const diff = (end - start) / (1000 * 60 * 60 * 24);
 
-  return sum + diff;
-}, 0) / PurchaseOrders.length;
+      return sum + diff;
+    }, 0) / PurchaseOrders.length
+  );
 
-const spendBySupplier = PurchaseOrders.reduce((acc, item) => {
-  const supplier = item.supplier_Name || "Unknown";
-  const value = Number(item.total_lpo_value || 0);
+const spendBySupplier = (PurchaseOrders || [])
+  .filter(Boolean)
+  .reduce((acc, item) => {
+    const supplier = item?.supplier_Name || "Unknown";
+    const value = Number(item?.total_lpo_value || 0);
 
-  acc[supplier] = (acc[supplier] || 0) + value;
+    acc[supplier] = (acc[supplier] || 0) + value;
 
-  return acc;
-}, {});
+    return acc;
+  }, {});
 
-const topSuppliers = Object.entries(spendBySupplier)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 10)
-  .map(([name, value]) => ({ name, value }));
-
+const topSuppliers = Object.entries(spendBySupplier || {})
+  .sort((a, b) => (b[1] || 0) - (a[1] || 0))
+  .slice(0, 7)
+  .map(([name, value]) => ({
+    name,
+    value: value || 0,
+  }));
+  
+const top2Suppliers = Object.entries(spendBySupplier || {})
+  .sort((a, b) => (b[1] || 0) - (a[1] || 0))
+  .slice(0, 2)
+  .map(([name, value]) => ({
+    name,
+    value: value || 0,
+  }));
 console.log("SPEND BY SUPPLIER", topSuppliers);
 
 const spendByBranch = PurchaseOrders.reduce((acc, item) => {
@@ -173,29 +187,83 @@ const ActualSpendSeries = [
     ),
   },
   {
-    name: "Trend",
+    name: "Budget",
     type: "line",
-    data: MONTHS.map((month) =>
-      Number(((monthlySpendMap[month] * 1.1) / 1_000_000).toFixed(2))
-    ),
+    // data: MONTHS.map((month) =>
+    //   Number(((monthlySpendMap[month] * 1.1) / 1_000_000).toFixed(2))
+    // ),
   },
 ];
+const groupedMap = new Map();
 
+(PurchaseOrders || []).forEach((item) => {
+  const supplier = item.supplier_Name;
+
+  const dueDate = new Date(item.expected_date);
+  const today = new Date();
+
+  const daysOverdue = Math.max(
+    0,
+    Math.floor((today - dueDate) / (1000 * 60 * 60 * 24))
+  );
+
+  if (!groupedMap.has(supplier)) {
+    groupedMap.set(supplier, {
+      supplier,
+      amount: Number(item.total_lpo_value || 0),
+      dueDate,
+      daysOverdue,
+    });
+  } else {
+    const existing = groupedMap.get(supplier);
+
+    // combine amounts per supplier
+    existing.amount += Number(item.total_lpo_value || 0);
+
+    // keep WORST overdue value
+    existing.daysOverdue = Math.max(existing.daysOverdue, daysOverdue);
+
+    // keep EARLIEST due date (more conservative view)
+    if (dueDate < existing.dueDate) {
+      existing.dueDate = dueDate;
+    }
+  }
+});
+
+const OverdueAccounts = Array.from(groupedMap.values())
+  .map((item) => ({
+    supplier: item.supplier,
+    amount: formatAmount(item.amount),
+    dueDate: item.dueDate.toLocaleDateString("en-GB"),
+    daysOverdue: item.daysOverdue,
+    daysOverdueLabel: `${item.daysOverdue} days`,
+    actionClass:
+      item.daysOverdue > 30
+        ? "danger"
+        : item.daysOverdue > 7
+        ? "warning"
+        : "success",
+  }))
+  .sort((a, b) => b.daysOverdue - a.daysOverdue)
+  .slice(0, 10);
+  
+console.log("OVERDUE ACCOUNTS", OverdueAccounts);
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
+            <BreadCrumb title="Purchases" pageTitle="Dashboards" />
           <Row>
             <Col>
               <div className="h-100">
-                <FilterActions onApply={handleApplyFilters}/>
-                {/* <Section rightClickBtn={toggleRightColumn} /> */}
+                                {/* <Section  rightClickBtn={toggleRightColumn} /> */}
+
                 <Row>
-                  <Widget formatAmount={formatAmount} totalSpend={totalSpend} activeSuppliers={activeSuppliers} avgLeadTime={avgLeadTime} branchMap={branchMap}/>
+                  <Widget rightClickBtn={toggleRightColumn} formatAmount={formatAmount} totalSpend={totalSpend} activeSuppliers={activeSuppliers} avgLeadTime={avgLeadTime} branchMap={branchMap}/>
                 </Row>
                      <Row>
                   <Col xl={6}>
-                     <StoreVisits/>
+                     <StoreVisits data={branchData} />
                   </Col>
                   <Col xl={6}>
           <SalesByLocations data={branchData} totalSpend={totalSpend} formatAmount={formatAmount}/>
@@ -206,10 +274,12 @@ const ActualSpendSeries = [
 <SupplierSpend
   supplierData={topSuppliers}
   formatAmount={formatAmount}
+top2Suppliers ={top2Suppliers}
+totalSpend={totalSpend}
 />             
 </Col>
 <Col xl={6}>
-<RecentOrders data={PurchaseOrders} />
+<RecentOrders data={PurchaseOrders}  OverdueAccounts={OverdueAccounts}/>
 </Col>
    </Row>
            
@@ -232,7 +302,9 @@ const ActualSpendSeries = [
                 </Row>
               </div>
             </Col>
-            <RecentActivity rightColumn={rightColumn} hideRightColumn={toggleRightColumn} />
+                            <FilterActions onApply={handleApplyFilters} rightColumn={rightColumn} hideRightColumn={toggleRightColumn}/>
+
+            {/* <RecentActivity rightColumn={rightColumn} hideRightColumn={toggleRightColumn} /> */}
           </Row>
         </Container>
       </div>

@@ -15,28 +15,51 @@ const Widget = ({
   totalRevenue = 0,
   cashSales = 0,
   creditSales = 0,
+  cashInvoices = 0,
   ordersReceived = 0,
   formatAmount,
   cashPercentage = 0,
   creditPercentage = 0,
   branchMap = {},
+    rightClickBtn,
+
 }) => {    
   
        const { branch, dateRange, startDate, endDate } = useSelector(
         (state) => state.powerbi.filters
       );
-      const branchName =
-  !branch || branch === "All Branches"
-    ? "All Branches"
-    : branchMap?.[branch] || "Unknown Branch";
+                const formatDisplay = (date) => date || "";
+
+//       const branchName =
+//   !branch || branch === "All Branches"
+//     ? "All Branches"
+//     : branchMap?.[branch] || "Unknown Branch";
 
     return (
        <React.Fragment>
-  <div className="mb-2">
-        <h4 className="card-title mb-0 text-start ">
+      <div className="d-flex align-items-center justify-content-between flex-wrap mb-1">
+  <h4 className="card-title mb-0">
     KEY METRICS 
-  {branchName !== "All Branches" && ` - ${branchName}`}        
+  {/* {branchName !== "All Branches" && ` - ${branchName}`}         */}
    </h4>
+
+  <div className="d-flex align-items-center gap-2 ">
+    <span>Filtered From:</span>
+    <strong >
+      {formatDisplay(startDate)}</strong> to <strong>
+      {formatDisplay(endDate)}
+    </strong>
+    
+  </div>
+
+  <button
+    type="button"
+    className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+    onClick={rightClickBtn}
+  >
+    <i className="ri-filter-fill"></i>
+    Filter
+  </button>
     </div>
 <Row className="g-2 mb-2">
 <Col xl={3} lg={4} md={6} sm={12}>
@@ -136,18 +159,20 @@ const Widget = ({
                 <CardBody className="p-2">
                     <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="font-medium  mb-0">Collections</p>
+                            <p className="font-medium  mb-0">Cash invoices</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-warning">
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={0.0}
+                                        end={Number(cashInvoices || 0)}
                                         decimals={1}
                                         duration={3}
                                     />
                                 </span>M
                             </h2>
-                            <p className="mb-0 text-muted">0% collection rate</p>
+                            <p className="mb-0 text-muted">Invoices paid in cash
+
+                            </p>
                         </div>
 
                         <div className="avatar-sm flex-shrink-0">
@@ -222,18 +247,19 @@ const Widget = ({
                 <CardBody className="p-2">
                     <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <p className="font-medium  mb-0">Orders Received</p>
+                            <p className="font-medium  mb-0">Collections</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
                                     <CountUp
                                         start={0}
-                                        end={Number(ordersReceived || 0)}
+                                        decimals={1}
+                                        end={0.0}
                                         duration={3}
                                     />
                                 </span>
                             </h2>
                             <p className="mb-0 text-muted">
-                                <i className="ri-arrow-up-line align-middle"></i> +0 vs avg
+                                <i className="ri-arrow-up-line align-middle"></i> 0% collection rate
                             </p>
                         </div>
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardBody, CardHeader } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -10,12 +11,15 @@ import {
 import { useRef } from "react";
 import Flatpickr from "react-flatpickr";
 
-const FilterActions = ({ onApply }) => {
+const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
+    const navigate = useNavigate();
+
   const dispatch = useDispatch();
   const startRef = useRef(null);
 const endRef = useRef(null);
 const {
   sales,
+  // branches,
   loading,
   error,
   filters: { branch, dateRange, startDate, endDate },
@@ -46,27 +50,32 @@ const {
 const formatDisplay = (date) => date || "";
 
   return (
-    <Card>
-      <CardHeader className="py-2">
+       <React.Fragment>
+             <div className={rightColumn ? "layout-rightside-col d-block" : " layout-rightside-col d-none"} id="layout-rightside-coll">
+            <div className="overlay" onClick={hideRightColumn}></div>
+          <div className="layout-rightside h-100">
+                   <Card className="h-100 card-animate">
+                     <CardHeader className="py-2">
         <h4 className="card-title mb-0">Filter Actions </h4>
       </CardHeader>
 
-      <CardBody>
-        <div className="row g-3">
-          <div className="col-md-3">
-            <label className="form-label">Branch</label>
+  
+  <CardBody className="d-flex flex-column h-100">
+   <div className="containerFluid">
+  <div className="row mb-3 align-items-center">
+            <label className="col-4 col-form-label">Branch</label>
+              <div className="col-8">
             <select
               className="form-select "
-              value={branch || "All"}
-              onChange={(e) =>
-                dispatch(
-                  setBranch(
-                    e.target.value === "All" ? null : Number(e.target.value),
-                  ),
-                )
-              }
+              value={branch || ""}
+                onChange={(e) => {
+                                    const value = e.target.value;
+                                    const branchId = Number(value);
+                                    dispatch(setBranch(branchId));
+                                    navigate(`/Dashboard-Analytics/${branchId}`);
+                                  }}
             >
-              <option value="All">All Branches</option>
+              <option value="">All Branches</option>
 
               {branches.map((b) => (
                 <option key={b.branchCode} value={b.branchCode}>
@@ -75,9 +84,11 @@ const formatDisplay = (date) => date || "";
               ))}
             </select>
           </div>
+</div>
 
-          <div className="col-md-3">
-            <label className="form-label">Date Range</label>
+        <div className="row mb-3 align-items-center">
+            <label className="col-4 col-form-label">Date Range</label>
+            <div className="col-8">
             <select
               className="form-select "
               value={dateRange}
@@ -91,9 +102,11 @@ const formatDisplay = (date) => date || "";
             </select>
             
           </div>
+</div>
 
-        <div className="col-md-3">
-  <label className="form-label ">Start Date</label>
+        <div className="row mb-3 align-items-center">
+  <label className="col-4 col-form-label">Start Date</label>
+  <div className="col-8">
 
   <Flatpickr
     ref={startRef}
@@ -117,10 +130,11 @@ const formatDisplay = (date) => date || "";
      readOnly={dateRange !== "Custom"}
   />
 </div>
+</div>
 
-       <div className="col-md-3">
-  <label className="form-label ">End Date</label>
-
+<div className="row mb-3 align-items-center">
+  <label className="col-4 col-form-label">End Date</label>
+  <div className="col-8">
   <Flatpickr
     ref={endRef}
     options={{
@@ -146,7 +160,16 @@ const formatDisplay = (date) => date || "";
         </div>
 
         <hr className="mb-2 mt-3" />
-        <div className="d-flex flex-wrap align-items-center justify-content-between small ">
+        <div className="d-flex justify-content-end mb-2" >
+                  <button className="btn btn-success me-2" onClick={onApply}>
+                Select
+              </button>
+                <button className="btn btn-danger " onClick={hideRightColumn}>
+                Close
+              </button>
+        </div>
+      </div>
+        {/* <div className="d-flex flex-wrap align-items-center justify-content-between small ">
           <div className="row w-100 align-items-center mx-0">
             <div className="col-md-4 d-flex align-items-center gap-1">
               <span className="font-muted">Selected Branch:</span> <strong>{selectedBranchName}</strong>
@@ -163,9 +186,12 @@ const formatDisplay = (date) => date || "";
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
       </CardBody>
     </Card>
+    </div>
+          </div>
+          </React.Fragment>
   );
 };
 

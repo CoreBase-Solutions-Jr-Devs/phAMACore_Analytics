@@ -1,54 +1,16 @@
 import React, { useMemo } from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 
-const RecentOrders = ({ data = [] }) => {
+const RecentOrders = ({ data = [], OverdueAccounts = [] }) => {
   const today = new Date();
-
-const rows = useMemo(() => {
-  const mapped = (data || []).map((item) => {
-    const dueDate = new Date(item.expected_date);
-
-    const daysOverdue = Math.max(
-      0,
-      Math.floor((today - dueDate) / (1000 * 60 * 60 * 24))
-    );
-
-    const amountValue = Number(item.total_lpo_value || 0);
-
-    return {
-      supplier: item.supplier_Name || "Unknown",
-      invoice: item.lpo_id,
-      amountValue, 
-      amount: `KES ${amountValue.toLocaleString()}`,
-      dueDate: dueDate.toLocaleDateString(),
-      daysOverdue,
-      daysOverdueLabel: `${daysOverdue} days`,
-      terms: item.terms || "Net 30",
-      action: daysOverdue > 0 ? "Pay today" : "On track",
-      actionClass: daysOverdue > 0 ? "danger" : "success",
-    };
-  });
-  const uniqueMap = new Map();
-
-mapped.forEach((item) => {
-  if (!uniqueMap.has(item.supplier)) {
-    uniqueMap.set(item.supplier, item);
-  }
-});
-
-return Array.from(uniqueMap.values())
-  .sort((a, b) => b.amountValue - a.amountValue)
-  .slice(0,7);
-}, [data]);
 
   return (
     <Card>
       <CardHeader className="align-items-center d-flex">
         <h4 className="card-title mb-0 flex-grow-1">
-          OVERDUE INVOICES - ACTION REQUIRED TODAY
+          OVERDUE INVOICES 
         </h4>
       </CardHeader>
-
       <CardBody>
         <div className="table-responsive table-card">
           <table className="table table-borderless table-centered table-nowrap mb-0">
@@ -64,7 +26,17 @@ return Array.from(uniqueMap.values())
             </thead>
 
             <tbody>
-              {rows.map((item, key) => (
+                {OverdueAccounts.length === 0 ? (
+    <tr>
+      <td colSpan="6" className="text-center py-5">
+        <h6 className="text-muted mb-0">
+          No overdue invoices found
+        </h6>
+      
+      </td>
+    </tr>
+  ) : (
+              OverdueAccounts.map((item, key) => (
                 <tr key={key} className="mb-0">
                   <td>
                     <div className="fw-medium">
@@ -89,7 +61,8 @@ return Array.from(uniqueMap.values())
                     </span>
                   </td>
                 </tr>
-              ))}
+                ))
+  )}
             </tbody>
           </table>
         </div>
