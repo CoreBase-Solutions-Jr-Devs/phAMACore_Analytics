@@ -27,6 +27,9 @@ export const GET_POWERBI_STOCK =
 export const GET_POWERBI_MOVEMENTS =
   "/api/PowerBi/PowerBIStockMovements";
 
+export const GET_POWERBI_BATCH_EXPIRY =
+  "/api/PowerBi/PowerBIBatchExpireDetails";
+
 //PROFILE
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
 export const POST_EDIT_PROFILE = "/user";
