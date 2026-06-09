@@ -6,6 +6,7 @@ import { getSalesTransactions } from "./thunk";
   
 const initialState = {
   sales: [],
+  branches: [],
   loading: false,
   error: null,
 
@@ -79,10 +80,29 @@ case "Custom":
         state.error = null;
       })
 
-      .addCase(getSalesTransactions.fulfilled, (state, action) => {
-        state.loading = false;
-        state.sales = action.payload?.result || action.payload || [];
-      })
+ 
+    .addCase(getSalesTransactions.fulfilled, (state, action) => {
+  state.loading = false;
+
+  const data = action.payload?.result || action.payload || [];
+  state.sales = data;
+
+  const map = {};
+
+  data.forEach((item) => {
+    const code = item.branch_ID;
+    const name = item.brancch_Name;
+
+    if (code == null) return;
+
+    map[code] = {
+      branchCode: code,
+      branchName: name,
+    };
+  });
+
+  state.branches = Object.values(map);
+})
 
       .addCase(getSalesTransactions.rejected, (state, action) => {
         state.loading = false;
@@ -94,6 +114,7 @@ case "Custom":
 
 export const {
   setBranch,
+  // setBranches,
   setDateRange,
   setStartDate,
   setEndDate,
