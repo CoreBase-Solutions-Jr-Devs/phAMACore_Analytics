@@ -43,24 +43,27 @@ const DashboardCrm = () => {
                             </Card>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col lg={6} xl={6}>
-                            <Card>
+                    <Row className="align-items-stretch">
+                        <Col lg={6} xl={6} className="d-flex">
+                            <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Stock Value By Branch</h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <BarChartTwo dataColors='["--vz-primary", "--vz-secondary", "--vz-success", "--vz-info", "--vz-warning", "--vz-danger", "--vz-dark", "--vz-primary", "--vz-success", "--vz-secondary"]' />
+                                    <BarChartTwo />
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col lg={6} xl={6}>
-                            <Card>
+
+                        <Col lg={6} xl={6} className="d-flex">
+                            <Card className="flex-fill">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Stock VS Sales Velocity - Branch Coverage Ratio</h4>
+                                    <h4 className="card-title mb-0">
+                                        Stock VS Sales Velocity - Branch Coverage Ratio
+                                    </h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <BarChartThree dataColors='["--vz-primary", "--vz-secondary", "--vz-success", "--vz-info", "--vz-warning", "--vz-danger", "--vz-dark", "--vz-primary", "--vz-success", "--vz-secondary"]' />
+                                    <BarChartThree />
                                 </CardBody>
                             </Card>
                         </Col>
