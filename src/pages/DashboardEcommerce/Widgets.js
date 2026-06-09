@@ -13,22 +13,50 @@ const Widgets = ({
   avgLeadTime = 0,
     formatAmount,
     branchMap = {},
+    rightClickBtn,
 }) => {
    const { branch, dateRange, startDate, endDate } = useSelector(
           (state) => state.PurchaseOrders.filters
         );
+          const formatDisplay = (date) => date || "";
+
        const branchName =
   !branch || branch === "All Branches"
     ? "All Branches"
     : branchMap?.[branch] || "Unknown Branch";
   return (
     <React.Fragment>
-     <div className="mb-2">
-        <h4 className="card-title mb-0 text-start ">
-    KEY METRICS 
-      {branchName !== "All Branches" && ` - ${branchName}`}        
-        </h4>
-    </div>
+      
+      <div className="d-flex align-items-center justify-content-between flex-wrap mb-1">
+
+  {/* LEFT - TITLE */}
+  <h4 className="card-title mb-0">
+    KEY METRICS
+    {branchName !== "All Branches" && ` - ${branchName}`}
+  </h4>
+
+  {/* CENTER - DATE RANGE */}
+  <div className="d-flex align-items-center gap-2 ">
+    <span>Filtered From:</span>
+    <strong >
+      {formatDisplay(startDate)}</strong> to <strong>
+      {formatDisplay(endDate)}
+    </strong>
+    
+  </div>
+
+  {/* RIGHT - BUTTON */}
+  <button
+    type="button"
+    className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+    onClick={rightClickBtn}
+  >
+    <i className="ri-filter-fill"></i>
+    Filter
+  </button>
+
+</div>
+
  <Row className="g-2 mb-2">
       {/* Total Spend */}
       <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
@@ -53,12 +81,12 @@ const Widgets = ({
             </h2>
 
             <p className="text-muted mb-0 ">
-              Budgeted:0
+              Budget:0.0M(0%)
             </p>
             </div>
 
                 <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-success-subtle rounded-circle fs-2">
+                            <span className="avatar-title bg-success-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="dollar-sign" className="text-success" />
                             </span>
                         </div>
@@ -93,7 +121,7 @@ const Widgets = ({
             </div>
 
                 <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-secondary-subtle rounded-circle fs-2">
+                            <span className="avatar-title bg-secondary-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="pie-chart" className="text-secondary" />
                             </span>
                         </div>
@@ -122,7 +150,7 @@ const Widgets = ({
              </div>
 
                 <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-info-subtle rounded-circle fs-2">
+                            <span className="avatar-title bg-info-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="users" className="text-info" />
                             </span>
                         </div>
@@ -152,7 +180,7 @@ const Widgets = ({
              </div>
 
                 <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-danger-subtle rounded-circle fs-2">
+                            <span className="avatar-title bg-danger-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="alert-triangle" className="text-danger" />
                             </span>
                         </div>
@@ -187,7 +215,7 @@ const Widgets = ({
             </div>
 
                 <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-warning-subtle rounded-circle fs-2">
+                            <span className="avatar-title bg-warning-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="trending-up" className="text-warning" />
                             </span>
                         </div>
@@ -211,7 +239,7 @@ const Widgets = ({
                 end={Number(avgLeadTime || 0)}
                 start={0}
                 // suffix=" days"
-                decimals={1}
+                // decimals={1}
                 duration={3}
               />
             </h2>
@@ -222,7 +250,7 @@ const Widgets = ({
                 </div>
 
                 <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-success-subtle rounded-circle fs-2">
+                            <span className="avatar-title bg-success-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="clock" className="text-success" />
                             </span>
                         </div>

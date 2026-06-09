@@ -13,31 +13,17 @@ const getColor = (percent) => {
   return "bg-danger";
 };
 
-const SupplierSpend = ({ supplierData, formatAmount }) => {
-    // const dispatch = useDispatch();
-
-    // const [periodType, setPeriodType] = useState("halfyearly");
-
-    // const liveuserData = createSelector(
-    //     (state) => state.DashboardAnalytics,
-    //     (chartData) => chartData.chartData
-    // );
-
-    // const chartData = useSelector(liveuserData);
-
-    // const onChangeChartPeriod = (pType) => {
-    //     setPeriodType(pType);
-    //     dispatch(getAllData(pType));
-    // };
-
-    // useEffect(() => {
-    //     dispatch(getAllData("halfyearly"));
-    // }, [dispatch]);
-
+const SupplierSpend = ({ supplierData, top2Suppliers, formatAmount, totalSpend }) => {
     const hasData =
     Array.isArray(supplierData) &&
     supplierData.length > 0;
-
+const top2Total =
+  (top2Suppliers[0]?.value || 0) +
+  (top2Suppliers[1]?.value || 0);
+  const top2Percent =
+  totalSpend > 0
+    ? ((top2Total / totalSpend) * 100).toFixed(1)
+    : 0;
     return (
         <React.Fragment>
       
@@ -45,7 +31,7 @@ const SupplierSpend = ({ supplierData, formatAmount }) => {
 
                     <CardHeader className="card-header align-items-center d-flex">
                         <h4 className="card-title mb-0 flex-grow-1">
-                           Top  Suppliers by Spend
+                         Spend by supplier
                         </h4>
                         </CardHeader>
                     <div className="card-body p-3">
@@ -68,7 +54,7 @@ const SupplierSpend = ({ supplierData, formatAmount }) => {
             const color = getColor(percent);
 
     return (
-      <div key={item.name} className="mb-0">
+      <div key={item.name} className="mb-3">
           <div className="d-flex justify-content-between">
                     <span className="text-uppercase"> 
                       {item.name}
@@ -96,17 +82,18 @@ const SupplierSpend = ({ supplierData, formatAmount }) => {
     );
   })}
 </div>
+
         )}
+    
                         <hr className="my-2" />
                         <div>
-
-  {/* <p className="mb-2 text-muted ">
-    Cosmos + Biodeal = <strong>66%</strong> of spend concentration within safe range (&lt;70%).
+{top2Suppliers.length === 2 && (
+  <p className="mb-2 ">
+    {top2Suppliers[0].name} +{" "}
+    {top2Suppliers[1].name}= 
+    <strong >{top2Percent}% of total spend</strong>
   </p>
-
-  <p className="mb-0 text-danger fw-semibold">
-    Universal + PharmaChem = <strong>KES 1.6M</strong> with C/D rated suppliers.
-  </p> */}
+)}
 
 </div>
                     </div>

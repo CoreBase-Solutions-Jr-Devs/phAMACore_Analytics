@@ -22,7 +22,7 @@ const topBranch = data.length
     <Card className="card-height-100">
       <CardHeader className="align-items-center d-flex">
         <h4 className="card-title mb-0 flex-grow-1">
-          Spend by branch - 
+          Spend by branch 
         </h4>
 
         {/* <div className="flex-shrink-0">
@@ -81,7 +81,7 @@ const percent = totalSpend
 
             <p >
               Revenue:
-              <strong> KES {formatAmount(Number(topBranch.amount))}</strong>
+              <strong> KES {formatAmount(Number(topBranch.value))}</strong>
             </p>
           </div>
         )}

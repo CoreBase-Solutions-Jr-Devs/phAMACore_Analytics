@@ -241,7 +241,7 @@ height={500}
 
 const StoreVisitsCharts = ({ dataColors }) => {
   var chartDonutBasicColors = getChartColorsArray(dataColors);
-  const series = [44, 55, 41, 17, 15];
+  const series = [];
   var options = {
 //    labels: [
 //   "Antibiotics",
