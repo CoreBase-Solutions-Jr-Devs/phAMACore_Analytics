@@ -1,3 +1,4 @@
+import { subtract } from "lodash";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -159,6 +160,14 @@ const Navdata = () => {
           label: "Sales",
           link: "/dashboard-analytics",
           parentId: "dashboard",
+          subItems: [
+      {
+        id: "sales-branch",
+        label: "Branch View",
+        link: "/dashboard-analytics/{branchId}", 
+      },
+    ],
+              
         },
         {
           id: "crm",

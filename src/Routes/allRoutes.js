@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 
 //Dashboard
 import DashboardAnalytics from "../pages/DashboardAnalytics";
+import DashboardAnalyticsBranch from "../pages/DashboardAnalytics/DashboardAnalyticsBranch";
 import DashboardCrm from "../pages/DashboardCrm";
 import DashboardEcommerce from "../pages/DashboardEcommerce";
 
@@ -250,6 +251,7 @@ import PageBlogOverview from "../pages/Pages/Blogs/Overview";
 
 const authProtectedRoutes = [
   { path: "/dashboard-analytics", component: <DashboardAnalytics /> },
+    { path: "/dashboard-analytics/:branchId", component: <DashboardAnalyticsBranch /> },
   { path: "/dashboard-crm", component: <DashboardCrm /> },
   { path: "/dashboard", component: <DashboardEcommerce /> },
   { path: "/index", component: <DashboardEcommerce /> },
