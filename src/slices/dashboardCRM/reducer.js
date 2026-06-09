@@ -1,13 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from './thunk';
+import { fetchBatchExpiry, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from './thunk';
 
 export const initialState = {
   dailyClosingStock: [],
   stockMovements: [],
+  batchExpiry: [],
   loadingStock: false,
   loadingMovements: false,
+  loadingBatchExpiry: false,
   errorStock: null,
   errorMovements: null,
+  errorBatchExpiry: null,
 };
 
 const StockInventorySlice = createSlice({
@@ -48,6 +51,20 @@ const StockInventorySlice = createSlice({
     builder.addCase(fetchStockInventoryKPIs.rejected, (state, action) => {
       state.errorStock = action.payload || "Failed to fetch stock/inventory KPIs!";
       state.errorMovements = action.payload || "Failed to fetch inventory/stock KPIs!";
+    });
+
+
+    builder.addCase(fetchBatchExpiry.pending, (state) => {
+      state.loadingBatchExpiry= true;
+      state.errorBatchExpiry = null;
+    });
+    builder.addCase(fetchBatchExpiry.fulfilled, (state, action) => {
+      state.loadingBatchExpiry = false;
+      state.batchExpiry = action.payload;
+    });
+    builder.addCase(fetchBatchExpiry.rejected, (state, action) => {
+      state.loadingBatchExpiry = false;
+      state.errorBatchExpiry = action.payload || action.payload.error || action.error || null;
     });
   }
 });

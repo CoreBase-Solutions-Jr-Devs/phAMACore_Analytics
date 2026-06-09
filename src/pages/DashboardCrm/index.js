@@ -1,18 +1,8 @@
 import React from 'react';
-import { Container, Row, Col, Card, CardHeader, CardBody, ListGroup, ListGroupItem, Badge } from 'reactstrap';
-import BreadCrumb from '../../Components/Common/BreadCrumb';
-import Widgets from './Widgets';
-import { CustomDataLabel } from '../Charts/ApexCharts/BarCharts/BarCharts';
-import { PaginationTable } from '../Tables/ReactTables/ReactTable';
-import SimpleBar from 'simplebar-react';
+import { Container, Row, Col, Card, CardHeader, CardBody, ListGroup, ListGroupItem } from 'reactstrap';
 import { Link } from 'react-router-dom';
-
-// Import Images
-import avatar1 from "../../assets/images/users/avatar-1.jpg";
-import avatar2 from "../../assets/images/users/avatar-2.jpg";
-import avatar3 from "../../assets/images/users/avatar-3.jpg";
-import avatar4 from "../../assets/images/users/avatar-4.jpg";
-import avatar5 from "../../assets/images/users/avatar-5.jpg";
+import SimpleBar from 'simplebar-react';
+import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
 import WidgetsTwo from './WidgetsTwo';
 import BarChartOne from './Charts/Custom/BarChartOne';
@@ -20,19 +10,21 @@ import BarChartTwo from './Charts/Custom/BarChartTwo';
 import BarChartThree from './Charts/Custom/BarChartThree';
 import CustomTableOne from './Tables/Custom/CustomTableOne';
 
-
 const DashboardCrm = () => {
-    document.title="Inventory/Stock Dashboard | phAMACore Analytics";
+    document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
+
     return (
         <React.Fragment>
             <div className="page-content">
                 <Container fluid>  
                     <BreadCrumb title="Inventory/Stock Dashboard" pageTitle="Dashboards" />
                     <Row>
-                        <WidgetsOne />
+                        <Col xl={12}>
+                            <WidgetsOne />
+                        </Col>
                     </Row>
                     <Row>
-                        <Col>
+                        <Col xl={12}>
                             <Card>
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Critical Stock Levels - MUST-NOT STOCKOUT items</h4>
@@ -43,30 +35,33 @@ const DashboardCrm = () => {
                             </Card>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col lg={6} xl={6}>
-                            <Card>
+                    <Row className="align-items-stretch">
+                        <Col lg={6} xl={6} className="d-flex">
+                            <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Stock Value By Branch</h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <BarChartTwo dataColors='["--vz-primary", "--vz-secondary", "--vz-success", "--vz-info", "--vz-warning", "--vz-danger", "--vz-dark", "--vz-primary", "--vz-success", "--vz-secondary"]' />
+                                    <BarChartTwo />
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col lg={6} xl={6}>
-                            <Card>
+
+                        <Col lg={6} xl={6} className="d-flex">
+                            <Card className="flex-fill">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Stock VS Sales Velocity - Branch Coverage Ratio</h4>
+                                    <h4 className="card-title mb-0">
+                                        Stock VS Sales Velocity - Branch Coverage Ratio
+                                    </h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <BarChartThree dataColors='["--vz-primary", "--vz-secondary", "--vz-success", "--vz-info", "--vz-warning", "--vz-danger", "--vz-dark", "--vz-primary", "--vz-success", "--vz-secondary"]' />
+                                    <BarChartThree />
                                 </CardBody>
                             </Card>
                         </Col>
                     </Row>
                     <Row>
-                        <Col>
+                        <Col xl={12}>
                             <Card>
                                 <CardHeader>
                                     <h4 className="card-title mb-0">EXPIRY WATCH - Products at WRITE-OFF Risk</h4>
