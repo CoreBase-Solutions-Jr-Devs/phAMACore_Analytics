@@ -4,6 +4,7 @@ import {
   getDailyClosingStock as getDailyClosingStockApi,
   getStockMovements as getStockMovementsApi,
   getBatchExpiry as getBatchExpiryApi,
+  getBatchExpiryNeo as getBatchExpiryNeoApi,
 }
   from "../../helpers/fakebackend_helper";
 
@@ -26,6 +27,7 @@ export const fetchStockMovements = createAsyncThunk(
   async (params, { rejectWithValue }) => {
     try {
       const response = await getStockMovementsApi(params);
+      return response.data ?? response;
     } catch (error) {
       return rejectWithValue(error?.response?.data?.message 
         || error?.response?.data || error.message ||
@@ -67,6 +69,23 @@ export const fetchBatchExpiry = createAsyncThunk(
       const response = await getBatchExpiryApi(params);
       return response.data ?? response;
     } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data || error.message ||
+        "Failed to fetch batch expiry data!"
+      );
+    }
+  }
+);
+
+export const fetchBatchExpiryNeo = createAsyncThunk(
+  "stockInventory/fetchBatchExpireDetailsNeo",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getBatchExpiryNeoApi(params);
+      return response.data ?? response;
+    }
+    catch (error) {
       return rejectWithValue(
         error?.response?.data?.message ||
         error?.response?.data || error.message ||

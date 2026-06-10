@@ -30,6 +30,9 @@ export const GET_POWERBI_MOVEMENTS =
 export const GET_POWERBI_BATCH_EXPIRY =
   "/api/PowerBi/PowerBIBatchExpireDetails";
 
+export const GET_POWERBI_BATCH_EXPIRY_NEO = 
+  "/api/PowerBi/PowerBIBatchExpireDetailsNeo";
+
 //PROFILE
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
 export const POST_EDIT_PROFILE = "/user";
