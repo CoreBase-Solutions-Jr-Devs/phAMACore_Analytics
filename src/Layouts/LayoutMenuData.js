@@ -156,18 +156,23 @@ const Navdata = () => {
       },
       subItems: [
         {
+          id: "myBusiness",
+          label: "My Business",
+          link: "/dashboard-my-business",
+          parentId: "dashboard",
+        },
+        {
           id: "analytics",
           label: "Sales",
           link: "/dashboard-analytics",
           parentId: "dashboard",
           subItems: [
-      {
-        id: "sales-branch",
-        label: "Branch View",
-        link: "/dashboard-analytics/{branchId}", 
-      },
-    ],
-              
+            {
+              id: "sales-branch",
+              label: "Branch View",
+              link: "/dashboard-analytics/{branchId}",
+            },
+          ],
         },
         {
           id: "crm",
