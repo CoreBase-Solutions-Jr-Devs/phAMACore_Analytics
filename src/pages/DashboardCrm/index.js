@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody, ListGroup, ListGroupItem } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import SimpleBar from 'simplebar-react';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
@@ -9,9 +10,19 @@ import BarChartOne from './Charts/Custom/BarChartOne';
 import BarChartTwo from './Charts/Custom/BarChartTwo';
 import BarChartThree from './Charts/Custom/BarChartThree';
 import CustomTableOne from './Tables/Custom/CustomTableOne';
+import { fetchBatchExpiryNeo } from '../../slices/dashboardCRM/thunk';
 
 const DashboardCrm = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchBatchExpiryNeo({
+            clientid: 1,
+            branchcode: 0,
+        }));
+    }, [dispatch])
 
     return (
         <React.Fragment>

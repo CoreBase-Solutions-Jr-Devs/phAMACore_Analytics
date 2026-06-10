@@ -1,34 +1,75 @@
-import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import TableContainer from '../../../../Components/Common/TableContainerReactTable';
+import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { Alert } from "reactstrap";
+import TableContainer from "../../../../Components/Common/TableContainerReactTable";
+import { useSelector } from "react-redux";
 
 const CustomTableOne = () => {
-    const paginationTable =
-        [{ product: "Ciproflacin 500mg", branch: "Eldoret", date: "07 Oct, 2021", total: "1,200", status: "Promote now", value: "96,000" },
-        { product: "Vitamin C 500mg", branch: "Mombasa", date: "07 Oct, 2021", total: "3,400", status: "Transfer/Promote", value: "96,000" },
-        { product: "Dextrose IV 5%", branch: "Nakuru", date: "06 Oct, 2021", total: "480", status: "Prioritise Sales", value: "96,000" },
-        { product: "Antifungal  Cream 2%", branch: "Kisumu", date: "05 Oct, 2021", total: "620", status: "Prioritise Sales", value: "96,000" },
-        { product: "Mutlivitamin Syrup", branch: "Thika", date: "05 Oct, 2021", total: "900", status: "Prioritise Sales", value: "96,000" },
-        // { product: "#VL2106", branch: "Traci", date: "04 Oct, 2021", total: "$24.05", status: "Prioritise Sales", value: "96,000" },
-        // { product: "#VL2105", branch: "Kerry", date: "04 Oct, 2021", total: "$26.15", status: "Paid", value: "96,000" },
-        // { product: "#VL2104", branch: "Patsy", date: "04 Oct, 2021", total: "$21.25", status: "Prioritise Sales", value: "96,000" },
-        // { product: "#VL2103", branch: "Cathy", date: "03 Oct, 2021", total: "$22.61", status: "Paid", value: "96,000" },
-        // { product: "#VL2102", branch: "Tyrone", date: "03 Oct, 2021", total: "$25.03", status: "Paid", value: "96,000" }
-        ];
+    const { batchExpiryNeo, loadingBatchExpiryNeo, errorBatchExpiryNeo } = useSelector(
+        (state) => state.StockInventory
+    );
+
+    const currentYear = new Date().getFullYear();
+
+    const paginationTable = useMemo(() => {
+        return (batchExpiryNeo || [])
+            .filter((item) => {
+                if (!item.expirydate) return false;
+
+                const year = new Date(item.expirydate).getFullYear();
+                return year === currentYear;
+            })
+            .map((item) => {
+                const qty = Number(item.qtyBal || 0);
+                const value = Number(item.costValue || 0);
+
+                const expiryDate = item.expirydate;
+
+                const daysRemaining = expiryDate
+                    ? Math.ceil(
+                        (new Date(expiryDate) - new Date()) /
+                        (1000 * 60 * 60 * 24)
+                    )
+                    : 999;
+
+                let action = "Prioritise Sales";
+
+                if (daysRemaining <= 30) {
+                    action = "Promote now";
+                } else if (daysRemaining <= 60) {
+                    action = "Transfer/Promote";
+                } else if (daysRemaining <= 90) {
+                    action = "Prioritise Sales";
+                }
+
+                return {
+                    product: item.invName,
+                    branch: item.branchName,
+                    date: expiryDate
+                        ? new Date(expiryDate).toLocaleDateString()
+                        : "-",
+                    total: qty.toLocaleString(),
+                    status: action,
+                    value: value.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    }),
+                };
+            });
+    }, [batchExpiryNeo]);
 
     const columns = useMemo(
         () => [
             {
                 header: "Product",
-                cell: (cell) => {
-                    return (
-                        <Link to="#" className="fw-medium">{cell.getValue()}</Link>
-                    );
-                },
                 accessorKey: "product",
                 enableColumnFilter: false,
+                cell: (cell) => (
+                    <Link to="#" className="fw-medium">
+                        {cell.getValue()}
+                    </Link>
+                ),
             },
-
             {
                 header: "Branch",
                 accessorKey: "branch",
@@ -46,55 +87,74 @@ const CustomTableOne = () => {
             },
             {
                 header: "Action",
-                enableColumnFilter: false,
                 accessorKey: "status",
+                enableColumnFilter: false,
                 cell: (cell) => {
                     switch (cell.getValue()) {
-                        case "Paid":
-                            return (<span className="badge bg-success-subtle text-success text-uppercase"> {cell.getValue()}</span>);
                         case "Prioritise Sales":
-                            return (<span className="badge bg-warning text-white text-uppercase"> {cell.getValue()}</span>);
+                            return (
+                                <span className="badge bg-warning text-white text-uppercase">
+                                    {cell.getValue()}
+                                </span>
+                            );
+
                         case "Transfer/Promote":
-                            return (<span className="badge bg-danger  text-black text-uppercase"> {cell.getValue()}</span>);
+                            return (
+                                <span className="badge bg-info text-white text-uppercase">
+                                    {cell.getValue()}
+                                </span>
+                            );
+
                         case "Promote now":
-                            return (<span className="badge bg-danger  text-black text-uppercase"> {cell.getValue()}</span>);
+                            return (
+                                <span className="badge bg-danger text-white text-uppercase">
+                                    {cell.getValue()}
+                                </span>
+                            );
+
                         default:
-                            return (<span className="badge bg-danger-subtle  text-danger text-uppercase"> {cell.getValue()}</span>);
+                            return (
+                                <span className="badge bg-secondary text-uppercase">
+                                    {cell.getValue()}
+                                </span>
+                            );
                     }
                 },
             },
             {
-                header: "Value(KES)",
+                header: "Value (KES)",
                 accessorKey: "value",
                 enableColumnFilter: false,
             },
-            // {
-            //     header: "Actions",
-            //     enableColumnFilter: false,
-            //     cell: (cell) => {
-            //         return (
-            //             <React.Fragment>
-            //                 Details
-            //             </React.Fragment>
-            //         );
-            //     },
-            // },
         ],
         []
     );
 
+    if (errorBatchExpiryNeo) {
+        return (
+            <Alert color="danger" className="mb-0">
+                <strong>Batch Expiry Error:</strong>{" "}
+                {typeof errorBatchExpiryNeo === "string"
+                    ? errorBatchExpiryNeo
+                    : "Unable to load batch expiry records."}
+            </Alert>
+        );
+    }
+
     return (
-        <React.Fragment >
+        <React.Fragment>
             <TableContainer
                 columns={(columns || [])}
                 data={(paginationTable || [])}
                 customPageSize={5}
+                isGlobalFilter={true}
+                isLoading={loadingBatchExpiryNeo}
                 tableClass="table-centered align-middle table-nowrap mb-0"
                 theadClass="text-muted table-light"
-                SearchPlaceholder='Search Products...'
+                SearchPlaceholder="Search Products..."
             />
-        </React.Fragment >
+        </React.Fragment>
     );
-}
+};
 
 export default CustomTableOne;
