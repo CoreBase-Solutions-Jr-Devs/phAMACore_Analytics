@@ -32,7 +32,7 @@ export const loginUser = (user, navigate) => async (dispatch) => {
 
     dispatch(loginSuccess(response.data.user));
 
-    navigate("/dashboard");
+    navigate("/dashboard-my-business");
 
   } catch (error) {
     dispatch(apiError(error));
