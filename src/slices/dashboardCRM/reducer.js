@@ -33,7 +33,7 @@ const StockInventorySlice = createSlice({
     });
     builder.addCase(fetchDailyClosingStock.rejected, (state, action) => {
       state.loadingStock = false;
-      state.errorStock = action.payload || action.payload.error || action.error || null;
+      state.errorStock = action.payload?.message || action.payload?.error || action.error?.message || null;
     });
 
 

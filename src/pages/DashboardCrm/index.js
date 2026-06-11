@@ -6,11 +6,12 @@ import SimpleBar from 'simplebar-react';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
 import WidgetsTwo from './WidgetsTwo';
-import BarChartOne from './Charts/Custom/BarChartOne';
+// import BarChartOne from './Charts/Custom/BarChartOne';
 import BarChartTwo from './Charts/Custom/BarChartTwo';
 import BarChartThree from './Charts/Custom/BarChartThree';
 import CustomTableOne from './Tables/Custom/CustomTableOne';
-import { fetchBatchExpiryNeo } from '../../slices/dashboardCRM/thunk';
+import { fetchBatchExpiryNeo, fetchDailyClosingStock } from '../../slices/dashboardCRM/thunk';
+import CriticalStockChart from './components/CriticalStockChart';
 
 const DashboardCrm = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -22,7 +23,17 @@ const DashboardCrm = () => {
             clientid: 1,
             branchcode: 0,
         }));
-    }, [dispatch])
+    }, [dispatch]);
+
+    useEffect(() => {
+        dispatch(fetchDailyClosingStock({
+            clientid: 1,
+            startDate: "",
+            endDate: "",
+            branchcode: 0,
+            itemcode: "",
+        }));
+    }, [dispatch]);
 
     return (
         <React.Fragment>
@@ -41,7 +52,7 @@ const DashboardCrm = () => {
                                     <h4 className="card-title mb-0">Critical Stock Levels - MUST-NOT STOCKOUT items</h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <BarChartOne dataColors='["--vz-primary", "--vz-secondary", "--vz-success", "--vz-info", "--vz-warning", "--vz-danger", "--vz-dark", "--vz-primary", "--vz-success", "--vz-secondary"]' />
+                                    <CriticalStockChart />
                                 </CardBody>
                             </Card>
                         </Col>
