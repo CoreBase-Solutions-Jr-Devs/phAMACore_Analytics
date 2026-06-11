@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody, ListGroup, ListGroupItem } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import SimpleBar from 'simplebar-react';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
@@ -12,11 +12,13 @@ import BarChartThree from './Charts/Custom/BarChartThree';
 import CustomTableOne from './Tables/Custom/CustomTableOne';
 import { fetchBatchExpiryNeo, fetchDailyClosingStock } from '../../slices/dashboardCRM/thunk';
 import CriticalStockChart from './components/CriticalStockChart';
+import SlowMovingStock from "./components/SlowMovingStock";
 
 const DashboardCrm = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
 
     const dispatch = useDispatch();
+    const { stockMovements = [] } = useSelector((state) => state.StockInventory);
 
     useEffect(() => {
         dispatch(fetchBatchExpiryNeo({
@@ -120,68 +122,7 @@ const DashboardCrm = () => {
                                         </Row>
 
                                         <SimpleBar style={{ height: "242px" }} className="mx-n3">
-                                            <ListGroup className="list mb-0" flush>
-                                                <ListGroupItem data-id="1">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Chlorpheniramine 4mg</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="12345">Eldoret. 0 units sold. 38 days</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Dead Stock</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                                <ListGroupItem data-id="2">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Ferrous Sulphate 200mg</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="23456">Nakuru. 4units/day. 28 days</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Slow</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                                <ListGroupItem data-id="3">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Hydrocortisone Cream</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="34567">Kisumu. 2 units/day. 32 days</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Slow</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                                <ListGroupItem data-id="4">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Zinc Sulphate Tabs</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="45678">Thika. 6 units/day. 22 days.</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Slow</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                                <ListGroupItem data-id="5">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Calamine Lotion 200ml</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="45678">Mombasa. 1 unit/day. 41 days.</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Near Dead</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                            </ListGroup >
+                                            <SlowMovingStock movements={stockMovements} />
                                         </SimpleBar>
                                     </div>
                                 </CardBody>
