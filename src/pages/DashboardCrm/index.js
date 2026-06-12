@@ -13,6 +13,8 @@ import CustomTableOne from './Tables/Custom/CustomTableOne';
 import { fetchBatchExpiryNeo, fetchDailyClosingStock } from '../../slices/dashboardCRM/thunk';
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
+import ImbalanceAlertsContainer from './components/ImbalanceAlerts/ImbalanceAlertsContainer';
+import ImbalanceAlerts from './components/ImbalanceAlerts';
 
 const DashboardCrm = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -138,74 +140,7 @@ const DashboardCrm = () => {
                                     <p className="text-muted">Products where one branch is overstocked while another is critically low.</p>
 
                                     <SimpleBar style={{ height: "272px" }} className="mx-n3 px-3">
-                                        <ListGroup className="list mb-0" flush>
-
-                                            <ListGroupItem data-id="01">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">Amoxicillin 500mg</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-success fs-11 fw-normal px-2 py-1">Nairobi 2,400u</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-danger fs-11 fw-normal px-2 py-1">Eldoret 260u</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Transfer queued</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                            <ListGroupItem data-id="02">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">Co-Artem 20/120mg</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-success fs-11 fw-normal px-2 py-1">Mombasa 1,140u</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-danger fs-11 fw-normal px-2 py-1">Eldoret 180u</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Transfer queued</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                            <ListGroupItem data-id="03">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">ORS Sachets</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-success fs-11 fw-normal px-2 py-1">Thika 3,200u</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-danger fs-11 fw-normal px-2 py-1">Nakuru 340u</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Transfer urgent</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                            <ListGroupItem data-id="04">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">Metformin 500mg</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-success fs-11 fw-normal px-2 py-1">Nairobi 1,650u</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-danger fs-11 fw-normal px-2 py-1">Nakuru 320u</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Transfer urgent</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                            <ListGroupItem data-id="05">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">Vitamin C 500mg</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-warning fs-11 fw-normal px-2 py-1">Mombasa 3,400u (near-expiry)</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-info fs-11 fw-normal px-2 py-1">All branches</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Promote urgently</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                        </ListGroup>
+                                        <ImbalanceAlerts />
                                     </SimpleBar>
                                 </CardBody>
                             </Card>
