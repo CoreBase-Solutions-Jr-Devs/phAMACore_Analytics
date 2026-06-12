@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
-import { RevenueCharts } from "./DashboardEcommerceCharts";
+import { MonthToDateCharts } from "./DashboardEcommerceCharts";
 import CountUp from "react-countup";
 import { useSelector, useDispatch } from "react-redux";
 import { getRevenueChartsData } from "../../slices/thunks";
 import { createSelector } from "reselect";
 
-const Revenue = ({categories, series, formatAmount}) => {
+const MonthToDatePurchases = ({categories, series, formatAmount}) => {
   // const dispatch = useDispatch();
 
   // const [chartData, setchartData] = useState([]);
@@ -34,7 +34,7 @@ const Revenue = ({categories, series, formatAmount}) => {
     <React.Fragment>
       <Card>
         <CardHeader className="border-0 align-items-center d-flex">
-          <h4 className="card-title mb-0 flex-grow-1">Year to Date Purchases Trend(YTD) </h4>
+          <h4 className="card-title mb-0 flex-grow-1">Month to Date Purchases Trend(MTD) </h4>
           {/* <div className="d-flex gap-1">
             <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { onChangeChartPeriod("all"); }}>
               ALL
@@ -54,7 +54,7 @@ const Revenue = ({categories, series, formatAmount}) => {
         <CardBody className="p-0 pb-2">
           <div className="w-100">
             <div dir="ltr">
-              <RevenueCharts categories={categories} series={series} formatAmount={formatAmount} dataColors='["--vz-primary", "--vz-success", "--vz-danger"]' />
+              <MonthToDateCharts categories={categories} series={series} formatAmount={formatAmount} dataColors='["--vz-primary", "--vz-success", "--vz-danger"]' />
             </div>
           </div>
         </CardBody>
@@ -63,4 +63,4 @@ const Revenue = ({categories, series, formatAmount}) => {
   );
 };
 
-export default Revenue;
+export default MonthToDatePurchases;

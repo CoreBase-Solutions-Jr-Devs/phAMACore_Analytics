@@ -2,34 +2,38 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 
-const RevenueCharts = ({ dataColors, series, categories }) => {
-  var linechartcustomerColors = getChartColorsArray(dataColors);
+const RevenueCharts = ({
+  dataColors,
+  series,
+  categories,
+  formatAmount,
+}) => {
+
+  var linechartcustomerColors =
+    getChartColorsArray(dataColors);
 
   var options = {
     chart: {
       height: 370,
-      type: "line",
+      type: "bar",
       toolbar: {
         show: false,
       },
     },
-   stroke: {
-  curve: "smooth",
-  dashArray: [0, 8],
-  width: [0, 3],
-},
-  fill: {
-  opacity: 1,
-},
-    markers: {
-      size: [0, 0, 0],
-      strokeWidth: 2,
-      hover: {
-        size: 4,
+
+    plotOptions: {
+      bar: {
+        columnWidth: "50%",
+        borderRadius: 4,
       },
     },
+
+    dataLabels: {
+      enabled: false,
+    },
+
     xaxis: {
-     categories: categories,
+      categories: categories || [],
       axisTicks: {
         show: false,
       },
@@ -37,92 +41,96 @@ const RevenueCharts = ({ dataColors, series, categories }) => {
         show: false,
       },
     },
-yaxis: {
-  min: 0,
-forceNiceScale: true,
-  tickAmount: 5,
 
-  labels: {
-    show: true,
-    formatter: (val) => `KES ${val.toFixed(1)}M`,
-    style: {
-      colors: "#878a99",
-      fontSize: "11px",
-    },
-  },
-},
-   grid: {
-  show: true,
-  xaxis: {
-    lines: {
-      show: true,
-    },
-  },
-  padding: {
-    top: 0,
-    right: -2,
-    bottom: 15,
-    left: 10,
-  },
-},
+    yaxis: {
+      min: 0,
+      forceNiceScale: true,
+      tickAmount: 5,
 
-    legend: {
-      show: true,
-      horizontalAlign: "center",
-      offsetX: 0,
-      offsetY: -5,
-      markers: {
-        width: 9,
-        height: 9,
-        radius: 6,
-      },
-      itemMargin: {
-        horizontal: 10,
-        vertical: 0,
+      labels: {
+        formatter: (val) => formatAmount(val),
       },
     },
-    plotOptions: {
-      bar: {
-        columnWidth: "70%",
-        // barHeight: "70%",
-      },
-    },
+
     colors: linechartcustomerColors,
-tooltip: {
-  shared: true,
-  y: [
-    {
-      formatter: function (y) {
-        if (typeof y !== "undefined") {
-          return `KES ${y.toFixed(1)}M`;
-        }
-        return y;
-      },
-    },
-    {
-      formatter: function (y) {
-        if (typeof y !== "undefined") {
-          return y.toFixed(0) + " Refunds";
-        }
-        return y;
-      },
-    },
-  ],
-},
   };
+
   return (
-    <React.Fragment>
-      <ReactApexChart dir="ltr"
-        options={options}
-        series={series}
-        type="line"
-        height="370"
-        className="apex-charts"
-      />
-    </React.Fragment>
+    <ReactApexChart
+      dir="ltr"
+      options={options}
+      series={series}
+      type="bar"
+      height={370}
+      className="apex-charts"
+    />
   );
 };
 
+const MonthToDateCharts = ({
+  dataColors,
+  series,
+  categories,
+  formatAmount,
+}) => {
+
+  var linechartcustomerColors =
+    getChartColorsArray(dataColors);
+
+  var options = {
+    chart: {
+      height: 370,
+      type: "bar",
+      toolbar: {
+        show: false,
+      },
+    },
+
+    plotOptions: {
+      bar: {
+        columnWidth: "50%",
+        borderRadius: 4,
+      },
+    },
+
+    dataLabels: {
+      enabled: false,
+    },
+
+    xaxis: {
+      categories: categories || [],
+      axisTicks: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
+    },
+
+    yaxis: {
+      min: 0,
+      forceNiceScale: true,
+      tickAmount: 5,
+
+      labels: {
+        formatter: (val) => formatAmount(val),
+      },
+    },
+
+    colors: linechartcustomerColors,
+  };
+
+  return (
+    <ReactApexChart
+      dir="ltr"
+      options={options}
+      series={series}
+      type="bar"
+      height={370}
+      className="apex-charts"
+    />
+  );
+};
 
 const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
   let barchartCountriesColors = [];
@@ -288,4 +296,4 @@ dataLabels: {
   );
 };
 
-export { RevenueCharts, StoreVisitsCharts, SpendCharts };
+export { RevenueCharts, StoreVisitsCharts, SpendCharts, MonthToDateCharts };

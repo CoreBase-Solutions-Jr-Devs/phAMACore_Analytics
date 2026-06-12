@@ -34,7 +34,7 @@ const Revenue = ({categories, series, formatAmount}) => {
     <React.Fragment>
       <Card>
         <CardHeader className="border-0 align-items-center d-flex">
-          <h4 className="card-title mb-0 flex-grow-1">Year to Date Purchases Trend(YTD) </h4>
+          <h4 className="card-title mb-0 flex-grow-1">Monthly Spend Trend</h4>
           {/* <div className="d-flex gap-1">
             <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { onChangeChartPeriod("all"); }}>
               ALL
