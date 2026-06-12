@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Col, Container, Row } from "reactstrap";
+import { useNavigate } from "react-router-dom"; 
 import { useDispatch, useSelector } from "react-redux";
 import Widget from "./Widgets";
 import BestSellingProducts from "./BestSellingProducts";
@@ -10,9 +11,10 @@ import SalesByLocations from "./SalesByLocations";
 import Section from "./Section";
 import StoreVisits from "./StoreVisits";
 import TopSellers from "./TopSellers";
+import MonthToDatePurchases from "./MonthToDatePurchases"
 import SupplierSpend from "./SupplierSpend";
 import FilterActions from "./FilterActions";
-import { getPurchaseOrders } from "../../slices/dashboardPurchase/thunk";
+import { getPurchaseOrders, getActualSpend, getDailySpend  } from "../../slices/dashboardPurchase/thunk";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
 
 const DashboardEcommerce = () => {
@@ -24,8 +26,9 @@ const DashboardEcommerce = () => {
   };
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
   
-   const { PurchaseOrders = [], filters } = useSelector(
+   const { PurchaseOrders = [], ActualSpend = [], DailySpend = [], filters } = useSelector(
       (state) => state.PurchaseOrders);
   
   const handleApplyFilters = () => {
@@ -35,10 +38,14 @@ const DashboardEcommerce = () => {
           clientid: 1,
           startDate: filters.startDate  ,
           endDate: filters.endDate,
-          branchcode:
-            filters.branch === "All Branches" ? null : filters.branch,
-        })
+      branchcode: filters.branch ?? null,
+            })
       );
+      if (filters.branch) {
+  navigate(`/Dashboard-ecommerce/${filters.branch}`);
+} else {
+  navigate("/Dashboard");
+}
     };
   
   useEffect(() => {
@@ -47,10 +54,30 @@ const DashboardEcommerce = () => {
         clientid: 1,
     startDate: filters.startDate,
           endDate: filters.endDate,
-        branchcode:
-      filters.branch === "All Branches" ? null : filters.branch,
+            branchcode: filters.branch ?? null,
       })
     );
+      dispatch(
+        getActualSpend({
+          clientid: 1,
+          startDate:  new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
+            endDate: new Date().toLocaleDateString("en-GB"),
+          // branchcode: filters.branch ?? null,
+        })
+      );
+        dispatch(
+        getDailySpend({
+          clientid: 1,
+          startDate: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    ).toLocaleDateString("en-GB"),
+
+    endDate: new Date().toLocaleDateString("en-GB"),
+          // branchcode: filters.branch ?? null,
+        })
+      );
   }, []);
 
   const branchMap = useMemo(() => {
@@ -91,17 +118,29 @@ const activeSuppliers = new Set(
   PurchaseOrders.map((item) => item.supplier_id)
 ).size;
 
+const lpoMap = {};
+
+PurchaseOrders.forEach((item) => {
+  const id = item.lpo_id;
+
+  if (!lpoMap[id]) {
+    const start = new Date(item.lpo_date);
+    const end = new Date(item.expected_date);
+
+    const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+
+    lpoMap[id] = diffDays;
+  }
+});
+
+const leadTimes = Object.values(lpoMap);
+
 const avgLeadTime =
-  Math.round(
-    PurchaseOrders.reduce((sum, item) => {
-      const start = new Date(item.lpo_date);
-      const end = new Date(item.expected_date);
-
-      const diff = (end - start) / (1000 * 60 * 60 * 24);
-
-      return sum + diff;
-    }, 0) / PurchaseOrders.length
-  );
+  leadTimes.length > 0
+    ? Math.round(
+        leadTimes.reduce((sum, val) => sum + val, 0) / leadTimes.length
+      )
+    : 0;
 
 const spendBySupplier = (PurchaseOrders || [])
   .filter(Boolean)
@@ -149,51 +188,119 @@ const branchData = Object.entries(spendByBranch).map(([name, value]) => ({
 //     data: Object.values(totalSpend),
 //   },
 // ];
-const getMonths = () => {
-  return Array.from({ length: 12 }, (_, i) =>
-    new Date(2000, i, 1).toLocaleString("default", {
+// const getMonths = () => {
+//   return Array.from({ length: 12 }, (_, i) =>
+//     new Date(2000, i, 1).toLocaleString("default", {
+//       month: "short",
+//     })
+//   );
+// };
+
+const actualSpendChart = useMemo(() => {
+  const currentMonth = new Date().getMonth() + 1;
+
+  const months = Array.from({ length: currentMonth }, (_, i) =>
+    new Date(2000, i, 1).toLocaleString("en-US", {
       month: "short",
     })
   );
-};
 
-const MONTHS = getMonths();
+  const map = Object.fromEntries(months.map((m) => [m, 0]));
 
-const monthlySpendMap = MONTHS.reduce((acc, month) => {
-  acc[month] = 0;
-  return acc;
-}, {});
+  (ActualSpend || []).forEach((item) => {
+    if (!item.lpo_date) return;
 
-PurchaseOrders.forEach((item) => {
-  const date = new Date(item.lpo_date);
+    const date = new Date(item.lpo_date);
 
-  const month = date.toLocaleString("default", {
-    month: "short",
+    const month = date.toLocaleString("en-US", {
+      month: "short",
+    });
+
+    const spend =
+      Number(item.total_lpo_value || 0);
+
+    if (map[month] !== undefined) {
+      map[month] += spend;
+    }
   });
 
-  if (monthlySpendMap.hasOwnProperty(month)) {
-    monthlySpendMap[month] += Number(item.total_lpo_value || 0);
-  }
-});
+  return {
+    categories: months,
+    series: [
+      {
+        name: "Actual Spend",
+        data: months.map((m) => map[m]),
+      },
+    ],
+  };
+}, [ActualSpend]);
+console.log(ActualSpend);
 
-const ActualSpendCategories = MONTHS;
+const monthToDateChart = useMemo(() => {
+  const now = new Date();
 
-const ActualSpendSeries = [
-  {
-    name: "Actual Spend",
-    type: "bar",
-    data: MONTHS.map((month) =>
-      Number((monthlySpendMap[month] / 1_000_000).toFixed(2))
-    ),
-  },
-  {
-    name: "Budget",
-    type: "line",
-    // data: MONTHS.map((month) =>
-    //   Number(((monthlySpendMap[month] * 1.1) / 1_000_000).toFixed(2))
-    // ),
-  },
-];
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const today = now.getDate();
+
+  // Create days array from 1 -> today
+  const DAYS = Array.from(
+    { length: today },
+    (_, i) => i + 1
+  );
+
+  // Initialize map
+  const map = DAYS.reduce((acc, d) => {
+    acc[d] = 0;
+    return acc;
+  }, {});
+
+  // Loop through API data
+  (DailySpend || []).forEach((item) => {
+
+    if (!item.lpo_date) return;
+
+    const date = new Date(item.lpo_date);
+
+    // Filter current month + year only
+    if (
+      date.getFullYear() !== currentYear ||
+      date.getMonth() !== currentMonth
+    ) {
+      return;
+    }
+
+    const day = date.getDate();
+
+    // Add spend value
+    if (map[day] !== undefined) {
+      map[day] += Number(
+        item.total_lpo_value || 0
+      );
+    }
+  });
+
+  console.log(
+    "MONTH TO DATE ACTUAL SPEND:",
+    DAYS.map((d) => map[d])
+  );
+
+  return {
+    categories: DAYS.map(String),
+
+    series: [
+      {
+        name: "Daily Spend",
+        data: DAYS.map((d) =>
+          Number(map[d] || 0)
+        ),
+      },
+    ],
+  };
+
+}, [DailySpend]);
+console.log(DailySpend)
+
 const groupedMap = new Map();
 
 (PurchaseOrders || []).forEach((item) => {
@@ -247,6 +354,7 @@ const OverdueAccounts = Array.from(groupedMap.values())
   .sort((a, b) => b.daysOverdue - a.daysOverdue)
   .slice(0, 10);
   
+  
 console.log("OVERDUE ACCOUNTS", OverdueAccounts);
   return (
     <React.Fragment>
@@ -284,11 +392,21 @@ totalSpend={totalSpend}
    </Row>
            
                 <Row>
-                  <Col xl={12}>
-                    <Revenue  categories={ActualSpendCategories}
-  series={ActualSpendSeries}  formatAmount={formatAmount}/>
-                  </Col>
-                 
+                  <Col xl={6}>
+                   <Revenue
+  categories={actualSpendChart.categories}
+  series={actualSpendChart.series}
+  formatAmount={formatAmount}
+/>
+                 </Col>
+                      <Col xl={6}>
+
+<MonthToDatePurchases 
+categories={monthToDateChart.categories}
+  series={monthToDateChart.series}
+  formatAmount={formatAmount}
+  />
+                 </Col>
                 </Row>
                 {/* <Row>
                   <BestSellingProducts />
