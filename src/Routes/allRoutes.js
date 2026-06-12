@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 //Dashboard
 import DashboardAnalytics from "../pages/DashboardAnalytics";
 import DashboardAnalyticsBranch from "../pages/DashboardAnalytics/DashboardAnalyticsBranch";
+import DashboardEcommerceBranch from "../pages/DashboardEcommerceBranch";
 import DashboardCrm from "../pages/DashboardCrm";
 import DashboardEcommerce from "../pages/DashboardEcommerce";
 
@@ -254,6 +255,7 @@ const authProtectedRoutes = [
     { path: "/dashboard-analytics/:branchId", component: <DashboardAnalyticsBranch /> },
   { path: "/dashboard-crm", component: <DashboardCrm /> },
   { path: "/dashboard", component: <DashboardEcommerce /> },
+     { path: "/dashboard-ecommerce/:branchId", component: <DashboardEcommerceBranch /> },
   { path: "/index", component: <DashboardEcommerce /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },
   { path: "/dashboard-projects", component: <DashboardProject /> },
