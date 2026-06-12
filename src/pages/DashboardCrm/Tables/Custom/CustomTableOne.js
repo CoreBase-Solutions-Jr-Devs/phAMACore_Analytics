@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Alert } from "reactstrap";
+import { Alert, Input } from "reactstrap";
 import TableContainer from "../../../../Components/Common/TableContainerReactTable";
 import { useSelector } from "react-redux";
 
@@ -8,7 +8,12 @@ const CustomTableOne = () => {
     const { batchExpiryNeo, loadingBatchExpiryNeo, errorBatchExpiryNeo } = useSelector(
         (state) => state.StockInventory
     );
+    const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
 
+    const [searchValue, setSearchValue] = useState("");
+
+    const today = new Date();
+    const cutoff = new Date(today.getTime() + NINETY_DAYS_MS);
     const currentYear = new Date().getFullYear();
 
     const paginationTable = useMemo(() => {
@@ -16,8 +21,10 @@ const CustomTableOne = () => {
             .filter((item) => {
                 if (!item.expirydate) return false;
 
-                const year = new Date(item.expirydate).getFullYear();
-                return year === currentYear;
+                const expiryDate = new Date(item.expirydate);
+                if (isNaN(expiryDate.getTime())) return false;
+
+                return expiryDate >= today && expiryDate <= cutoff;
             })
             .map((item) => {
                 const qty = Number(item.qtyBal || 0);
@@ -57,6 +64,16 @@ const CustomTableOne = () => {
                 };
             });
     }, [batchExpiryNeo]);
+
+    const filteredTable = useMemo(() => {
+        const term = searchValue.trim().toLowerCase();
+        if (!term) return paginationTable;
+
+        return paginationTable.filter((row) =>
+            [row.product, row.branch, row.date, row.total, row.status, row.value]
+                .some((field) => String(field ?? "").toLowerCase().includes(term))
+        );
+    }, [paginationTable, searchValue]);
 
     const columns = useMemo(
         () => [
@@ -150,15 +167,34 @@ const CustomTableOne = () => {
 
     return (
         <React.Fragment>
+            <div className="app-search d-block p-0 mb-2">
+                <div className="position-relative">
+                    <Input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search Products..."
+                        id="table-search-options"
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
+                    />
+                    <span className="mdi mdi-magnify search-widget-icon"></span>
+                    <span
+                        className={`mdi mdi-close-circle search-widget-icon search-widget-icon-close ${searchValue ? "" : "d-none"}`}
+                        id="table-search-close-options"
+                        role="button"
+                        onClick={() => setSearchValue("")}
+                    ></span>
+                </div>
+            </div>
+
             <TableContainer
                 columns={(columns || [])}
-                data={(paginationTable || [])}
+                data={(filteredTable || [])}
                 customPageSize={5}
-                isGlobalFilter={true}
+                isGlobalFilter={false}
                 isLoading={loadingBatchExpiryNeo}
                 tableClass="table-centered align-middle table-nowrap mb-0"
                 theadClass="text-muted table-light"
-                SearchPlaceholder="Search Products..."
             />
         </React.Fragment>
     );
