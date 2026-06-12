@@ -74,8 +74,22 @@ const CriticalStockChart = () => {
 
     if (loadingStock) {
         return (
-            <div className="text-center py-5">
-                Loading critical stock data...
+            <div className="d-flex flex-column align-items-center justify-content-center py-5">
+                <div
+                    className="spinner-border text-primary mb-3"
+                    role="status"
+                    style={{ width: "3rem", height: "3rem" }}
+                >
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+
+                <h6 className="text-muted mb-1">
+                    Loading Critical Stock Levels
+                </h6>
+
+                <small className="text-muted">
+                    Calculating days of stock cover...
+                </small>
             </div>
         );
     }
