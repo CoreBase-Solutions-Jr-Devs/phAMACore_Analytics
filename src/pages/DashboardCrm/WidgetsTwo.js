@@ -1,10 +1,18 @@
 import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
 import CountUp from "react-countup";
+import FeatherIcon from "feather-icons-react";
+import { Card, CardBody, Col, Row } from "reactstrap";
+import { useSelector } from "react-redux";
+
+const EXPIRY_ICON_MAP = {
+    1: { icon: "alert-octagon", color: "danger" },
+    2: { icon: "clock", color: "warning" },
+    3: { icon: "eye", color: "info" },
+};
 
 const WidgetsTwo = () => {
     const batchExpiryNeo = useSelector(
-        (state) => state.StockInventory.batchExpiryNeo || []
+        (state) => state.StockInventory?.batchExpiryNeo ?? []
     );
 
     const widgetData = useMemo(() => {
@@ -19,74 +27,64 @@ const WidgetsTwo = () => {
             if (!item.expirydate) return;
 
             const expiryDate = new Date(item.expirydate);
-
-            const daysToExpiry = Math.ceil(
-                (expiryDate - today) / msPerDay
-            );
+            const daysToExpiry = Math.ceil((expiryDate - today) / msPerDay);
 
             if (daysToExpiry < 0 || daysToExpiry > 90) return;
 
-            if (daysToExpiry <= 30) {
-                days0to30++;
-            } else if (daysToExpiry <= 60) {
-                days31to60++;
-            } else {
-                days61to90++;
-            }
+            if (daysToExpiry <= 30) days0to30++;
+            else if (daysToExpiry <= 60) days31to60++;
+            else days61to90++;
         });
 
         return [
-            {
-                label: "0 - 30 Days (Critical)",
-                counter: days0to30,
-                icon: "ri-fire-line text-danger",
-                badge: "ri-arrow-up-circle-line text-danger",
-            },
-            {
-                label: "31 - 60 Days (Warning)",
-                counter: days31to60,
-                icon: "ri-timer-flash-line text-warning",
-                badge: "ri-arrow-right-circle-line text-warning",
-            },
-            {
-                label: "61 - 90 Days (Watch)",
-                counter: days61to90,
-                icon: "ri-time-line text-info",
-                badge: "ri-arrow-down-circle-line text-info",
-            },
+            { id: 1, label: "0 - 30 Days (Critical)", counter: days0to30, subtitle: "Products" },
+            { id: 2, label: "31 - 60 Days (Warning)", counter: days31to60, subtitle: "Products" },
+            { id: 3, label: "61 - 90 Days (Watch)", counter: days61to90, subtitle: "Products" },
         ];
     }, [batchExpiryNeo]);
 
     return (
-        <div className="row row-cols-xxl-3 row-cols-md-3 row-cols-1 g-0">
-            {widgetData.map((widget, index) => (
-                <div className="col" key={index}>
-                    <div className="py-4 px-3">
-                        <h5 className="text-muted text-uppercase fs-13">
-                            {widget.label}
-                            <i className={`${widget.badge} fs-18 float-end align-middle`}></i>
-                        </h5>
+        <Row className="g-2 mb-2">
+            {widgetData.map((widget) => {
+                const { icon, color } =
+                    EXPIRY_ICON_MAP[widget.id] ?? { icon: "activity", color: "primary" };
 
-                        <div className="d-flex align-items-center">
-                            <div className="flex-shrink-0">
-                                <i className={`${widget.icon} display-6`}></i>
-                            </div>
+                return (
+                    <Col xl={4} lg={4} md={4} sm={6} key={widget.id} className="d-flex px-2 pt-2">
+                        <Card className="card-animate w-100">
+                            <CardBody className="p-2">
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p className="font-medium mb-0">{widget.label}</p>
 
-                            <div className="flex-grow-1 ms-3">
-                                <h2 className="mb-0">
-                                    <CountUp
-                                        start={0}
-                                        end={widget.counter}
-                                        duration={2}
-                                    />
-                                    <span className="fs-14 ms-1">Products</span>
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ))}
-        </div>
+                                        <h2 className={`mt-4 ff-secondary fw-semibold text-${color}`}>
+                                            <CountUp
+                                                start={0}
+                                                end={widget.counter}
+                                                separator=","
+                                                duration={4}
+                                            />
+                                        </h2>
+
+                                        <p className="text-muted mb-0">
+                                            {widget.subtitle ?? "\u00A0"}
+                                        </p>
+                                    </div>
+
+                                    <div className="avatar-sm flex-shrink-0">
+                                        <span
+                                            className={`avatar-title bg-${color}-subtle rounded-circle fs-2`}
+                                        >
+                                            <FeatherIcon icon={icon} className={`text-${color}`} />
+                                        </span>
+                                    </div>
+                                </div>
+                            </CardBody>
+                        </Card>
+                    </Col>
+                );
+            })}
+        </Row>
     );
 };
 
