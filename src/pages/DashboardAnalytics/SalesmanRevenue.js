@@ -3,7 +3,7 @@ import { Card, CardBody, CardHeader } from "reactstrap";
 import { salesmanRevenue } from "../../common/data/dashboardEcommerce";
 
 const SalesmanRevenue = ({ data = [], formatAmount  }) => {
-  const sorted = [...data].sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+  const sorted = [...data].sort((a, b) => b.revenue - a.revenue).slice(0, 10);
 
   return (
     <React.Fragment>
