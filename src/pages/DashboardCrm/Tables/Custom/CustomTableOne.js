@@ -86,45 +86,52 @@ const CustomTableOne = () => {
                 enableColumnFilter: false,
             },
             {
-                header: "Action",
+                header: () => (
+                    <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                        Action
+                    </div>
+                ),
                 accessorKey: "status",
                 enableColumnFilter: false,
                 cell: (cell) => {
-                    switch (cell.getValue()) {
+                    const value = cell.getValue();
+
+                    const badge = (color) => (
+                        <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                            <span className={`badge ${color} text-white text-uppercase`}>
+                                {value}
+                            </span>
+                        </div>
+                    );
+
+                    switch (value) {
                         case "Prioritise Sales":
-                            return (
-                                <span className="badge bg-warning text-white text-uppercase">
-                                    {cell.getValue()}
-                                </span>
-                            );
+                            return badge("bg-warning");
 
                         case "Transfer/Promote":
-                            return (
-                                <span className="badge bg-info text-white text-uppercase">
-                                    {cell.getValue()}
-                                </span>
-                            );
+                            return badge("bg-info");
 
                         case "Promote now":
-                            return (
-                                <span className="badge bg-danger text-white text-uppercase">
-                                    {cell.getValue()}
-                                </span>
-                            );
+                            return badge("bg-danger");
 
                         default:
-                            return (
-                                <span className="badge bg-secondary text-uppercase">
-                                    {cell.getValue()}
-                                </span>
-                            );
+                            return badge("bg-secondary");
                     }
                 },
             },
             {
-                header: "Value (KES)",
+                header: () => (
+                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        Value (KES)
+                    </div>
+                ),
                 accessorKey: "value",
                 enableColumnFilter: false,
+                cell: (cell) => (
+                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        {cell.getValue()}
+                    </div>
+                ),
             },
         ],
         []
