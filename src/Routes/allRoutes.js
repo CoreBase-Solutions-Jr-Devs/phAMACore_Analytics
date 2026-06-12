@@ -9,6 +9,7 @@ import DashboardCrm from "../pages/DashboardCrm";
 import DashboardEcommerce from "../pages/DashboardEcommerce";
 
 import DashboardCrypto from "../pages/DashboardCrypto";
+import DashboardMyBusiness from "../pages/DashboardMyBusiness";
 import DashboardProject from "../pages/DashboardProject";
 import DashboardNFT from "../pages/DashboardNFT";
 import DashboardJob from "../pages/DashboardJob/";
@@ -252,12 +253,13 @@ import PageBlogOverview from "../pages/Pages/Blogs/Overview";
 
 const authProtectedRoutes = [
   { path: "/dashboard-analytics", component: <DashboardAnalytics /> },
-    { path: "/dashboard-analytics/:branchId", component: <DashboardAnalyticsBranch /> },
+  { path: "/dashboard-analytics/:branchId", component: <DashboardAnalyticsBranch /> },
   { path: "/dashboard-crm", component: <DashboardCrm /> },
   { path: "/dashboard", component: <DashboardEcommerce /> },
      { path: "/dashboard-ecommerce/:branchId", component: <DashboardEcommerceBranch /> },
   { path: "/index", component: <DashboardEcommerce /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },
+  { path: "/dashboard-my-business", component: <DashboardMyBusiness /> },
   { path: "/dashboard-projects", component: <DashboardProject /> },
   { path: "/dashboard-nft", component: <DashboardNFT /> },
   { path: "/dashboard-job", component: <DashboardJob /> },
