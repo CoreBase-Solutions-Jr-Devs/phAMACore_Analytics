@@ -2,8 +2,8 @@ import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 
 const getColor = (percent) => {
-  if (percent >= 90) return "bg-caramel";
-  if (percent >= 75) return "bg-success";
+  if (percent >= 90) return "bg-success";
+  if (percent >= 75) return "bg-caramel";
   if (percent >= 60) return "bg-info";
   if (percent >= 45) return "bg-primary";
   if (percent >= 30) return "bg-warning";

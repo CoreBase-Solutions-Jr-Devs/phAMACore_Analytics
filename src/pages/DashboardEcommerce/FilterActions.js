@@ -70,30 +70,24 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
                 <div className="row mb-3 align-items-center">
                   <label className="col-4 col-form-label">Branch</label>
                   <div className="col-8">
-                    <select
-                      className="form-select"
-                      style={{ minWidth: "180px" }}
-                      value={branch || "All"}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === "All") {
-                          dispatch(setBranch(null));
-                          navigate("/purchases");
-                          return;
-                        }
-                        const branchId = Number(value);
-                        dispatch(setBranch(branchId));
-                        navigate(`/purchases/branch/${branchId}`);
-                      }}
-                    >
-                      <option value="All">All Branches</option>
+                <select
+  className="form-select"
+  style={{ minWidth: "180px" }}
+  value={branch ?? ""}
+  onChange={(e) => {
+    const value = e.target.value;
 
-                      {branches.map((b) => (
-                        <option key={b.branchCode} value={b.branchCode}>
-                          {b.branchName}
-                        </option>
-                      ))}
-                    </select>
+    dispatch(setBranch(value === "" ? null : Number(value)));
+  }}
+>
+  <option value="">All Branches</option>
+
+  {branches.map((b) => (
+    <option key={b.branchCode} value={b.branchCode}>
+      {b.branchName}
+    </option>
+  ))}
+</select>
                   </div>
                 </div>
 

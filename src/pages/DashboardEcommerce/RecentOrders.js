@@ -3,9 +3,9 @@ import { Card, CardBody, CardHeader } from "reactstrap";
 
 const RecentOrders = ({ data = [], OverdueAccounts = [] }) => {
   const today = new Date();
-
+const firstOverdue = OverdueAccounts?.[0];
   return (
-    <Card>
+    <Card className="card-height-100">
       <CardHeader className="align-items-center d-flex">
         <h4 className="card-title mb-0 flex-grow-1">
           OVERDUE INVOICES 
@@ -63,7 +63,21 @@ const RecentOrders = ({ data = [], OverdueAccounts = [] }) => {
                 </tr>
                 ))
   )}
+
             </tbody>
+<tfoot>
+  {firstOverdue && (
+    <tr>
+      <td colSpan="6">
+        <div className="text-center ">
+          <p className="mb-1 ">
+            <strong className="text-danger">{firstOverdue.supplier}</strong> will switch to cash on delivery if not delivered by <strong className="text-danger">{firstOverdue.dueDate}</strong>
+          </p>
+        </div>
+      </td>
+    </tr>
+  )}
+</tfoot>
           </table>
         </div>
       </CardBody>

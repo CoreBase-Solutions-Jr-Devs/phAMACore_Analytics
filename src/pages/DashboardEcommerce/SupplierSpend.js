@@ -81,21 +81,24 @@ const top2Total =
       </div>
     );
   })}
+  <hr className="my-2" />
+
+{top2Suppliers.length === 2 && (
+  <div className="text-center">
+    <p className="mb-1">
+      <strong>{top2Suppliers[0].name} + {top2Suppliers[1].name}</strong> ={" "}
+      {top2Percent}% of total spend
+    </p>
+    <p className="text-danger small mb-0">
+      Concentration is within the safe range (≤ 75%).
+    </p>
+  </div>
+)}
 </div>
 
         )}
     
-                        <hr className="my-2" />
-                        <div>
-{top2Suppliers.length === 2 && (
-  <p className="mb-2 ">
-    {top2Suppliers[0].name} +{" "}
-    {top2Suppliers[1].name}= 
-    <strong >{top2Percent}% of total spend</strong>
-  </p>
-)}
 
-</div>
                     </div>
 
                 </Card>

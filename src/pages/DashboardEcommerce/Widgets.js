@@ -20,10 +20,10 @@ const Widgets = ({
         );
           const formatDisplay = (date) => date || "";
 
-       const branchName =
-  !branch || branch === "All Branches"
-    ? "All Branches"
-    : branchMap?.[branch] || "Unknown Branch";
+  //      const branchName =
+  // !branch || branch === "All Branches"
+  //   ? "All Branches"
+  //   : branchMap?.[branch] || "Unknown Branch";
   return (
     <React.Fragment>
       
@@ -32,7 +32,7 @@ const Widgets = ({
   {/* LEFT - TITLE */}
   <h4 className="card-title mb-0">
     KEY METRICS
-    {branchName !== "All Branches" && ` - ${branchName}`}
+    {/* {branchName !== "All Branches" && ` - ${branchName}`} */}
   </h4>
 
   {/* CENTER - DATE RANGE */}
@@ -57,9 +57,9 @@ const Widgets = ({
 
 </div>
 
- <Row className="g-2 mb-2">
+ <Row className="g-2 mb-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
       {/* Total Spend */}
-      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+      <Col className="d-flex">
         <Card className="card-animate w-100 h-80">     
         <CardBody className="p-2">
         <div className="d-flex justify-content-between align-items-center">
@@ -70,19 +70,20 @@ const Widgets = ({
 
             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                               <span className="counter-value">
-              <CountUp
+              {/* <CountUp
                 end={Number(totalSpend)}
                 start={0}
                 decimals={1}
                 duration={4}
                 formattingFn={(value) => formatAmount(value)}
-              />
+              /> */}
+              {formatAmount(Number(totalSpend))}
               </span>
             </h2>
 
-            <p className="text-muted mb-0 ">
+            {/* <p className="text-muted mb-0 ">
               Budget:0.0M(0%)
-            </p>
+            </p> */}
             </div>
 
                 <div className="avatar-sm flex-shrink-0">
@@ -95,43 +96,8 @@ const Widgets = ({
         </Card>
       </Col>
 
-      {/* Budget Left */}
-      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
-        <Card className="card-animate w-100 h-80">     
-        <CardBody className="p-2">
-        <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-            <p className=" font-medium mb-0">
-              Budget Left
-            </p>
-
-            <h2 className="mt-4 ff-secondary fw-semibold text-secondary">
-              <CountUp
-                end={Number(budgetLeft || 0)}
-                 start={0}
-                decimals={1}
-                duration={4}
-                formattingFn={(value) => formatAmount(value)}
-              />
-            </h2>
-
-                        <p className="text-muted mb-0 ">
-0% unused
-</p>
-            </div>
-
-                <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-secondary-subtle rounded-circle fs-1">
-                                <FeatherIcon icon="pie-chart" className="text-secondary" />
-                            </span>
-                        </div>
-                    </div>
-          </CardBody>
-        </Card>
-      </Col>
-
       {/* Active Suppliers */}
-      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+      <Col  className="d-flex">
         <Card className="card-animate w-100 h-80">     
         <CardBody className="p-2">
         <div className="d-flex justify-content-between align-items-center">
@@ -141,7 +107,8 @@ const Widgets = ({
             </p>
 
             <h2 className="mt-4 ff-secondary fw-semibold text-info">
-              <CountUp end={Number(activeSuppliers || 0)} start={0} duration={2} />
+              {/* <CountUp end={Number(activeSuppliers || 0)} start={0} duration={2} /> */}
+              {Number(activeSuppliers || 0)}
             </h2>
 
  <p className="text-muted mb-0 ">
@@ -160,7 +127,7 @@ const Widgets = ({
       </Col>
 
       {/* Price Alerts */}
-      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+      <Col className="d-flex">
          <Card className="card-animate h-80 w-100">     
         <CardBody className="p-2">
         <div className="d-flex justify-content-between align-items-center">
@@ -190,7 +157,7 @@ const Widgets = ({
       </Col>
 
       {/* Maverick Spend */}
-      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+      <Col className="d-flex">
         <Card className="card-animate w-100 h-80">     
         <CardBody className="p-2">
         <div className="d-flex justify-content-between align-items-center">
@@ -225,7 +192,7 @@ const Widgets = ({
       </Col>
 
       {/* Avg Lead Time */}
-      <Col xl={2} lg={4} md={6} sm={6} className="d-flex">
+      <Col className="d-flex">
         <Card className="card-animate w-100 h-80">     
         <CardBody className="p-2">
         <div className="d-flex justify-content-between align-items-center">
@@ -235,13 +202,14 @@ const Widgets = ({
             </p>
 
             <h2 className="mt-4 ff-secondary fw-semibold text-success">
-              <CountUp
+              {/* <CountUp
                 end={Number(avgLeadTime || 0)}
                 start={0}
-                // suffix=" days"
-                // decimals={1}
+                suffix=" days"
+                decimals={1}
                 duration={3}
-              />
+              /> */}
+              {Number(avgLeadTime || 0)}
             </h2>
 
  <p className="text-muted mb-0 ">
