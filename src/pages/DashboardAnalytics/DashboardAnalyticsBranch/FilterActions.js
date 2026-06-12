@@ -66,20 +66,14 @@ const formatDisplay = (date) => date || "";
               <div className="col-8">
             <select
               className="form-select "
-              value={branch ?? "All"}
+              value={branch ?? ""}
             onChange={(e) => {
   const value = e.target.value;
 
-  if (value === "All") {
-    dispatch(setBranch(null));
-    navigate("/dashboard-analytics");
-  } else {
-    dispatch(setBranch(Number(value)));
-    navigate(`/dashboard-analytics/${value}`);
-  }
+dispatch(setBranch(value === "" ? null : Number(value)));
 }}
             >
-              <option value="All">All Branches</option>
+              <option value="">All Branches</option>
 
               {branchOptions.map((b) => (
                 <option key={b.branchCode} value={b.branchCode}>
