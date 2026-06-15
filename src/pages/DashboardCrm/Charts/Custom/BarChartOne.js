@@ -25,7 +25,10 @@ const BarChartOne = ({
             return '#0ab39c';
         });
 
-    const axisMax = Math.ceil(Math.max(...resolvedData) * 1.30);
+    const axisMax =
+    resolvedData.length > 0
+        ? Math.ceil(Math.max(...resolvedData) * 1.3)
+        : 10;
 
     const pointAnnotations = resolvedData.map((val, i) => ({
         x: axisMax,

@@ -71,7 +71,20 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
     const outOfStock = items.filter(r => Number(r.closing_qty) <= 0).length;
 
     // Near Expiry
-    const nearExpiry = items.filter(r => { const e = parseExpiry(r.expiry_date); return e && e > today && e <= in90d; }).length;
+    const nearExpiry = batchExpiryRows.reduce((count, item) => {
+        if (!item.expirydate) return count;
+
+        const expiryDate = new Date(item.expirydate);
+        const daysToExpiry = Math.ceil(
+            (expiryDate - today) / (1000 * 60 * 60 * 24)
+        );
+
+        if (daysToExpiry >= 0 && daysToExpiry <= 90) {
+            return count + 1;
+        }
+
+        return count;
+    }, 0);
 
     // Slow Movers (prefer movements data, fall back to closing stock qty_sold)
     const slowMovers = movementsRows.length

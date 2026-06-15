@@ -40,7 +40,8 @@ export const getStockMovements = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_MOVEMENTS, { params });
 export const getBatchExpiry = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_BATCH_EXPIRY, { params });
-
+export const getBatchExpiryNeo = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_BATCH_EXPIRY_NEO, { params });
 
 // Register Method
 export const postFakeRegister = data => api.create(url.POST_FAKE_REGISTER, data);

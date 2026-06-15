@@ -1,28 +1,90 @@
-import React from 'react';
-import { Container, Row, Col, Card, CardHeader, CardBody, ListGroup, ListGroupItem } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col, Card, CardHeader, CardBody } from 'reactstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import SimpleBar from 'simplebar-react';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
 import WidgetsTwo from './WidgetsTwo';
-import BarChartOne from './Charts/Custom/BarChartOne';
+// import BarChartOne from './Charts/Custom/BarChartOne';
 import BarChartTwo from './Charts/Custom/BarChartTwo';
 import BarChartThree from './Charts/Custom/BarChartThree';
 import CustomTableOne from './Tables/Custom/CustomTableOne';
 
+import {
+    fetchBatchExpiryNeo,
+    fetchDailyClosingStock,
+    fetchStockMovements
+} from '../../slices/dashboardCRM/thunk';
+
+import CriticalStockChart from './components/CriticalStockChart';
+import SlowMovingStock from "./components/SlowMovingStock";
+import ImbalanceAlerts from './components/ImbalanceAlerts';
+
+import FilterActions from './FilterActions';
+
 const DashboardCrm = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
+
+    const dispatch = useDispatch();
+    const { stockMovements = [] } = useSelector((state) => state.StockInventory);
+
+    const [rightColumn, setRightColumn] = useState(false);
+
+    const toggleRightColumn = () => {
+        setRightColumn(prev => !prev);
+    };
+
+    const [filters, setFilters] = useState({
+        clientid: 1,
+        startDate: "",
+        endDate: "",
+        branchcode: 0,
+        itemcode: ""
+    });
+
+    // 1st Load
+    useEffect(() => {
+        dispatch(fetchDailyClosingStock(filters));
+        dispatch(fetchStockMovements(filters));
+        dispatch(fetchBatchExpiryNeo(filters));
+    }, [dispatch]);
+
+    // Load after filters
+    useEffect(() => {
+        dispatch(fetchDailyClosingStock(filters));
+        dispatch(fetchStockMovements(filters));
+        dispatch(fetchBatchExpiryNeo(filters));
+    }, [dispatch, filters]);
 
     return (
         <React.Fragment>
             <div className="page-content">
-                <Container fluid>  
+                <Container fluid>
+
                     <BreadCrumb title="Inventory/Stock Dashboard" pageTitle="Dashboards" />
+
+                    <Row className="align-items-center mb-2">
+                        <Col>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h4 className="mb-0">KEY METRICS</h4>
+
+                                <button
+                                    className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                                    onClick={toggleRightColumn}
+                                >
+                                    <i className="ri-filter-fill me-1"></i>
+                                    Filter
+                                </button>
+                            </div>
+                        </Col>
+                    </Row>
+
                     <Row>
                         <Col xl={12}>
                             <WidgetsOne />
                         </Col>
                     </Row>
+
                     <Row>
                         <Col xl={12}>
                             <Card>
@@ -30,13 +92,13 @@ const DashboardCrm = () => {
                                     <h4 className="card-title mb-0">Critical Stock Levels - MUST-NOT STOCKOUT items</h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <BarChartOne dataColors='["--vz-primary", "--vz-secondary", "--vz-success", "--vz-info", "--vz-warning", "--vz-danger", "--vz-dark", "--vz-primary", "--vz-success", "--vz-secondary"]' />
+                                    <CriticalStockChart />
                                 </CardBody>
                             </Card>
                         </Col>
                     </Row>
                     <Row className="align-items-stretch">
-                        <Col lg={6} xl={6} className="d-flex">
+                        <Col lg={6} className="d-flex">
                             <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Stock Value By Branch</h4>
@@ -47,7 +109,7 @@ const DashboardCrm = () => {
                             </Card>
                         </Col>
 
-                        <Col lg={6} xl={6} className="d-flex">
+                        <Col lg={6} className="d-flex">
                             <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">
@@ -64,7 +126,7 @@ const DashboardCrm = () => {
                         <Col xl={12}>
                             <Card>
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">EXPIRY WATCH - Products at WRITE-OFF Risk</h4>
+                                    <h4 className="card-title mb-0">EXPIRY WATCH - WRITE-OFF RISK</h4>
                                 </CardHeader>
                                 <div className="card-body p-0 border-top">
                                     <WidgetsTwo />
@@ -79,7 +141,7 @@ const DashboardCrm = () => {
                         <Col lg={5}>
                             <Card>
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">SLOW-MOVING STOCK( 0 or Low Movement - 30 days)</h4>
+                                    <h4 className="card-title mb-0">SLOW MOVING STOCK (30 DAYS)</h4>
                                 </CardHeader>
                                 <CardBody>
                                     <p className="text-muted">Use data attributes and other custom attributes as keys</p>
@@ -98,68 +160,7 @@ const DashboardCrm = () => {
                                         </Row>
 
                                         <SimpleBar style={{ height: "242px" }} className="mx-n3">
-                                            <ListGroup className="list mb-0" flush>
-                                                <ListGroupItem data-id="1">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Chlorpheniramine 4mg</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="12345">Eldoret. 0 units sold. 38 days</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Dead Stock</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                                <ListGroupItem data-id="2">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Ferrous Sulphate 200mg</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="23456">Nakuru. 4units/day. 28 days</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Slow</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                                <ListGroupItem data-id="3">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Hydrocortisone Cream</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="34567">Kisumu. 2 units/day. 32 days</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Slow</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                                <ListGroupItem data-id="4">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Zinc Sulphate Tabs</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="45678">Thika. 6 units/day. 22 days.</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Slow</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                                <ListGroupItem data-id="5">
-                                                    <div className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <h5 className="fs-13 mb-1"><Link to="#" className="link name text-body">Calamine Lotion 200ml</Link></h5>
-                                                            <p className="born timestamp text-muted mb-0" data-timestamp="45678">Mombasa. 1 unit/day. 41 days.</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Near Dead</span>
-                                                        </div>
-                                                    </div>
-                                                </ListGroupItem>
-
-                                            </ListGroup >
+                                            <SlowMovingStock movements={stockMovements} />
                                         </SimpleBar>
                                     </div>
                                 </CardBody>
@@ -175,78 +176,17 @@ const DashboardCrm = () => {
                                     <p className="text-muted">Products where one branch is overstocked while another is critically low.</p>
 
                                     <SimpleBar style={{ height: "272px" }} className="mx-n3 px-3">
-                                        <ListGroup className="list mb-0" flush>
-
-                                            <ListGroupItem data-id="01">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">Amoxicillin 500mg</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-success fs-11 fw-normal px-2 py-1">Nairobi 2,400u</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-danger fs-11 fw-normal px-2 py-1">Eldoret 260u</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Transfer queued</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                            <ListGroupItem data-id="02">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">Co-Artem 20/120mg</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-success fs-11 fw-normal px-2 py-1">Mombasa 1,140u</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-danger fs-11 fw-normal px-2 py-1">Eldoret 180u</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-warning text-warning fs-11 fw-normal px-2 py-1">Transfer queued</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                            <ListGroupItem data-id="03">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">ORS Sachets</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-success fs-11 fw-normal px-2 py-1">Thika 3,200u</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-danger fs-11 fw-normal px-2 py-1">Nakuru 340u</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Transfer urgent</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                            <ListGroupItem data-id="04">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">Metformin 500mg</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-success fs-11 fw-normal px-2 py-1">Nairobi 1,650u</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-danger fs-11 fw-normal px-2 py-1">Nakuru 320u</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Transfer urgent</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                            <ListGroupItem data-id="05">
-                                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                    <div className="d-flex align-items-center flex-wrap gap-2">
-                                                        <span className="fw-medium text-body fs-13">Vitamin C 500mg</span>
-                                                        <span className="ms-1 text-muted">·</span>
-                                                        <span className="badge rounded-pill text-bg-warning fs-11 fw-normal px-2 py-1">Mombasa 3,400u (near-expiry)</span>
-                                                        <span className="text-muted">→</span>
-                                                        <span className="badge rounded-pill text-bg-info fs-11 fw-normal px-2 py-1">All branches</span>
-                                                    </div>
-                                                    <span className="badge rounded-pill border border-danger text-danger fs-11 fw-normal px-2 py-1">Promote urgently</span>
-                                                </div>
-                                            </ListGroupItem>
-
-                                        </ListGroup>
+                                        <ImbalanceAlerts />
                                     </SimpleBar>
                                 </CardBody>
                             </Card>
                         </Col>
+                        <FilterActions
+                            rightColumn={rightColumn}
+                            hideRightColumn={toggleRightColumn}
+                            filters={filters}
+                            setFilters={setFilters}
+                        />
                     </Row>
                 </Container>
             </div>

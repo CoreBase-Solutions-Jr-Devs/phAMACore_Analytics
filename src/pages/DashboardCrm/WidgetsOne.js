@@ -3,7 +3,7 @@ import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDailyClosingStock, fetchStockMovements, fetchBatchExpiry } from "../../slices/dashboardCRM/thunk";
+import { fetchDailyClosingStock, fetchStockMovements, fetchBatchExpiryNeo } from "../../slices/dashboardCRM/thunk";
 import { KPI_META, computeKPIs, getTodayApi, getNDaysAgoApi} from "../utils/StockInventoryUtils";
 
 
@@ -22,7 +22,7 @@ const WidgetsOne = ({ branchMap = {} }) => {
     const dispatch = useDispatch();
 
     const {
-        dailyClosingStock = [], stockMovements = [], batchExpiry = [],
+        dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [],
         loadingStock, loadingMovements, errorStock,
     } = useSelector((state) => state.StockInventory ?? {});
 
@@ -59,9 +59,9 @@ const WidgetsOne = ({ branchMap = {} }) => {
 
         // Batch Expiry data - Near Expiry KPI
         dispatch(
-            fetchBatchExpiry({
+            fetchBatchExpiryNeo({
                 clientid: 1,
-                startDate: "01/01/2026",
+                startDate: getTodayApi(),
                 endDate: getTodayApi(),
                 // branchcode: 1,
             })
@@ -69,20 +69,14 @@ const WidgetsOne = ({ branchMap = {} }) => {
     }, [dispatch]);
 
     const kpis = useMemo(
-        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiry),
-        [dailyClosingStock, stockMovements, batchExpiry]
+        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo),
+        [dailyClosingStock, stockMovements, batchExpiryNeo]
     );
 
     const isLoading = loadingStock || loadingMovements;
 
     return (
         <React.Fragment>
-            <div className="mb-2">
-                <h4 className="card-title mb-0 text-start">
-                    KEY METRICS
-                    {branchName !== "All Branches" && ` — ${branchName}`}
-                </h4>
-            </div>
 
             <Row className="g-2 mb-2">
                 {KPI_META.map((widget) => {

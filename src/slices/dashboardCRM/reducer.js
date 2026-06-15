@@ -1,16 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from './thunk';
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from './thunk';
 
 export const initialState = {
   dailyClosingStock: [],
   stockMovements: [],
   batchExpiry: [],
+  batchExpiryNeo: [],
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
+  loadingBatchExpiryNeo: false,
   errorStock: null,
   errorMovements: null,
   errorBatchExpiry: null,
+  errorBatchExpiryNeo: null,
 };
 
 const StockInventorySlice = createSlice({
@@ -30,7 +33,7 @@ const StockInventorySlice = createSlice({
     });
     builder.addCase(fetchDailyClosingStock.rejected, (state, action) => {
       state.loadingStock = false;
-      state.errorStock = action.payload || action.payload.error || action.error || null;
+      state.errorStock = action.payload?.message || action.payload?.error || action.error?.message || null;
     });
 
 
@@ -65,6 +68,21 @@ const StockInventorySlice = createSlice({
     builder.addCase(fetchBatchExpiry.rejected, (state, action) => {
       state.loadingBatchExpiry = false;
       state.errorBatchExpiry = action.payload || action.payload.error || action.error || null;
+    });
+
+
+    builder.addCase(fetchBatchExpiryNeo.pending, (state) => {
+      state.loadingBatchExpiryNeo = true;
+      state.errorBatchExpiryNeo = null;
+    });
+    builder.addCase(fetchBatchExpiryNeo.fulfilled, (state, action) => {
+      state.loadingBatchExpiryNeo = false;
+      state.batchExpiryNeo = action.payload;
+      // console.log("Payload", action.payload);
+    });
+    builder.addCase(fetchBatchExpiryNeo.rejected, (state, action) => {
+      state.loadingBatchExpiryNeo = false;
+      state.errorBatchExpiryNeo = action.payload || action.payload.error || action.error || null;
     });
   }
 });
