@@ -1,16 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getPurchaseOrders } from "./thunk";
+import { getPurchaseOrders, getActualSpend, getDailySpend } from "./thunk";
 
   const formatDMY = (date) =>
   date.toLocaleDateString("en-GB");
   
 const initialState = {
   PurchaseOrders: [],
+   ActualSpend: [],
+   DailySpend: [],
   loading: false,
   error: null,
 
   filters: {
-    branch: "All Branches",
+    branch: null,
     dateRange: "Today",
    startDate: new Date().toLocaleDateString("en-GB"),
 endDate: new Date().toLocaleDateString("en-GB"),
@@ -84,7 +86,29 @@ case "Custom":
         state.PurchaseOrders = action.payload?.result || action.payload || [];
       })
 
+         .addCase(getActualSpend.fulfilled, (state, action) => {
+        state.loading = false;
+        state.ActualSpend = action.payload?.result || action.payload || [];
+      })
+
+        .addCase(getDailySpend.fulfilled, (state, action) => {
+        state.loading = false;
+        state.DailySpend = action.payload?.result || action.payload || [];
+      })
+
       .addCase(getPurchaseOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message || action.error.message || "Error loading data";
+      })
+
+        .addCase(getActualSpend.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message || action.error.message || "Error loading data";
+      })
+
+        .addCase(getDailySpend.rejected, (state, action) => {
         state.loading = false;
         state.error =
           action.payload?.message || action.error.message || "Error loading data";

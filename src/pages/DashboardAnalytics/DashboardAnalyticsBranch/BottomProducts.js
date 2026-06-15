@@ -20,18 +20,14 @@ const BottomProducts = ({ data = [], }) => {
 
         {data.length === 0 ? (
           <div className="text-center py-5">
-            {/* <h6 className="text-muted mb-2">
+            <h6 className="text-muted mb-2">
               No product sales data available
-            </h6> */}
+            </h6>
           </div>
         ) : (
           <>
-          <div className="text-center py-5">
-            <h6 className="text-muted mb-2">
-              No bottom product sales data available
-            </h6>
-          </div>
-            {/* {data.map((product, index) => {
+      
+            {data.map((product, index) => {
               const max = data[0]?.qty || 1;
               const percentage = (product.qty / max) * 100;
 
@@ -65,10 +61,10 @@ const BottomProducts = ({ data = [], }) => {
 
                 </div>
               );
-            })} */}
+            })} 
       
-            {/* <hr className="my-2" /> */}
-{/* 
+            <hr className="my-2" />
+ 
             {bottomProduct && (
                <div className="d-flex flex-row align-items-center justify-content-center mb-2 gap-3">
                 <p>
@@ -83,7 +79,7 @@ const BottomProducts = ({ data = [], }) => {
                   </strong>
                 </p>
               </div>
-            )} */}
+            )}
 
           </>
         )}

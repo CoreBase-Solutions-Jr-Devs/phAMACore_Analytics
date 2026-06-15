@@ -1,19 +1,44 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
+import {
+  getSalesTransactions as getSalesTransactionsApi,
+  getMonthlySales as getMonthlySalesApi,
+  getMonthToDateSales as getMonthToDateApi,
+} from "../../helpers/fakebackend_helper";
 
-import { getSalesTransactions as getSalesTransactionsApi } from "../../helpers/fakebackend_helper";
-
-// GET SALES
+// MAIN SALES
 export const getSalesTransactions = createAsyncThunk(
   "powerbi/getSalesTransactions",
   async (params, { rejectWithValue }) => {
     try {
       const response = await getSalesTransactionsApi(params);
-
-      // IMPORTANT FIX
       return response.data || response;
     } catch (error) {
-      toast.error("Failed to fetch sales transactions", { autoClose: 3000 });
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// MONTHLY CHART
+export const getMonthlySales = createAsyncThunk(
+  "powerbi/getMonthlySales",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getMonthlySalesApi(params);
+      return response.data || response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// MONTH TO DATE
+export const getMonthToDateSales = createAsyncThunk(
+  "powerbi/getMonthToDateSales",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getMonthToDateApi(params);
+      return response.data || response;
+    } catch (error) {
       return rejectWithValue(error.message);
     }
   }

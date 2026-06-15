@@ -69,8 +69,8 @@ const firstOverdue = OverdueAccounts?.[0];
   {firstOverdue && (
     <tr>
       <td colSpan="6">
-        <div className="text-center ">
-          <p className="mb-1 ">
+        <div className="d-flex justify-content-center align-items-center mb-2 gap-3">
+          <p className="mb-0 text-center">
             <strong className="text-danger">{firstOverdue.supplier}</strong> will switch to cash on delivery if not delivered by <strong className="text-danger">{firstOverdue.dueDate}</strong>
           </p>
         </div>

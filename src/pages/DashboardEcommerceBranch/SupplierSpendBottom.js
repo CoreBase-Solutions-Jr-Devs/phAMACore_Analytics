@@ -13,17 +13,17 @@ const getColor = (percent) => {
   return "bg-danger";
 };
 
-const SupplierSpend = ({ supplierData, top2Suppliers, formatAmount, totalSpend }) => {
+const SupplierSpendBottom = ({ supplierData,  formatAmount }) => {
     const hasData =
     Array.isArray(supplierData) &&
     supplierData.length > 0;
-const top2Total =
-  (top2Suppliers[0]?.value || 0) +
-  (top2Suppliers[1]?.value || 0);
-  const top2Percent =
-  totalSpend > 0
-    ? ((top2Total / totalSpend) * 100).toFixed(1)
-    : 0;
+// const top2Total =
+//   (top2Suppliers[0]?.value || 0) +
+//   (top2Suppliers[1]?.value || 0);
+//   const top2Percent =
+//   totalSpend > 0
+//     ? ((top2Total / totalSpend) * 100).toFixed(1)
+//     : 0;
     return (
         <React.Fragment>
       
@@ -31,7 +31,7 @@ const top2Total =
 
                     <CardHeader className="card-header align-items-center d-flex">
                         <h4 className="card-title mb-0 flex-grow-1">
-                         Spend by supplier
+                         Bottom  suppliers
                         </h4>
                         </CardHeader>
                     <div className="card-body p-3">
@@ -83,7 +83,7 @@ const top2Total =
   })}
   <hr className="my-2" />
 
-{top2Suppliers.length === 2 && (
+{/* {top2Suppliers.length === 2 && (
   <div className="text-center">
     <p className="mb-1">
       <strong>{top2Suppliers[0].name} + {top2Suppliers[1].name}</strong> ={" "}
@@ -93,7 +93,7 @@ const top2Total =
       Concentration is within the safe range (≤ 75%).
     </p>
   </div>
-)}
+)} */}
 </div>
 
         )}
@@ -107,4 +107,4 @@ const top2Total =
     );
 };
 
-export default SupplierSpend;
+export default SupplierSpendBottom;

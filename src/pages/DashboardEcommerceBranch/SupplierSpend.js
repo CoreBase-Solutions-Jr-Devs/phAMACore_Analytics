@@ -31,7 +31,7 @@ const top2Total =
 
                     <CardHeader className="card-header align-items-center d-flex">
                         <h4 className="card-title mb-0 flex-grow-1">
-                         Spend by supplier
+                         Top Suppliers
                         </h4>
                         </CardHeader>
                     <div className="card-body p-3">

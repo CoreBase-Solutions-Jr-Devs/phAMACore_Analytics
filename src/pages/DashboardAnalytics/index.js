@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Col, Container, Row } from "reactstrap";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
 formatToApiDate,
@@ -15,19 +16,20 @@ import TopCustomers from "./TopCustomers";
 import ProgressiveSales from "./ProgressiveSales";
 import MonthToDateSales from "./MonthToDateSales";
 // import BranchDropdown from "./BranchDropdown";
-import { getSalesTransactions } from "../../slices/dashboardSales/thunk";
+import { getSalesTransactions, getMonthToDateSales, getMonthlySales } from "../../slices/dashboardSales/thunk";
 import FilterActions from "./FilterActions";
 
 const DashboardAnalytics = () => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
     const [rightColumn, setRightColumn] = useState(false);
     const toggleRightColumn = () => {
       setRightColumn(!rightColumn);
     };
 
- const { sales = [], filters } = useSelector(
+ const { sales = [], monthToDateSales = [], monthlySales = [], filters } = useSelector(
     (state) => state.powerbi
   );
 
@@ -38,10 +40,17 @@ const handleApplyFilters = () => {
         clientid: 1,
         startDate: filters.startDate  ,
         endDate: filters.endDate,
-branchcode: filters.branch === "All Branches" ? null : filters.branch,
-              })
-    );
-  };
+branchcode:
+       filters.branch ?? null,
+    })
+  );
+console.log("CURRENT BRANCH FILTER:", filters.branch);
+if (filters.branch) {
+  navigate(`/Dashboard-Analytics/${filters.branch}`);
+} else {
+  navigate("/Dashboard-Analytics");
+}
+};
 
 useEffect(() => {
   dispatch(
@@ -50,11 +59,32 @@ useEffect(() => {
   startDate: filters.startDate,
         endDate: filters.endDate,
       branchcode:
-        filters.branch === "All Branches"
-          ? null
-          : filters.branch,
+        filters.branch ?? null,
     })
   );
+   dispatch(
+    getMonthlySales({
+      clientid: 1,
+      startDate:  new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
+        endDate: new Date().toLocaleDateString("en-GB"),
+      // branchcode: filters.branch ?? null,
+    })
+  );
+
+  dispatch(
+    getMonthToDateSales({
+      clientid: 1,
+     startDate: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    ).toLocaleDateString("en-GB"),
+
+    endDate: new Date().toLocaleDateString("en-GB"),
+      // branchcode: filters.branch ?? null,
+    })
+  );
+  console.log("INITIAL BRANCH FILTER:", filters.branch);
 }, []);
 
 const branchMap = useMemo(() => {
@@ -191,42 +221,84 @@ const customerTotals = sales.reduce((acc, item) => {
 
 const topCustomersData = Object.values(customerTotals)
   .sort((a, b) => b.revenue - a.revenue)
-  .slice(0, 5);
+  .slice(0, 10);
   
-const getMonths = () => {
-  return Array.from({ length: 12 }, (_, i) =>
-    new Date(2000, i, 1).toLocaleString("default", { month: "short" })
-  );
-};
+// const getMonths = () => {
+//   return Array.from({ length: 12 }, (_, i) =>
+//     new Date(2000, i, 1).toLocaleString("default", { month: "short" })
+//   );
+// };
+
+// const monthlyChart = useMemo(() => {
+//   const now = new Date();
+//   const currentMonthIndex = now.getMonth();
+
+//   const MONTHS = getMonths().slice(0, currentMonthIndex + 1);
+
+//   const map = Object.fromEntries(MONTHS.map(m => [m, 0]));
+
+//   monthlySales.forEach((s) => {
+//     const date = new Date(s.transaction_Date);
+
+//     const month = date.toLocaleString("default", { month: "short" });
+
+//     if (map[month] !== undefined) {
+//       map[month] += Number(s.revenue || 0);
+//     }
+//   });
+
+//   return {
+//     categories: MONTHS,
+//     series: [
+//       {
+//         name: "Revenue",
+//         data: MONTHS.map(m => map[m]),
+//       },
+//     ],
+//   };
+//     console.log("📊 Monthly MAP:", map);
+// }, [monthlySales]);
 
 const monthlyChart = useMemo(() => {
-  const now = new Date();
-  const currentMonthIndex = now.getMonth();
 
-  const MONTHS = getMonths().slice(0, currentMonthIndex + 1);
+    const currentMonth = new Date().getMonth() + 1;
 
-  const map = Object.fromEntries(MONTHS.map(m => [m, 0]));
+  const months = Array.from({ length: currentMonth  }, (_, i) =>
+    new Date(2000, i, 1).toLocaleString("en-US", {
+      month: "short",
+    })
+  );
 
-  sales.forEach((s) => {
-    const date = new Date(s.transaction_Date);
+  const map = Object.fromEntries(months.map((m) => [m, 0]));
 
-    const month = date.toLocaleString("default", { month: "short" });
+  (monthlySales || []).forEach((item) => {
+    if (!item.transaction_Date) return;
+
+    const date = new Date(item.transaction_Date);
+
+    // console.log("PARSED DATE:", date);
+
+    const month = date.toLocaleString("en-US", {
+      month: "short",
+    });
+
+    console.log("MONTH:", month);
 
     if (map[month] !== undefined) {
-      map[month] += Number(s.revenue || 0);
+      map[month] += Number(item.revenue || 0);
     }
   });
 
   return {
-    categories: MONTHS,
+    categories: months,
     series: [
       {
         name: "Revenue",
-        data: MONTHS.map(m => map[m]),
+        data: months.map((m) => map[m]),
       },
     ],
   };
-}, [sales]);
+}, [monthlySales]);
 
 const monthToDateChart = useMemo(() => {
   const now = new Date();
@@ -241,13 +313,17 @@ const monthToDateChart = useMemo(() => {
     return acc;
   }, {});
 
-  sales.forEach((s) => {
+  (monthToDateSales || []).forEach((s) => {
+    if (!s.transaction_Date) return;
+
     const date = new Date(s.transaction_Date);
-  
+
     if (
       date.getFullYear() !== currentYear ||
       date.getMonth() !== currentMonth
-    ) return;
+    ) {
+      return;
+    }
 
     const day = date.getDate();
 
@@ -255,20 +331,22 @@ const monthToDateChart = useMemo(() => {
       map[day] += Number(s.revenue || 0);
     }
   });
-  
-console.log("FINAL SERIES:", DAYS.map((d) => map[d]));
-  console.log("📊 MTD DAILY MAP:", map);
+
+  console.log(
+    "FINAL SERIES:",
+    DAYS.map((d) => map[d])
+  );
 
   return {
     categories: DAYS.map(String),
     series: [
       {
         name: "Revenue",
-data: DAYS.map((d) => Number(map[d] || 0)),
+        data: DAYS.map((d) => Number(map[d] || 0)),
       },
     ],
   };
-}, [sales]);
+}, [monthToDateSales]);
 
 const normalizeProductName = (name = "") => {
   return name
@@ -321,7 +399,7 @@ document.title = "Sales Dashboard | phAMACore Analytics";
   </Col>
 </Row>
           <Row>
-            <Col xxl={5}>
+          
               <Widget sales={sales}  totalRevenue={totalRevenue}
   cashSales={cashSales}
   creditSales={creditSales}
@@ -334,7 +412,6 @@ cashInvoices={cashInvoices}
   branchMap={branchMap}
   rightClickBtn={toggleRightColumn}
   />
-            </Col>
           </Row>
 
           <Row className="mt-4">

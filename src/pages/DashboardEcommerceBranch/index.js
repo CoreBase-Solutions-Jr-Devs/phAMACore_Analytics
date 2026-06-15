@@ -1,32 +1,34 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Col, Container, Row } from "reactstrap";
-import { useNavigate } from "react-router-dom"; 
 import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link , useNavigate} from "react-router-dom";
 import Widget from "./Widgets";
 import BestSellingProducts from "./BestSellingProducts";
 import RecentActivity from "./RecentActivity";
 import RecentOrders from "./RecentOrders";
 import Revenue from "./Revenue";
+import MonthToDatePurchases from "./MonthToDatePurchases";
 import SalesByLocations from "./SalesByLocations";
 import Section from "./Section";
 import StoreVisits from "./StoreVisits";
 import TopSellers from "./TopSellers";
-import MonthToDatePurchases from "./MonthToDatePurchases"
 import SupplierSpend from "./SupplierSpend";
+import SupplierSpendBottom from "./SupplierSpendBottom";
+
 import FilterActions from "./FilterActions";
 import { getPurchaseOrders, getActualSpend, getDailySpend  } from "../../slices/dashboardPurchase/thunk";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
 
-const DashboardEcommerce = () => {
+const DashboardEcommerceBranch = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
   const [rightColumn, setRightColumn] = useState(false);
   const toggleRightColumn = () => {
     setRightColumn(!rightColumn);
   };
-
+  const navigate = useNavigate();
+  const { branchId } = useParams();
     const dispatch = useDispatch();
-    const navigate = useNavigate();
   
    const { PurchaseOrders = [], ActualSpend = [], DailySpend = [], filters } = useSelector(
       (state) => state.PurchaseOrders);
@@ -38,14 +40,16 @@ const DashboardEcommerce = () => {
           clientid: 1,
           startDate: filters.startDate  ,
           endDate: filters.endDate,
-      branchcode: filters.branch ?? null,
-            })
+            branchcode: filters.branch ?? null,
+
+        })
       );
+
       if (filters.branch) {
-  navigate(`/Dashboard-ecommerce/${filters.branch}`);
-} else {
-  navigate("/Dashboard");
-}
+    navigate(`/dashboard-ecommerce/${filters.branch}`);
+  } else {
+    navigate("/dashboard");
+  }
     };
   
   useEffect(() => {
@@ -55,29 +59,30 @@ const DashboardEcommerce = () => {
     startDate: filters.startDate,
           endDate: filters.endDate,
             branchcode: filters.branch ?? null,
+
       })
     );
-      dispatch(
-        getActualSpend({
-          clientid: 1,
-          startDate:  new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
-            endDate: new Date().toLocaleDateString("en-GB"),
-          // branchcode: filters.branch ?? null,
-        })
-      );
-        dispatch(
-        getDailySpend({
-          clientid: 1,
-          startDate: new Date(
-      new Date().getFullYear(),
-      new Date().getMonth(),
-      1
-    ).toLocaleDateString("en-GB"),
-
-    endDate: new Date().toLocaleDateString("en-GB"),
-          // branchcode: filters.branch ?? null,
-        })
-      );
+         dispatch(
+              getActualSpend({
+                clientid: 1,
+                startDate:  new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
+                  endDate: new Date().toLocaleDateString("en-GB"),
+                branchcode: filters.branch ?? null,
+              })
+            );
+              dispatch(
+              getDailySpend({
+                clientid: 1,
+                startDate: new Date(
+            new Date().getFullYear(),
+            new Date().getMonth(),
+            1
+          ).toLocaleDateString("en-GB"),
+      
+          endDate: new Date().toLocaleDateString("en-GB"),
+                branchcode: filters.branch ?? null,
+              })
+            );
   }, []);
 
   const branchMap = useMemo(() => {
@@ -169,6 +174,14 @@ const top2Suppliers = Object.entries(spendBySupplier || {})
     value: value || 0,
   }));
 console.log("SPEND BY SUPPLIER", topSuppliers);
+
+const bottomSuppliers = Object.entries(spendBySupplier || {})
+  .sort((a, b) => (a[1] || 0) - (b[1] || 0)) // ascending order
+  .slice(0, 7)
+  .map(([name, value]) => ({
+    name,
+    value: value || 0,
+  }));
 
 const spendByBranch = PurchaseOrders.reduce((acc, item) => {
   const branch = item.branch_name;
@@ -360,8 +373,16 @@ console.log("OVERDUE ACCOUNTS", OverdueAccounts);
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-            <BreadCrumb title="Purchases" pageTitle="Dashboards" />
-          <Row>
+<BreadCrumb
+  title={<Link to="/dashboard-ecommerce">Sales</Link>}
+  pageTitle="Dashboards"
+  subtitle={
+    <>
+    {PurchaseOrders.find(p => p.branch_ID === Number(branchId))?.branch_name || branchId}
+    </>
+    }
+/>
+            <Row>
             <Col>
               <div className="h-100">
                                 {/* <Section  rightClickBtn={toggleRightColumn} /> */}
@@ -374,8 +395,12 @@ console.log("OVERDUE ACCOUNTS", OverdueAccounts);
                      <StoreVisits data={branchData} />
                   </Col>
                   <Col xl={6}>
-          <SalesByLocations data={branchData} totalSpend={totalSpend} formatAmount={formatAmount}/>
-                  </Col>
+<SupplierSpendBottom
+  supplierData={bottomSuppliers}
+  formatAmount={formatAmount}
+// top2Suppliers ={top2Suppliers}
+// totalSpend={totalSpend}
+/>                   </Col>
                 </Row>
                  <Row>
                   <Col xl={6}>
@@ -391,7 +416,7 @@ totalSpend={totalSpend}
 </Col>
    </Row>
            
-                <Row>
+                           <Row>
                   <Col xl={6}>
                    <Revenue
   categories={actualSpendChart.categories}
@@ -430,5 +455,5 @@ categories={monthToDateChart.categories}
   );
 };
 
-export default DashboardEcommerce;
+export default DashboardEcommerceBranch;
    
