@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getMarketChartsDatas } from '../../../../../slices/thunks';
 
 // Import Chart
-import { ProgressiveSalesChart } from '../../../../DashboardAnalytics/DashboardAnalyticsCharts';
+import { ProgressiveSalesChart } from '../../../../DashboardSales/DashboardAnalyticsCharts';
 import { Link } from 'react-router-dom';
 import { createSelector } from 'reselect';
 
