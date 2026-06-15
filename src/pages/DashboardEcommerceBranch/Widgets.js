@@ -20,10 +20,10 @@ const Widgets = ({
         );
           const formatDisplay = (date) => date || "";
 
-  //      const branchName =
-  // !branch || branch === "All Branches"
-  //   ? "All Branches"
-  //   : branchMap?.[branch] || "Unknown Branch";
+       const branchName =
+  !branch || branch === "All Branches"
+    ? "All Branches"
+    : branchMap?.[branch] || "Unknown Branch";
   return (
     <React.Fragment>
       
@@ -32,7 +32,7 @@ const Widgets = ({
   {/* LEFT - TITLE */}
   <h4 className="card-title mb-0">
     KEY METRICS
-    {/* {branchName !== "All Branches" && ` - ${branchName}`} */}
+    {branchName !== "All Branches" && ` - ${branchName}`}
   </h4>
 
   {/* CENTER - DATE RANGE */}

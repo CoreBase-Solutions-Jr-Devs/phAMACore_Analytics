@@ -1,17 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getSalesTransactions } from "./thunk";
+import { getSalesTransactions, getMonthlySales, getMonthToDateSales } from "./thunk";
 
   const formatDMY = (date) =>
   date.toLocaleDateString("en-GB");
   
 const initialState = {
   sales: [],
+    monthlySales: [],
+  monthToDateSales: [],
   branches: [],
   loading: false,
   error: null,
 
   filters: {
-    branch: "All Branches",
+    branch: null,
     dateRange: "Today",
    startDate: new Date().toLocaleDateString("en-GB"),
 endDate: new Date().toLocaleDateString("en-GB"),
@@ -104,7 +106,29 @@ case "Custom":
   state.branches = Object.values(map);
 })
 
-      .addCase(getSalesTransactions.rejected, (state, action) => {
+.addCase(getMonthlySales.fulfilled, (state, action) => {
+  state.monthlySales = action.payload?.result || action.payload || [];
+})
+
+// MONTH TO DATE
+.addCase(getMonthToDateSales.fulfilled, (state, action) => {
+  state.monthToDateSales = action.payload?.result || action.payload || [];
+})
+
+      
+.addCase(getSalesTransactions.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message || action.error.message || "Error loading data";
+      })
+
+      .addCase(getMonthToDateSales.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message || action.error.message || "Error loading data";
+      })
+
+         .addCase(getMonthlySales.rejected, (state, action) => {
         state.loading = false;
         state.error =
           action.payload?.message || action.error.message || "Error loading data";

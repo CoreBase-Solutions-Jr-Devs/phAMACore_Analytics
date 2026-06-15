@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link , useNavigate} from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -17,19 +17,20 @@ import TopCustomers from "./TopCustomers";
 import ProgressiveSales from "./ProgressiveSales";
 import MonthToDateSales from "./MonthToDateSales";
 // import BranchDropdown from "./BranchDropdown";
-import { getSalesTransactions } from "../../../slices/dashboardSales/thunk";
+import { getSalesTransactions, getMonthToDateSales, getMonthlySales } from "../../../slices/dashboardSales/thunk";
 import FilterActions from "./FilterActions";
 
 const DashboardAnalyticsBranch = () => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { branchId } = useParams();
     const [rightColumn, setRightColumn] = useState(false);
     const toggleRightColumn = () => {
       setRightColumn(!rightColumn);
     };
 
- const { sales = [], filters } = useSelector(
+ const { sales = [], monthToDateSales = [], monthlySales = [], filters } = useSelector(
     (state) => state.powerbi
   );
 
@@ -40,9 +41,15 @@ const handleApplyFilters = () => {
         clientid: 1,
         startDate: filters.startDate  ,
         endDate: filters.endDate,
-  branchcode: branchId || null,
+  branchcode:  filters.branch ?? null,
       })
     );
+ console.log("CURRENT BRANCH FILTER:", branchId);
+if (filters.branch) {
+  navigate(`/Dashboard-Analytics/${filters.branch}`);
+} else {
+  navigate("/Dashboard-Analytics");
+}
   };
 
 useEffect(() => {
@@ -51,10 +58,32 @@ useEffect(() => {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-      branchcode: branchId || null,
+      branchcode: filters.branch ?? null,
     })
   );
-}, [branchId, filters.startDate, filters.endDate]);
+     dispatch(
+      getMonthlySales({
+        clientid: 1,
+        startDate:  new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
+          endDate: new Date().toLocaleDateString("en-GB"),
+      branchcode: filters.branch ?? null,
+      })
+    );
+  
+    dispatch(
+      getMonthToDateSales({
+        clientid: 1,
+       startDate: new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        1
+      ).toLocaleDateString("en-GB"),
+  
+      endDate: new Date().toLocaleDateString("en-GB"),
+      branchcode: filters.branch ?? null,
+      })
+    );
+}, []);
 
 const branchMap = useMemo(() => {
    if (!filters.branch) return null;
@@ -200,36 +229,45 @@ const getMonths = () => {
 };
 
 const monthlyChart = useMemo(() => {
-  const MONTHS = getMonths();
 
-  const map = MONTHS.reduce((acc, m) => {
-    acc[m] = 0;
-    return acc;
-  }, {});
+    const currentMonth = new Date().getMonth() + 1;
 
-  sales.forEach((s) => {
-    const date = new Date(s.transaction_Date);
-    const month = date.toLocaleString("default", { month: "short" });
+  const months = Array.from({ length: currentMonth  }, (_, i) =>
+    new Date(2000, i, 1).toLocaleString("en-US", {
+      month: "short",
+    })
+  );
 
-    if (map.hasOwnProperty(month)) {
-      map[month] += Number(s.revenue || 0);
+  const map = Object.fromEntries(months.map((m) => [m, 0]));
+
+  (monthlySales || []).forEach((item) => {
+    if (!item.transaction_Date) return;
+
+    const date = new Date(item.transaction_Date);
+
+    // console.log("PARSED DATE:", date);
+
+    const month = date.toLocaleString("en-US", {
+      month: "short",
+    });
+
+    console.log("MONTH:", month);
+
+    if (map[month] !== undefined) {
+      map[month] += Number(item.revenue || 0);
     }
   });
 
-  const totals = MONTHS.map((m) => map[m]);
-
-  console.log("📊 Monthly Sales Totals:", map);
-
   return {
-    categories: MONTHS,
+    categories: months,
     series: [
       {
         name: "Revenue",
-        data: totals,
+        data: months.map((m) => map[m]),
       },
     ],
   };
-}, [sales]);
+}, [monthlySales]);
 
 const monthToDateChart = useMemo(() => {
   const now = new Date();
@@ -244,13 +282,17 @@ const monthToDateChart = useMemo(() => {
     return acc;
   }, {});
 
-  sales.forEach((s) => {
+  (monthToDateSales || []).forEach((s) => {
+    if (!s.transaction_Date) return;
+
     const date = new Date(s.transaction_Date);
-  
+
     if (
       date.getFullYear() !== currentYear ||
       date.getMonth() !== currentMonth
-    ) return;
+    ) {
+      return;
+    }
 
     const day = date.getDate();
 
@@ -258,20 +300,22 @@ const monthToDateChart = useMemo(() => {
       map[day] += Number(s.revenue || 0);
     }
   });
-  
-console.log("FINAL SERIES:", DAYS.map((d) => map[d]));
-  console.log("📊 MTD DAILY MAP:", map);
+
+  console.log(
+    "FINAL SERIES:",
+    DAYS.map((d) => map[d])
+  );
 
   return {
     categories: DAYS.map(String),
     series: [
       {
         name: "Revenue",
-data: DAYS.map((d) => Number(map[d] || 0)),
+        data: DAYS.map((d) => Number(map[d] || 0)),
       },
     ],
   };
-}, [sales]);
+}, [monthToDateSales]);
 
 const normalizeProductName = (name = "") => {
   return name
@@ -330,7 +374,7 @@ const bottomProductsData = sales.reduce((acc, item) => {
 
 const bottomProducts = Object.values(bottomProductsData)
   .sort((a, b) => a.qty - b.qty)
-  .slice(0, 3)
+  .slice(0, 5)
   .map(item => ({
     ...item,
     qty: Math.round(item.qty),

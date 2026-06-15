@@ -70,13 +70,14 @@ const Widget = ({
                             <p className="font-medium  mb-0">Total Revenue</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
-                                    <CountUp
+                                    {/* <CountUp
                                         start={0}
                                         end={Number(totalRevenue || 0)}
                                         decimals={1}
                                         duration={3}
   formattingFn={(value) => formatAmount(value)}
-                                    />
+                                    /> */}
+                                     {formatAmount(Number(totalRevenue || 0))}
                                 </span>
                             </h2>
                             <p className="mb-0 text-muted">
@@ -102,13 +103,14 @@ const Widget = ({
                             <p className="font-medium  mb-0">Cash Sales</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-success">
                                 <span className="counter-value">
-                                    <CountUp
+                                    {/* <CountUp
                                         start={0}
                                         end={Number(cashSales || 0)}
                                         decimals={1}
                                         duration={3}
                                         formattingFn={(value) => formatAmount(value)}
-                                    />
+                                    /> */}
+                                    {formatAmount(Number(cashSales || 0))}
                                 </span>
                             </h2>
                             <p className="mb-0 text-muted">{cashPercentage.toFixed(1)}% of total</p>
@@ -132,13 +134,14 @@ const Widget = ({
                             <p className="font-medium  mb-0">Credit Sales</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-info">
                                 <span className="counter-value">
-                                    <CountUp
+                                    {/* <CountUp
                                         start={0}
                                         end={Number(creditSales || 0)}
                                         decimals={1}
                                         duration={3}
                                         formattingFn={(value) => formatAmount(value)}
-                                    />
+                                    /> */}
+                                    {formatAmount(Number(creditSales || 0))}
                                 </span>
                             </h2>
                             <p className="mb-0 text-muted">  {creditPercentage.toFixed(1)}% of total</p>
@@ -162,13 +165,14 @@ const Widget = ({
                             <p className="font-medium  mb-0">Cash invoices</p>
                             <h2 className="mt-4 ff-secondary fw-semibold text-warning">
                                 <span className="counter-value">
-                                    <CountUp
+                                    {/* <CountUp
                                         start={0}
                                         end={Number(cashInvoices || 0)}
                                         decimals={1}
                                         duration={3}
-                                    />
-                                </span>M
+                                    /> */}
+                                    {Number(cashInvoices || 0)}
+                                </span>
                             </h2>
                             <p className="mb-0 text-muted">Invoices paid in cash
 

@@ -70,13 +70,11 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
                 <div className="row mb-3 align-items-center">
                   <label className="col-4 col-form-label">Branch</label>
                   <div className="col-8">
-                <select
+                    <select
   className="form-select"
-  style={{ minWidth: "180px" }}
   value={branch ?? ""}
   onChange={(e) => {
     const value = e.target.value;
-
     dispatch(setBranch(value === "" ? null : Number(value)));
   }}
 >

@@ -185,6 +185,13 @@ const Navdata = () => {
           label: "Purchases",
           link: "/dashboard",
           parentId: "dashboard",
+                 subItems: [
+      {
+        id: "purchase-branch",
+        label: "Branch View",
+        link: "/dashboard-ecommerce/{branchId}", 
+      },
+    ],
         },
         // {
         //   id: "crypto",
