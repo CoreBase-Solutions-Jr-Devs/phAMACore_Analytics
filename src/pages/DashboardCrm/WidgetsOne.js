@@ -77,12 +77,6 @@ const WidgetsOne = ({ branchMap = {} }) => {
 
     return (
         <React.Fragment>
-            <div className="mb-2">
-                <h4 className="card-title mb-0 text-start">
-                    KEY METRICS
-                    {branchName !== "All Branches" && ` — ${branchName}`}
-                </h4>
-            </div>
 
             <Row className="g-2 mb-2">
                 {KPI_META.map((widget) => {

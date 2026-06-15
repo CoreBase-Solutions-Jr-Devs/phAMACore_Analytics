@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
-import { Container, Row, Col, Card, CardHeader, CardBody, ListGroup, ListGroupItem } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col, Card, CardHeader, CardBody } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import SimpleBar from 'simplebar-react';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
@@ -10,11 +9,18 @@ import WidgetsTwo from './WidgetsTwo';
 import BarChartTwo from './Charts/Custom/BarChartTwo';
 import BarChartThree from './Charts/Custom/BarChartThree';
 import CustomTableOne from './Tables/Custom/CustomTableOne';
-import { fetchBatchExpiryNeo, fetchDailyClosingStock } from '../../slices/dashboardCRM/thunk';
+
+import {
+    fetchBatchExpiryNeo,
+    fetchDailyClosingStock,
+    fetchStockMovements
+} from '../../slices/dashboardCRM/thunk';
+
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
-import ImbalanceAlertsContainer from './components/ImbalanceAlerts/ImbalanceAlertsContainer';
 import ImbalanceAlerts from './components/ImbalanceAlerts';
+
+import FilterActions from './FilterActions';
 
 const DashboardCrm = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -22,33 +28,63 @@ const DashboardCrm = () => {
     const dispatch = useDispatch();
     const { stockMovements = [] } = useSelector((state) => state.StockInventory);
 
+    const [rightColumn, setRightColumn] = useState(false);
+
+    const toggleRightColumn = () => {
+        setRightColumn(prev => !prev);
+    };
+
+    const [filters, setFilters] = useState({
+        clientid: 1,
+        startDate: "",
+        endDate: "",
+        branchcode: 0,
+        itemcode: ""
+    });
+
+    // 1st Load
     useEffect(() => {
-        dispatch(fetchBatchExpiryNeo({
-            clientid: 1,
-            branchcode: 0,
-        }));
+        dispatch(fetchDailyClosingStock(filters));
+        dispatch(fetchStockMovements(filters));
+        dispatch(fetchBatchExpiryNeo(filters));
     }, [dispatch]);
 
+    // Load after filters
     useEffect(() => {
-        dispatch(fetchDailyClosingStock({
-            clientid: 1,
-            startDate: "",
-            endDate: "",
-            branchcode: 0,
-            itemcode: "",
-        }));
-    }, [dispatch]);
+        dispatch(fetchDailyClosingStock(filters));
+        dispatch(fetchStockMovements(filters));
+        dispatch(fetchBatchExpiryNeo(filters));
+    }, [dispatch, filters]);
 
     return (
         <React.Fragment>
             <div className="page-content">
-                <Container fluid>  
+                <Container fluid>
+
                     <BreadCrumb title="Inventory/Stock Dashboard" pageTitle="Dashboards" />
+
+                    <Row className="align-items-center mb-2">
+                        <Col>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h4 className="mb-0">KEY METRICS</h4>
+
+                                <button
+                                    className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                                    onClick={toggleRightColumn}
+                                >
+                                    <i className="ri-filter-fill me-1"></i>
+                                    Filter
+                                </button>
+                            </div>
+                        </Col>
+                    </Row>
+
                     <Row>
                         <Col xl={12}>
                             <WidgetsOne />
                         </Col>
                     </Row>
+
                     <Row>
                         <Col xl={12}>
                             <Card>
@@ -62,7 +98,7 @@ const DashboardCrm = () => {
                         </Col>
                     </Row>
                     <Row className="align-items-stretch">
-                        <Col lg={6} xl={6} className="d-flex">
+                        <Col lg={6} className="d-flex">
                             <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">Stock Value By Branch</h4>
@@ -73,7 +109,7 @@ const DashboardCrm = () => {
                             </Card>
                         </Col>
 
-                        <Col lg={6} xl={6} className="d-flex">
+                        <Col lg={6} className="d-flex">
                             <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">
@@ -90,7 +126,7 @@ const DashboardCrm = () => {
                         <Col xl={12}>
                             <Card>
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">EXPIRY WATCH - Products at WRITE-OFF Risk</h4>
+                                    <h4 className="card-title mb-0">EXPIRY WATCH - WRITE-OFF RISK</h4>
                                 </CardHeader>
                                 <div className="card-body p-0 border-top">
                                     <WidgetsTwo />
@@ -105,7 +141,7 @@ const DashboardCrm = () => {
                         <Col lg={5}>
                             <Card>
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">SLOW-MOVING STOCK( 0 or Low Movement - 30 days)</h4>
+                                    <h4 className="card-title mb-0">SLOW MOVING STOCK (30 DAYS)</h4>
                                 </CardHeader>
                                 <CardBody>
                                     <p className="text-muted">Use data attributes and other custom attributes as keys</p>
@@ -145,6 +181,12 @@ const DashboardCrm = () => {
                                 </CardBody>
                             </Card>
                         </Col>
+                        <FilterActions
+                            rightColumn={rightColumn}
+                            hideRightColumn={toggleRightColumn}
+                            filters={filters}
+                            setFilters={setFilters}
+                        />
                     </Row>
                 </Container>
             </div>
