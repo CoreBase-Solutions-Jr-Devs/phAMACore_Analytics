@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Row } from "reactstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import UsersByDevice from "../../DashboardAnalytics/UsersByDevice";
+import UsersByDevice from "../../DashboardSales/UsersByDevice";
 import JobSummary from "./JobSummary";
 import NatworkSummary from "./NatworkSummary";
 import VisitorGraph from "./VisitorGraph";
