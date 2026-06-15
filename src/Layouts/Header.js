@@ -123,11 +123,13 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                             </button>
 
 
-                            <SearchOption />
+                            {/* <SearchOption /> */}
                         </div>
 
                         <div className="d-flex align-items-center">
-
+{/* <>
+<p>CoreBase Solutions LTD</p>
+</> */}
                             <Dropdown isOpen={search} toggle={toogleSearch} className="d-md-none topbar-head-dropdown header-item">
                                 <DropdownToggle type="button" tag="button" className="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle">
                                     <i className="bx bx-search fs-22"></i>
