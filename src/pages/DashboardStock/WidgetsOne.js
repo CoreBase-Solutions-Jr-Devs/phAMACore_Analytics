@@ -2,8 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchDailyClosingStock, fetchStockMovements, fetchBatchExpiryNeo } from "../../slices/dashboardStock/thunk";
+import { useSelector } from "react-redux";
 import { KPI_META, computeKPIs, getTodayApi, getNDaysAgoApi} from "../utils/StockInventoryUtils";
 
 
@@ -19,7 +18,6 @@ const KPI_ICON_MAP = {
 };
 
 const WidgetsOne = ({ branchMap = {} }) => {
-    const dispatch = useDispatch();
 
     const {
         dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [],
@@ -34,39 +32,6 @@ const WidgetsOne = ({ branchMap = {} }) => {
         !branch || branch === "All Branches"
             ? "All Branches"
             : branchMap?.[branch] || "Unknown Branch";
-
-    useEffect(() => {
-        // All items — no itemcode / suppliercode / manufucturercode params
-        dispatch(
-            fetchDailyClosingStock({
-                clientid: 1,
-                startDate: "01/01/2026",
-                endDate: getTodayApi(),
-                branchcode: 1,
-            })
-        );
-
-        // 30-day window for Slow Movers KPI
-        dispatch(
-            fetchStockMovements({
-                clientid: 1,
-                startDate: getNDaysAgoApi(30),
-                endDate: getTodayApi(),
-                branchcode: 1,
-                itemcode: 20007,
-            })
-        );
-
-        // Batch Expiry data - Near Expiry KPI
-        dispatch(
-            fetchBatchExpiryNeo({
-                clientid: 1,
-                startDate: getTodayApi(),
-                endDate: getTodayApi(),
-                // branchcode: 1,
-            })
-        );
-    }, [dispatch]);
 
     const kpis = useMemo(
         () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo),

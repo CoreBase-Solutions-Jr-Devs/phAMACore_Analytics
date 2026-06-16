@@ -38,18 +38,11 @@ const DashboardStock = () => {
         clientid: 1,
         startDate: "",
         endDate: "",
-        branchcode: 0,
+        branchcode: 1,
         itemcode: ""
     });
 
-    // 1st Load
-    useEffect(() => {
-        dispatch(fetchDailyClosingStock(filters));
-        dispatch(fetchStockMovements(filters));
-        dispatch(fetchBatchExpiryNeo(filters));
-    }, [dispatch]);
-
-    // Load after filters
+    // Load with filters
     useEffect(() => {
         dispatch(fetchDailyClosingStock(filters));
         dispatch(fetchStockMovements(filters));
