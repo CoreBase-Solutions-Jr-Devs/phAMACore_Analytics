@@ -73,7 +73,7 @@ import APIKeyReducer from "./apiKey/reducer";
 import PowerBIReducer from "./dashboardSales/reducer";
 
 // Stock/Inventory
-import StockInventoryReducer from "./dashboardCRM/reducer";
+import StockInventoryReducer from "./dashboardStock/reducer";
 
  import PurchaseOrdersReducer from "./dashboardPurchase/reducer";
 

@@ -176,9 +176,9 @@ const Navdata = () => {
           ],
         },
         {
-          id: "crm",
+          id: "stock",
           label: "Inventory/Stock",
-          link: "/dashboard-crm",
+          link: "/dashboard-stock",
           parentId: "dashboard",
         },
         {
@@ -186,14 +186,14 @@ const Navdata = () => {
           label: "Purchases",
           link: "/dashboard-purchase-orders",
           parentId: "dashboard",
-                 subItems: [
-      {
-        id: "purchase-branch",
-        label: "Branch View",
-        link: "/dashboard-purchase-orders/{branchId}", 
-          parentId: "purchases",
-      },
-    ],
+          subItems: [
+            {
+              id: "purchase-branch",
+              label: "Branch View",
+              link: "/dashboard-purchase-orders/{branchId}",
+              parentId: "purchases",
+            },
+          ],
         },
         // {
         //   id: "crypto",
