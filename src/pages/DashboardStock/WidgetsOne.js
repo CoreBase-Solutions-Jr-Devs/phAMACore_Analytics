@@ -3,7 +3,7 @@ import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDailyClosingStock, fetchStockMovements, fetchBatchExpiryNeo } from "../../slices/dashboardCRM/thunk";
+import { fetchDailyClosingStock, fetchStockMovements, fetchBatchExpiryNeo } from "../../slices/dashboardStock/thunk";
 import { KPI_META, computeKPIs, getTodayApi, getNDaysAgoApi} from "../utils/StockInventoryUtils";
 
 

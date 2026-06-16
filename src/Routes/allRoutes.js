@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 import DashboardSales from "../pages/DashboardSales";
 import DashboardSalesBranch from "../pages/DashboardSalesBranch";
 import DashboardPurchaseOrdersBranch from "../pages/DashboardPurchaseOrdersBranch";
-import DashboardCrm from "../pages/DashboardCrm";
+import DashboardStock from "../pages/DashboardStock";
 import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
 
 import DashboardCrypto from "../pages/DashboardCrypto";
@@ -254,9 +254,9 @@ import PageBlogOverview from "../pages/Pages/Blogs/Overview";
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardSales /> },
   { path: "/dashboard-sales/:branchId", component: <DashboardSalesBranch /> },
-  { path: "/dashboard-crm", component: <DashboardCrm /> },
+  { path: "/dashboard-stock", component: <DashboardStock /> },
   { path: "/dashboard-purchase-orders", component: <DashboardPurchaseOrders /> },
-     { path: "/dashboard-purchase-orders/:branchId", component: <DashboardPurchaseOrdersBranch /> },
+  { path: "/dashboard-purchase-orders/:branchId", component: <DashboardPurchaseOrdersBranch /> },
   { path: "/index", component: <DashboardSales /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },
   { path: "/dashboard-my-business", component: <DashboardMyBusiness /> },

@@ -14,7 +14,7 @@ import {
     fetchBatchExpiryNeo,
     fetchDailyClosingStock,
     fetchStockMovements
-} from '../../slices/dashboardCRM/thunk';
+} from '../../slices/dashboardStock/thunk';
 
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
@@ -22,7 +22,7 @@ import ImbalanceAlerts from './components/ImbalanceAlerts';
 
 import FilterActions from './FilterActions';
 
-const DashboardCrm = () => {
+const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
 
     const dispatch = useDispatch();
@@ -194,4 +194,4 @@ const DashboardCrm = () => {
     );
 };
 
-export default DashboardCrm;
+export default DashboardStock;
