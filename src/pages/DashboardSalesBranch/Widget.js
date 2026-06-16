@@ -7,7 +7,7 @@ import {
   setDateRange,
   setStartDate,
   setEndDate,
-} from "../../../slices/dashboardSales/reducer";
+} from "../../slices/dashboardSales/reducer";
 import { useDispatch, useSelector } from "react-redux";
 
 

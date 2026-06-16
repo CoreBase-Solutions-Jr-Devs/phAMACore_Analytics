@@ -1,7 +1,7 @@
 import React from "react";
 import ReactApexChart from "react-apexcharts";
 
-import getChartColorsArray from "../../../Components/Common/ChartsDynamicColor";
+import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 
 const AudiencesCharts = ({ dataColors, series }) => {
   let chartAudienceColumnChartsColors = [];
@@ -690,7 +690,7 @@ const UsersByDeviceCharts = ({ dataColors, series }) => {
 export {
   AudiencesCharts,
   AudiencesSessionsCharts,
-  ProgressiveSalesChart,
+ProgressiveSalesChart,
   MonthToDateSalesChart,
   BranchPerformanceChart,
   CountriesCharts,

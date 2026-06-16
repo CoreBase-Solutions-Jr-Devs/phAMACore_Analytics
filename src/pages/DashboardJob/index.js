@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Row } from "reactstrap";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
-import SalesByLocations from "../DashboardEcommerce/SalesByLocations";
+// import SalesByLocations from "../DashboardSales/";
 import ApplicationsStatistic from "./ApplicationsStatistic";
 import Candidates from "./Candidates";
 import FeaturedCompanies from "./FeaturedCompanies";
@@ -34,7 +34,7 @@ const DashboardJobs = () => {
 
           <Row>
             <RecentApplicants />
-            <SalesByLocations />
+            {/* <SalesByLocations /> */}
           </Row>
         </Container>
       </div>

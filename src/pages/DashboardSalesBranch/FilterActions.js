@@ -7,7 +7,7 @@ import {
   setDateRange,
   setStartDate,
   setEndDate,
-} from "../../../slices/dashboardSales/reducer";
+} from "../../slices/dashboardSales/reducer";
 import { useRef } from "react";
 import Flatpickr from "react-flatpickr";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
-import { topCustomers } from "../../../common/data/dashboardEcommerce";
+import { topCustomers } from "../../common/data/dashboardEcommerce";
 const TopCustomers = ({ data = [], formatAmount }) => {
 
   const sorted = [...data].sort((a, b) => b.revenue - a.revenue);

@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getRevenueChartsData } from "../../slices/thunks";
 import { createSelector } from "reselect";
 
-const Revenue = ({categories, series, formatAmount}) => {
+const YearToDatePurchases = ({categories, series, formatAmount}) => {
   // const dispatch = useDispatch();
 
   // const [chartData, setchartData] = useState([]);
@@ -63,4 +63,4 @@ const Revenue = ({categories, series, formatAmount}) => {
   );
 };
 
-export default Revenue;
+export default YearToDatePurchases;

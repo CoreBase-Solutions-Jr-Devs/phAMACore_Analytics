@@ -28,7 +28,7 @@ import {
   Price,
 } from "../EcommerceProducts/EcommerceProductCol";
 
-import Revenue from "../../DashboardEcommerce/Revenue";
+// import Revenue from "../../DashboardEcommerce/Revenue";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";

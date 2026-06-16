@@ -2,11 +2,11 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 
 //Dashboard
-import DashboardAnalytics from "../pages/DashboardAnalytics";
-import DashboardAnalyticsBranch from "../pages/DashboardAnalytics/DashboardAnalyticsBranch";
-import DashboardEcommerceBranch from "../pages/DashboardEcommerceBranch";
+import DashboardSales from "../pages/DashboardSales";
+import DashboardSalesBranch from "../pages/DashboardSalesBranch";
+import DashboardPurchaseOrdersBranch from "../pages/DashboardPurchaseOrdersBranch";
 import DashboardCrm from "../pages/DashboardCrm";
-import DashboardEcommerce from "../pages/DashboardEcommerce";
+import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
 
 import DashboardCrypto from "../pages/DashboardCrypto";
 import DashboardMyBusiness from "../pages/DashboardMyBusiness";
@@ -252,12 +252,12 @@ import BlogGridView from "../pages/Pages/Blogs/GridView";
 import PageBlogOverview from "../pages/Pages/Blogs/Overview";
 
 const authProtectedRoutes = [
-  { path: "/dashboard-analytics", component: <DashboardAnalytics /> },
-  { path: "/dashboard-analytics/:branchId", component: <DashboardAnalyticsBranch /> },
+  { path: "/dashboard", component: <DashboardSales /> },
+  { path: "/dashboard-sales/:branchId", component: <DashboardSalesBranch /> },
   { path: "/dashboard-crm", component: <DashboardCrm /> },
-  { path: "/dashboard", component: <DashboardEcommerce /> },
-     { path: "/dashboard-ecommerce/:branchId", component: <DashboardEcommerceBranch /> },
-  { path: "/index", component: <DashboardEcommerce /> },
+  { path: "/dashboard-purchase-orders", component: <DashboardPurchaseOrders /> },
+     { path: "/dashboard-purchase-orders/:branchId", component: <DashboardPurchaseOrdersBranch /> },
+  { path: "/index", component: <DashboardSales /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },
   { path: "/dashboard-my-business", component: <DashboardMyBusiness /> },
   { path: "/dashboard-projects", component: <DashboardProject /> },
