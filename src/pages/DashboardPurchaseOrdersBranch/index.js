@@ -6,7 +6,7 @@ import Widget from "./Widgets";
 import BestSellingProducts from "./BestSellingProducts";
 import RecentActivity from "./RecentActivity";
 import RecentOrders from "./RecentOrders";
-import Revenue from "./Revenue";
+import YearToDatePurchases from "./YearToDatePurchases";
 import MonthToDatePurchases from "./MonthToDatePurchases";
 import SalesByLocations from "./SalesByLocations";
 import Section from "./Section";
@@ -18,8 +18,9 @@ import SupplierSpendBottom from "./SupplierSpendBottom";
 import FilterActions from "./FilterActions";
 import { getPurchaseOrders, getActualSpend, getDailySpend  } from "../../slices/dashboardPurchase/thunk";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
+import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
 
-const DashboardEcommerceBranch = () => {
+const DashboardPurchaseOrdersBranch = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
   const [rightColumn, setRightColumn] = useState(false);
@@ -33,26 +34,29 @@ const DashboardEcommerceBranch = () => {
    const { PurchaseOrders = [], ActualSpend = [], DailySpend = [], filters } = useSelector(
       (state) => state.PurchaseOrders);
   
-  const handleApplyFilters = () => {
-      console.log("APPLY CLICKED");
-     dispatch(
-        getPurchaseOrders({
-          clientid: 1,
-          startDate: filters.startDate  ,
-          endDate: filters.endDate,
-            branchcode: filters.branch ?? null,
+const handleApplyFilters = () => {
+  console.log("APPLY CLICKED");
 
-        })
-      );
+  const branch = filters.branch || null;
 
-      if (filters.branch) {
-    navigate(`/dashboard-ecommerce/${filters.branch}`);
+  dispatch(
+    getPurchaseOrders({
+      clientid: 1,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      branchcode: branch,
+    })
+  );
+
+  if (branch) {
+    navigate(`/dashboard-purchase-orders/${branch}`);
   } else {
-    navigate("/dashboard");
+    navigate("/dashboard-purchase-orders");
   }
-    };
+};
   
   useEffect(() => {
+    //  dispatch(clearPurchaseOrdersData()); 
     dispatch(
       getPurchaseOrders({
         clientid: 1,
@@ -374,7 +378,7 @@ console.log("OVERDUE ACCOUNTS", OverdueAccounts);
       <div className="page-content">
         <Container fluid>
 <BreadCrumb
-  title={<Link to="/dashboard-ecommerce">Sales</Link>}
+  title="Purchase-Orders"
   pageTitle="Dashboards"
   subtitle={
     <>
@@ -418,7 +422,7 @@ totalSpend={totalSpend}
            
                            <Row>
                   <Col xl={6}>
-                   <Revenue
+                   <YearToDatePurchases
   categories={actualSpendChart.categories}
   series={actualSpendChart.series}
   formatAmount={formatAmount}
@@ -455,5 +459,5 @@ categories={monthToDateChart.categories}
   );
 };
 
-export default DashboardEcommerceBranch;
+export default DashboardPurchaseOrdersBranch;
    

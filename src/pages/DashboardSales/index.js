@@ -1,30 +1,30 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useParams, Link , useNavigate} from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
 formatToApiDate,
-} from "../../../pages/utils/dateHelper";
+} from "../../pages/utils/dateHelper";
 import Widget from "./Widget";
-import BreadCrumb from "../../../Components/Common/BreadCrumb";
-// import OrderPipeline from "./Order Pipeline";
+import BreadCrumb from "../../Components/Common/BreadCrumb";
+import OrderPipeline from "./Order Pipeline";
 import BranchPerformance from "./BranchPerfomance";
 import TopProducts from "./TopProducts";
-import BottomProducts from "./BottomProducts";
 import SalesmanRevenue from "./SalesmanRevenue";
 import ReceivablesAgeing from "./ReceivablesAgeing";
 import TopCustomers from "./TopCustomers";
-import ProgressiveSales from "./ProgressiveSales";
+import YearToDateSales from "./YearToDateSales";
 import MonthToDateSales from "./MonthToDateSales";
 // import BranchDropdown from "./BranchDropdown";
-import { getSalesTransactions, getMonthToDateSales, getMonthlySales } from "../../../slices/dashboardSales/thunk";
+import { getSalesTransactions, getMonthToDateSales, getMonthlySales } from "../../slices/dashboardSales/thunk";
 import FilterActions from "./FilterActions";
+import { clearSalesData } from "../../slices/dashboardSales/reducer";
 
-const DashboardAnalyticsBranch = () => {
+const DashboardSales = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { branchId } = useParams();
+
     const [rightColumn, setRightColumn] = useState(false);
     const toggleRightColumn = () => {
       setRightColumn(!rightColumn);
@@ -41,48 +41,60 @@ const handleApplyFilters = () => {
         clientid: 1,
         startDate: filters.startDate  ,
         endDate: filters.endDate,
-  branchcode:  filters.branch ?? null,
-      })
-    );
- console.log("CURRENT BRANCH FILTER:", branchId);
+branchcode:
+       filters.branch ?? null,
+    })
+  );
+console.log("CURRENT BRANCH FILTER:", filters.branch);
 if (filters.branch) {
-  navigate(`/Dashboard-Analytics/${filters.branch}`);
-} else {
-  navigate("/Dashboard-Analytics");
-}
-  };
+    // dispatch(clearSalesData());   
+    navigate(`/Dashboard-Sales/${filters.branch}`);
+  } else {
+    // dispatch(clearSalesData());   
+    navigate("/Dashboard");
+  }
+};
 
 useEffect(() => {
+ 
   dispatch(
     getSalesTransactions({
       clientid: 1,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      branchcode: filters.branch ?? null,
+  startDate: filters.startDate,
+        endDate: filters.endDate,
+      branchcode:
+        filters.branch ?? null,
     })
   );
-     dispatch(
-      getMonthlySales({
-        clientid: 1,
-        startDate:  new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
-          endDate: new Date().toLocaleDateString("en-GB"),
-      branchcode: filters.branch ?? null,
-      })
-    );
-  
-    dispatch(
-      getMonthToDateSales({
-        clientid: 1,
-       startDate: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        1
-      ).toLocaleDateString("en-GB"),
-  
-      endDate: new Date().toLocaleDateString("en-GB"),
-      branchcode: filters.branch ?? null,
-      })
-    );
+   dispatch(
+    getMonthlySales({
+      clientid: 1,
+      startDate:  new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
+        endDate: new Date().toLocaleDateString("en-GB"),
+      // branchcode: filters.branch ?? null,
+    })
+  );
+
+  dispatch(
+    getMonthToDateSales({
+      clientid: 1,
+     startDate: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    ).toLocaleDateString("en-GB"),
+
+    endDate: new Date().toLocaleDateString("en-GB"),
+      // branchcode: filters.branch ?? null,
+    })
+  );
+  console.log("INITIAL BRANCH FILTER:", filters.branch);
+}, []);
+
+useEffect(() => {
+  return () => {
+    dispatch(clearSalesData());
+  };
 }, []);
 
 const branchMap = useMemo(() => {
@@ -93,7 +105,6 @@ const branchMap = useMemo(() => {
   });
   return map;
 }, [sales]);
-
 
 const formatAmount = (value) => {
   if (value === null || value === undefined) return "0";
@@ -220,13 +231,43 @@ const customerTotals = sales.reduce((acc, item) => {
 
 const topCustomersData = Object.values(customerTotals)
   .sort((a, b) => b.revenue - a.revenue)
-  .slice(0, 5);
+  .slice(0, 10);
   
-const getMonths = () => {
-  return Array.from({ length: 12 }, (_, i) =>
-    new Date(2000, i, 1).toLocaleString("default", { month: "short" })
-  );
-};
+// const getMonths = () => {
+//   return Array.from({ length: 12 }, (_, i) =>
+//     new Date(2000, i, 1).toLocaleString("default", { month: "short" })
+//   );
+// };
+
+// const monthlyChart = useMemo(() => {
+//   const now = new Date();
+//   const currentMonthIndex = now.getMonth();
+
+//   const MONTHS = getMonths().slice(0, currentMonthIndex + 1);
+
+//   const map = Object.fromEntries(MONTHS.map(m => [m, 0]));
+
+//   monthlySales.forEach((s) => {
+//     const date = new Date(s.transaction_Date);
+
+//     const month = date.toLocaleString("default", { month: "short" });
+
+//     if (map[month] !== undefined) {
+//       map[month] += Number(s.revenue || 0);
+//     }
+//   });
+
+//   return {
+//     categories: MONTHS,
+//     series: [
+//       {
+//         name: "Revenue",
+//         data: MONTHS.map(m => map[m]),
+//       },
+//     ],
+//   };
+//     console.log("📊 Monthly MAP:", map);
+// }, [monthlySales]);
 
 const monthlyChart = useMemo(() => {
 
@@ -354,31 +395,6 @@ const topProducts = Object.values(topProductsData)
 
 console.log(topProducts);
 
-const bottomProductsData = sales.reduce((acc, item) => {
-  const rawName = item.item_Name || "UNKNOWN PRODUCT";
-  const name = normalizeProductName(rawName);
-
-  const qty = Number(item.quantity_Sold || 0);
-
-  if (!acc[name]) {
-    acc[name] = {
-      name: rawName,
-      qty: 0,
-    };
-  }
-
-  acc[name].qty += qty;
-
-  return acc;
-}, {});
-
-const bottomProducts = Object.values(bottomProductsData)
-  .sort((a, b) => a.qty - b.qty)
-  .slice(0, 5)
-  .map(item => ({
-    ...item,
-    qty: Math.round(item.qty),
-  }));
 document.title = "Sales Dashboard | phAMACore Analytics";
 
   return (
@@ -386,21 +402,14 @@ document.title = "Sales Dashboard | phAMACore Analytics";
       <div className="page-content">
         <Container fluid>
 
-<BreadCrumb
-  title={<Link to="/dashboard-analytics">Sales</Link>}
-  pageTitle="Dashboards"
-  subtitle={
-    <>
-    {sales.find(s => s.branch_ID === Number(branchId))?.brancch_Name || branchId}
-    </>
-  }
-/>
+          <BreadCrumb title="Sales" pageTitle="Dashboards" />
+
 <Row>
   <Col xl={12}>
   </Col>
 </Row>
           <Row>
-            <Col xxl={5}>
+          
               <Widget sales={sales}  totalRevenue={totalRevenue}
   cashSales={cashSales}
   creditSales={creditSales}
@@ -413,25 +422,20 @@ cashInvoices={cashInvoices}
   branchMap={branchMap}
   rightClickBtn={toggleRightColumn}
   />
-            </Col>
           </Row>
 
           <Row className="mt-4">
             <Col xl={6}>
-{/* <BranchPerformance
+<BranchPerformance
   branchData={branchData}
   totalRevenue={totalRevenue}
   chartSeries={branchChartSeries}
   categories={branchCategories}
   formatAmount={formatAmount}
-/>     */}
-<TopProducts data={topProducts} />
-
- </Col>
+/>     </Col>
 
             <Col xl={6}>
-            <BottomProducts data={bottomProducts} />
-
+<TopProducts data={topProducts} />
             </Col>
           </Row>
 
@@ -454,7 +458,7 @@ cashInvoices={cashInvoices}
           </Row>
  <Row>
   <Col xl={6}>
-            <ProgressiveSales     series={monthlyChart.series}
+            <YearToDateSales     series={monthlyChart.series}
               categories={monthlyChart.categories}  formatAmount={formatAmount}/>
             </Col>
             <Col xl={6}>
@@ -469,4 +473,4 @@ cashInvoices={cashInvoices}
   );
 };
 
-export default DashboardAnalyticsBranch;
+export default DashboardSales;

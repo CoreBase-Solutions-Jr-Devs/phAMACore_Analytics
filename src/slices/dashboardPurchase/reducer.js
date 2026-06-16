@@ -72,6 +72,21 @@ case "Custom":
     setEndDate: (state, action) => {
       state.filters.endDate = action.payload;
     },
+    clearPurchaseOrdersData: (state) => {
+  state.PurchaseOrders = [];
+  // state.monthlySales = [];
+  // state.monthToDateSales = [];
+  // state.branches = [];
+  state.loading = false;
+  state.error = null;
+
+  // state.filters = {
+  //   branch: null,
+  //   dateRange: null,
+  //   startDate: null,
+  //   endDate: null,
+  // };
+},
   },
 
   extraReducers: (builder) => {
@@ -121,6 +136,7 @@ export const {
   setDateRange,
   setStartDate,
   setEndDate,
+  clearPurchaseOrdersData,
 } = PurchaseOrdersSlice.actions;
 
 export default PurchaseOrdersSlice.reducer;

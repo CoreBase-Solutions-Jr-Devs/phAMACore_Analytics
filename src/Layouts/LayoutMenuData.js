@@ -162,15 +162,16 @@ const Navdata = () => {
           parentId: "dashboard",
         },
         {
-          id: "analytics",
+          id: "sales",
           label: "Sales",
-          link: "/dashboard-analytics",
+          link: "/dashboard",
           parentId: "dashboard",
           subItems: [
             {
               id: "sales-branch",
               label: "Branch View",
-              link: "/dashboard-analytics/{branchId}",
+              link: "/dashboard-sales",
+                parentId: "sales",
             },
           ],
         },
@@ -181,15 +182,16 @@ const Navdata = () => {
           parentId: "dashboard",
         },
         {
-          id: "ecommerce",
+          id: "purchases",
           label: "Purchases",
-          link: "/dashboard",
+          link: "/dashboard-purchase-orders",
           parentId: "dashboard",
                  subItems: [
       {
         id: "purchase-branch",
         label: "Branch View",
-        link: "/dashboard-ecommerce/{branchId}", 
+        link: "/dashboard-purchase-orders/{branchId}", 
+          parentId: "purchases",
       },
     ],
         },

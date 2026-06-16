@@ -13,7 +13,7 @@ import {
 import CountUp from "react-countup";
 import Countdown from "react-countdown";
 import { useSelector, useDispatch } from "react-redux";
-import { getMarketChartsDatas } from "../../../slices/thunks";
+import { getMarketChartsDatas } from "../../slices/thunks";
 
 import { MonthToDateSalesChart } from "./DashboardAnalyticsCharts";
 import { Link } from "react-router-dom";

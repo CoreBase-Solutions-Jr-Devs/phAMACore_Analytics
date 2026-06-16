@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardBody, CardHeader, Row, Col } from "reactstrap";
 import { ProgressiveSalesChart } from "./DashboardAnalyticsCharts";
 
-const ProgressiveSales = ({ series, categories, formatAmount }) => {
+const YearToDateSales = ({ series, categories, formatAmount }) => {
   return (
     <Row>
       <Col xxl={12}>
@@ -27,4 +27,4 @@ const ProgressiveSales = ({ series, categories, formatAmount }) => {
   );
 };
 
-export default ProgressiveSales;
+export default YearToDateSales;

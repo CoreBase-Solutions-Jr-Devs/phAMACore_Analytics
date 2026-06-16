@@ -6,7 +6,7 @@ import Widget from "./Widgets";
 import BestSellingProducts from "./BestSellingProducts";
 import RecentActivity from "./RecentActivity";
 import RecentOrders from "./RecentOrders";
-import Revenue from "./Revenue";
+import YearToDatePurchases from "./YearToDatePurchases";
 import SalesByLocations from "./SalesByLocations";
 import Section from "./Section";
 import StoreVisits from "./StoreVisits";
@@ -16,8 +16,9 @@ import SupplierSpend from "./SupplierSpend";
 import FilterActions from "./FilterActions";
 import { getPurchaseOrders, getActualSpend, getDailySpend  } from "../../slices/dashboardPurchase/thunk";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
+import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
 
-const DashboardEcommerce = () => {
+const DashboardPurchaseOrders = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
   const [rightColumn, setRightColumn] = useState(false);
@@ -42,13 +43,14 @@ const DashboardEcommerce = () => {
             })
       );
       if (filters.branch) {
-  navigate(`/Dashboard-ecommerce/${filters.branch}`);
+  navigate(`/Dashboard-purchase-orders/${filters.branch}`);
 } else {
-  navigate("/Dashboard");
+  navigate("/Dashboard-purchase-orders");
 }
     };
   
   useEffect(() => {
+     dispatch(clearPurchaseOrdersData()); 
     dispatch(
       getPurchaseOrders({
         clientid: 1,
@@ -393,7 +395,7 @@ totalSpend={totalSpend}
            
                 <Row>
                   <Col xl={6}>
-                   <Revenue
+                   <YearToDatePurchases
   categories={actualSpendChart.categories}
   series={actualSpendChart.series}
   formatAmount={formatAmount}
@@ -430,5 +432,5 @@ categories={monthToDateChart.categories}
   );
 };
 
-export default DashboardEcommerce;
+export default DashboardPurchaseOrders;
    
