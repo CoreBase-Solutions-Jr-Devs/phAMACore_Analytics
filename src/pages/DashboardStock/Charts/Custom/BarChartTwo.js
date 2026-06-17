@@ -1,134 +1,139 @@
-import React from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import ReactApexChart from "react-apexcharts";
 
-/**
- * BarChartTwo — Stock Value by Branch (KES Millions)
- *
- * RHS label technique: point annotations at x = axisMax so every
- * label lands at the same right-wall position in data-unit coordinates.
- */
+const BRANCH_COLORS = { MAIN: "#405189", CENTRAL: "#4b9fd4", WESTLANDS: "#0ab39c", WAREHOUSE: "#299cdb", MOMBASA: "#2a9d8f", KAKAMEGA: "#e76f51", WAJIR: "#f4a261", KAMPALA: "#8e44ad" };
 
-const BRANCHES = ['MAIN', 'CENTRAL', 'MOMBASA', 'WESTLANDS', 'KAMPALA', 'WAREHOUSE', 'KAKAMEGA', 'WAJIR', 'TEST BRANCH', 'TESTING'];
-const DEFAULT_DATA = [14.2, 10.5, 8.8, 7.8, 6.1, 5.4, 3.6, 2.9, 1.7, 1.2];
-
-const BRANCH_COLORS = {
-    MAIN: '#405189',
-    CENTRAL: '#4b9fd4',
-    WESTLANDS: '#0ab39c',
-    WAREHOUSE: '#299cdb',
-    MOMBASA: '#2a9d8f',
-    KAKAMEGA: '#e76f51',
-    WAJIR: '#f4a261',
-    KAMPALA: '#8e44ad',
-    'TEST BRANCH': '#f7b84b',
-    TESTING: '#f06548',
-};
-
-const FALLBACK_PALETTE = ['#405189', '#4b9fd4', '#0ab39c', '#299cdb', '#f7b84b', '#f06548'];
+const FALLBACK_PALETTE = [ "#405189", "#4b9fd4", "#0ab39c", "#299cdb", "#f7b84b", "#f06548"];
 
 const BarChartTwo = () => {
-    const colors = BRANCHES.map((name, i) => {
-        const key = name.toUpperCase().trim();
+    const { dailyClosingStock, loadingStock } = useSelector(
+        (state) => state.StockInventory
+    );
+
+    const chartData = useMemo(() => {
+        if (!dailyClosingStock?.length) {
+            return {
+                branches: [],
+                values: [],
+            };
+        }
+
+        const branchTotals = dailyClosingStock.reduce((acc, item) => {
+            const branch = item.branch_Name || "Unknown";
+            const value = Number(item.closing_value || 0);
+            acc[branch] = (acc[branch] || 0) + value;
+
+            return acc;
+        }, {});
+
+        const sorted = Object.entries(branchTotals)
+            .map(([branch, value]) => ({
+                branch,
+                value: value / 1000000,
+            }))
+            .sort((a, b) => b.value - a.value);
+
+        return {
+            branches: sorted.map((x) => x.branch),
+            values: sorted.map((x) => Number(x.value.toFixed(2))),
+        };
+    }, [dailyClosingStock]);
+
+    const colors = chartData.branches.map((branch, i) => {
+        const key = branch.toUpperCase().trim();
         return BRANCH_COLORS[key] || FALLBACK_PALETTE[i % FALLBACK_PALETTE.length];
     });
 
-    const axisMax = Math.ceil(Math.max(...DEFAULT_DATA) * 1.30);
+    const axisMax =
+        chartData.values.length > 0
+            ? Math.ceil(Math.max(...chartData.values) * 1.3)
+            : 10;
 
-    const pointAnnotations = DEFAULT_DATA.map((val, i) => ({
+    const pointAnnotations = chartData.values.map((val, i) => ({
         x: axisMax,
-        y: BRANCHES[i],
+        y: chartData.branches[i],
         marker: { size: 0 },
         label: {
-            text: `${parseFloat(val).toFixed(2)}M`,
-            textAnchor: 'end',
+            text: `${val.toFixed(2)}M`,
+            textAnchor: "end",
             offsetX: -4,
             offsetY: 5,
             borderWidth: 0,
             style: {
-                background: 'transparent',
+                background: "transparent",
                 color: colors[i],
-                fontSize: '12px',
+                fontSize: "12px",
                 fontWeight: 700,
-                padding: { top: 0, bottom: 0, left: 0, right: 0 },
             },
         },
     }));
 
-    const series = [{ data: DEFAULT_DATA }];
-
     const options = {
         chart: {
-            type: 'bar',
+            type: "bar",
             height: 380,
             toolbar: { show: false },
-            animations: { enabled: true },
         },
         plotOptions: {
             bar: {
-                barHeight: '45%',
+                barHeight: "45%",
                 distributed: true,
                 horizontal: true,
-                dataLabels: { position: 'top' },
             },
         },
         colors,
         dataLabels: { enabled: false },
-        stroke: { width: 1, colors: ['transparent'] },
         annotations: {
             points: pointAnnotations,
         },
         xaxis: {
             min: 0,
             max: axisMax,
-            categories: BRANCHES,
+            categories: chartData.branches,
             labels: {
                 formatter: (val) => `${Math.round(val)}M`,
-                style: { fontSize: '11px' },
             },
             axisBorder: { show: false },
             axisTicks: { show: false },
         },
+
         yaxis: {
             labels: {
-                show: true,
-                align: 'left',
-                maxWidth: 130,
-                style: { fontSize: '12px', fontWeight: 500 },
-                offsetX: -10,
+                maxWidth: 140,
             },
         },
+
         grid: {
-            borderColor: 'rgba(0,0,0,0.08)',
-            xaxis: { lines: { show: true } },
-            yaxis: { lines: { show: false } },
+            borderColor: "rgba(0,0,0,0.08)",
         },
-        legend: { show: false },
-        title: {
-            text: 'Stock value by branch (KES)',
-            align: 'left',
-            style: { fontWeight: 600, fontSize: '13px' },
-        },
-        subtitle: {
-            text: 'Branch stock distribution overview across all operational locations.',
-            align: 'left',
-            style: { fontSize: '11px', color: '#878a99' },
+        legend: {
+            show: false,
         },
         tooltip: {
-            theme: 'dark',
-            x: { show: true },
             y: {
-                formatter: (val) => `KES ${parseFloat(val).toFixed(2)}M`,
-                title: {
-                    formatter: (seriesName, opts) =>
-                        BRANCHES[opts?.dataPointIndex] ?? seriesName,
-                },
+                formatter: (val) =>
+                    `KES ${(val * 1000000).toLocaleString()}`,
             },
         },
     };
 
+    const series = [
+        {
+            data: chartData.values,
+        },
+    ];
+
+    if (loadingStock) {
+        return (
+            <div className="text-center py-5">
+                Loading branch stock values...
+            </div>
+        );
+    }
+
     return (
         <ReactApexChart
-            className="apex-charts"
             options={options}
             series={series}
             type="bar"
