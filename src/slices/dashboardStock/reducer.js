@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from './thunk';
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
@@ -22,11 +22,11 @@ export const initialState = {
     dateRange: "Today",
     startDate: formatDMY(new Date()),
     endDate: formatDMY(new Date()),
-  }
+  },
 };
 
 const StockInventorySlice = createSlice({
-  name: 'StockInventory',
+  name: "StockInventory",
   initialState,
   reducers: {
     resetInventoryState: () => initialState,
@@ -46,11 +46,11 @@ const StockInventorySlice = createSlice({
         }
 
         case "Yesterday": {
-          const y = new Date();
-          y.setDate(y.getDate() - 1);
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
 
-          state.filters.startDate = formatDMY(y);
-          state.filters.endDate = formatDMY(y);
+          state.filters.startDate = formatDMY(yesterday);
+          state.filters.endDate = formatDMY(yesterday);
           break;
         }
 
@@ -58,7 +58,7 @@ const StockInventorySlice = createSlice({
           const end = new Date();
           const start = new Date();
 
-          start.setDate(end.getDate() - 7);
+          start.setDate(end.getDate() - 6);
 
           state.filters.startDate = formatDMY(start);
           state.filters.endDate = formatDMY(end);
@@ -66,7 +66,6 @@ const StockInventorySlice = createSlice({
         }
 
         case "Custom":
-          state.filters.dateRange = "Custom";
           break;
 
         default:
@@ -82,73 +81,97 @@ const StockInventorySlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchDailyClosingStock.pending, (state) => {
-      state.loadingStock= true;
-      state.errorStock = null;
-    });
-    builder.addCase(fetchDailyClosingStock.fulfilled, (state, action) => {
-      state.loadingStock = false;
-      state.dailyClosingStock = action.payload;
-    });
-    builder.addCase(fetchDailyClosingStock.rejected, (state, action) => {
-      state.loadingStock = false;
-      state.errorStock = action.payload?.message || action.payload?.error || action.error?.message || null;
-    });
+    builder
+      .addCase(fetchDailyClosingStock.pending, (state) => {
+        state.loadingStock = true;
+        state.errorStock = null;
+      })
 
+      .addCase(fetchDailyClosingStock.fulfilled, (state, action) => {
+        state.loadingStock = false;
+        state.dailyClosingStock = action.payload;
+
+        if (!state.branches.length) {
+          const map = {};
+
+          (action.payload || []).forEach((item) => {
+            const code = item.branchID;
+            const name = item.branchName;
+
+            if (code == null) return;
+
+            map[code] = {
+              branchCode: code,
+              branchName: name,
+            };
+          });
+
+          state.branches = Object.values(map);
+        }
+      })
+
+      .addCase(fetchDailyClosingStock.rejected, (state, action) => {
+        state.loadingStock = false;
+
+        state.errorStock =
+          action.payload?.message ||
+          action.payload?.error ||
+          action.error?.message ||
+          null;
+      });
 
     builder.addCase(fetchStockMovements.pending, (state) => {
-      state.loadingMovements = true;
-      state.errorMovements = null;
-    });
-    builder.addCase(fetchStockMovements.fulfilled, (state, action) => {
-      state.loadingMovements = false;
-      state.stockMovements = action.payload;
-    });
-    builder.addCase(fetchStockMovements.rejected, (state, action) => {
-      state.loadingMovements = false;
-      state.errorMovements = action.payload || action.payload.error || action.error || null;
-    });
+        state.loadingMovements = true;
+        state.errorMovements = null;
+      })
 
+      .addCase(fetchStockMovements.fulfilled, (state, action) => {
+        state.loadingMovements = false;
+        state.stockMovements = action.payload;
+      })
+
+      .addCase(fetchStockMovements.rejected, (state, action) => {
+        state.loadingMovements = false;
+        state.errorMovements =
+          action.payload ||
+          action.payload?.error ||
+          action.error ||
+          null;
+      });
 
     builder.addCase(fetchStockInventoryKPIs.rejected, (state, action) => {
       state.errorStock = action.payload || "Failed to fetch stock/inventory KPIs!";
       state.errorMovements = action.payload || "Failed to fetch inventory/stock KPIs!";
     });
 
-
     builder.addCase(fetchBatchExpiry.pending, (state) => {
-      state.loadingBatchExpiry= true;
-      state.errorBatchExpiry = null;
-    });
-    builder.addCase(fetchBatchExpiry.fulfilled, (state, action) => {
-      state.loadingBatchExpiry = false;
-      state.batchExpiry = action.payload;
-    });
-    builder.addCase(fetchBatchExpiry.rejected, (state, action) => {
-      state.loadingBatchExpiry = false;
-      state.errorBatchExpiry = action.payload || action.payload.error || action.error || null;
-    });
-
+        state.loadingBatchExpiry = true;
+        state.errorBatchExpiry = null;
+      })
+      .addCase(fetchBatchExpiry.fulfilled, (state, action) => {
+        state.loadingBatchExpiry = false;
+        state.batchExpiry = action.payload;
+      })
+      .addCase(fetchBatchExpiry.rejected, (state, action) => {
+        state.loadingBatchExpiry = false;
+        state.errorBatchExpiry = action.payload || action.payload?.error || action.error || null;
+      });
 
     builder.addCase(fetchBatchExpiryNeo.pending, (state) => {
-      state.loadingBatchExpiryNeo = true;
-      state.errorBatchExpiryNeo = null;
-    });
-    builder.addCase(fetchBatchExpiryNeo.fulfilled, (state, action) => {
-      state.loadingBatchExpiryNeo = false;
-      state.batchExpiryNeo = action.payload;
-      // console.log("Payload", action.payload);
-    });
-    builder.addCase(fetchBatchExpiryNeo.rejected, (state, action) => {
-      state.loadingBatchExpiryNeo = false;
-      state.errorBatchExpiryNeo = action.payload || action.payload.error || action.error || null;
-    });
-  }
+        state.loadingBatchExpiryNeo = true;
+        state.errorBatchExpiryNeo = null;
+      })
+      .addCase(fetchBatchExpiryNeo.fulfilled, (state, action) => {
+        state.loadingBatchExpiryNeo = false;
+        state.batchExpiryNeo = action.payload;
+      })
+      .addCase(fetchBatchExpiryNeo.rejected, (state, action) => {
+        state.loadingBatchExpiryNeo = false;
+        state.errorBatchExpiryNeo = action.payload || action.payload?.error || action.error || null;
+      });
+  },
 });
 
-export const { 
-  resetInventoryState, setBranch, setDateRange, 
-  setStartDate, setEndDate 
-} = StockInventorySlice.actions;
+export const { resetInventoryState, setBranch, setDateRange, setStartDate, setEndDate } = StockInventorySlice.actions;
 
 export default StockInventorySlice.reducer;

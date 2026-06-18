@@ -34,20 +34,27 @@ const DashboardStock = () => {
         setRightColumn(prev => !prev);
     };
 
-    const [filters, setFilters] = useState({
-        clientid: 1,
-        startDate: "",
-        endDate: "",
-        branchcode: 1,
-        itemcode: ""
-    });
+    const { filters } = useSelector((state) => state.StockInventory);
+
+    const handleApplyFilters = () => {
+        const payload = {
+            clientid: 1,
+            branchcode: filters.branch ?? null,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+        };
+
+        dispatch(fetchDailyClosingStock(payload));
+        dispatch(fetchStockMovements(payload));
+        dispatch(fetchBatchExpiryNeo(payload));
+
+        toggleRightColumn();
+    };
 
     // Load with filters
     useEffect(() => {
-        dispatch(fetchDailyClosingStock(filters));
-        dispatch(fetchStockMovements(filters));
-        dispatch(fetchBatchExpiryNeo(filters));
-    }, [dispatch, filters]);
+        handleApplyFilters();
+    }, []);
 
     return (
         <React.Fragment>
@@ -175,10 +182,9 @@ const DashboardStock = () => {
                             </Card>
                         </Col>
                         <FilterActions
+                            onApply={handleApplyFilters}
                             rightColumn={rightColumn}
                             hideRightColumn={toggleRightColumn}
-                            filters={filters}
-                            setFilters={setFilters}
                         />
                     </Row>
                 </Container>
