@@ -1,11 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from './thunk';
 
+const formatDMY = (date) => date.toLocaleDateString("en-GB");
+
 export const initialState = {
   dailyClosingStock: [],
   stockMovements: [],
   batchExpiry: [],
   batchExpiryNeo: [],
+  branches: [],
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
@@ -14,6 +17,12 @@ export const initialState = {
   errorMovements: null,
   errorBatchExpiry: null,
   errorBatchExpiryNeo: null,
+  filters: {
+    branch: null,
+    dateRange: "Today",
+    startDate: formatDMY(new Date()),
+    endDate: formatDMY(new Date()),
+  }
 };
 
 const StockInventorySlice = createSlice({
@@ -21,6 +30,56 @@ const StockInventorySlice = createSlice({
   initialState,
   reducers: {
     resetInventoryState: () => initialState,
+    setBranch: (state, action) => {
+      state.filters.branch = action.payload;
+    },
+    setDateRange: (state, action) => {
+      const type = action.payload;
+      state.filters.dateRange = type;
+
+      switch (type) {
+        case "Today": {
+          const today = new Date();
+          state.filters.startDate = formatDMY(today);
+          state.filters.endDate = formatDMY(today);
+          break;
+        }
+
+        case "Yesterday": {
+          const y = new Date();
+          y.setDate(y.getDate() - 1);
+
+          state.filters.startDate = formatDMY(y);
+          state.filters.endDate = formatDMY(y);
+          break;
+        }
+
+        case "Last 7 Days": {
+          const end = new Date();
+          const start = new Date();
+
+          start.setDate(end.getDate() - 7);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
+
+        case "Custom":
+          state.filters.dateRange = "Custom";
+          break;
+
+        default:
+          break;
+      }
+    },
+
+    setStartDate: (state, action) => {
+      state.filters.startDate = action.payload;
+    },
+    setEndDate: (state, action) => {
+      state.filters.endDate = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchDailyClosingStock.pending, (state) => {
@@ -87,6 +146,9 @@ const StockInventorySlice = createSlice({
   }
 });
 
-export const { resetInventoryState } = StockInventorySlice.actions;
+export const { 
+  resetInventoryState, setBranch, setDateRange, 
+  setStartDate, setEndDate 
+} = StockInventorySlice.actions;
 
 export default StockInventorySlice.reducer;
