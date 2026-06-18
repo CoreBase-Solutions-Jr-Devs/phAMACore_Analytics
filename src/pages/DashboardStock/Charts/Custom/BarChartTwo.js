@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import ReactApexChart from "react-apexcharts";
+import { Spinner } from "reactstrap";
 
 const BRANCH_COLORS = { MAIN: "#405189", CENTRAL: "#4b9fd4", WESTLANDS: "#0ab39c", WAREHOUSE: "#299cdb", MOMBASA: "#2a9d8f", KAKAMEGA: "#e76f51", WAJIR: "#f4a261", KAMPALA: "#8e44ad" };
 
@@ -50,24 +51,27 @@ const BarChartTwo = () => {
             ? Math.ceil(Math.max(...chartData.values) * 1.3)
             : 10;
 
-    const pointAnnotations = chartData.values.map((val, i) => ({
-        x: axisMax,
-        y: chartData.branches[i],
-        marker: { size: 0 },
-        label: {
-            text: `${val.toFixed(2)}M`,
-            textAnchor: "end",
-            offsetX: -4,
-            offsetY: 5,
-            borderWidth: 0,
-            style: {
-                background: "transparent",
-                color: colors[i],
-                fontSize: "12px",
-                fontWeight: 700,
+    const pointAnnotations = chartData.values.map((val, i) => {
+        const isZero = val === 0;
+        return {
+            x: isZero ? 0 : axisMax,
+            y: chartData.branches[i],
+            marker: { size: 0 },
+            label: {
+                text: `${val.toFixed(2)}M`,
+                textAnchor: isZero ? "start" : "end",
+                offsetX: isZero ? 15 : -4,
+                offsetY: 5,
+                borderWidth: 0,
+                style: {
+                    background: "transparent",
+                    color: colors[i] || "#000",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                },
             },
-        },
-    }));
+        };
+    });
 
     const options = {
         chart: {
@@ -126,8 +130,9 @@ const BarChartTwo = () => {
 
     if (loadingStock) {
         return (
-            <div className="text-center py-5">
-                Loading branch stock values...
+            <div className="d-flex flex-column justify-content-center align-items-center py-5 my-3" style={{ height: "380px" }}>
+                <Spinner color="primary" className="mb-3"> Loading... </Spinner>
+                <div className="text-muted fw-semibold">Loading branch stock values...</div>
             </div>
         );
     }
