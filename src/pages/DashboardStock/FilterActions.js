@@ -1,47 +1,44 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 import Flatpickr from "react-flatpickr";
+import { useDispatch, useSelector } from "react-redux";
 
-const FilterActions = ({ filters, setFilters, rightColumn, hideRightColumn }) => {
+import { setBranch, setDateRange, setStartDate, setEndDate } from "../../slices/dashboardStock/reducer";
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
-        setFilters((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+    const dispatch = useDispatch();
 
-    const handleDateChange = (name, selectedDates) => {
-        if (!selectedDates?.length) {
-            setFilters((prev) => ({
-                ...prev,
-                [name]: ""
-            }));
-            return;
+    const {
+        branches = [],
+        filters: {
+            branch,
+            dateRange,
+            startDate,
+            endDate,
+        },
+    } = useSelector((state) => state.StockInventory);
+
+    const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Custom"];
+
+    const handleDateChange = (type, selectedDates) => {
+        if (!selectedDates?.length) return;
+
+        const formatted = selectedDates[0].toLocaleDateString("en-GB");
+
+        dispatch(setDateRange("Custom"));
+
+        if (type === "startDate") {
+            dispatch(setStartDate(formatted));
         }
-
-        const date = selectedDates[0];
-
-        const formatted =
-            `${String(date.getDate()).padStart(2, "0")}/` +
-            `${String(date.getMonth() + 1).padStart(2, "0")}/` +
-            `${date.getFullYear()}`;
-
-        setFilters((prev) => ({ ...prev,
-            [name]: formatted
-        }));
+        if (type === "endDate") {
+            dispatch(setEndDate(formatted));
+        }
     };
 
     const handleReset = () => {
-        setFilters({
-            clientid: 1,
-            startDate: "",
-            endDate: "",
-            branchcode: 0,
-            itemcode: ""
-        });
+        dispatch(setBranch(null));
+        dispatch(setDateRange("Today"));
     };
 
     return (
@@ -52,7 +49,7 @@ const FilterActions = ({ filters, setFilters, rightColumn, hideRightColumn }) =>
                     : "layout-rightside-col d-none"
             }
         >
-            <div className="overlay" onClick={hideRightColumn}></div>
+            <div className="overlay" onClick={hideRightColumn} />
 
             <div className="layout-rightside h-100">
                 <Card className="h-100 card-animate">
@@ -62,58 +59,116 @@ const FilterActions = ({ filters, setFilters, rightColumn, hideRightColumn }) =>
                     </CardHeader>
 
                     <CardBody>
+
                         <div className="mb-3">
-                            <label>Client ID</label>
-                            <input
-                                className="form-control"
-                                name="clientid"
-                                value={filters.clientid}
-                                onChange={handleChange}
-                            />
+                            <label>Branch</label>
+
+                            <select
+                                className="form-select"
+                                value={branch ?? ""}
+                                onChange={(e) =>
+                                    dispatch(
+                                        setBranch(
+                                            e.target.value === ""
+                                                ? null
+                                                : Number(
+                                                      e.target.value
+                                                  )
+                                        )
+                                    )
+                                }
+                            >
+                                <option value="">
+                                    All Branches
+                                </option>
+
+                                {branches.map((b) => (
+                                    <option
+                                        key={b.branchCode}
+                                        value={b.branchCode}
+                                    >
+                                        {b.branchName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="mb-3">
+                            <label>Date Range</label>
+
+                            <select
+                                className="form-select"
+                                value={dateRange}
+                                onChange={(e) =>
+                                    dispatch(
+                                        setDateRange(
+                                            e.target.value
+                                        )
+                                    )
+                                }
+                            >
+                                {dateOptions.map((option) => (
+                                    <option
+                                        key={option}
+                                        value={option}
+                                    >
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="mb-3">
                             <label>Start Date</label>
                             <Flatpickr
-                                className="form-control"
-                                options={{ dateFormat: "d/m/Y" }}
-                                value={filters.startDate}
+                                className={`form-control ${
+                                    dateRange !== "Custom"
+                                        ? "bg-light text-primary"
+                                        : ""
+                                }`}
+                                options={{
+                                    dateFormat: "d/m/Y",
+                                    allowInput: dateRange === "Custom",
+                                    clickOpens: dateRange === "Custom",
+                                }}
+                                value={startDate}
                                 onChange={(dates) => handleDateChange("startDate", dates)}
+                                readOnly={dateRange !== "Custom"}
                             />
                         </div>
 
                         <div className="mb-3">
                             <label>End Date</label>
                             <Flatpickr
-                                className="form-control"
-                                options={{ dateFormat: "d/m/Y" }}
-                                value={filters.endDate}
-                                onChange={(dates) => handleDateChange("endDate", dates)}
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label>Branch Code</label>
-                            <input
-                                className="form-control"
-                                name="branchcode"
-                                value={filters.branchcode}
-                                onChange={handleChange}
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label>Item Code</label>
-                            <input
-                                className="form-control"
-                                name="itemcode"
-                                value={filters.itemcode}
-                                onChange={handleChange}
+                                className={`form-control ${
+                                    dateRange !== "Custom"
+                                        ? "bg-light text-primary"
+                                        : ""
+                                }`}
+                                options={{
+                                    dateFormat: "d/m/Y",
+                                    allowInput:
+                                        dateRange ===
+                                        "Custom",
+                                    clickOpens:
+                                        dateRange ===
+                                        "Custom",
+                                }}
+                                value={endDate}
+                                onChange={(dates) =>
+                                    handleDateChange(
+                                        "endDate",
+                                        dates
+                                    )
+                                }
+                                readOnly={
+                                    dateRange !== "Custom"
+                                }
                             />
                         </div>
 
                         <div className="d-flex justify-content-end gap-2">
-                            <button className="btn btn-success" onClick={hideRightColumn}>
+                            <button className="btn btn-success" onClick={onApply}>
                                 Apply
                             </button>
 

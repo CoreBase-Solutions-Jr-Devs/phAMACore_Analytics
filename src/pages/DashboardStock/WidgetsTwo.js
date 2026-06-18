@@ -48,6 +48,7 @@ const WidgetsTwo = () => {
             {widgetData.map((widget) => {
                 const { icon, color } =
                     EXPIRY_ICON_MAP[widget.id] ?? { icon: "activity", color: "primary" };
+                const productLabel = widget.counter === 1 ? "product" : "products";
 
                 return (
                     <Col xl={4} lg={4} md={4} sm={6} key={widget.id} className="d-flex px-2 pt-2">
@@ -67,7 +68,7 @@ const WidgetsTwo = () => {
                                         </h2>
 
                                         <p className="text-muted mb-0">
-                                            {widget.subtitle ?? "\u00A0"}
+                                            {widget.counter} {productLabel}
                                         </p>
                                     </div>
 

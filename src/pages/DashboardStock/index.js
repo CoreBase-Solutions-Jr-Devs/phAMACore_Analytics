@@ -14,7 +14,7 @@ import {
     fetchBatchExpiryNeo,
     fetchDailyClosingStock,
     fetchStockMovements
-} from '../../slices/dashboardCRM/thunk';
+} from '../../slices/dashboardStock/thunk';
 
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
@@ -22,7 +22,7 @@ import ImbalanceAlerts from './components/ImbalanceAlerts';
 
 import FilterActions from './FilterActions';
 
-const DashboardCrm = () => {
+const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
 
     const dispatch = useDispatch();
@@ -34,27 +34,27 @@ const DashboardCrm = () => {
         setRightColumn(prev => !prev);
     };
 
-    const [filters, setFilters] = useState({
-        clientid: 1,
-        startDate: "",
-        endDate: "",
-        branchcode: 0,
-        itemcode: ""
-    });
+    const { filters } = useSelector((state) => state.StockInventory);
 
-    // 1st Load
-    useEffect(() => {
-        dispatch(fetchDailyClosingStock(filters));
-        dispatch(fetchStockMovements(filters));
-        dispatch(fetchBatchExpiryNeo(filters));
-    }, [dispatch]);
+    const handleApplyFilters = () => {
+        const payload = {
+            clientid: 1,
+            branchcode: filters.branch ?? null,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+        };
 
-    // Load after filters
+        dispatch(fetchDailyClosingStock(payload));
+        dispatch(fetchStockMovements(payload));
+        dispatch(fetchBatchExpiryNeo(payload));
+
+        toggleRightColumn();
+    };
+
+    // Load with filters
     useEffect(() => {
-        dispatch(fetchDailyClosingStock(filters));
-        dispatch(fetchStockMovements(filters));
-        dispatch(fetchBatchExpiryNeo(filters));
-    }, [dispatch, filters]);
+        handleApplyFilters();
+    }, []);
 
     return (
         <React.Fragment>
@@ -182,10 +182,9 @@ const DashboardCrm = () => {
                             </Card>
                         </Col>
                         <FilterActions
+                            onApply={handleApplyFilters}
                             rightColumn={rightColumn}
                             hideRightColumn={toggleRightColumn}
-                            filters={filters}
-                            setFilters={setFilters}
                         />
                     </Row>
                 </Container>
@@ -194,4 +193,4 @@ const DashboardCrm = () => {
     );
 };
 
-export default DashboardCrm;
+export default DashboardStock;
