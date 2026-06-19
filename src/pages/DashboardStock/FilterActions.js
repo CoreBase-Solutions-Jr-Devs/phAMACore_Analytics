@@ -11,12 +11,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
     const {
         branches = [],
-        filters: {
-            branch,
-            dateRange,
-            startDate,
-            endDate,
-        },
+        filters: { branch, dateRange, startDate, endDate },
     } = useSelector((state) => state.StockInventory);
 
     const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Custom"];
@@ -43,10 +38,9 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
     return (
         <div
-            className={
-                rightColumn
-                    ? "layout-rightside-col d-block"
-                    : "layout-rightside-col d-none"
+            className={ rightColumn
+                ? "layout-rightside-col d-block"
+                : "layout-rightside-col d-none"
             }
         >
             <div className="overlay" onClick={hideRightColumn} />
@@ -66,14 +60,10 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
                                 <select
                                     className="form-select"
                                     value={branch ?? ""}
-                                    onChange={(e) =>
-                                        dispatch(
-                                            setBranch(e.target.value === ""
+                                    onChange={(e) => dispatch(setBranch(e.target.value === ""
                                                 ? null
                                                 : Number(e.target.value)
-                                            )
-                                        )
-                                    }
+                                            ))}
                                 >
                                     <option value="">
                                         All Branches
@@ -97,13 +87,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
                                 <select
                                     className="form-select"
                                     value={dateRange}
-                                    onChange={(e) =>
-                                        dispatch(
-                                            setDateRange(
-                                                e.target.value
-                                            )
-                                        )
-                                    }
+                                    onChange={(e) =>dispatch(setDateRange(e.target.value))}
                                 >
                                     {dateOptions.map((option) => (
                                         <option
