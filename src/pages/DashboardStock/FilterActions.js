@@ -11,12 +11,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
     const {
         branches = [],
-        filters: {
-            branch,
-            dateRange,
-            startDate,
-            endDate,
-        },
+        filters: { branch, dateRange, startDate, endDate },
     } = useSelector((state) => state.StockInventory);
 
     const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Custom"];
@@ -43,10 +38,9 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
     return (
         <div
-            className={
-                rightColumn
-                    ? "layout-rightside-col d-block"
-                    : "layout-rightside-col d-none"
+            className={ rightColumn
+                ? "layout-rightside-col d-block"
+                : "layout-rightside-col d-none"
             }
         >
             <div className="overlay" onClick={hideRightColumn} />
@@ -55,117 +49,100 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
                 <Card className="h-100 card-animate">
 
                     <CardHeader className="py-2">
-                        <h5 className="mb-0">Filters</h5>
+                        <h5 className="mb-0">Filter Actions</h5>
                     </CardHeader>
 
                     <CardBody>
 
-                        <div className="mb-3">
-                            <label>Branch</label>
-
-                            <select
-                                className="form-select"
-                                value={branch ?? ""}
-                                onChange={(e) =>
-                                    dispatch(
-                                        setBranch(
-                                            e.target.value === ""
+                        <div className="row mb-3 align-items-center">
+                            <label className="col-4 col-form-label">Branch</label>
+                            <div className="col-8">
+                                <select
+                                    className="form-select"
+                                    value={branch ?? ""}
+                                    onChange={(e) => dispatch(setBranch(e.target.value === ""
                                                 ? null
-                                                : Number(
-                                                      e.target.value
-                                                  )
-                                        )
-                                    )
-                                }
-                            >
-                                <option value="">
-                                    All Branches
-                                </option>
-
-                                {branches.map((b) => (
-                                    <option
-                                        key={b.branchCode}
-                                        value={b.branchCode}
-                                    >
-                                        {b.branchName}
+                                                : Number(e.target.value)
+                                            ))}
+                                >
+                                    <option value="">
+                                        All Branches
                                     </option>
-                                ))}
-                            </select>
+
+                                    {branches.map((b) => (
+                                        <option
+                                            key={b.branchCode}
+                                            value={b.branchCode}
+                                        >
+                                            {b.branchName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
-                        <div className="mb-3">
-                            <label>Date Range</label>
-
-                            <select
-                                className="form-select"
-                                value={dateRange}
-                                onChange={(e) =>
-                                    dispatch(
-                                        setDateRange(
-                                            e.target.value
-                                        )
-                                    )
-                                }
-                            >
-                                {dateOptions.map((option) => (
-                                    <option
-                                        key={option}
-                                        value={option}
-                                    >
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
+                        <div className="row mb-3 align-items-center">
+                            <label className="col-4 col-form-label">Date Range</label>
+                            <div className="col-8">
+                                <select
+                                    className="form-select"
+                                    value={dateRange}
+                                    onChange={(e) =>dispatch(setDateRange(e.target.value))}
+                                >
+                                    {dateOptions.map((option) => (
+                                        <option
+                                            key={option}
+                                            value={option}
+                                        >
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
-                        <div className="mb-3">
-                            <label>Start Date</label>
-                            <Flatpickr
-                                className={`form-control ${
-                                    dateRange !== "Custom"
-                                        ? "bg-light text-primary"
-                                        : ""
-                                }`}
-                                options={{
-                                    dateFormat: "d/m/Y",
-                                    allowInput: dateRange === "Custom",
-                                    clickOpens: dateRange === "Custom",
-                                }}
-                                value={startDate}
-                                onChange={(dates) => handleDateChange("startDate", dates)}
-                                readOnly={dateRange !== "Custom"}
-                            />
+                        <div className="row mb-3 align-items-center">
+                            <label className="col-4 col-form-label">Start Date</label>
+                            <div className="col-8">
+                                <Flatpickr
+                                    className={`form-control ${dateRange !== "Custom"
+                                            ? "bg-light text-primary"
+                                            : ""
+                                        }`}
+                                    options={{
+                                        dateFormat: "d/m/Y",
+                                        allowInput: dateRange === "Custom",
+                                        clickOpens: dateRange === "Custom",
+                                    }}
+                                    value={startDate}
+                                    onChange={(dates) => handleDateChange("startDate", dates)}
+                                    readOnly={dateRange !== "Custom"}
+                                />
+                            </div>
                         </div>
 
-                        <div className="mb-3">
-                            <label>End Date</label>
-                            <Flatpickr
-                                className={`form-control ${
-                                    dateRange !== "Custom"
-                                        ? "bg-light text-primary"
-                                        : ""
-                                }`}
-                                options={{
-                                    dateFormat: "d/m/Y",
-                                    allowInput:
-                                        dateRange ===
-                                        "Custom",
-                                    clickOpens:
-                                        dateRange ===
-                                        "Custom",
-                                }}
-                                value={endDate}
-                                onChange={(dates) =>
-                                    handleDateChange(
-                                        "endDate",
-                                        dates
-                                    )
-                                }
-                                readOnly={
-                                    dateRange !== "Custom"
-                                }
-                            />
+                        <div className="row mb-3 align-items-center">
+                            <label className="col-4 col-form-label">End Date</label>
+                            <div className="col-8">
+                                <Flatpickr
+                                    className={`form-control ${dateRange !== "Custom"
+                                            ? "bg-light text-primary"
+                                            : ""
+                                        }`}
+                                    options={{
+                                        dateFormat: "d/m/Y",
+                                        allowInput:dateRange ==="Custom",
+                                        clickOpens:dateRange ==="Custom",
+                                    }}
+                                    value={endDate}
+                                    onChange={(dates) => handleDateChange("endDate",dates)
+                                    }
+                                    readOnly={dateRange !== "Custom"}
+                                />
+                            </div>
                         </div>
+
+                        <hr className="mb-2 mt-3" />
 
                         <div className="d-flex justify-content-end gap-2">
                             <button className="btn btn-success" onClick={onApply}>
