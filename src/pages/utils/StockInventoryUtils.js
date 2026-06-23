@@ -33,6 +33,7 @@ export const KPI_META = [
 
 const OVERSTOCK_MULTIPLIER = 2;
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
 const parseExpiry = (val) => {
     if (!val || typeof val !== "string" || !val.trim()) return null;
@@ -86,13 +87,26 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
         return count;
     }, 0);
 
-    // Slow Movers (prefer movements data, fall back to closing stock qty_sold)
-    const slowMovers = movementsRows.length
-        ? (() => {
-            const soldSet = new Set(movementsRows.filter(r => Number(r.qty_sold ?? r.salesQty ?? 0) > 0).map(r => r.item_code));
-            return items.filter(r => !soldSet.has(r.item_code)).length;
-        })()
-        : items.filter(r => Number(r.qty_sold) === 0).length;
+    // Slow Movers
+    const slowMovers = (() => {
+        const slowItems = new Set();
+
+        movementsRows.forEach((row) => {
+            if (!row.receive_date || !row.movement_date) return;
+
+            const receiveDate = new Date(row.receive_date);
+            const movementDate = new Date(row.movement_date);
+
+            const daysToMove =
+                (movementDate - receiveDate) / (1000 * 60 * 60 * 24);
+
+            if (daysToMove > 30) {
+                slowItems.add(row.item_Code || row.item_code);
+            }
+        });
+
+        return slowItems.size;
+    })();
 
     // Overstocked
     const overstocked = items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) > OVERSTOCK_MULTIPLIER * Number(r.reorder_level)).length;
