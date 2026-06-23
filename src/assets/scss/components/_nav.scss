@@ -10,6 +10,12 @@
         }
     }
 }
+.nav-item::before,
+.nav-link::before,
+.menu-link::before {
+  display: none !important;
+  content: none !important;
+}
 
 .nav-pills {
     >a {
