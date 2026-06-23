@@ -48,8 +48,8 @@ const Sidebar = ({ layoutType }) => {
             <span className="logo-lg d-flex align-items-center gap-2">
               <img src={phamacoreImage} alt="" height="40" />
               <span className="logo-text d-flex flex-column lh-1">
-                <span className="fw-bold" style={{ color: "#c58c4f" }}>phAMACore</span>
-                <span className="small" style={{ color: "#c58c4f" }}>Analytics</span>
+                <span className="fw-bold fs-4" style={{ color: "#c58c4f" }}>phAMACore</span>
+                <span  style={{ color: "#c58c4f" }}>Analytics</span>
               </span>
             </span>
           </Link>
@@ -61,8 +61,8 @@ const Sidebar = ({ layoutType }) => {
             <span className="logo-lg d-flex align-items-center gap-2">
               <img src={phamacoreImage} alt="" height="40" />
               <span className="logo-text d-flex flex-column lh-1" style={{ color: "#c58c4f" }}>
-                <span className="fw-bold">phAMACore</span>
-                <span className="small">Analytics</span>
+                <span className="fw-bold fs-4">phAMACore</span>
+                <span >Analytics</span>
               </span>
             </span>
           </Link>
@@ -91,7 +91,7 @@ const Sidebar = ({ layoutType }) => {
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <SimpleBar id="scrollbar" className="h-100">
+            <SimpleBar id="scrollbar" className="h-100 pt-4">
               <Container fluid>
                 <div id="two-column-menu"></div>
                 <ul className="navbar-nav" id="navbar-nav">
