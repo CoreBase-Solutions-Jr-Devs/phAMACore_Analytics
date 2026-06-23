@@ -43,9 +43,9 @@ const DashboardPurchaseOrders = () => {
             })
       );
       if (filters.branch) {
-  navigate(`/Dashboard-purchase-orders/${filters.branch}`);
+  navigate(`/dashboard-purchase-orders/${filters.branch}`);
 } else {
-  navigate("/Dashboard-purchase-orders");
+  navigate("/dashboard-purchase-orders");
 }
     };
   
