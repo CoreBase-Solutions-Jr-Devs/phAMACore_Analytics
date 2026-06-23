@@ -6,102 +6,128 @@ import FeatherIcon from "feather-icons-react";
 const kpis = [
     {
         title: "Receivables",
-        value: 1250000,
+        value: 0,
         prefix: "KES ",
         suffix: "",
         icon: "credit-card",
         color: "success",
-        subtitle: "Outstanding customer balances"
+        subtitle: "Customer balances"
     },
     {
         title: "Payables",
-        value: 840000,
+        value: 0,
         prefix: "KES ",
         suffix: "",
         icon: "shopping-bag",
         color: "danger",
-        subtitle: "Outstanding supplier balances"
-    },
-    {
-        title: "Sales",
-        value: 5680000,
-        prefix: "KES ",
-        suffix: "",
-        icon: "trending-up",
-        color: "primary",
-        subtitle: "Current month sales"
-    },
-    {
-        title: "Stock Profits",
-        value: 1320000,
-        prefix: "KES ",
-        suffix: "",
-        icon: "package",
-        color: "warning",
-        subtitle: "Estimated gross stock profit"
-    },
-    {
-        title: "Ageing",
-        value: 187,
-        prefix: "",
-        suffix: "",
-        icon: "clock",
-        color: "info",
-        subtitle: "Invoices over 90 days"
+        subtitle: "Supplier balances"
     },
     {
         title: "Cash Available",
-        value: 2450000,
+        value: 0,
         prefix: "KES ",
         suffix: "",
         icon: "dollar-sign",
         color: "success",
         subtitle: "Available cash position"
+    },
+    {
+        title: "Sales",
+        value: 0,
+        prefix: "KES ",
+        suffix: "",
+        icon: "trending-up",
+        color: "primary",
+        subtitle: "Current period sales"
+    },
+    {
+        title: "Stock Profit",
+        value: 0,
+        prefix: "KES ",
+        suffix: "",
+        icon: "package",
+        color: "warning",
+        subtitle: "Estimated stock profit"
+    },
+    {
+        title: "Income Statement",
+        value:0,
+        prefix: "KES ",
+        suffix: "",
+        icon: "bar-chart-2",
+        color: "secondary",
+        subtitle: "Net profit after expenses"
+    },
+    {
+        title: "Collections",
+        value: 0,
+        prefix: "KES ",
+        suffix: "",
+        icon: "archive",
+        color: "success",
+        subtitle: "Customer payments received"
+    },
+    {
+        title: "Ageing",
+        value: 0,
+        prefix: "",
+        suffix: "",
+        icon: "clock",
+        color: "info",
+        subtitle: "Invoices over 90 days"
     }
 ];
 
 export default function Widgets() {
     return (
-        <Row>
-            {kpis.map((item, index) => (
-                <Col xl={4} md={6} key={index}>
-                    <Card className="card-animate">
-                        <CardBody>
-                            <div className="d-flex justify-content-between">
-                                <div>
-                                    <p className="text-uppercase fw-medium text-muted mb-2">
-                                        {item.title}
-                                    </p>
+               <React.Fragment>
+          {/* LEFT - TITLE */}
+  <h4 className="card-title mb-0">
+    KEY METRICS
+    {/* {branchName !== "All Branches" && ` - ${branchName}`} */}
+  </h4>
+  <Row className="g-2 mb-2">
+    {kpis.map((item, index) => (
+        <Col xl={3} lg={4} md={6} sm={12} key={index}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+                    <div className="d-flex justify-content-between align-items-center">
 
-                                    <h2 className={`fw-semibold text-${item.color}`}>
-                                        {item.prefix}
-                                        <CountUp
-                                            end={item.value}
-                                            separator=","
-                                        />
-                                        {item.suffix}
-                                    </h2>
-                                </div>
+                        {/* Left content */}
+                        <div>
+                            <p className="font-medium mb-0">
+                                {item.title}
+                            </p>
 
-                                <div className="avatar-sm flex-shrink-0">
-                                    <span
-                                        className={`avatar-title rounded-circle fs-2 bg-${item.color}-subtle text-${item.color}`}
-                                    >
-                                        <FeatherIcon
-                                            icon={item.icon}
-                                            size={24}
-                                        />
-                                    </span>
-                                </div>
-                            </div>
+                            <h2 className={`mt-4 ff-secondary fw-semibold text-${item.color}`}>
+                                <span className="counter-value">
+                                    {item.prefix}
+                                    {Number(item.value || 0)}
+                                    {item.suffix}
+                                </span>
+                            </h2>
 
-                            <p className="text-muted mb-0 mt-3">
+                            <p className="mb-0 text-muted">
                                 {item.subtitle}
                             </p>
-                        </CardBody>
-                    </Card>
-                </Col>
-            ))}
-        </Row>
+                        </div>
+
+                        {/* Right icon */}
+                        <div className="avatar-sm flex-shrink-0">
+                            <span className={`avatar-title bg-${item.color}-subtle rounded-circle fs-2`}>
+                                <FeatherIcon
+                                    icon={item.icon}
+                                    className={`text-${item.color}`}
+                                />
+                            </span>
+                        </div>
+
+                    </div>
+                </CardBody>
+            </Card>
+        </Col>
+    ))}
+</Row>
+        </React.Fragment>
     );
 }
