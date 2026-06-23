@@ -48,11 +48,12 @@ const DashboardStock = () => {
         dispatch(fetchStockMovements(payload));
         dispatch(fetchBatchExpiryNeo(payload));
 
-        toggleRightColumn();
+        setRightColumn(false);
     };
 
     // Load with filters
     useEffect(() => {
+        setRightColumn(false);
         handleApplyFilters();
     }, []);
 
@@ -69,7 +70,7 @@ const DashboardStock = () => {
                                 <h4 className="mb-0">KEY METRICS</h4>
 
                                 <button
-                                    className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                                    className="btn btn-caramel d-flex align-items-center gap-2"
                                     onClick={toggleRightColumn}
                                 >
                                     <i className="ri-filter-fill me-1"></i>
