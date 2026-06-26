@@ -62,7 +62,7 @@ const DashboardStock = () => {
             <div className="page-content">
                 <Container fluid>
 
-                    <BreadCrumb title="Inventory/Stock Dashboard" pageTitle="Dashboards" />
+                    <BreadCrumb title="Inventory/Stock" pageTitle="Dashboards" />
 
                     <Row className="align-items-center mb-2">
                         <Col>
