@@ -31,9 +31,10 @@ const WidgetsTwo = () => {
 
             if (daysToExpiry < 0 || daysToExpiry > 90) return;
 
-            if (daysToExpiry <= 30) days0to30++;
-            else if (daysToExpiry <= 60) days31to60++;
-            else days61to90++;
+            if (daysToExpiry >= 0 && daysToExpiry <= 30) days0to30++;
+            else if (daysToExpiry > 30 && daysToExpiry <= 60) days31to60++;
+            else if (daysToExpiry > 60 && daysToExpiry <= 90) 
+                return days61to90++;
         });
 
         return [
