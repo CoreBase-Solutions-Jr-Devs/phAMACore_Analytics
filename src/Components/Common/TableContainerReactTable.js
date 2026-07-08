@@ -124,6 +124,11 @@ const TableContainer = ({
   useEffect(() => {
     (customPageSize) && setPageSize((customPageSize));
   }, [customPageSize, setPageSize]);
+
+  const { pageIndex, pageSize } = getState().pagination;
+  const totalResults = data.length;
+  const startResult = totalResults === 0 ? 0 : pageIndex * pageSize + 1;
+  const endResult = Math.min((pageIndex + 1) * pageSize, totalResults);
   
   return (
     <Fragment>
@@ -203,7 +208,7 @@ const TableContainer = ({
 
       <Row className="align-items-center mt-2 g-3 text-center text-sm-start">
         <div className="col-sm">
-          <div className="text-muted">Showing<span className="fw-semibold ms-1">{getState().pagination.pageSize}</span> of <span className="fw-semibold">{data.length}</span> Results
+          <div className="text-muted">Showing{" "}<span className="fw-semibold">{startResult}</span> - <span className="fw-semibold">{endResult}</span> {" "}of{" "} <span className="fw-semibold">{totalResults}</span>{" "}Results
           </div>
         </div>
         <div className="col-sm-auto">
