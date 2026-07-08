@@ -134,10 +134,10 @@ const CustomTableOne = () => {
 
                     switch (value) {
                         case "Prioritise Sales":
-                            return badge("bg-warning");
+                            return badge("bg-info");
 
                         case "Transfer/Promote":
-                            return badge("bg-info");
+                            return badge("bg-warning");
 
                         case "Promote now":
                             return badge("bg-danger");
