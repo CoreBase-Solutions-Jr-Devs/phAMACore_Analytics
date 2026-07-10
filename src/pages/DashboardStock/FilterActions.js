@@ -146,7 +146,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
                         <div className="d-flex justify-content-end gap-2">
                             <button className="btn btn-success" onClick={onApply}>
-                                Apply
+                                Select
                             </button>
 
                             <button className="btn btn-warning" onClick={handleReset}>

@@ -9,7 +9,7 @@ import logoLight from "../../../assets/images/logo-light.png";
 
 
 const BasicSignIn = () => {
-document.title="Basic SignIn | Velzon - React Admin & Dashboard Template";
+document.title="Basic SignIn | phAMACore Analytics - Admin Dashboards";
     return (
         <React.Fragment>
             <ParticlesAuth>

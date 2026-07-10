@@ -35,6 +35,7 @@ const DashboardStock = () => {
     };
 
     const { filters } = useSelector((state) => state.StockInventory);
+    const formatDisplay = (date) => date || "";
 
     const handleApplyFilters = () => {
         const payload = {
@@ -62,23 +63,31 @@ const DashboardStock = () => {
             <div className="page-content">
                 <Container fluid>
 
-                    <BreadCrumb title="Inventory/Stock Dashboard" pageTitle="Dashboards" />
+                    <BreadCrumb title="Inventory/Stock" pageTitle="Dashboards" />
 
-                    <Row className="align-items-center mb-2">
-                        <Col>
-                            <div className="d-flex justify-content-between align-items-center">
-                                <h4 className="mb-0">KEY METRICS</h4>
+                    <div className="d-flex align-items-center justify-content-between flex-wrap mb-3">
 
-                                <button
-                                    className="btn btn-caramel d-flex align-items-center gap-2"
-                                    onClick={toggleRightColumn}
-                                >
-                                    <i className="ri-filter-fill me-1"></i>
-                                    Filter
-                                </button>
-                            </div>
-                        </Col>
-                    </Row>
+                        <h4 className="card-title mb-0">
+                            KEY METRICS
+                        </h4>
+
+                        <div className="d-flex align-items-center gap-2">
+                            <span>Filtered From:</span>
+                            <strong>{formatDisplay(filters.startDate)}</strong>
+                            <span>to</span>
+                            <strong>{formatDisplay(filters.endDate)}</strong>
+                        </div>
+
+                        <button
+                            type="button"
+                            className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                            onClick={toggleRightColumn}
+                        >
+                            <i className="ri-filter-fill"></i>
+                            Filter
+                        </button>
+
+                    </div>
 
                     <Row>
                         <Col xl={12}>

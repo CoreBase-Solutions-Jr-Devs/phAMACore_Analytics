@@ -19,20 +19,21 @@ export const getNDaysAgoApi = (n) => {
 // KPI CARD METADATA
 
 export const KPI_META = [
-    { id: 1, label: "Total SKUs", icon: "ri-medicine-bottle-line text-primary", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 2, label: "Total Stock Value", icon: "ri-money-dollar-circle-line text-success", decimals: 2, prefix: "KES ", suffix: "m", separator: "," },
-    { id: 3, label: "Items below Reorder Level", icon: "ri-arrow-down-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 4, label: "Out of Stock Items", icon: "ri-error-warning-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 5, label: "Near Expiry (\u2264 90 days)", icon: "ri-time-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 6, label: "Slow Movers (30d)", icon: "ri-hourglass-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 7, label: "Overstocked Items", icon: "ri-stack-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 8, label: "Branch Imbalances (> 20%)", icon: "ri-git-branch-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 1, label: "Total SKUs", subtitle: "Across all branches", icon: "ri-medicine-bottle-line text-primary", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 2, label: "Total Stock Value", subtitle: "KES - all branches", icon: "ri-money-dollar-circle-line text-success", decimals: 2, prefix: "KES ", suffix: "m", separator: "," },
+    { id: 3, label: "Items below Reorder Level", subtitle: "Need action now", icon: "ri-arrow-down-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 4, label: "Out of Stock Items", subtitle: "Units out of stock", icon: "ri-error-warning-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 5, label: "Near Expiry (\u2264 90 days)", subtitle: "Products at risk", icon: "ri-time-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 6, label: "Slow Movers (30d)", subtitle: "Below velocity threshold", icon: "ri-hourglass-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 7, label: "Overstocked Items", subtitle: ">120 days cover", icon: "ri-stack-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 8, label: "Branch Imbalances (> 20%)", subtitle: "Transfer candidates", icon: "ri-git-branch-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
 ];
 
 // KPI COMPUTATION HELPERS
 
 const OVERSTOCK_MULTIPLIER = 2;
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
 const parseExpiry = (val) => {
     if (!val || typeof val !== "string" || !val.trim()) return null;
@@ -86,13 +87,26 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
         return count;
     }, 0);
 
-    // Slow Movers (prefer movements data, fall back to closing stock qty_sold)
-    const slowMovers = movementsRows.length
-        ? (() => {
-            const soldSet = new Set(movementsRows.filter(r => Number(r.qty_sold ?? r.salesQty ?? 0) > 0).map(r => r.item_code));
-            return items.filter(r => !soldSet.has(r.item_code)).length;
-        })()
-        : items.filter(r => Number(r.qty_sold) === 0).length;
+    // Slow Movers
+    const slowMovers = (() => {
+        const slowItems = new Set();
+
+        movementsRows.forEach((row) => {
+            if (!row.receive_date || !row.movement_date) return;
+
+            const receiveDate = new Date(row.receive_date);
+            const movementDate = new Date(row.movement_date);
+
+            const daysToMove =
+                (movementDate - receiveDate) / (1000 * 60 * 60 * 24);
+
+            if (daysToMove > 30) {
+                slowItems.add(row.item_Code || row.item_code);
+            }
+        });
+
+        return slowItems.size;
+    })();
 
     // Overstocked
     const overstocked = items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) > OVERSTOCK_MULTIPLIER * Number(r.reorder_level)).length;

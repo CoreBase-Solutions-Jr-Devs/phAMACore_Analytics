@@ -20,55 +20,92 @@ const CriticalStockChart = () => {
             };
         }
 
-        const criticalItems = dailyClosingStock
+        const grouped = new Map();
+
+        dailyClosingStock.forEach((row) => {
+            const key = row.item_code;
+
+            const existing = grouped.get(key);
+
+            if (existing) {
+                existing.closingQty += Number(
+                    row.closing_qty ?? 0
+                );
+
+                existing.qtySold += Number(
+                    row.qty_sold ?? 0
+                );
+            } else {
+                grouped.set(key, {
+                    itemCode: row.item_code,
+                    name: row.item_Name,
+                    closingQty: Number(
+                        row.closing_qty ?? 0
+                    ),
+                    qtySold: Number(
+                        row.qty_sold ?? 0
+                    ),
+                });
+            }
+        });
+
+        const criticalItems = Array.from(grouped.values())
             .map((item) => {
-                const closingQty = Number(item.closing_qty || 0);
-                const qtySold = Number(item.qty_sold || 0);
+                const avgDailySales = item.qtySold > 0
+                    ? item.qtySold / PERIOD_DAYS
+                    : 0;
 
-                const avgDailySales =
-                    qtySold > 0 ? qtySold / PERIOD_DAYS : 0;
-
-                const daysOfCover =
-                    avgDailySales > 0
-                        ? closingQty / avgDailySales
-                        : 9999;
+                const daysOfCover = avgDailySales > 0
+                    ? item.closingQty / avgDailySales
+                    : Number.MAX_SAFE_INTEGER;
 
                 return {
                     ...item,
                     daysOfCover,
                 };
             })
-            .filter(
-                (item) =>
-                    item.closing_qty > 0 &&
-                    item.qty_sold > 0
+            .filter((item) =>
+                item.closingQty > 0 && item.qtySold > 0
             )
-            .sort(
-                (a, b) =>
-                    a.daysOfCover - b.daysOfCover
+            .sort((a, b) =>
+                a.daysOfCover - b.daysOfCover
             )
             .slice(0, 10);
 
+        console.log("Grouped Critical Items", criticalItems);
+
         return {
-            categories: criticalItems.map((item) =>
-                item.item_Name?.length > 40
-                    ? `${item.item_Name.substring(0, 40)}...`
-                    : item.item_Name
+            categories: criticalItems.map(
+                (item) =>
+                    item.name?.length > 40
+                        ? `${item.name.substring(
+                            0,
+                            40
+                        )}...`
+                        : item.name
             ),
 
             data: criticalItems.map((item) =>
-                Number(item.daysOfCover.toFixed(1))
+                Number(
+                    item.daysOfCover.toFixed(1)
+                )
             ),
 
-            colors: criticalItems.map((item) => {
-                if (item.daysOfCover <= 7)
-                    return "#f06548";
+            colors: criticalItems.map(
+                (item) => {
+                    if (
+                        item.daysOfCover <= 7
+                    )
+                        return "#f06548";
 
-                if (item.daysOfCover <= 14)
-                    return "#f7b84b";
+                    if (
+                        item.daysOfCover <= 14
+                    )
+                        return "#f7b84b";
 
-                return "#0ab39c";
-            }),
+                    return "#0ab39c";
+                }
+            ),
         };
     }, [dailyClosingStock]);
 
