@@ -126,30 +126,41 @@ const formatAmount = (value) => {
   return value % 1 === 0 ? value.toFixed(0) : value.toFixed(2);
 };
 
-
   const totalRevenue = sales.reduce(
     (sum, item) => sum + (item.revenue || 0),
     0
 );
 
-const getDateOnly = (dateStr) =>
-  new Date(dateStr).toDateString();
-const today = new Date().toDateString();
+const getStartOfDay = (date = new Date()) => {
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized.getTime();
+};
 
-const todayRevenue = sales
-  .filter(item => getDateOnly(item.transaction_Date) === today)
-  .reduce((sum, item) => sum + (item.revenue || 0), 0);
-  const yesterday = new Date();
-yesterday.setDate(yesterday.getDate() - 1);
+const todayStart = getStartOfDay(new Date());
+const yesterdayStart = new Date(todayStart);
+yesterdayStart.setDate(yesterdayStart.getDate() - 1);
 
-const yesterdayRevenue = sales
-  .filter(item => getDateOnly(item.transaction_Date) === yesterday.toDateString())
-  .reduce((sum, item) => sum + (item.revenue || 0), 0);
+const todayRevenue = sales.reduce((sum, item) => {
+  const itemDate = new Date(item.transaction_Date);
+  if (getStartOfDay(itemDate) === todayStart) {
+    return sum + (item.revenue || 0);
+  }
+  return sum;
+}, 0);
 
-  const revenueChange =
-  yesterdayRevenue > 0
-    ? ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100
-    : 0;
+const yesterdayRevenue = sales.reduce((sum, item) => {
+  const itemDate = new Date(item.transaction_Date);
+  if (getStartOfDay(itemDate) === yesterdayStart.getTime()) {
+    return sum + (item.revenue || 0);
+  }
+  return sum;
+}, 0);
+
+const revenueChange = yesterdayRevenue > 0 
+  ? ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100 
+  : 0;
+
 
     const cashSales = sales
     .filter(item => item.client_ID === "CSC999")
@@ -420,6 +431,7 @@ document.title = "Sales Dashboard | phAMACore Analytics";
 revenueChange={revenueChange}
 cashInvoices={cashInvoices}
   branchMap={branchMap}
+  
   rightClickBtn={toggleRightColumn}
   />
           </Row>
