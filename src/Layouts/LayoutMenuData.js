@@ -160,46 +160,46 @@ subItems: [
     label: "My Business",
     link: "/dashboard-my-business",
     parentId: "dashboard",
-    icon: "ri-building-4-fill",
+ icon: "ri-home-4-line",
   },
   {
     id: "sales",
     label: "Sales",
     link: "/dashboard",
     parentId: "dashboard",
-    icon: "ri-line-chart-fill",
-    subItems: [
-      {
-        id: "sales-branch",
-        label: "Branch View",
-        link: "/dashboard-sales",
-        parentId: "sales",
-        icon: "ri-bar-chart-grouped-fill",
-      },
-    ],
+    icon: "ri-bar-chart-fill",
+    // subItems: [
+    //   {
+    //     id: "sales-branch",
+    //     label: "Branch View",
+    //     link: "/dashboard-sales",
+    //     parentId: "sales",
+    //     icon: "ri-bar-chart-grouped-fill",
+    //   },
+    // ],
   },
   {
     id: "stock",
     label: "Inventory / Stock",
     link: "/dashboard-stock",
     parentId: "dashboard",
-    icon: "ri-stack-fill",
+    icon: "ri-box-3-line",
   },
   {
     id: "purchases",
     label: "Purchases",
     link: "/dashboard-purchase-orders",
     parentId: "dashboard",
-    icon: "ri-shopping-cart-fill",
-    subItems: [
-      {
-        id: "purchase-branch",
-        label: "Branch View",
-        link: "/dashboard-purchase-orders/{branchId}",
-        parentId: "purchases",
-        icon: "ri-file-list-2-fill",
-      },
-    ],
+    icon: "ri-todo-line",
+    // subItems: [
+    //   {
+    //     id: "purchase-branch",
+    //     label: "Branch View",
+    //     link: "/dashboard-purchase-orders/{branchId}",
+    //     parentId: "purchases",
+    //     icon: "ri-file-list-2-fill",
+    //   },
+    // ],
   },
 ]
     },

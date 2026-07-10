@@ -45,7 +45,7 @@ const {
   const selectedBranchName =
   branches.find(b => b.branchCode === branch)?.branchName || "All Branches";
   
-  const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Custom"];
+  const dateOptions = ["Today", "Yesterday", "This Week", "Last Week", "This Month" , "Last Month", "This Year", "Last Year", "Custom"];
   
 const formatDisplay = (date) => date || "";
 

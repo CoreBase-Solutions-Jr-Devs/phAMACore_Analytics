@@ -29,7 +29,7 @@ const SalesCollection = () => {
        <React.Fragment>
       <Card>
         <CardHeader className="border-0 align-items-center d-flex">
-          <h4 className="card-title mb-0 flex-grow-1">Stock vs Purchases Performance Trend(YTD) </h4>
+          <h4 className="card-title mb-0 flex-grow-1">Sales vs Collections Performance Trend(YTD) </h4>
  </CardHeader>
         <CardBody className="p-0 pb-2">
           <div className="w-100">
