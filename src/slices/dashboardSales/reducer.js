@@ -49,19 +49,97 @@ const powerBISlice = createSlice({
           break;
         }
 
-        case "Last 7 Days": {
-          const end = new Date();
-          const start = new Date();
-          start.setDate(end.getDate() - 7);
+        // case "Last 7 Days": {
+        //   const end = new Date();
+        //   const start = new Date();
+        //   start.setDate(end.getDate() - 7);
 
-          state.filters.startDate = formatDMY(start);
-          state.filters.endDate = formatDMY(end);
-          break;
-        }
+        //   state.filters.startDate = formatDMY(start);
+        //   state.filters.endDate = formatDMY(end);
+        //   break;
+        // }
+
+  case "This Week": {
+  const today = new Date();
+
+  const start = new Date(today);
+  start.setDate(today.getDate() - today.getDay());
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  state.filters.startDate = formatDMY(start);
+  state.filters.endDate = formatDMY(end);
+  break;
+}
+
+case "Last Week": {
+  const today = new Date();
+
+  const currentWeekStart = new Date(today);
+  currentWeekStart.setDate(today.getDate() - today.getDay());
+
+  const start = new Date(currentWeekStart);
+  start.setDate(currentWeekStart.getDate() - 7);
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  state.filters.startDate = formatDMY(start);
+  state.filters.endDate = formatDMY(end);
+  break;
+}
+
+case "This Month": {
+  const today = new Date();
+
+  const start = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  state.filters.startDate = formatDMY(start);
+  state.filters.endDate = formatDMY(end);
+  break;
+}
+
+case "Last Month": {
+  const today = new Date();
+
+  const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+
+  const end = new Date(today.getFullYear(), today.getMonth(), 0);
+
+  state.filters.startDate = formatDMY(start);
+  state.filters.endDate = formatDMY(end);
+  break;
+}
+
+case "This Year": {
+  const today = new Date();
+
+  const start = new Date(today.getFullYear(), 0, 1);
+
+  const end = new Date(today.getFullYear(), 11, 31);
+
+  state.filters.startDate = formatDMY(start);
+  state.filters.endDate = formatDMY(end);
+  break;
+}
+
+case "Last Year": {
+  const today = new Date();
+
+  const start = new Date(today.getFullYear() - 1, 0, 1);
+
+  const end = new Date(today.getFullYear() - 1, 11, 31);
+
+  state.filters.startDate = formatDMY(start);
+  state.filters.endDate = formatDMY(end);
+  break;
+}
 
 case "Custom":
   state.filters.dateRange = "Custom";
-  // DO NOT reset dates
   break;
       }
     },
