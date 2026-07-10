@@ -291,10 +291,10 @@ const ProgressiveSalesChart = ({
 
   const options = {
     chart: {
-      height: 350,
+      height: 370,
       type: "line",
       toolbar: { show: false },
-      zoom: { enabled: false },
+      // zoom: { enabled: false },
     },
 
     stroke: {
@@ -310,6 +310,12 @@ const ProgressiveSalesChart = ({
 
     xaxis: {
       categories,
+         axisTicks: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
     },
 
     yaxis: {
@@ -319,6 +325,7 @@ const ProgressiveSalesChart = ({
       labels: {
         formatter: (val) => formatAmount(val),
       },
+      
     },
 
     // grid: {
