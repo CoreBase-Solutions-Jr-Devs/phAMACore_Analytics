@@ -115,16 +115,6 @@ const BarChartOne = ({
             yaxis: { lines: { show: false } },
         },
         legend: { show: false },
-        title: {
-            text: 'Live stock vs. safety minimum — days of cover remaining',
-            align: 'left',
-            style: { fontWeight: 600, fontSize: '13px' },
-        },
-        subtitle: {
-            text: 'Vertical line = reorder threshold (25% = 6-day cover). Red zone = critical. Amber = reorder now. Green = safe stock.',
-            align: 'left',
-            style: { fontSize: '11px', color: '#878a99' },
-        },
         tooltip: {
             theme: 'dark',
             x: { show: true },
@@ -138,15 +128,62 @@ const BarChartOne = ({
         },
     };
 
+    const legendItems = [
+        {
+            color: "#f06548",
+            label: "Critical Stock",
+        },
+        {
+            color: "#f7b84b",
+            label: "Reorder Now",
+        },
+        {
+            color: "#0ab39c",
+            label: "Safe Stock",
+        },
+    ];
+
     return (
-        <ReactApexChart
-            dir="ltr"
-            className="apex-charts"
-            options={options}
-            series={series}
-            type="bar"
-            height={height}
-        />
+        <>
+            <ReactApexChart
+                dir="ltr"
+                className="apex-charts"
+                options={options}
+                series={series}
+                type="bar"
+                height={height}
+            />
+            <hr className="my-3" />
+
+            <div className="px-2">
+                <div className="fw-semibold mb-2">
+                    Live Stock vs. Safety Minimum — days of cover remaining
+                </div>
+
+                <div className="text-muted small">
+                    <strong>Vertical Line</strong> = Reorder threshold ({reorderLine} days of cover).
+                </div>
+
+                <div className="d-flex flex-wrap gap-3 mt-2 small">
+                    {legendItems.map(({ color, label }) => (
+                        <span
+                            key={label}
+                            className="d-flex align-items-center"
+                        >
+                            <span
+                                className="me-2 rounded-circle"
+                                style={{
+                                    width: 10,
+                                    height: 10,
+                                    backgroundColor: color,
+                                }}
+                            />
+                            {label}
+                        </span>
+                    ))}
+                </div>
+            </div>
+        </>
     );
 };
 

@@ -117,7 +117,7 @@ onSubmit: async (values) => {
       }, 3000);
     }
   }, [dispatch, errorMsg]);
-  document.title = "Basic SignIn | Velzon - React Admin & Dashboard Template";
+  document.title = "Login | phAMACore Analytics - Admin Dashboards";
   return (
     <React.Fragment>
       <ParticlesAuth>
