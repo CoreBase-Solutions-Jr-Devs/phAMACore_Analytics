@@ -13,7 +13,9 @@ const CustomTableOne = () => {
     const [searchValue, setSearchValue] = useState("");
 
     const today = new Date();
-    const cutoff = new Date(today.getTime() + NINETY_DAYS_MS);
+    today.setHours(0, 0, 0, 0);
+    const cutoff = new Date(today);
+    cutoff.setDate(cutoff.getDate() + 90);
     const currentYear = new Date().getFullYear();
 
     const paginationTable = useMemo(() => {
@@ -24,6 +26,8 @@ const CustomTableOne = () => {
                 const expiryDate = new Date(item.expirydate);
                 if (isNaN(expiryDate.getTime())) return false;
 
+                expiryDate.setHours(0, 0, 0, 0);
+
                 return expiryDate >= today && expiryDate <= cutoff;
             })
             .map((item) => {
@@ -33,10 +37,17 @@ const CustomTableOne = () => {
                 const expiryDate = item.expirydate;
 
                 const daysRemaining = expiryDate
-                    ? Math.ceil(
-                        (new Date(expiryDate) - new Date()) /
-                        (1000 * 60 * 60 * 24)
-                    )
+                    ? (() => {
+                        const expiry = new Date(expiryDate);
+                        expiry.setHours(0, 0, 0, 0);
+
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        return Math.ceil(
+                            (expiry - today) / (1000 * 60 * 60 * 24)
+                        );
+                    })()
                     : 999;
 
                 let action = "Prioritise Sales";
@@ -123,10 +134,10 @@ const CustomTableOne = () => {
 
                     switch (value) {
                         case "Prioritise Sales":
-                            return badge("bg-warning");
+                            return badge("bg-info");
 
                         case "Transfer/Promote":
-                            return badge("bg-info");
+                            return badge("bg-warning");
 
                         case "Promote now":
                             return badge("bg-danger");

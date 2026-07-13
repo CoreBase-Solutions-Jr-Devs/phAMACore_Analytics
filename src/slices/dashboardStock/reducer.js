@@ -65,6 +65,76 @@ const StockInventorySlice = createSlice({
           break;
         }
 
+        case "This Week": {
+          const today = new Date();
+          const start = new Date(today);
+
+          const day = start.getDay();
+          const diff = day === 0 ? 6 : day - 1;
+
+          start.setDate(start.getDate() - diff);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(today);
+          break;
+        }
+
+        case "Last Week": {
+          const today = new Date();
+          // Current week Monday
+          const currentWeekStart = new Date(today);
+          const day = currentWeekStart.getDay();
+          const diff = day === 0 ? 6 : day - 1;
+          currentWeekStart.setDate(currentWeekStart.getDate() - diff);
+          // Previous week Monday
+          const start = new Date(currentWeekStart);
+          start.setDate(start.getDate() - 7);
+          // Previous week Sunday
+          const end = new Date(currentWeekStart);
+          end.setDate(end.getDate() - 1);
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
+
+        case "This Month": {
+          const today = new Date();
+          const start = new Date(today.getFullYear(), today.getMonth(), 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(today);
+          break;
+        }
+
+        case "Last Month": {
+          const today = new Date();
+
+          const start = new Date(
+            today.getFullYear(),
+            today.getMonth() - 1,
+            1
+          );
+
+          const end = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            0
+          );
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
+
+        case "This Year": {
+          const today = new Date();
+          const start = new Date(today.getFullYear(), 0, 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(today);
+          break;
+        }
+
         case "Custom":
           break;
 
