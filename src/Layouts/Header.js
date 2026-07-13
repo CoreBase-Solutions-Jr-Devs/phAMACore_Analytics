@@ -90,8 +90,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     <span className="logo-lg d-flex align-items-center gap-2">
                                         <img src={phamacoreImage} alt="" height="20" />
                                         <span className="logo-text d-flex flex-column lh-1" style={{ color: "#c58c4f" }}>
-                                            <span className="fw-bold">phAMACore</span>
-                                            <span className="small">Analytics</span>
+                                            <span className="fw-bold fs-4">phAMACore</span>
+                                            <span className="fw-medium ">Analytics</span>
                                         </span>
                                     </span>
                                 </Link>
@@ -103,8 +103,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     <span className="logo-lg d-flex align-items-center gap-2">
                                         <img src={phamacoreImage} alt="" height="20" />
                                         <span className="logo-text d-flex flex-column lh-1">
-                                            <span className="fw-bold text-white">phAMACore</span>
-                                            <span className="small text-white">Analytics</span>
+                                            <span className="fw-bold text-white fs-4">phAMACore</span>
+                                            <span className="fw-medium text-white "className=" text-white">Analytics</span>
                                         </span>
                                     </span>
                                 </Link>
@@ -113,7 +113,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                             <button
                                 onClick={toogleMenuBtn}
                                 type="button"
-                                className="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger"
+                                className="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger text-danger"
+                               style={{ color: "#c58c4f" }}
                                 id="topnav-hamburger-icon">
                                 <span className="hamburger-icon">
                                     <span></span>
@@ -125,11 +126,19 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
 
                             {/* <SearchOption /> */}
                         </div>
-
+ <div className="d-none d-md-flex justify-content-center flex-grow-1">
+            <span
+                className="fw-bold"
+                style={{
+                    color: "#c58c4f",
+                    fontSize: "18px",
+                    // letterSpacing: "1px"
+                }}
+            >
+                COREBASE SOLUTIONS LTD
+            </span>
+        </div>
                         <div className="d-flex align-items-center">
-{/* <>
-<p>CoreBase Solutions LTD</p>
-</> */}
                             <Dropdown isOpen={search} toggle={toogleSearch} className="d-md-none topbar-head-dropdown header-item">
                                 <DropdownToggle type="button" tag="button" className="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle">
                                     <i className="bx bx-search fs-22"></i>

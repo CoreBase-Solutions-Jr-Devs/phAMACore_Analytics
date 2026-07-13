@@ -48,10 +48,10 @@ const handleApplyFilters = () => {
  console.log("CURRENT BRANCH FILTER:", branchId);
 if (filters.branch) {
     //  dispatch(clearSalesData()); 
-  navigate(`/Dashboard-Sales/${filters.branch}`);
+  navigate(`/dashboard-Sales/${filters.branch}`);
 } else {
     //  dispatch(clearSalesData()); 
-  navigate("/Dashboard");
+  navigate("/dashboard");
 }
   };
 

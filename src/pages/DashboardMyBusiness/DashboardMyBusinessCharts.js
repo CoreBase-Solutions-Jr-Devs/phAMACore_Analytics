@@ -281,20 +281,19 @@ const TopProductsCharts = ({ dataColors, series, categories = [] }) => {
   );
 };
 
-const ProgressiveSalesChart = ({
+const RevenueExpensesChart = ({
   dataColors,
   series,
   categories = [],
-  formatAmount,
 }) => {
   const colors = getChartColorsArray(dataColors);
 
   const options = {
     chart: {
-      height: 370,
+      height: 350,
       type: "line",
       toolbar: { show: false },
-      // zoom: { enabled: false },
+      zoom: { enabled: false },
     },
 
     stroke: {
@@ -310,31 +309,13 @@ const ProgressiveSalesChart = ({
 
     xaxis: {
       categories,
-         axisTicks: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
     },
 
     yaxis: {
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
-      labels: {
-        formatter: (val) => formatAmount(val),
-      },
-      
     },
-
-    // grid: {
-    //   yaxis: {
-    //     lines: {
-    //       show: true,
-    //     },
-    //   },
-    // },
   };
 
   return (
@@ -346,7 +327,6 @@ const ProgressiveSalesChart = ({
     />
   );
 };
-
 // const BranchPerformanceChart = ({ dataColors, series, categories = [] }) => {
 //     let barchartCountriesColors = [];
 //     try {
@@ -694,11 +674,131 @@ const UsersByDeviceCharts = ({ dataColors, series }) => {
   );
 };
 
+const StockPurchasesCharts = ({
+  dataColors,
+  series,
+  categories,
+}) => {
+  const linechartcustomerColors = getChartColorsArray(dataColors);
+
+  const options = {
+    chart: {
+      height: 370,
+      type: "bar",
+      toolbar: {
+        show: false,
+      },
+    },
+
+    plotOptions: {
+      bar: {
+        columnWidth: "50%",
+        borderRadius: 4,
+      },
+    },
+
+    dataLabels: {
+      enabled: false,
+    },
+
+    xaxis: {
+      categories: categories || [],
+      axisTicks: { show: false },
+      axisBorder: { show: false },
+    },
+
+    yaxis: {
+      min: 0,
+      forceNiceScale: true,
+      tickAmount: 5,
+    },
+
+    colors: linechartcustomerColors,
+  };
+
+  return (
+    <ReactApexChart
+      dir="ltr"
+      options={options}
+      series={series}
+      type="bar"
+      height={370}
+      className="apex-charts"
+    />
+  );
+};
+
+const SalesCollectionCharts = ({ dataColors, series, categories }) => {
+  const colors = getChartColorsArray(dataColors);
+
+  const options = {
+    chart: {
+      height: 374,
+      type: "line",
+      stacked: false,
+      toolbar: {
+        show: false,
+      },
+    },
+
+    stroke: {
+      curve: "smooth",
+      width: [0, 0, 3], // only revenue line visible thicker
+    },
+
+    plotOptions: {
+      bar: {
+        columnWidth: "40%",
+      },
+    },
+
+    fill: {
+      opacity: [1, 1, 1],
+    },
+
+    dataLabels: {
+      enabled: false,
+    },
+
+    xaxis: {
+      categories: categories,
+      axisTicks: { show: false },
+      axisBorder: { show: false },
+    },
+
+    yaxis: {
+      min: 0,
+      forceNiceScale: true,
+      tickAmount: 5,
+    },
+
+    legend: {
+      show: true,
+      position: "top",
+    },
+
+    colors,
+  };
+
+  return (
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="line"
+      height={374}
+    />
+  );
+};
+
+
+
 export {
   AudiencesCharts,
   AudiencesSessionsCharts,
-ProgressiveSalesChart,
+  SalesCollectionCharts,
+RevenueExpensesChart,
   MonthToDateSalesChart,
+  StockPurchasesCharts,
   BranchPerformanceChart,
   CountriesCharts,
   UsersByDeviceCharts,

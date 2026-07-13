@@ -138,10 +138,10 @@ const Navdata = () => {
   ]);
 
   const menuItems = [
-    {
-      label: "Menu",
-      isHeader: true,
-    },
+    // {
+    //   label: "Menu",
+    //   isHeader: true,
+    // },
     {
       id: "dashboard",
       label: "Dashboards",
@@ -154,80 +154,54 @@ const Navdata = () => {
         setIscurrentState("Dashboard");
         updateIconSidebar(e);
       },
-      subItems: [
-        {
-          id: "myBusiness",
-          label: "My Business",
-          link: "/dashboard-my-business",
-          parentId: "dashboard",
-        },
-        {
-          id: "sales",
-          label: "Sales",
-          link: "/dashboard",
-          parentId: "dashboard",
-          subItems: [
-            {
-              id: "sales-branch",
-              label: "Branch View",
-              link: "/dashboard-sales",
-                parentId: "sales",
-            },
-          ],
-        },
-        {
-          id: "stock",
-          label: "Inventory/Stock",
-          link: "/dashboard-stock",
-          parentId: "dashboard",
-        },
-        {
-          id: "purchases",
-          label: "Purchases",
-          link: "/dashboard-purchase-orders",
-          parentId: "dashboard",
-          subItems: [
-            {
-              id: "purchase-branch",
-              label: "Branch View",
-              link: "/dashboard-purchase-orders/{branchId}",
-              parentId: "purchases",
-            },
-          ],
-        },
-        // {
-        //   id: "crypto",
-        //   label: "Crypto",
-        //   link: "/dashboard-crypto",
-        //   parentId: "dashboard",
-        // },
-        // {
-        //   id: "projects",
-        //   label: "Branch ",
-        //   link: "/dashboard-projects",
-        //   parentId: "dashboard",
-        // },
-        // {
-        //   id: "nft",
-        //   label: "NFT",
-        //   link: "/dashboard-nft",
-        //   parentId: "dashboard",
-        // },
-        // {
-        //   id: "job",
-        //   label: "Job",
-        //   link: "/dashboard-job",
-        //   parentId: "dashboard",
-        // },
-        // {
-        //   id: "blog",
-        //   label: "Blog",
-        //   link: "/dashboard-blog",
-        //   parentId: "dashboard",
-        //   badgeColor: "success",
-        //   badgeName: "New",
-        // },
-      ],
+subItems: [
+  {
+    id: "myBusiness",
+    label: "My Business",
+    link: "/dashboard-my-business",
+    parentId: "dashboard",
+ icon: "ri-home-4-line",
+  },
+  {
+    id: "sales",
+    label: "Sales",
+    link: "/dashboard",
+    parentId: "dashboard",
+    icon: "ri-bar-chart-fill",
+    // subItems: [
+    //   {
+    //     id: "sales-branch",
+    //     label: "Branch View",
+    //     link: "/dashboard-sales",
+    //     parentId: "sales",
+    //     icon: "ri-bar-chart-grouped-fill",
+    //   },
+    // ],
+  },
+  {
+    id: "stock",
+    label: "Inventory / Stock",
+    link: "/dashboard-stock",
+    parentId: "dashboard",
+    icon: "ri-box-3-line",
+  },
+  {
+    id: "purchases",
+    label: "Purchases",
+    link: "/dashboard-purchase-orders",
+    parentId: "dashboard",
+    icon: "ri-todo-line",
+    // subItems: [
+    //   {
+    //     id: "purchase-branch",
+    //     label: "Branch View",
+    //     link: "/dashboard-purchase-orders/{branchId}",
+    //     parentId: "purchases",
+    //     icon: "ri-file-list-2-fill",
+    //   },
+    // ],
+  },
+]
     },
     // {
     //   id: "apps",

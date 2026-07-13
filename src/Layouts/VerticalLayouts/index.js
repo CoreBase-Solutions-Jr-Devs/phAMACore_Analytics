@@ -186,9 +186,10 @@ const VerticalLayout = (props) => {
                                                             <li className="nav-item">
                                                                 <Link
                                                                     to={subItem.link ? subItem.link : "/#"}
-                                                                    className="nav-link"
+                                                                   className="nav-link d-flex align-items-center gap-2"
                                                                 >
-                                                                    {props.t(subItem.label)}
+                                                                      {subItem.icon && <i className={subItem.icon}></i>}
+                                                                   <span> {props.t(subItem.label)}</span>
                                                                     {subItem.badgeName ?
                                                                         <span className={"badge badge-pill bg-" + subItem.badgeColor} data-key="t-new">{subItem.badgeName}</span>
                                                                         : null}
