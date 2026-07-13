@@ -135,6 +135,16 @@ const StockInventorySlice = createSlice({
           break;
         }
 
+        case "Last Year": {
+          const today = new Date();
+          const start = new Date(today.getFullYear() - 1, 0, 1);
+          const end = new Date(today.getFullYear() - 1, 11, 31);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
+
         case "Custom":
           break;
 

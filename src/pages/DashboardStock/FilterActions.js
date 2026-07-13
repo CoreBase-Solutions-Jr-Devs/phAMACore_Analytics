@@ -14,7 +14,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
         filters: { branch, dateRange, startDate, endDate },
     } = useSelector((state) => state.StockInventory);
 
-    const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Last Week", "This Week", "This Month", "Last Month", "This Year", "Custom"];
+    const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Last Week", "This Week", "This Month", "Last Month", "This Year", "Last Year", "Custom"];
 
     const handleDateChange = (type, selectedDates) => {
         if (!selectedDates?.length) return;
