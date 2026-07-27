@@ -1,19 +1,17 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { Row, Col, Alert, Card, CardBody, Container, FormFeedback, Input, Label, Form } from "reactstrap";
-
+import phamacoreCloud from "../../assets/images/phamacore-cloud.jpg";
 //redux
 import { useSelector, useDispatch } from "react-redux";
-
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import withRouter from "../../Components/Common/withRouter";
-
 // Formik Validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // action
-import { userForgetPassword } from "../../slices/thunks";
+import { forgotPassword } from "../../slices/auth/forgetpwd/thunk";
 
 // import images
 // import profile from "../../assets/images/bg.png";
@@ -23,80 +21,66 @@ import { createSelector } from "reselect";
 
 const ForgetPasswordPage = props => {
   const dispatch = useDispatch();
-
+ const navigate = useNavigate();
   const validation = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
-    initialValues: {
-      email: '',
-    },
-    validationSchema: Yup.object({
-      email: Yup.string().required("Please Enter Your Email"),
-    }),
+  initialValues: {
+  identifier: "",
+},
+ validationSchema: Yup.object({
+  identifier: Yup.string().required("Please enter Customer ID"),
+}),
     onSubmit: (values) => {
-      dispatch(userForgetPassword(values, props.history));
+      dispatch(forgotPassword({ identifier: values.identifier }));
     }
   });
 
 
-  const selectLayoutState = (state) => state.ForgetPassword;
-  const selectLayoutProperties = createSelector(
-    selectLayoutState,
-    (state) => ({
-      forgetError: state.forgetError,
-      forgetSuccessMsg: state.forgetSuccessMsg,
-    })
-  );
-  // Inside your component
-  const {
-    forgetError, forgetSuccessMsg
-  } = useSelector(selectLayoutProperties);
+const selectForgotPasswordState = (state) => state.forgotpwd;
+
+const selectForgotPasswordProperties = createSelector(
+  selectForgotPasswordState,
+  (state) => ({
+    loading: state.loading,
+    forgetError: state.forgetError,
+    forgetSuccessMsg: state.forgetSuccessMsg,
+    forgetPasswordResponse: state.forgetPasswordResponse,
+  })
+);
+
+const {
+  loading,
+  forgetError,
+  forgetSuccessMsg,
+  forgetPasswordResponse,
+} = useSelector(selectForgotPasswordProperties);
 
   document.title = "Reset Password | Velzon - React Admin & Dashboard Template";
   return (
     <ParticlesAuth>
-      <div className="auth-page-content mt-lg-5">
-
+      <div className="auth-page-content py-5">
         <Container>
-          <Row>
-            <Col lg={12}>
-              <div className="text-center mt-sm-5 mb-4 text-white-50">
-                <div>
-                  <Link to="/" className="d-inline-block auth-logo">
-                    <img src={logoLight} alt="" height="20" />
-                  </Link>
-                </div>
-                <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
-              </div>
-            </Col>
-          </Row>
-
           <Row className="justify-content-center">
             <Col md={8} lg={6} xl={5}>
-              <Card className="mt-4">
-
-                <CardBody className="p-4">
-                  <div className="text-center mt-2">
-                    <h5 className="text-primary">Forgot Password?</h5>
-                    <p className="text-muted">Reset password with velzon</p>
-
-                    <lord-icon
-                      src="https://cdn.lordicon.com/rhvddzym.json"
-                      trigger="loop"
-                      colors="primary:#0ab39c"
-                      className="avatar-xl"
-                      style={{ width: "120px", height: "120px" }}
-                    >
-                    </lord-icon>
-
+              <Card className=" shadow-sm p-2">
+                <CardBody >
+                  <div className="text-center ">
+                         <Link to="/" className="d-block auth-logo">
+                            <img
+                              src={phamacoreCloud}
+                              alt="phAMACore"
+                              style={{ height: "80px" }}
+                            />
+                          </Link>
+                    <h5 className="fw-medium mb-2">Forgot Password</h5>
                   </div>
 
                   <Alert className="border-0 alert-warning text-center mb-2 mx-2" role="alert">
-                    Enter your email and instructions will be sent to you!
-                  </Alert>
+Enter your Customer ID to receive your new password                  </Alert>
                   <div className="p-2">
-                    {forgetError && forgetError ? (
+                    {forgetError  ? (
                       <Alert color="danger" style={{ marginTop: "13px" }}>
                         {forgetError}
                       </Alert>
@@ -114,35 +98,54 @@ const ForgetPasswordPage = props => {
                       }}
                     >
                       <div className="mb-4">
-                        <Label className="form-label">Email</Label>
-                        <Input
-                          name="email"
-                          className="form-control"
-                          placeholder="Enter email"
-                          type="email"
-                          onChange={validation.handleChange}
-                          onBlur={validation.handleBlur}
-                          value={validation.values.email || ""}
-                          invalid={
-                            validation.touched.email && validation.errors.email ? true : false
-                          }
-                        />
-                        {validation.touched.email && validation.errors.email ? (
-                          <FormFeedback type="invalid"><div>{validation.errors.email}</div></FormFeedback>
-                        ) : null}
+                        <Label className="form-label">Customer ID</Label>
+                    <Input
+  name="identifier"
+  className="form-control"
+  placeholder="Enter Customer ID"
+  type="text"
+  onChange={validation.handleChange}
+  onBlur={validation.handleBlur}
+  value={validation.values.identifier}
+  invalid={
+    validation.touched.identifier &&
+    !!validation.errors.identifier
+  }
+/>
+
+{validation.touched.identifier &&
+validation.errors.identifier ? (
+  <FormFeedback>
+    {validation.errors.identifier}
+  </FormFeedback>
+) : null}
+                  
                       </div>
 
-                      <div className="text-center mt-4">
-                        <button className="btn btn-success w-100" type="submit">Send Reset Link</button>
+                     <div className="d-flex gap-2 mt-4">
+<button
+  className="btn btn-success w-100"
+  type="submit"
+  disabled={loading}
+>
+  {loading ? "Sending..." : "Send Reset Link"}
+</button>                
+<button
+  className="btn btn-outline-danger w-100"
+  type="button"
+  onClick={() => navigate("/login")}
+>
+  Cancel
+</button>
                       </div>
                     </Form>
                   </div>
                 </CardBody>
               </Card>
 
-              <div className="mt-4 text-center">
+              {/* <div className="mt-4 text-center">
                 <p className="mb-0">Wait, I remember my password... <Link to="/login" className="fw-semibold text-primary text-decoration-underline"> Click here </Link> </p>
-              </div>
+              </div> */}
 
             </Col>
           </Row>

@@ -1,42 +1,37 @@
-import { userForgetPasswordSuccess, userForgetPasswordError } from "./reducer"
-
-//Include Both Helper File with needed methods
-import { getFirebaseBackend } from "../../../helpers/firebase_helper";
-
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 import {
-  postFakeForgetPwd,
-  postJwtForgetPwd,
+  forgotPasswordAPI,
 } from "../../../helpers/fakebackend_helper";
 
-const fireBaseBackend = getFirebaseBackend();
+export const forgotPassword = createAsyncThunk(
+  "forgetpwd/forgotPassword",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await forgotPasswordAPI(data);
 
-export const userForgetPassword = (user, history) => async (dispatch) => {
-  try {
-      let response;
-      if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
+      toast.success(
+        response?.data?.detail ||
+          response?.data?.message ||
+          "Password reset link sent successfully.",
+        {
+          autoClose: 3000,
+        }
+      );
 
-          response = fireBaseBackend.forgetPassword(
-              user.email
-          )
+      return response.data;
+    } catch (error) {
+      const message =
+        error?.response?.data?.detail ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to send reset link.";
 
-      } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
-          response = postJwtForgetPwd(
-              user.email
-          )
-      } else {
-          response = postFakeForgetPwd(
-              user.email
-          )
-      }
+      toast.error(message, {
+        autoClose: 3000,
+      });
 
-      const data = await response;
-
-      if (data) {
-          dispatch(userForgetPasswordSuccess(
-              "Reset link are sended to your mailbox, check there first"
-          ))
-      }
-  } catch (forgetError) {
-      dispatch(userForgetPasswordError(forgetError))
+      return rejectWithValue(message);
+    }
   }
-}
+);
