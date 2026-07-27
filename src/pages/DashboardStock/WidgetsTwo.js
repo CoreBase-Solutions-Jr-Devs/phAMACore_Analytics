@@ -21,12 +21,15 @@ const WidgetsTwo = () => {
         let days61to90 = 0;
 
         const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const msPerDay = 1000 * 60 * 60 * 24;
 
         batchExpiryNeo.forEach((item) => {
             if (!item.expirydate) return;
 
             const expiryDate = new Date(item.expirydate);
+            expiryDate.setHours(0, 0, 0, 0);
+
             const daysToExpiry = Math.ceil((expiryDate - today) / msPerDay);
 
             if (daysToExpiry < 0 || daysToExpiry > 90) return;
