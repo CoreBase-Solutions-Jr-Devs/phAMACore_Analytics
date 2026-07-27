@@ -12,6 +12,7 @@ import {
   FormFeedback,
   Alert,
   Spinner,
+  CardTitle,
 } from "reactstrap";
 import ParticlesAuth from "../AuthenticationInner/ParticlesAuth";
 // import { loginUserAPI } from "../../helpers/url_helper";
@@ -25,7 +26,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // actions
-import { loginUser, socialLogin, resetLoginFlag } from "../../slices/thunks";
+import { loginUser } from "../../slices/auth/login/thunk";
 import phamacoreCloud from "../../assets/images/phamacore-cloud.jpg";
 // import logoLight from "../../assets/images/logo-light.png";
 import { createSelector } from "reselect";
@@ -45,7 +46,7 @@ const Login = (props) => {
   // Inside your component
   const { user, error, loading, errorMsg } = useSelector(loginpageData);
 
-const [userLogin, setUserLogin] = useState({});
+  const [userLogin, setUserLogin] = useState({});
   const [passwordShow, setPasswordShow] = useState(false);
 
   useEffect(() => {
@@ -69,32 +70,34 @@ const [userLogin, setUserLogin] = useState({});
     // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
-initialValues: {
-  username: userLogin.username || "",
-  password: userLogin.password || "",
-},
+    initialValues: {
+      username: userLogin.username || "",
+      password: userLogin.password || "",
+    },
     validationSchema: Yup.object({
       username: Yup.string().required("Please Enter Your Username"),
       password: Yup.string().required("Please Enter Your Password"),
     }),
 
-onSubmit: async (values) => {
-  const fakeUser = {
-    username: values.username,
-    email: "admin@themesbrand.com",
-    token: "fake-jwt-token",
+ onSubmit: async (values) => {
+  const payload = {
+    user: {
+      cusCode: values.username,
+      password: values.password,
+    },
   };
 
-  // store user like real login
-  sessionStorage.setItem("authUser", JSON.stringify(fakeUser));
+  try {
+    const authUser = await dispatch(loginUser(payload)).unwrap();
 
-  // dispatch fake success into redux (if you want state updated)
-  dispatch({
-    type: "login/success",
-    payload: fakeUser,
-  });
-
-  navigate("/dashboard");
+    if (authUser.requirePasswordChange) {
+      navigate("/change-password");
+    } else {
+      navigate("/dashboard-my-business");
+    }
+  } catch (error) {
+    console.error(error);
+  }
 },
   });
 
@@ -120,38 +123,32 @@ onSubmit: async (values) => {
   document.title = "Login | phAMACore Analytics - Admin Dashboards";
   return (
     <React.Fragment>
-      <ParticlesAuth>
-        <div className="auth-page-content mt-lg-5">
-          <Container>
-            <Row>
-              <Col lg={12}>
-                <div className="text-center mt-sm-5 mb-4 text-white-50">
-                  <div>
-                    <Link to="/" className="w-100 auth-logo">
-                      <img src={phamacoreCloud} alt="" height="100" />
-                    </Link>
-                  </div>
-                  {/* <p className="mt-3 fs-15 fw-medium">
-                    Premium Admin & Dashboard Template
-                  </p> */}
-                </div>
-              </Col>
-            </Row>
+ <ParticlesAuth>
+  <div className="auth-page-content py-5">
+    <Container >
+      <Row className="justify-content-center">
+      <Col md={8} lg={6} xl={5}>
+      <Card className="shadow-sm p-2">
+  <CardBody >
+    <div className="text-center ">
+      <Link to="/" className="d-block auth-logo">
+        <img
+          src={phamacoreCloud}
+          alt="phAMACore"
+          style={{ height: "80px" }}
+        />
+      </Link>
 
-            <Row className="justify-content-center">
-              <Col md={8} lg={6} xl={5}>
-                <Card className="mt-4">
-                  <CardBody className="p-4">
-                    <div className="text-center mt-2">
-                      <h5 className="text-primary">Welcome Back !</h5>
-                      <p className="text-muted">
-                        Please enter your credentials to sign in!
-                      </p>
-                    </div>
+      <h5 className="fw-medium mb-2">Welcome Back!</h5>
+
+      <p className="text-muted mb-0">
+        Please enter your credentials to sign in!
+      </p>
+    </div>
                     {error && error ? (
                       <Alert color="danger"> {error} </Alert>
                     ) : null}
-                    <div className="p-2 mt-4">
+                    <div className="p-2 ">
                       <Form
                         onSubmit={(e) => {
                           e.preventDefault();
@@ -162,7 +159,7 @@ onSubmit: async (values) => {
                       >
                         <div className="mb-3">
                           <Label htmlFor="username" className="form-label">
-                            Username
+                            Customer ID
                           </Label>
                           <Input
                             name="username"
@@ -267,7 +264,19 @@ onSubmit: async (values) => {
                           </Button>
                         </div>
 
-                        <div className="mt-4 text-center">
+                        {/* <div className="mt-4 text-center">
+                          <p className="mb-0">
+                            Don't have an account ?{" "}
+                            <Link
+                              to="/register"
+                              className="fw-semibold text-caramel text-decoration-underline"
+                            >
+                              {" "}
+                              Signup{" "}
+                            </Link>{" "}
+                          </p>
+                        </div> */}
+                        {/* <div className="mt-4 text-center">
                           <div className="signin-other-title">
                             <h5 className="fs-13 mb-4 title">Sign In with</h5>
                           </div>
@@ -299,24 +308,11 @@ onSubmit: async (values) => {
                               <i className="ri-twitter-fill fs-16"></i>
                             </Button>
                           </div>
-                        </div>
+                        </div> */}
                       </Form>
                     </div>
                   </CardBody>
                 </Card>
-
-                <div className="mt-4 text-center">
-                  <p className="mb-0">
-                    Don't have an account ?{" "}
-                    <Link
-                      to="/register"
-                      className="fw-semibold text-caramel text-decoration-underline"
-                    >
-                      {" "}
-                      Signup{" "}
-                    </Link>{" "}
-                  </p>
-                </div>
               </Col>
             </Row>
           </Container>

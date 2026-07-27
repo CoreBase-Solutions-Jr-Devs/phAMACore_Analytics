@@ -1,49 +1,59 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { loginUser, logoutUser, forgotPassword } from "./thunk";
 
-export const initialState = {
-  user: {},
-  error: "", // for error message
+const initialState = {
+  user: null,
   loading: false,
+  error: null,
   isUserLogout: false,
-  errorMsg: false, // for error
+ 
 };
 
 const loginSlice = createSlice({
   name: "login",
   initialState,
   reducers: {
-  apiError(state, action) {
-  state.error = action.payload.data;
-  state.loading = false;
-  state.isUserLogout = false;
-  state.errorMsg = true;
-},
-loginStart(state) {
+    reset_login_flag: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // LOGIN
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // LOGOUT
+    .addCase(logoutUser.pending, (state) => {
   state.loading = true;
-  state.error = null;
-},
-    loginSuccess(state, action) {
-      state.user = action.payload
-      state.loading = false;
-      state.errorMsg = false;
-    },
-    logoutUserSuccess(state, action) {
-      state.isUserLogout = true
-    },
-    reset_login_flag(state) {
-      state.error = null
-      state.loading = false;
-      state.errorMsg = false;
-    }
+})
+
+.addCase(logoutUser.fulfilled, (state) => {
+  state.loading = false;
+  state.user = null;
+  state.isUserLogout = true;
+})
+
+.addCase(logoutUser.rejected, (state, action) => {
+  state.loading = false;
+  state.user = null;
+  state.error = action.payload;
+})
+
+
   },
 });
 
-export const {
-  apiError,
-    loginStart,
-  loginSuccess,
-  logoutUserSuccess,
-  reset_login_flag
-} = loginSlice.actions
+export const { reset_login_flag } = loginSlice.actions;
 
 export default loginSlice.reducer;

@@ -1,96 +1,70 @@
-//Include Both Helper File with needed methods
-import { getFirebaseBackend } from "../../../helpers/firebase_helper";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 import {
-  postFakeLogin,
-  postJwtLogin,
-  postSocialLogin,
+  loginUserAPI,
+  logoutUserAPI,
+  
 } from "../../../helpers/fakebackend_helper";
 import { setAuthorization } from "../../../helpers/api_helper";
-import { loginStart,loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
-import { loginUserAPI, logoutUserAPI  } from "../../../helpers/url_helper";
 
-export const loginUser = (user, navigate) => async (dispatch) => {
-  try {
+export const loginUser = createAsyncThunk(
+  "login/loginUser",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await loginUserAPI(data);
 
-    // ❌ COMMENT THIS OUT
-    // const response = await AuthAPI.post("/Auth", user);
+      const authUser = response.data.response;
 
-    // ✅ FAKE RESPONSE
-    const response = {
-      data: {
-        user: {
-          username: user.username,
-          token: "fake-token",
-        },
-      },
-    };
+      sessionStorage.setItem(
+        "authUser",
+        JSON.stringify(authUser)
+      );
 
-    sessionStorage.setItem(
-      "authUser",
-      JSON.stringify(response.data.user)
-    );
+      setAuthorization(authUser.token);
 
-    dispatch(loginSuccess(response.data.user));
+      return authUser;
+    } catch (error) {
+      toast.error(error?.response?.data?.detail || error.message, {
+        autoClose: 3000,
+      });
 
-    navigate("/dashboard-my-business");
-
-  } catch (error) {
-    dispatch(apiError(error));
-  }
-};
-
-export const logoutUser = () => async (dispatch) => {
-  try {
-    const token = JSON.parse(sessionStorage.getItem("authUser"))?.token;
-
-    if (token) {
-      await logoutUserAPI(token); // only call if token exists
+      return rejectWithValue(
+        error?.response?.data?.detail || error.message
+      );
     }
-
-    sessionStorage.removeItem("authUser");
-    setAuthorization(null);
-
-    dispatch(logoutUserSuccess(true));
-
-  } catch (error) {
-    console.log("LOGOUT ERROR:", error);
-
-    sessionStorage.removeItem("authUser");
-    setAuthorization(null);
-
-    dispatch(logoutUserSuccess(true));
   }
-};
+);
 
-export const socialLogin = (type, history) => async (dispatch) => {
-  try {
-    let response;
+export const logoutUser = createAsyncThunk(
+  "login/logoutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const authUser = JSON.parse(
+        sessionStorage.getItem("authUser")
+      );
 
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      const fireBaseBackend = getFirebaseBackend();
-      response = fireBaseBackend.socialLoginUser(type);
+      const token = authUser?.token;
+
+      if (token) {
+        await logoutUserAPI(token);
+      }
+
+      sessionStorage.removeItem("authUser");
+      setAuthorization(null);
+
+      return true;
+
+    } catch (error) {
+      // Even if API fails, clear local session
+      sessionStorage.removeItem("authUser");
+      setAuthorization(null);
+
+      return rejectWithValue(
+        error?.response?.data?.detail ||
+        error.message ||
+        "Logout failed"
+      );
     }
-    //  else {
-      //   response = postSocialLogin(data);
-      // }
-      
-      const socialdata = await response;
-    if (socialdata) {
-      sessionStorage.setItem("authUser", JSON.stringify(response));
-      dispatch(loginSuccess(response));
-      history('/dashboard')
-    }
-
-  } catch (error) {
-    dispatch(apiError(error));
   }
-};
+);
 
-export const resetLoginFlag = () => async (dispatch) => {
-  try {
-    const response = dispatch(reset_login_flag());
-    return response;
-  } catch (error) {
-    dispatch(apiError(error));
-  }
-};
