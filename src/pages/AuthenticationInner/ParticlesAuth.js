@@ -4,7 +4,7 @@ import withRouter from '../../Components/Common/withRouter';
 const ParticlesAuth = ({ children }) => {
     return (
         <React.Fragment>
-            <div className="auth-page-wrapper pt-5">
+            <div className="auth-page-wrapper ">
                 <div className="auth-one-bg-position auth-one-bg" id="auth-particles">
 
                     <div className="bg-overlay"></div>
