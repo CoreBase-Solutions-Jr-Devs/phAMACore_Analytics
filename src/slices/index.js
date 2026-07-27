@@ -81,7 +81,7 @@ const rootReducer = combineReducers({
     Layout: LayoutReducer,
     Login: LoginReducer,
     Account: AccountReducer,
-    ForgetPassword: ForgetPasswordReducer,
+    forgotpwd: ForgetPasswordReducer,
     Profile: ProfileReducer,
     Calendar: CalendarReducer,
     Chat: chatReducer,
