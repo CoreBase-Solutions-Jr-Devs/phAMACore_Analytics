@@ -1,163 +1,247 @@
 import axios from "axios";
 import { api } from "../config";
 
-// default
-axios.defaults.baseURL = api.API_URL;
-const AuthAPI = axios.create({
+// ============================
+// Axios Instances
+// ============================
+
+export const API = axios.create({
+  baseURL: api.API_URL,
+});
+
+export const AuthAPI = axios.create({
   baseURL: api.AUTH_API_URL,
 });
 
-const PowerBIAPI = axios.create({
+export const PowerBIAPI = axios.create({
   baseURL: api.POWERBI_API_URL,
 });
 
-// content type
-axios.defaults.headers.post["Content-Type"] = "application/json";
-
-axios.interceptors.request.use((config) => {
-  const user = JSON.parse(sessionStorage.getItem("authUser"));
-  const token = user?.token;
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  const accessKey = process.env.REACT_APP_AUTH_ACCESS_KEY;
-
-  if (accessKey) {
-    config.headers.accesskey = accessKey;
-  }
-
-  return config;
+export const LogoutAPI = axios.create({
+  baseURL: api.LOGOUT_API_URL,
 });
 
-AuthAPI.interceptors.request.use((config) => {
-  const user = JSON.parse(sessionStorage.getItem("authUser"));
-  const token = user?.token;
+// ============================
+// Logged In User
+// ============================
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+export const getLoggedinUser = () => {
+  const user = sessionStorage.getItem("authUser");
+  return user ? JSON.parse(user) : null;
+};
 
-  return config;
-});
+// ============================
+// API
+// ============================
 
-PowerBIAPI.interceptors.request.use((config) => {
-  const user = JSON.parse(sessionStorage.getItem("authUser"));
-  const token = user?.token;
+API.interceptors.request.use(
+  (config) => {
+    const token = getLoggedinUser()?.token;
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  const accessKey = process.env.REACT_APP_POWERBI_ACCESSKEY;
-
-  if (accessKey) {
-    config.headers.accesskey = accessKey;
-  }
-console.log("POWERBI ACCESS KEY:", accessKey);
-  return config;
-});
-// content type
-// const token = JSON.parse(sessionStorage.getItem("authUser")) ? JSON.parse(sessionStorage.getItem("authUser")).token : null;
-// if (token)
-//   axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-
-// intercepting to capture errors
-axios.interceptors.response.use(
-  function (response) {
-    return response.data ? response.data : response;
-  },
-  function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    let message;
-    switch (error.status) {
-      case 500:
-        message = "Internal Server Error";
-        break;
-      case 401:
-        message = "Invalid credentials";
-        break;
-      case 404:
-        message = "Sorry! the data you are looking for could not be found";
-        break;
-      default:
-        message = error.message || error;
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return Promise.reject(message);
+
+    config.headers["Content-Type"] = "application/json";
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const { response } = error;
+
+    if (response) {
+      const { data, status } = response;
+
+      if (status === 401) {
+        sessionStorage.removeItem("authUser");
+        window.location.href = "/";
+      }
+
+      return Promise.reject(data);
+    }
+
+    return Promise.reject({
+      message: "Network error or server did not respond.",
+    });
   }
 );
-/**
- * Sets the default authorization
- * @param {*} token
- */
-export const setAuthorization = (token) => {
-  if (token) {
-    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-    AuthAPI.defaults.headers.common["Authorization"] = "Bearer " + token;
-  } else {
-    delete axios.defaults.headers.common["Authorization"];
-    delete AuthAPI.defaults.headers.common["Authorization"];
-  }
-};
 
-class APIClient {
-  /**
-   * Fetches data from given url
-   */
+// ============================
+// AUTH API
+// ============================
 
-  //  get = (url, params) => {
-  //   return axios.get(url, params);
-  // };
-  get = (url, params) => {
-    let response;
 
-    let paramKeys = [];
+AuthAPI.interceptors.request.use(
+  (config) => {
+    const token = getLoggedinUser()?.token;
 
-    if (params) {
-      Object.keys(params).map(key => {
-        paramKeys.push(key + '=' + params[key]);
-        return paramKeys;
-      });
-
-      const queryString = paramKeys && paramKeys.length ? paramKeys.join('&') : "";
-      response = axios.get(`${url}?${queryString}`, params);
-    } else {
-      response = axios.get(`${url}`, params);
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
-    return response;
-  };
-  /**
-   * post given data to url
-   */
-  create = (url, data) => {
-    return axios.post(url, data);
-  };
-  /**
-   * Updates data
-   */
-  update = (url, data) => {
-    return axios.patch(url, data);
-  };
+    config.headers["Content-Type"] = "application/json";
 
-  put = (url, data) => {
-    return axios.put(url, data);
-  };
-  /**
-   * Delete
-   */
-  delete = (url, config) => {
-    return axios.delete(url, { ...config });
-  };
+    const accessKey = process.env.REACT_APP_AUTH_APIKEY;
+
+    if (accessKey) {
+      config.headers.accesskey = accessKey;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+AuthAPI.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const { response } = error;
+
+    if (response) {
+      const { data, status } = response;
+
+      if (status === 401) {
+        sessionStorage.removeItem("authUser");
+      }
+
+      return Promise.reject(data);
+    }
+
+   console.log("Axios Error:", error);
+console.log("Response:", error.response);
+console.log("Request:", error.request);
+
+if (error.response) {
+  return Promise.reject(error.response.data);
 }
-const getLoggedinUser = () => {
-const user = sessionStorage.getItem("authUser");
-  if (!user) {
-    return null;
+
+return Promise.reject({
+  message: error.message,
+});
+  }
+);
+
+// ============================
+// POWER BI API
+// ============================
+
+PowerBIAPI.interceptors.request.use(
+  (config) => {
+    const token = getLoggedinUser()?.token;
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    config.headers["Content-Type"] = "application/json";
+
+    const accessKey = process.env.REACT_APP_POWERBI_ACCESSKEY;
+
+    if (accessKey) {
+      config.headers.accesskey = accessKey;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+PowerBIAPI.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const { response } = error;
+
+    if (response) {
+      return Promise.reject(response.data);
+    }
+
+    return Promise.reject({
+      message: "Network error or server did not respond.",
+    });
+  }
+);
+
+// ============================
+// LOGOUT API
+// ============================
+
+LogoutAPI.interceptors.request.use(
+  (config) => {
+    const token = getLoggedinUser()?.token;
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    config.headers["Content-Type"] = "application/json";
+
+    const accessKey = process.env.REACT_APP_LOGOUT_ACCESS_KEY;
+
+    if (accessKey) {
+      config.headers.accesskey = accessKey;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+LogoutAPI.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const { response } = error;
+
+    if (response) {
+      return Promise.reject(response.data);
+    }
+
+    return Promise.reject({
+      message: "Network error or server did not respond.",
+    });
+  }
+);
+
+// ============================
+// Authorization
+// ============================
+
+export const setAuthorization = (token) => {
+  if (token) {
+    API.defaults.headers.common.Authorization = `Bearer ${token}`;
+    AuthAPI.defaults.headers.common.Authorization = `Bearer ${token}`;
+    PowerBIAPI.defaults.headers.common.Authorization = `Bearer ${token}`;
+    LogoutAPI.defaults.headers.common.Authorization = `Bearer ${token}`;
   } else {
-    return JSON.parse(user);
+    delete API.defaults.headers.common.Authorization;
+    delete AuthAPI.defaults.headers.common.Authorization;
+    delete PowerBIAPI.defaults.headers.common.Authorization;
+    delete LogoutAPI.defaults.headers.common.Authorization;
   }
 };
 
-export { APIClient, AuthAPI, PowerBIAPI, getLoggedinUser };
+// ============================
+// Generic API Client
+// ============================
+
+class APIClient {
+  get = (url, config) => API.get(url, config);
+
+  create = (url, data) => API.post(url, data);
+
+  update = (url, data) => API.patch(url, data);
+
+  put = (url, data) => API.put(url, data);
+
+  delete = (url, config) => API.delete(url, config);
+}
+
+export { APIClient };

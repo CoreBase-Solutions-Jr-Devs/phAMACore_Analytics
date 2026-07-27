@@ -1,4 +1,4 @@
-import { AuthAPI, PowerBIAPI } from "./api_helper";
+import { AuthAPI, PowerBIAPI, LogoutAPI  } from "./api_helper";
 
 //REGISTER
 export const POST_FAKE_REGISTER = "/auth/signup";
@@ -10,10 +10,10 @@ export const POST_FAKE_PASSWORD_FORGET = "/auth/forgot-password";
 export const POST_FAKE_JWT_PASSWORD_FORGET = "/jwt-forget-pwd";
 export const SOCIAL_LOGIN = "/social-login";
 
-export const loginUserAPI = (data) => {
-  return AuthAPI.post("/Auth", data);
-};
+// CURRENT LOGIN
+export const POST_LOGIN = "/auth/login";
 
+export const POST_FORGOT_PASSWORD = "/auth/reset-token";
 // Power BI APIs
 export const GET_POWERBI_SALES =
   "/api/PowerBi/PowerBISalesTransactions";
@@ -37,9 +37,7 @@ export const GET_POWERBI_BATCH_EXPIRY_NEO =
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
 export const POST_EDIT_PROFILE = "/user";
 
-export const logoutUserAPI = () => {
-  return AuthAPI.post("/Auth/Logout");
-};
+export const POST_LOGOUT = "/Auth/Logout";
 
 // Calendar
 export const GET_EVENTS = "/events";

@@ -1,24 +1,39 @@
-import { APIClient, PowerBIAPI } from "./api_helper";
-
+import {
+  APIClient,
+  AuthAPI,
+  PowerBIAPI,
+  LogoutAPI,
+  getLoggedinUser,
+} from "./api_helper";
 import * as url from "./url_helper";
 
 const api = new APIClient();
+// const authApi = new AuthAPI();
 // const powerBIApi = new PowerBIAPI();
 
-// Gets the logged in user data from local session
 export const getLoggedInUser = () => {
-  const user = localStorage.getItem("user");
-  if (user) return JSON.parse(user);
-  return null;
+  return getLoggedinUser();
 };
 
 // //is user is logged in
 export const isUserAuthenticated = () => {
   return getLoggedInUser() !== null;
 };
+// Login APIs
+export const loginUserAPI = (data) => {
+  return AuthAPI.post(url.POST_LOGIN, data);
+};
+
+export const logoutUserAPI = () => {
+  return PowerBIAPI.post(url.POST_LOGOUT, );
+};
+
+export const forgotPasswordAPI = (data) => {
+  return AuthAPI.post(url.POST_FORGOT_PASSWORD, data);
+};
+
 
 // Power BI APIs
-
 export const getSalesTransactions = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
 export const getMonthlySales = (params) =>
