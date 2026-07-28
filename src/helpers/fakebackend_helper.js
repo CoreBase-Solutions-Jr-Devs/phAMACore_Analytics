@@ -2,7 +2,7 @@ import {
   APIClient,
   AuthAPI,
   PowerBIAPI,
-  LogoutAPI,
+  // LogoutAPI,
   getLoggedinUser,
 } from "./api_helper";
 import * as url from "./url_helper";
@@ -40,9 +40,9 @@ export const profileAPI = (data) => {
   return AuthAPI.put(url.PUT_PROFILE, data);
 };
 
-export const logoutUserAPI = () => {
-  return LogoutAPI.post(url.POST_LOGOUT, );
-};
+// export const logoutUserAPI = () => {
+//   return LogoutAPI.post(url.POST_LOGOUT, );
+// };
 
 export const forgotPasswordAPI = (data) => {
   return AuthAPI.post(url.POST_FORGOT_PASSWORD, data);
