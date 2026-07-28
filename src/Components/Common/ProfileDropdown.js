@@ -22,7 +22,7 @@ const { user } = useSelector((state) => state.Profile || {});
     const [userName, setUserName] = useState("Admin");
 
 useEffect(() => {
-    const storedUser = sessionStorage.getItem("authUser");
+    const storedUser = localStorage.getItem("authUser");
 
     let parsedUser = null;
     try {

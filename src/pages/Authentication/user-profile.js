@@ -54,7 +54,7 @@ const UserProfile = () => {
 
 
 useEffect(() => {
-  const stored = sessionStorage.getItem("authUser");
+  const stored = localStorage.getItem("authUser");
 
   if (!stored) return;
 

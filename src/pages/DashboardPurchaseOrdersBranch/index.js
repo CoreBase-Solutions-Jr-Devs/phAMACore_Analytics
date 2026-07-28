@@ -15,7 +15,7 @@ import TopSellers from "./TopSellers";
 import SupplierSpend from "./SupplierSpend";
 import SupplierSpendBottom from "./SupplierSpendBottom";
 
-import FilterActions from "./FilterActions";
+import FilterActions from "../DashboardPurchaseOrders/FilterActions";
 import { getPurchaseOrders, getActualSpend, getDailySpend  } from "../../slices/dashboardPurchase/thunk";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
 import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
@@ -49,12 +49,13 @@ const handleApplyFilters = () => {
   );
 
   if (branch) {
-    navigate(`/dashboard-purchase-orders/${branch}`);
-  } else {
-    navigate("/dashboard-purchase-orders");
-  }
-};
-  
+    //  dispatch(clearSalesData()); 
+  navigate(`/dashboard-purchase-orders/${branch}`);
+} else {
+    //  dispatch(clearSalesData()); 
+  navigate("/dashboard-purchase-orders");
+}
+  };
   useEffect(() => {
     //  dispatch(clearPurchaseOrdersData()); 
     dispatch(
@@ -87,6 +88,7 @@ const handleApplyFilters = () => {
                 branchcode: filters.branch ?? null,
               })
             );
+            
   }, []);
 
   const branchMap = useMemo(() => {

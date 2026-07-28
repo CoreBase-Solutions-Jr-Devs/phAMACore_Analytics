@@ -1,5 +1,8 @@
 import { AuthAPI, PowerBIAPI, LogoutAPI  } from "./api_helper";
 
+import { setAuthorization } from "./api_helper";
+
+
 //REGISTER
 export const POST_FAKE_REGISTER = "/auth/signup";
 
@@ -15,6 +18,7 @@ export const SOCIAL_LOGIN = "/social-login";
 
 // CURRENT LOGIN
 export const POST_LOGIN = "/auth/login";
+export const PUT_PROFILE = "/auth/profile";
 
 export const POST_FORGOT_PASSWORD = "/auth/reset-token";
 // Power BI APIs
