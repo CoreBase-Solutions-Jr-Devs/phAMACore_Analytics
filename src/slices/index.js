@@ -7,6 +7,8 @@ import LayoutReducer from "./layouts/reducer";
 import LoginReducer from "./auth/login/reducer";
 import AccountReducer from "./auth/register/reducer";
 import ForgetPasswordReducer from "./auth/forgetpwd/reducer";
+import ChangePasswordReducer from "./auth/changepassword/reducer";
+import ResetPasswordReducer from "./auth/resetpassword/reducer";
 import ProfileReducer from "./auth/profile/reducer";
 
 //Calendar
@@ -82,6 +84,8 @@ const rootReducer = combineReducers({
     Login: LoginReducer,
     Account: AccountReducer,
     forgotpwd: ForgetPasswordReducer,
+    ChangePassword: ChangePasswordReducer,
+    ResetPassword: ResetPasswordReducer,
     Profile: ProfileReducer,
     Calendar: CalendarReducer,
     Chat: chatReducer,

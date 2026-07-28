@@ -24,6 +24,18 @@ export const loginUserAPI = (data) => {
   return AuthAPI.post(url.POST_LOGIN, data);
 };
 
+export const changePasswordAPI = (data) => {
+  return AuthAPI.post(url.POST_CHANGE_PASSWORD, data);
+}
+
+export const resetPasswordAPI = (data) => {
+  return AuthAPI.post(url.POST_RESET_PASSWORD, data);
+};
+
+export const resetTokenAPI = () => {
+  return AuthAPI.post(url.POST_RESET_TOKEN);
+};
+
 export const profileAPI = (data) => {
   return AuthAPI.put(url.PUT_PROFILE, data);
 };

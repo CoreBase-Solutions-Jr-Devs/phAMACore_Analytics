@@ -194,6 +194,8 @@ import APIKey from "../pages/APIKey/index";
 //login
 import Login from "../pages/Authentication/Login";
 import ForgetPasswordPage from "../pages/Authentication/ForgetPassword";
+import ChangePassword from "../pages/Authentication/ChangePassword";
+import ResetPassword from "../pages/Authentication/ResetPassword";
 import Logout from "../pages/Authentication/Logout";
 import Register from "../pages/Authentication/Register";
 
@@ -479,6 +481,8 @@ const publicRoutes = [
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login /> },
   { path: "/forgot-password", component: <ForgetPasswordPage /> },
+  { path: "/change-password", component: <ChangePassword /> },
+  { path: "/reset-password", component: <ResetPassword /> },
   { path: "/register", component: <Register /> },
 
   //AuthenticationInner pages
