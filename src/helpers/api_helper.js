@@ -17,10 +17,6 @@ export const PowerBIAPI = axios.create({
   baseURL: api.POWERBI_API_URL,
 });
 
-export const LogoutAPI = axios.create({
-  baseURL: api.LOGOUT_API_URL,
-});
-
 // ============================
 // Logged In User
 // ============================
@@ -170,47 +166,6 @@ PowerBIAPI.interceptors.response.use(
 );
 
 // ============================
-// LOGOUT API
-// ============================
-
-LogoutAPI.interceptors.request.use(
-  (config) => {
-    const token = getLoggedinUser()?.token;
-
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    config.headers["Content-Type"] = "application/json";
-
-    const accessKey = process.env.REACT_APP_LOGOUT_ACCESS_KEY;
-
-    if (accessKey) {
-      config.headers.accesskey = accessKey;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// LogoutAPI.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     const { response } = error;
-
-//     if (response) {
-//       return Promise.reject(response.data);
-//     }
-
-//     return Promise.reject({
-//       message: "Network error or server did not respond.",
-//     });
-//   }
-// );
-
-// ============================
 // Authorization
 // ============================
 
@@ -219,12 +174,10 @@ export const setAuthorization = (token) => {
     API.defaults.headers.common.Authorization = `Bearer ${token}`;
     AuthAPI.defaults.headers.common.Authorization = `Bearer ${token}`;
     PowerBIAPI.defaults.headers.common.Authorization = `Bearer ${token}`;
-    LogoutAPI.defaults.headers.common.Authorization = `Bearer ${token}`;
   } else {
     delete API.defaults.headers.common.Authorization;
     delete AuthAPI.defaults.headers.common.Authorization;
     delete PowerBIAPI.defaults.headers.common.Authorization;
-    delete LogoutAPI.defaults.headers.common.Authorization;
   }
 };
 
