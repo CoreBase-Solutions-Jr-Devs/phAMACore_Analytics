@@ -34,9 +34,36 @@ import ResetPassword from "../pages/Authentication/ResetPassword";
 import Logout from "../pages/Authentication/Logout";
 import Register from "../pages/Authentication/Register";
 
+//Charts
+import LineCharts from "../pages/Charts/ApexCharts/LineCharts";
+import AreaCharts from "../pages/Charts/ApexCharts/AreaCharts";
+import ColumnCharts from "../pages/Charts/ApexCharts/ColumnCharts";
+import BarCharts from "../pages/Charts/ApexCharts/BarCharts";
+import MixedCharts from "../pages/Charts/ApexCharts/MixedCharts";
+import TimelineCharts from "../pages/Charts/ApexCharts/TimelineCharts";
+import CandlestickChart from "../pages/Charts/ApexCharts/CandlestickChart";
+import BoxplotCharts from "../pages/Charts/ApexCharts/BoxplotCharts";
+import BubbleChart from "../pages/Charts/ApexCharts/BubbleChart";
+import ScatterCharts from "../pages/Charts/ApexCharts/ScatterCharts";
+import HeatmapCharts from "../pages/Charts/ApexCharts/HeatmapCharts";
+import TreemapCharts from "../pages/Charts/ApexCharts/TreemapCharts";
+import PieCharts from "../pages/Charts/ApexCharts/PieCharts";
+import RadialbarCharts from "../pages/Charts/ApexCharts/RadialbarCharts";
+import RadarCharts from "../pages/Charts/ApexCharts/RadarCharts";
+import PolarCharts from "../pages/Charts/ApexCharts/PolarCharts";
+import ChartsJs from "../pages/Charts/ChartsJs/index";
+import Echarts from "../pages/Charts/ECharts/index";
+
+//Tables
+import BasicTables from '../pages/Tables/BasicTables/BasicTables';
+import ListTables from '../pages/Tables/ListTables/ListTables';
+import ReactTable from "../pages/Tables/ReactTables";
+
 
 // User Profile
 import UserProfile from "../pages/Authentication/user-profile";
+
+import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
 
 
 const authProtectedRoutes = [
@@ -51,7 +78,6 @@ const authProtectedRoutes = [
   { path: "/dashboard-projects", component: <DashboardProject /> },
   { path: "/dashboard-nft", component: <DashboardNFT /> },
   { path: "/dashboard-job", component: <DashboardJob /> },
-  { path: "/dashboard-blog", component: <DashboardBlog /> },
 
   //charts
   { path: "/charts-apex-line", component: <LineCharts /> },
@@ -60,30 +86,19 @@ const authProtectedRoutes = [
   { path: "/charts-apex-bar", component: <BarCharts /> },
   { path: "/charts-apex-mixed", component: <MixedCharts /> },
   { path: "/charts-apex-timeline", component: <TimelineCharts /> },
-  { path: "/charts-apex-range-area", component: <RangeArea /> },
-  { path: "/charts-apex-funnel", component: <FunnelChart /> },
-  { path: "/charts-apex-candlestick", component: <CandlestickChart /> },
-  { path: "/charts-apex-boxplot", component: <BoxplotCharts /> },
-  { path: "/charts-apex-bubble", component: <BubbleChart /> },
-  { path: "/charts-apex-scatter", component: <ScatterCharts /> },
-  { path: "/charts-apex-heatmap", component: <HeatmapCharts /> },
-  { path: "/charts-apex-treemap", component: <TreemapCharts /> },
-  { path: "/charts-apex-pie", component: <PieCharts /> },
-  { path: "/charts-apex-radialbar", component: <RadialbarCharts /> },
-  { path: "/charts-apex-radar", component: <RadarCharts /> },
-  { path: "/charts-apex-polar", component: <PolarCharts /> },
-  { path: "/charts-apex-slope", component: <SlopeCharts /> },
-
   { path: "/charts-chartjs", component: <ChartsJs /> },
   { path: "/charts-echarts", component: <Echarts /> },
 
-  //Pages
-  { path: "/pages-profile", component: <SimplePage /> },
-  { path: "/pages-profile-settings", component: <Settings /> },
+
+  //Tables
+  { path: "/tables-basic", component: <BasicTables /> },
+  { path: "/tables-listjs", component: <ListTables /> },
+  { path: "/tables-react", component: <ReactTable /> },
 
 
   //User Profile
   { path: "/profile", component: <UserProfile /> },
+  
 
   // this route should be at the end of all other routes
   // eslint-disable-next-line react/display-name
@@ -110,30 +125,10 @@ const publicRoutes = [
   { path: "/auth-signup-basic", component: <BasicSignUp /> },
   { path: "/auth-signup-cover", component: <CoverSignUp /> },
   { path: "/auth-pass-reset-basic", component: <BasicPasswReset /> },
-  { path: "/auth-pass-reset-cover", component: <CoverPasswReset /> },
-  { path: "/auth-lockscreen-basic", component: <BasicLockScreen /> },
-  { path: "/auth-lockscreen-cover", component: <CoverLockScreen /> },
-  { path: "/auth-logout-basic", component: <BasicLogout /> },
-  { path: "/auth-logout-cover", component: <CoverLogout /> },
-  { path: "/auth-success-msg-basic", component: <BasicSuccessMsg /> },
-  { path: "/auth-success-msg-cover", component: <CoverSuccessMsg /> },
-  { path: "/auth-twostep-basic", component: <BasicTwosVerify /> },
-  { path: "/auth-twostep-cover", component: <CoverTwosVerify /> },
   { path: "/auth-404-basic", component: <Basic404 /> },
   { path: "/auth-404-cover", component: <Cover404 /> },
   { path: "/auth-404-alt", component: <Alt404 /> },
   { path: "/auth-500", component: <Error500 /> },
-  { path: "/pages-maintenance", component: <Maintenance /> },
-  { path: "/pages-coming-soon", component: <ComingSoon /> },
-
-  { path: "/landing", component: <OnePage /> },
-  { path: "/nft-landing", component: <NFTLanding /> },
-  { path: "/job-landing", component: <JobLanding /> },
-
-  { path: "/auth-pass-change-basic", component: <BasicPasswCreate /> },
-  { path: "/auth-pass-change-cover", component: <CoverPasswCreate /> },
-  { path: "/auth-offline", component: <Offlinepage /> },
-
 ];
 
 export { authProtectedRoutes, publicRoutes };
