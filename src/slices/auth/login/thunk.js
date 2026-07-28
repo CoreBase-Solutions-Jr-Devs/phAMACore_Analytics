@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import {
   loginUserAPI,
   logoutUserAPI,
-  
 } from "../../../helpers/fakebackend_helper";
 import { setAuthorization } from "../../../helpers/api_helper";
 
@@ -15,7 +14,7 @@ export const loginUser = createAsyncThunk(
 
       const authUser = response.data.response;
 
-      sessionStorage.setItem(
+      localStorage.setItem(
         "authUser",
         JSON.stringify(authUser)
       );
@@ -39,29 +38,26 @@ export const logoutUser = createAsyncThunk(
   "login/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      const authUser = JSON.parse(
-        sessionStorage.getItem("authUser")
-      );
-
+      const authUser = JSON.parse(localStorage.getItem("authUser"));
       const token = authUser?.token;
 
-      if (token) {
-        await logoutUserAPI(token);
+      if (!token) {
+        return rejectWithValue("No token found");
       }
 
-      sessionStorage.removeItem("authUser");
+      // Call logout endpoint
+      await logoutUserAPI(token);
+
+      // Only clear session if API succeeds
+      localStorage.removeItem("authUser");
       setAuthorization(null);
 
       return true;
-
     } catch (error) {
-      // Even if API fails, clear local session
-      sessionStorage.removeItem("authUser");
-      setAuthorization(null);
-
+      // Keep the user logged in
       return rejectWithValue(
-        error?.response?.data?.detail ||
-        error.message ||
+        error?.detail ||
+        error?.message ||
         "Logout failed"
       );
     }
