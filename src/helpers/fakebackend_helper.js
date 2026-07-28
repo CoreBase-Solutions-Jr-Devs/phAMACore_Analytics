@@ -73,6 +73,8 @@ export const getBatchExpiry = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_BATCH_EXPIRY, { params });
 export const getBatchExpiryNeo = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_BATCH_EXPIRY_NEO, { params });
+export const getBranches = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_BRANCHES, { params });
 
 // Register Method
 export const postFakeRegister = data => api.create(url.POST_FAKE_REGISTER, data);
