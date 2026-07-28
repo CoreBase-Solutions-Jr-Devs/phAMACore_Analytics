@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardHeader, CardBody, Col, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 import { StoreVisitsCharts } from './DashboardEcommerceCharts';
 
-const StoreVisits = ({ data= [] }) => {
+const StoreVisits = () => {
     return (
         <React.Fragment>
            
@@ -12,25 +12,15 @@ const StoreVisits = ({ data= [] }) => {
                      
                     </CardHeader>
                    <CardBody>
-                            {data.length === 0 ? (
-          <div className="text-center py-5">
-            <h6 className="text-muted mb-2">
-            No product category data available
-            </h6>
-          </div>
-        ) : (
-          <>
-              <div className="text-center py-5">
-            <h6 className="text-muted mb-2">
-            No product category data available
-            </h6>
-          </div>
-                            {/* <StoreVisitsCharts 
+                          
+           
+         
+                            <StoreVisitsCharts 
                             dataColors='["--vz-primary", "--vz-success", "--vz-warning", "--vz-danger", "--vz-info"]'
-                            /> */}
+                            />
                      
-                       </>
-        )}
+                      
+        
                     </CardBody>
                 </Card>
            

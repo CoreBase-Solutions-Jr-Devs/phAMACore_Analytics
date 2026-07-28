@@ -249,15 +249,15 @@ height={500}
 
 const StoreVisitsCharts = ({ dataColors }) => {
   var chartDonutBasicColors = getChartColorsArray(dataColors);
-  const series = [];
+const series = [44, 25, 18, 9, 4];
   var options = {
-//    labels: [
-//   "Antibiotics",
-//   "ARVs",
-//   "Antimalarials",
-//   "Chronic Disease",
-//   "OTC/Supp"
-// ],
+   labels: [
+  "Antibiotics",
+  "ARVs",
+  "Antimalarials",
+  "Chronic Disease",
+  "OTC/Supp"
+],
 
 dataLabels: {
   enabled: true,
@@ -281,7 +281,7 @@ dataLabels: {
         enabled: false,
       },
     },
-    // colors: chartDonutBasicColors,
+    colors: chartDonutBasicColors,
   };
   return (
     <React.Fragment>
