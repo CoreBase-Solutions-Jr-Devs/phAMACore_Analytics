@@ -26,7 +26,7 @@ export const LogoutAPI = axios.create({
 // ============================
 
 export const getLoggedinUser = () => {
-  const user = sessionStorage.getItem("authUser");
+  const user = localStorage.getItem("authUser");
   return user ? JSON.parse(user) : null;
 };
 
@@ -59,7 +59,7 @@ API.interceptors.response.use(
       const { data, status } = response;
 
       if (status === 401) {
-        sessionStorage.removeItem("authUser");
+        localStorage.removeItem("authUser");
         window.location.href = "/";
       }
 
@@ -108,7 +108,7 @@ AuthAPI.interceptors.response.use(
       const { data, status } = response;
 
       if (status === 401) {
-        sessionStorage.removeItem("authUser");
+        localStorage.removeItem("authUser");
       }
 
       return Promise.reject(data);
@@ -195,20 +195,20 @@ LogoutAPI.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-LogoutAPI.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const { response } = error;
+// LogoutAPI.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     const { response } = error;
 
-    if (response) {
-      return Promise.reject(response.data);
-    }
+//     if (response) {
+//       return Promise.reject(response.data);
+//     }
 
-    return Promise.reject({
-      message: "Network error or server did not respond.",
-    });
-  }
-);
+//     return Promise.reject({
+//       message: "Network error or server did not respond.",
+//     });
+//   }
+// );
 
 // ============================
 // Authorization
