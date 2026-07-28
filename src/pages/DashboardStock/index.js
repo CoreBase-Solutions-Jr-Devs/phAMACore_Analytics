@@ -12,6 +12,7 @@ import CustomTableOne from './Tables/Custom/CustomTableOne';
 
 import {
     fetchBatchExpiryNeo,
+    fetchBranches,
     fetchDailyClosingStock,
     fetchStockMovements
 } from '../../slices/dashboardStock/thunk';
@@ -40,11 +41,13 @@ const DashboardStock = () => {
     const handleApplyFilters = () => {
         const payload = {
             clientid: 1,
-            branchcode: filters.branch ?? null,
+            branchcode: filters.branch ?? 0,
             startDate: filters.startDate,
             endDate: filters.endDate,
         };
 
+        // console.log("Filters:", filters);
+        // console.log("Payload:", payload);
         dispatch(fetchDailyClosingStock(payload));
         dispatch(fetchStockMovements(payload));
         dispatch(fetchBatchExpiryNeo(payload));
@@ -54,6 +57,8 @@ const DashboardStock = () => {
 
     // Load with filters
     useEffect(() => {
+        dispatch(fetchBranches({ clientid: 1 }));
+
         setRightColumn(false);
         handleApplyFilters();
     }, []);
