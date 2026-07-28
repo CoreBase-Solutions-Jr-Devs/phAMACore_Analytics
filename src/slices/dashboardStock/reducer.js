@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
@@ -13,6 +13,8 @@ export const initialState = {
   loadingMovements: false,
   loadingBatchExpiry: false,
   loadingBatchExpiryNeo: false,
+  loadingBranches: false, 
+  errorBranches: null,
   errorStock: null,
   errorMovements: null,
   errorBatchExpiry: null,
@@ -170,24 +172,6 @@ const StockInventorySlice = createSlice({
       .addCase(fetchDailyClosingStock.fulfilled, (state, action) => {
         state.loadingStock = false;
         state.dailyClosingStock = action.payload;
-
-        if (!state.branches.length) {
-          const map = {};
-
-          (action.payload || []).forEach((item) => {
-            const code = item.branchID;
-            const name = item.branchName;
-
-            if (code == null) return;
-
-            map[code] = {
-              branchCode: code,
-              branchName: name,
-            };
-          });
-
-          state.branches = Object.values(map);
-        }
       })
 
       .addCase(fetchDailyClosingStock.rejected, (state, action) => {
@@ -248,6 +232,28 @@ const StockInventorySlice = createSlice({
       .addCase(fetchBatchExpiryNeo.rejected, (state, action) => {
         state.loadingBatchExpiryNeo = false;
         state.errorBatchExpiryNeo = action.payload || action.payload?.error || action.error || null;
+      });
+
+    builder.addCase(fetchBranches.pending, (state) => {
+        state.loadingBranches = true;
+        state.errorBranches = null;
+      })
+      .addCase(fetchBranches.fulfilled, (state, action) => {
+        state.loadingBranches = false;
+
+        state.branches = (action.payload || []).map((branch) => ({
+          branchCode: branch.bcode,
+          branchName: branch.brancH_NAME,
+        }));
+      })
+
+      .addCase(fetchBranches.rejected, (state, action) => {
+        state.loadingBranches = false;
+
+        state.errorBranches =
+          action.payload ||
+          action.error?.message ||
+          null;
       });
   },
 });

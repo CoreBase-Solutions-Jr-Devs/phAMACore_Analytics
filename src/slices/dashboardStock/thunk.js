@@ -5,6 +5,7 @@ import {
   getStockMovements as getStockMovementsApi,
   getBatchExpiry as getBatchExpiryApi,
   getBatchExpiryNeo as getBatchExpiryNeoApi,
+  getBranches as getBranchesApi,
 }
   from "../../helpers/fakebackend_helper";
 
@@ -93,4 +94,19 @@ export const fetchBatchExpiryNeo = createAsyncThunk(
       );
     }
   }
+);
+
+export const fetchBranches = createAsyncThunk(
+    "stockInventory/fetchBranches",
+    async (params, { rejectWithValue }) => {
+        try {
+            const response = await getBranchesApi(params);
+            return response.data ?? response;
+        } catch (error) {
+            return rejectWithValue(
+                error?.response?.data?.message ||
+                error.message
+            );
+        }
+    }
 );
