@@ -3,7 +3,7 @@ import { ListGroup, ListGroupItem } from "reactstrap";
 import { Link } from "react-router-dom";
 import moment from "moment";
 
-const SlowMovingStock = ({ movements = [] }) => {
+const SlowMovingStock = ({ movements = [], searchTerm = "", sortAscending = true, }) => {
     const processed = useMemo(() => {
         const now = moment();
         const DAYS_WINDOW = 30;
@@ -56,9 +56,23 @@ const SlowMovingStock = ({ movements = [] }) => {
             };
         });
 
-        // 4. Sort by inactivity (worst first)
-        return result.sort((a, b) => b.daysSince - a.daysSince);
-    }, [movements]);
+        // 4. Filter by search term
+        const filtered = result.filter((item) => {
+            const search = searchTerm.toLowerCase();
+
+            return (
+                item.item_Name.toLowerCase().includes(search) ||
+                item.item_Code.toLowerCase().includes(search)
+            );
+        });
+
+        // 5. Sort alphabetically by item_Name
+        return [...filtered].sort((a, b) => {
+            return sortAscending
+                ? a.item_Name.localeCompare(b.item_Name)
+                : b.item_Name.localeCompare(a.item_Name);
+        });
+    }, [movements, searchTerm, sortAscending]);
 
     const getBadgeClass = (status) => {
         switch (status) {

@@ -22,9 +22,13 @@ import SlowMovingStock from "./components/SlowMovingStock";
 import ImbalanceAlerts from './components/ImbalanceAlerts';
 
 import FilterActions from './FilterActions';
+import { mockSlowMovingStock } from './components/Sample/slowMovingStock';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortAscending, setSortAscending] = useState(true);
 
     const dispatch = useDispatch();
     const { stockMovements = [] } = useSelector((state) => state.StockInventory);
@@ -41,7 +45,7 @@ const DashboardStock = () => {
     const handleApplyFilters = () => {
         const payload = {
             clientid: 1,
-            branchcode: filters.branch ?? 0,
+            branchcode: filters.branch ?? 1,
             startDate: filters.startDate,
             endDate: filters.endDate,
         };
@@ -104,7 +108,13 @@ const DashboardStock = () => {
                         <Col xl={12}>
                             <Card>
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Critical Stock Levels - MUST-NOT STOCKOUT items</h4>
+                                    <h4 className="card-title mb-1">
+                                        Critical Stock Levels - MUST-NOT STOCKOUT items
+                                    </h4>
+
+                                    {/* <small className="text-warning">
+                                        Showing illustrative sample data while stock cover calculations are being validated.
+                                    </small> */}
                                 </CardHeader>
                                 <CardBody>
                                     <CriticalStockChart />
@@ -159,23 +169,41 @@ const DashboardStock = () => {
                                     <h4 className="card-title mb-0">SLOW MOVING STOCK (30 DAYS)</h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <p className="text-muted">Use data attributes and other custom attributes as keys</p>
+                                    <p className="text-muted">Low Sales Velocity Items (30 Days)</p>
                                     <div id="users">
-                                        <Row className="mb-2">
+                                        <Row className="mb-3 align-items-center g-2">
                                             <Col>
-                                                <div>
-                                                    <input className="search form-control" placeholder="Search" />
-                                                </div>
+                                                <input
+                                                    className="form-control"
+                                                    placeholder="Search by item name or code..."
+                                                    value={searchTerm}
+                                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                                />
                                             </Col>
-                                            <Col className="col-auto">
-                                                <button className="btn btn-light sort" data-sort="name">
-                                                    Sort by name
+
+                                            <Col xs="auto">
+                                                <button
+                                                    className="btn btn-outline-secondary"
+                                                    onClick={() => setSortAscending((prev) => !prev)}
+                                                >
+                                                    {sortAscending ? "A–Z ▲" : "Z–A ▼"}
                                                 </button>
                                             </Col>
                                         </Row>
 
                                         <SimpleBar style={{ height: "242px" }} className="mx-n3">
-                                            <SlowMovingStock movements={stockMovements} />
+                                            <SlowMovingStock
+                                                movements={mockSlowMovingStock}
+                                                searchTerm={searchTerm}
+                                                sortAscending={sortAscending}
+                                            />
+                                            {/* <SlowMovingStock
+                                                movements={
+                                                    stockMovements?.length
+                                                        ? stockMovements
+                                                        : mockSlowMovingStock
+                                                }
+                                            /> */}
                                         </SimpleBar>
                                     </div>
                                 </CardBody>

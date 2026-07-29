@@ -11,10 +11,15 @@ const BRANCHES = [
 // const COVER_COLORS    = (v) =>
 //     v < 10 ? '#f06548' : v < 21 ? '#f7b84b' : v <= 30 ? '#0ab39c' : '#405189';
 
+const DEFAULT_BRANCHES = [ "WAREHOUSE", "MAIN", "CENTRAL", "WESTLANDS BRANCH", "THIKA BRANCH", "MOMBASA BRANCH", "KAMPALA BRANCH", "KAKAMEGA BRANCH", "WAJIR BRANCH", "Testing", "Test Branch"];
+const DEFAULT_STOCK = [152, 185, 128, 97, 91, 79, 64, 49, 23, 8, 5];
+const DEFAULT_SALES = [4.0, 6.0, 4.9, 4.4, 4.6, 4.9, 4.9, 4.9, 3.3, 2.0, 2.5];
+
 const BarChartThree = ({
     height = 420,
-    categories = [],
-    values = [],
+    categories = DEFAULT_BRANCHES,
+    stock = DEFAULT_STOCK,
+    sales = DEFAULT_SALES,
 }) => {
     // const daysOfCover = useMemo(
     //     () => stockUnits.map((s, i) => (avgDailySales[i] > 0 ? Math.round(s / avgDailySales[i]) : 0)),
@@ -28,72 +33,73 @@ const BarChartThree = ({
 
     const series = [
         {
-            name: "Stock Value",
-            data: values,
+            name: "Stock Value (KES M)",
+            type: "column",
+            data: stock,
+        },
+        {
+            name: "Daily Sales (KES M)",
+            type: "line",
+            data: sales,
         },
     ];
 
-    const options = useMemo(
-        () => ({
-            chart: {
-                type: "bar",
-                height,
-                toolbar: { show: false },
-            },
-
-            plotOptions: {
-                bar: {
-                    horizontal: true, // Branches on Y-axis
-                    borderRadius: 4,
-                    dataLabels: {
-                        position: "right",
-                    },
-                },
-            },
-
-            xaxis: {
-                labels: {
-                    show: false,
-                },
-                axisBorder: {
-                    show: false,
-                },
-                axisTicks: {
-                    show: false,
-                },
-            },
-
-            yaxis: {
-                labels: {
-                    show: true,
-                },
-            },
-
-            grid: {
+    const options = useMemo(() => ({
+        chart: {
+            height,
+            stacked: false,
+            toolbar: {
                 show: false,
             },
+        },
 
-            legend: {
-                show: false,
+        stroke: {
+            width: [0, 3],
+            curve: "smooth",
+        },
+
+        plotOptions: {
+            bar: {
+                columnWidth: "45%",
+                borderRadius: 4,
             },
+        },
 
-            tooltip: {
-                y: {
-                    formatter: (val) => val?.toLocaleString(),
+        dataLabels: {
+            enabled: false,
+        },
+
+        xaxis: {
+            categories,
+        },
+
+        yaxis: [
+            {
+                title: {
+                    text: "Stock Value (KES M)",
                 },
             },
-
-            dataLabels: {
-                enabled: true,
-                formatter: (val) => val?.toLocaleString(),
+            {
+                opposite: true,
+                title: {
+                    text: "Daily Sales (KES M)",
+                },
             },
+        ],
 
-            xaxis: {
-                categories,
-            },
-        }),
-        [height, categories]
-    );
+        legend: {
+            position: "top",
+        },
+
+        tooltip: {
+            shared: true,
+            intersect: false,
+        },
+
+        grid: {
+            borderColor: "#f1f1f1",
+        },
+    }), [height, categories]);
 
     return (
         <ReactApexChart
@@ -101,7 +107,7 @@ const BarChartThree = ({
             className="apex-charts"
             options={options}
             series={series}
-            type="bar"
+            type="line"
             height={height}
         />
     );

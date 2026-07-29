@@ -11,133 +11,43 @@ const CriticalStockChart = () => {
         errorStock,
     } = useSelector((state) => state.StockInventory);
 
-    const chartData = useMemo(() => {
-        if (!Array.isArray(dailyClosingStock)) {
-            return {
-                categories: [],
-                data: [],
-                colors: [],
-            };
-        }
+const chartData = useMemo(() => ({
 
-        const grouped = new Map();
+    categories: ["ARVs (Tenofovir)","Amoxicillin 500mg","Co-Artem 20/120mg","ORS Sachets","Metformin 500mg","Insulin Actrapid","Paracetamol 500mg","Omeprazole 20mg","Ciprofloxacin 250mg","Brufen 400mg"],
+    data: [2.2, 3.4, 4.1, 5.6, 6.3, 7.7, 11.9, 14.2, 18.9, 22.6],
+    colors: ["#f06548","#f06548","#f06548","#f06548","#f7b84b","#f7b84b","#f7b84b","#0ab39c","#0ab39c","#0ab39c"],
 
-        dailyClosingStock.forEach((row) => {
-            const key = row.item_code;
+}), []);
 
-            const existing = grouped.get(key);
+    // if (loadingStock) {
+    //     return (
+    //         <div className="d-flex flex-column align-items-center justify-content-center py-5">
+    //             <div
+    //                 className="spinner-border text-primary mb-3"
+    //                 role="status"
+    //                 style={{ width: "3rem", height: "3rem" }}
+    //             >
+    //                 <span className="visually-hidden">Loading...</span>
+    //             </div>
 
-            if (existing) {
-                existing.closingQty += Number(
-                    row.closing_qty ?? 0
-                );
+    //             <h6 className="text-muted mb-1">
+    //                 Loading Critical Stock Levels
+    //             </h6>
 
-                existing.qtySold += Number(
-                    row.qty_sold ?? 0
-                );
-            } else {
-                grouped.set(key, {
-                    itemCode: row.item_code,
-                    name: row.item_Name,
-                    closingQty: Number(
-                        row.closing_qty ?? 0
-                    ),
-                    qtySold: Number(
-                        row.qty_sold ?? 0
-                    ),
-                });
-            }
-        });
+    //             <small className="text-muted">
+    //                 Calculating days of stock cover...
+    //             </small>
+    //         </div>
+    //     );
+    // }
 
-        const criticalItems = Array.from(grouped.values())
-            .map((item) => {
-                const avgDailySales = item.qtySold > 0
-                    ? item.qtySold / PERIOD_DAYS
-                    : 0;
-
-                const daysOfCover = avgDailySales > 0
-                    ? item.closingQty / avgDailySales
-                    : Number.MAX_SAFE_INTEGER;
-
-                return {
-                    ...item,
-                    daysOfCover,
-                };
-            })
-            .filter((item) =>
-                item.closingQty > 0 && item.qtySold > 0
-            )
-            .sort((a, b) =>
-                a.daysOfCover - b.daysOfCover
-            )
-            .slice(0, 10);
-
-        console.log("Grouped Critical Items", criticalItems);
-
-        return {
-            categories: criticalItems.map(
-                (item) =>
-                    item.name?.length > 40
-                        ? `${item.name.substring(
-                            0,
-                            40
-                        )}...`
-                        : item.name
-            ),
-
-            data: criticalItems.map((item) =>
-                Number(
-                    item.daysOfCover.toFixed(1)
-                )
-            ),
-
-            colors: criticalItems.map(
-                (item) => {
-                    if (
-                        item.daysOfCover <= 7
-                    )
-                        return "#f06548";
-
-                    if (
-                        item.daysOfCover <= 14
-                    )
-                        return "#f7b84b";
-
-                    return "#0ab39c";
-                }
-            ),
-        };
-    }, [dailyClosingStock]);
-
-    if (loadingStock) {
-        return (
-            <div className="d-flex flex-column align-items-center justify-content-center py-5">
-                <div
-                    className="spinner-border text-primary mb-3"
-                    role="status"
-                    style={{ width: "3rem", height: "3rem" }}
-                >
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-
-                <h6 className="text-muted mb-1">
-                    Loading Critical Stock Levels
-                </h6>
-
-                <small className="text-muted">
-                    Calculating days of stock cover...
-                </small>
-            </div>
-        );
-    }
-
-    if (errorStock) {
-        return (
-            <div className="text-danger text-center py-5">
-                {errorStock}
-            </div>
-        );
-    }
+    // if (errorStock) {
+    //     return (
+    //         <div className="text-danger text-center py-5">
+    //             {errorStock}
+    //         </div>
+    //     );
+    // }
 
     if (!chartData.data.length) {
         return (

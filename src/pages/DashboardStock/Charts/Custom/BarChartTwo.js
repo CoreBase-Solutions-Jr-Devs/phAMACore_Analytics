@@ -2,25 +2,33 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import ReactApexChart from "react-apexcharts";
 import { Spinner } from "reactstrap";
+import { mockDailyClosingStock } from "../../components/Sample/stockValueByBranch";
 
 const BRANCH_COLORS = { MAIN: "#405189", CENTRAL: "#4b9fd4", WESTLANDS: "#0ab39c", WAREHOUSE: "#299cdb", MOMBASA: "#2a9d8f", KAKAMEGA: "#e76f51", WAJIR: "#f4a261", KAMPALA: "#8e44ad" };
 
 const FALLBACK_PALETTE = [ "#405189", "#4b9fd4", "#0ab39c", "#299cdb", "#f7b84b", "#f06548"];
 
 const BarChartTwo = () => {
-    const { dailyClosingStock, loadingStock } = useSelector(
+    const { loadingStock } = useSelector(
         (state) => state.StockInventory
     );
 
+    // const stockData =
+    //     dailyClosingStock?.length
+    //         ? dailyClosingStock
+    //         : mockDailyClosingStock;
+
+    const stockData = mockDailyClosingStock;
+
     const chartData = useMemo(() => {
-        if (!dailyClosingStock?.length) {
+        if (!stockData?.length) {
             return {
                 branches: [],
                 values: [],
             };
         }
 
-        const branchTotals = dailyClosingStock.reduce((acc, item) => {
+        const branchTotals = stockData.reduce((acc, item) => {
             const branch = item.branch_Name || "Unknown";
             const value = Number(item.closing_value || 0);
             acc[branch] = (acc[branch] || 0) + value;
@@ -39,7 +47,7 @@ const BarChartTwo = () => {
             branches: sorted.map((x) => x.branch),
             values: sorted.map((x) => Number(x.value.toFixed(2))),
         };
-    }, [dailyClosingStock]);
+    }, [stockData]);
 
     const colors = chartData.branches.map((branch, i) => {
         const key = branch.toUpperCase().trim();
@@ -94,12 +102,17 @@ const BarChartTwo = () => {
         xaxis: {
             min: 0,
             max: axisMax,
+            tickAmount: 4,
             categories: chartData.branches,
             labels: {
                 formatter: (val) => `${Math.round(val)}M`,
             },
-            axisBorder: { show: false },
-            axisTicks: { show: false },
+            axisBorder: {
+                show: false,
+            },
+            axisTicks: {
+                show: false,
+            },
         },
 
         yaxis: {

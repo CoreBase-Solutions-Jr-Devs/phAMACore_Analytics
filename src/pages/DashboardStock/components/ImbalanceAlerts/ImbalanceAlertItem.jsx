@@ -2,6 +2,19 @@ import React from "react";
 import { ListGroupItem } from "reactstrap";
 
 const ImbalanceAlertItem = ({ data, index }) => {
+
+    const badgeClass = {
+        queued: "border-warning text-warning",
+        urgent: "border-danger text-danger",
+        promote: "border-info text-info",
+    }[data.status] || "border-secondary text-secondary";
+
+    const badgeText = {
+        queued: "Transfer queued",
+        urgent: "Transfer urgent",
+        promote: "Promote urgently",
+    }[data.status] || data.status;
+
     return (
         <ListGroupItem data-id={index}>
             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -24,13 +37,8 @@ const ImbalanceAlertItem = ({ data, index }) => {
                     </span>
                 </div>
 
-                <span
-                    className={`badge fs-11 px-2 py-1 border ${data.status === "urgent"
-                            ? "border-danger text-danger"
-                            : "border-warning text-warning"
-                        }`}
-                >
-                    Transfer {data.status}
+                <span className={`badge fs-11 px-2 py-1 border ${badgeClass}`}>
+                    {badgeText}
                 </span>
 
             </div>

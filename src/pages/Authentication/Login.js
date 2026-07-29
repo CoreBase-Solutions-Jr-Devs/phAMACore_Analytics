@@ -91,7 +91,7 @@ const Login = (props) => {
     const authUser = await dispatch(loginUser(payload)).unwrap();
 
     if (authUser.requirePasswordChange) {
-      navigate("/forgot-password");
+      navigate("/change-password");
     } else {
       navigate("/dashboard-my-business");
     }
