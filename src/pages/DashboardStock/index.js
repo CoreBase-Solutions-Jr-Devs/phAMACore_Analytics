@@ -22,6 +22,7 @@ import SlowMovingStock from "./components/SlowMovingStock";
 import ImbalanceAlerts from './components/ImbalanceAlerts';
 
 import FilterActions from './FilterActions';
+import { mockSlowMovingStock } from './components/Sample/slowMovingStock';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -175,7 +176,13 @@ const DashboardStock = () => {
                                         </Row>
 
                                         <SimpleBar style={{ height: "242px" }} className="mx-n3">
-                                            <SlowMovingStock movements={stockMovements} />
+                                            <SlowMovingStock
+                                                movements={
+                                                    stockMovements?.length
+                                                        ? stockMovements
+                                                        : mockSlowMovingStock
+                                                }
+                                            />
                                         </SimpleBar>
                                     </div>
                                 </CardBody>
