@@ -81,11 +81,14 @@ const kpis = [
 export default function Widgets() {
     return (
                <React.Fragment>
-          {/* LEFT - TITLE */}
+             <div className="d-flex align-items-center justify-content-between flex-wrap mb-4">
+
   <h4 className="card-title mb-0">
     KEY METRICS
     {/* {branchName !== "All Branches" && ` - ${branchName}`} */}
   </h4>
+        </div>
+
   <Row className="g-2 mb-2">
     {kpis.map((item, index) => (
         <Col xl={3} lg={4} md={6} sm={12} key={index}>
