@@ -45,7 +45,7 @@ const DashboardStock = () => {
     const handleApplyFilters = () => {
         const payload = {
             clientid: 1,
-            branchcode: filters.branch ?? 0,
+            branchcode: filters.branch ?? 1,
             startDate: filters.startDate,
             endDate: filters.endDate,
         };
