@@ -14,11 +14,12 @@ import {
   FormFeedback,
   Form,
 } from "reactstrap";
+// import BreadCrumb from "../../Components/Common/BreadCrumb";
 
 // Formik Validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
-
+import { Link } from "react-router-dom";
 //redux
 import { useSelector, useDispatch } from "react-redux";
 
@@ -29,7 +30,9 @@ import { createSelector } from "reselect";
 
 const UserProfile = () => {
   const dispatch = useDispatch();
-
+const [cusCode, setCusCode] = useState("");
+const [phone, setPhone] = useState("");
+const [fullName, setFullName] = useState("");
   const [email, setemail] = useState("admin@gmail.com");
   const [idx, setidx] = useState("1");
 
@@ -60,25 +63,23 @@ useEffect(() => {
 
   const obj = JSON.parse(stored);
 
-  const firstName =
-    user?.first_name ||
-    obj?.data?.first_name ||
-    obj?.first_name ||
-    "Admin";
+  setCusCode(obj?.cusCode || "");
+  setemail(obj?.email || "admin@gmail.com");
+  setPhone(obj?.phone || "");
+  setFullName(obj?.fullName || "Admin");
 
-  setUserName(firstName);
-  setemail(obj?.data?.email || obj?.email || "admin@gmail.com");
-  setidx(obj?.data?._id || obj?._id || "1");
+  // Use the full name as the username
+  setUserName(obj?.fullName || "Admin");
 
   setTimeout(() => {
     dispatch(resetProfileFlag());
   }, 3000);
-}, [dispatch, user]);
+
+}, [dispatch]);
 
 
 
   const validation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
     initialValues: {
@@ -95,80 +96,196 @@ useEffect(() => {
 
   document.title = "Profile | Velzon - React Admin & Dashboard Template";
   return (
-    <React.Fragment>
-      <div className="page-content mt-lg-5">
-        <Container fluid>
-          <Row>
-            <Col lg="12">
-              {error && error ? <Alert color="danger">{error}</Alert> : null}
-              {success ? <Alert color="success">Username Updated To {userName}</Alert> : null}
+  <React.Fragment>
+  <div className="page-content ">
+    <Container fluid>
+                  {/* <BreadCrumb  pageTitle="Profile" /> */}
+      
+<div className="d-flex justify-content-between align-items-center p-2 ">
 
-              <Card>
-                <CardBody>
-                  <div className="d-flex">
-                    <div className="mx-3">
-                      <img
-                        src={avatar}
-                        alt=""
-                        className="avatar-md rounded-circle img-thumbnail"
-                      />
-                    </div>
-                    <div className="flex-grow-1 align-self-center">
-                      <div className="text-muted">
-                        <h5>{userName || "Admin"}</h5>
-                        <p className="mb-1">Email Id : {email}</p>
-                        <p className="mb-0">Id No : #{idx}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
+    <div>
+        <h2 className="fw-bold mb-1">
+            My Profile
+        </h2>
+
+        <p className="text-muted mb-0">
+            View your account information
+        </p>
+    </div>
+</div>
+
+      <Card className="border-0 shadow-sm rounded-4 mb-4">
+        <CardBody className="p-4">
+          <div className="d-flex align-items-center">
+
+            <img
+              src={avatar}
+              alt=""
+              className="rounded-circle border border-3 border-warning"
+              width={90}
+              height={90}
+            />
+
+            <div className="ms-4">
+              <h3 className="mb-1 fw-semibold">
+                {fullName || userName}
+              </h3>
+
+              <p className="text-muted mb-2">
+                Administrator
+              </p>
+
+              <span className="badge bg-success-subtle text-success">
+                ● Active
+              </span>
+            </div>
+
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Account Information */}
+      <Card className="border-0 shadow-sm rounded-4 mb-4">
+        <CardBody>
+
+          <h5 className="fw-semibold mb-4">
+            Account Information
+          </h5>
+
+          <Row>
+
+            <Col md={6}>
+              <div className="d-flex align-items-center p-3 border rounded-3 mb-3">
+
+                <div className="avatar-sm bg-light rounded-3 d-flex align-items-center justify-content-center">
+                  <i className="bx bx-id-card fs-3 text-caramel"></i>
+                </div>
+
+                <div className="ms-3">
+                  <small className="text-muted">
+                    Customer Code
+                  </small>
+
+                  <h6 className="mb-0">
+                    {cusCode}
+                  </h6>
+                </div>
+
+              </div>
             </Col>
+
+            <Col md={6}>
+              <div className="d-flex align-items-center p-3 border rounded-3 mb-3">
+
+                <div className="avatar-sm bg-light rounded-3 d-flex align-items-center justify-content-center">
+                  <i className="bx bx-envelope fs-3 text-caramel"></i>
+                </div>
+
+                <div className="ms-3">
+                  <small className="text-muted">
+                    Email
+                  </small>
+
+                  <h6 className="mb-0">
+                    {email}
+                  </h6>
+                </div>
+
+              </div>
+            </Col>
+
+            <Col md={6}>
+              <div className="d-flex align-items-center p-3 border rounded-3">
+
+                <div className="avatar-sm bg-light rounded-3 d-flex align-items-center justify-content-center">
+                  <i className="bx bx-user fs-3 text-caramel"></i>
+                </div>
+
+                <div className="ms-3">
+                  <small className="text-muted">
+                    Full Name
+                  </small>
+
+                  <h6 className="mb-0">
+                    {fullName}
+                  </h6>
+                </div>
+
+              </div>
+            </Col>
+
+            <Col md={6}>
+              <div className="d-flex align-items-center p-3 border rounded-3">
+
+                <div className="avatar-sm bg-light rounded-3 d-flex align-items-center justify-content-center">
+                  <i className="bx bx-phone fs-3 text-caramel"></i>
+                </div>
+
+                <div className="ms-3">
+                  <small className="text-muted">
+                    Phone Number
+                  </small>
+
+                  <h6 className="mb-0">
+                    {phone}
+                  </h6>
+                </div>
+
+              </div>
+            </Col>
+
           </Row>
 
-          <h4 className="card-title mb-4">Change User Name</h4>
+        </CardBody>
+      </Card>
 
-          <Card>
-            <CardBody>
-              <Form
-                className="form-horizontal"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  validation.handleSubmit();
-                  return false;
-                }}
-              >
-                <div className="form-group">
-                  <Label className="form-label">User Name</Label>
-                  <Input
-                    name="first_name"
-                    // value={name}
-                    className="form-control"
-                    placeholder="Enter User Name"
-                    type="text"
-                    onChange={validation.handleChange}
-                    onBlur={validation.handleBlur}
-                    value={validation.values.first_name || ""}
-                    invalid={
-                      validation.touched.first_name && validation.errors.first_name ? true : false
-                    }
-                  />
-                  {validation.touched.first_name && validation.errors.first_name ? (
-                    <FormFeedback type="invalid">{validation.errors.first_name}</FormFeedback>
-                  ) : null}
-                  <Input name="idx" value={idx} type="hidden" />
-                </div>
-                <div className="text-center mt-4">
-                  <Button type="submit" color="danger">
-                    Update User Name
-                  </Button>
-                </div>
-              </Form>
-            </CardBody>
-          </Card>
-        </Container>
-      </div>
-    </React.Fragment>
+      <Card className="border-0 shadow-sm rounded-4">
+
+        <CardBody>
+
+          <h5 className="fw-semibold mb-4">
+            Security
+          </h5>
+
+          <div className="d-flex justify-content-between align-items-center border rounded-3 p-3">
+
+            <div className="d-flex align-items-center">
+
+              <div className="avatar-sm bg-light rounded-3 d-flex align-items-center justify-content-center">
+                <i className="bx bx-lock fs-3 text-caramel"></i>
+              </div>
+
+              <div className="ms-3">
+
+                <small className="text-muted">
+                  Password
+                </small>
+
+                <h6 className="mb-0">
+                  ••••••••••••
+                </h6>
+
+              </div>
+
+            </div>
+
+            <Link
+              to="/forgot-password"
+              className="fw-semibold text-caramel text-decoration-none"
+            >
+              Change Password
+              <i className="bx bx-chevron-right ms-1"></i>
+            </Link>
+
+          </div>
+
+        </CardBody>
+
+      </Card>
+
+    </Container>
+  </div>
+</React.Fragment>
   );
 };
 
