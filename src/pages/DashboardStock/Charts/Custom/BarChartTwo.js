@@ -9,14 +9,16 @@ const BRANCH_COLORS = { MAIN: "#405189", CENTRAL: "#4b9fd4", WESTLANDS: "#0ab39c
 const FALLBACK_PALETTE = [ "#405189", "#4b9fd4", "#0ab39c", "#299cdb", "#f7b84b", "#f06548"];
 
 const BarChartTwo = () => {
-    const { dailyClosingStock, loadingStock } = useSelector(
+    const { loadingStock } = useSelector(
         (state) => state.StockInventory
     );
 
-    const stockData =
-        dailyClosingStock?.length
-            ? dailyClosingStock
-            : mockDailyClosingStock;
+    // const stockData =
+    //     dailyClosingStock?.length
+    //         ? dailyClosingStock
+    //         : mockDailyClosingStock;
+
+    const stockData = mockDailyClosingStock;
 
     const chartData = useMemo(() => {
         if (!stockData?.length) {
