@@ -70,6 +70,7 @@ const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardSales /> },
   { path: "/dashboard-sales/:branchId", component: <DashboardSalesBranch /> },
   { path: "/dashboard-stock", component: <DashboardStock /> },
+  { path: "/dashboard-stock/:branchId", component: <DashboardStock /> },
   { path: "/dashboard-purchase-orders", component: <DashboardPurchaseOrders /> },
   { path: "/dashboard-purchase-orders/:branchId", component: <DashboardPurchaseOrdersBranch /> },
   { path: "/index", component: <DashboardSales /> },
