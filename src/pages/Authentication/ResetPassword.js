@@ -17,6 +17,7 @@ import {
 } from "reactstrap";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import { createSelector } from "reselect";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -106,9 +107,15 @@ const ResetPassword = () => {
     }, [token, navigate]);
 
     useEffect(() => {
-        if (success) {
+        if (!success) return;
+
+        toast.success("Password reset successfully.");
+
+        const timer = setTimeout(() => {
             navigate("/login");
-        }
+        }, 2000);
+
+        return () => clearTimeout(timer);
     }, [success, navigate]);
 
     return (
@@ -151,9 +158,11 @@ const ResetPassword = () => {
                                         )}
 
                                         {success && (
-                                            <Alert color="success">
-                                                Password reset successfully.
-                                                Redirecting to login...
+                                            <Alert color="success" className="mb-3">
+                                                <i className="ri-checkbox-circle-fill me-2"></i>
+                                                Your password has been reset successfully.
+                                                <br />
+                                                Redirecting you to the login page...
                                             </Alert>
                                         )}
 
@@ -292,7 +301,7 @@ const ResetPassword = () => {
                                                 size="sm"
                                                 className="w-100 py-2"
                                                 type="submit"
-                                                disabled={loading}
+                                                disabled={loading || success}
                                             >
                                                 {loading
                                                     ? "Resetting..."
