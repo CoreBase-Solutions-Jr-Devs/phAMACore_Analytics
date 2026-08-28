@@ -12,7 +12,7 @@ const Widgets = ({
   maverickSpend = 0,
   avgLeadTime = 0,
     formatAmount,
-    branchMap = {},
+    // branchMap = {},
     rightClickBtn,
 }) => {
    const { branch, dateRange, startDate, endDate } = useSelector(
