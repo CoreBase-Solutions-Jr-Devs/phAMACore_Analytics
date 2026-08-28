@@ -43,7 +43,6 @@ const Login = (props) => {
     loading: state.Login.loading,
     errorMsg: state.Login.errorMsg,
   }));
-  // Inside your component
   const { user, error, loading, errorMsg } = useSelector(loginpageData);
 
   const [userLogin, setUserLogin] = useState({});
@@ -67,7 +66,6 @@ const Login = (props) => {
   }, [user]);
 
   const validation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
     initialValues: {
@@ -93,7 +91,7 @@ const Login = (props) => {
     if (authUser.requirePasswordChange) {
       navigate("/change-password");
     } else {
-      navigate("/dashboard-my-business");
+      navigate("/dashboard");
     }
   } catch (error) {
     console.error(error);

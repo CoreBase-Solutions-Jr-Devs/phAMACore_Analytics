@@ -3,11 +3,10 @@ import { Navigate } from "react-router-dom";
 
 //Dashboard
 import DashboardSales from "../pages/DashboardSales";
-import DashboardSalesBranch from "../pages/DashboardSalesBranch";
-import DashboardPurchaseOrdersBranch from "../pages/DashboardPurchaseOrdersBranch";
+// import DashboardSalesBranch from "../pages/DashboardSalesBranch";
+// import DashboardPurchaseOrdersBranch from "../pages/DashboardPurchaseOrdersBranch";
 import DashboardStock from "../pages/DashboardStock";
 import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
-
 import DashboardCrypto from "../pages/DashboardCrypto";
 import DashboardMyBusiness from "../pages/DashboardMyBusiness";
 import DashboardProject from "../pages/DashboardProject";
@@ -24,7 +23,6 @@ import Basic404 from '../pages/AuthenticationInner/Errors/Basic404';
 import Cover404 from '../pages/AuthenticationInner/Errors/Cover404';
 import Alt404 from '../pages/AuthenticationInner/Errors/Alt404';
 import Error500 from '../pages/AuthenticationInner/Errors/Error500';
-
 
 //login
 import Login from "../pages/Authentication/Login";
@@ -59,27 +57,24 @@ import BasicTables from '../pages/Tables/BasicTables/BasicTables';
 import ListTables from '../pages/Tables/ListTables/ListTables';
 import ReactTable from "../pages/Tables/ReactTables";
 
-
 // User Profile
 import UserProfile from "../pages/Authentication/user-profile";
-
 import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
 
-
 const authProtectedRoutes = [
-  { path: "/dashboard", component: <DashboardSales /> },
-  { path: "/dashboard-sales/:branchId", component: <DashboardSalesBranch /> },
+  { path: "/dashboard", component: <DashboardMyBusiness /> },
+    // { path: "/index", component: <DashboardMyBusiness /> },
+  { path: "/dashboard-sales", component: <DashboardSales /> },
+  { path: "/dashboard-sales/branch/:branchId", component: <DashboardSales /> },
   { path: "/dashboard-stock", component: <DashboardStock /> },
   { path: "/dashboard-purchase-orders", component: <DashboardPurchaseOrders /> },
-  { path: "/dashboard-purchase-orders/:branchId", component: <DashboardPurchaseOrdersBranch /> },
-  { path: "/index", component: <DashboardSales /> },
+  { path: "/dashboard-purchase-orders/branch/:branchId", component: <DashboardPurchaseOrders /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },
-  { path: "/dashboard-my-business", component: <DashboardMyBusiness /> },
   { path: "/dashboard-projects", component: <DashboardProject /> },
   { path: "/dashboard-nft", component: <DashboardNFT /> },
   { path: "/dashboard-job", component: <DashboardJob /> },
 
-  //charts
+  
   { path: "/charts-apex-line", component: <LineCharts /> },
   { path: "/charts-apex-area", component: <AreaCharts /> },
   { path: "/charts-apex-column", component: <ColumnCharts /> },
@@ -89,29 +84,18 @@ const authProtectedRoutes = [
   { path: "/charts-chartjs", component: <ChartsJs /> },
   { path: "/charts-echarts", component: <Echarts /> },
 
-
-  //Tables
   { path: "/tables-basic", component: <BasicTables /> },
   { path: "/tables-listjs", component: <ListTables /> },
   { path: "/tables-react", component: <ReactTable /> },
 
-
-  //User Profile
   { path: "/profile", component: <UserProfile /> },
-  
 
-  // this route should be at the end of all other routes
-  // eslint-disable-next-line react/display-name
-  {
-    path: "/dashboard",
-    exact: true,
-    component: <Navigate to="/dashboard" />,
-  },
-  { path: "*", component: <Navigate to="/dashboard" /> },
+ 
 ];
 
 const publicRoutes = [
-  // Authentication Page
+    { path: "/", component: <Navigate to="/login" replace /> },
+
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login /> },
   { path: "/forgot-password", component: <ForgetPasswordPage /> },
@@ -119,7 +103,6 @@ const publicRoutes = [
   { path: "/reset-password", component: <ResetPassword /> },
   { path: "/register", component: <Register /> },
 
-  //AuthenticationInner pages
   { path: "/auth-signin-basic", component: <BasicSignIn /> },
   { path: "/auth-signin-cover", component: <CoverSignIn /> },
   { path: "/auth-signup-basic", component: <BasicSignUp /> },
