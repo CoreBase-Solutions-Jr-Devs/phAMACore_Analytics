@@ -19,7 +19,6 @@ const LiveUsers = () => {
         (state) => state.DashboardAnalytics,
         (chartData) => chartData.chartData
       );
-    // Inside your component
     const chartData = useSelector(liveuserData);
 
     useEffect(() => {

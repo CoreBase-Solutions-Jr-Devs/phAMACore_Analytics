@@ -151,22 +151,10 @@ case "Custom":
     setEndDate: (state, action) => {
       state.filters.endDate = action.payload;
     },
-    clearSalesData: (state) => {
-  state.sales = [];
-  // state.monthlySales = [];
-  // state.monthToDateSales = [];
-  // state.branches = [];
-  state.loading = false;
-  state.error = null;
 
-  state.filters = {
-    branch: null,
-   dateRange: "Today",
-   startDate: new Date().toLocaleDateString("en-GB"),
-endDate: new Date().toLocaleDateString("en-GB"),
-  };
-},
+    clearSalesData: () => initialState,
   },
+  
 
   extraReducers: (builder) => {
     builder
