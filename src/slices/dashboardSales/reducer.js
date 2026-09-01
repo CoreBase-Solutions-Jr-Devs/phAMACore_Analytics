@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getSalesTransactions, getMonthlySales, getMonthToDateSales } from "./thunk";
+import { getSalesTransactions, getMonthlySales, getMonthToDateSales, fetchBranches } from "./thunk";
+import { saveCachedBranches } from "../../helpers/branch_helper";
 
   const formatDMY = (date) =>
   date.toLocaleDateString("en-GB");
@@ -152,7 +153,13 @@ case "Custom":
       state.filters.endDate = action.payload;
     },
 
-    clearSalesData: () => initialState,
+    clearSalesData: (state) => {
+      state.sales = [];
+      state.monthlySales = [];
+      state.monthToDateSales = [];
+      state.loading = false;
+      state.error = null;
+    },
   },
   
 
@@ -165,27 +172,35 @@ case "Custom":
 
  
     .addCase(getSalesTransactions.fulfilled, (state, action) => {
-  state.loading = false;
+      state.loading = false;
+      const data = action.payload?.result || action.payload || [];
+      state.sales = data;
 
-  const data = action.payload?.result || action.payload || [];
-  state.sales = data;
+      // If branches haven't been fetched via fetchBranches yet, initialize from sales data
+      if (!state.branches || state.branches.length === 0) {
+        const map = {};
+        data.forEach((item) => {
+          const code = item.branch_ID;
+          const name = item.brancch_Name;
+          if (code == null) return;
+          map[code] = {
+            branchCode: code,
+            branchName: name,
+          };
+        });
+        state.branches = Object.values(map);
+        saveCachedBranches(state.branches);
+      }
+    })
 
-  const map = {};
-
-  data.forEach((item) => {
-    const code = item.branch_ID;
-    const name = item.brancch_Name;
-
-    if (code == null) return;
-
-    map[code] = {
-      branchCode: code,
-      branchName: name,
-    };
-  });
-
-  state.branches = Object.values(map);
-})
+    .addCase(fetchBranches.fulfilled, (state, action) => {
+      const branchList = action.payload?.result || action.payload || [];
+      state.branches = branchList.map((branch) => ({
+        branchCode: branch.bcode,
+        branchName: branch.brancH_NAME,
+      }));
+      saveCachedBranches(state.branches);
+    })
 
 .addCase(getMonthlySales.fulfilled, (state, action) => {
   state.monthlySales = action.payload?.result || action.payload || [];
