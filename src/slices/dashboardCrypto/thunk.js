@@ -1,15 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 //Include Both Helper File with needed methods
-import {
-  getBtcPortfolioData as getBtcPortfolioDataApi,
-  getUsdPortfolioData as getUsdPortfolioDataApi,
-  getEuroPortfolioData as getEuroPortfolioDataApi,
-  getAllMarketData as getAllMarketDataApi,
-  getYearMarketData as getYearMarketDataApi,
-  getMonthMarketData as getMonthMarketDataApi,
-  getWeekMarketData as getWeekMarketDataApi,
-  getHourMarketData as getHourMarketDataApi
-} from "../../helpers/fakebackend_helper";
+// import {
+//   getBtcPortfolioData as getBtcPortfolioDataApi,
+//   getUsdPortfolioData as getUsdPortfolioDataApi,
+//   getEuroPortfolioData as getEuroPortfolioDataApi,
+//   getAllMarketData as getAllMarketDataApi,
+//   getYearMarketData as getYearMarketDataApi,
+//   getMonthMarketData as getMonthMarketDataApi,
+//   getWeekMarketData as getWeekMarketDataApi,
+//   getHourMarketData as getHourMarketDataApi
+// } from "../../helpers/fakebackend_helper";
 
 export const getPortfolioChartsData = createAsyncThunk("dashboardCrypto/getPortfolioChartsData", async (data) => {
   try {

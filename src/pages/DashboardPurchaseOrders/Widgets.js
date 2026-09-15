@@ -2,7 +2,9 @@ import React from "react";
 import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { resolveBranchName } from "../../helpers/branch_helper";
 
 const Widgets = ({
   totalSpend = 0,
@@ -11,19 +13,25 @@ const Widgets = ({
   priceAlerts = 0,
   maverickSpend = 0,
   avgLeadTime = 0,
-    formatAmount,
-    // branchMap = {},
-    rightClickBtn,
+  formatAmount,
+  rightClickBtn,
+  isBranchView = false,
+  branchDisplayName = "",
 }) => {
-   const { branch, dateRange, startDate, endDate } = useSelector(
-          (state) => state.PurchaseOrders.filters
-        );
-          const formatDisplay = (date) => date || "";
+  const { branchId } = useParams();
+  const { branch, dateRange, startDate, endDate } = useSelector(
+    (state) => state.PurchaseOrders.filters
+  );
+  const { branches = [], PurchaseOrders = [] } = useSelector(
+    (state) => state.PurchaseOrders
+  );
 
-  //      const branchName =
-  // !branch || branch === "All Branches"
-  //   ? "All Branches"
-  //   : branchMap?.[branch] || "Unknown Branch";
+  const activeBranchCode = branchId ? Number(branchId) : (branch ? Number(branch) : null);
+  const isBranchViewActive = isBranchView || !!branchId;
+  const displayBranchName = branchDisplayName || (isBranchViewActive && activeBranchCode ? resolveBranchName(activeBranchCode, branches, PurchaseOrders) : "");
+
+  const formatDisplay = (date) => date || "";
+
   return (
     <React.Fragment>
       
@@ -32,17 +40,22 @@ const Widgets = ({
   {/* LEFT - TITLE */}
   <h4 className="card-title mb-0">
     KEY METRICS
-    {/* {branchName !== "All Branches" && ` - ${branchName}`} */}
   </h4>
 
   {/* CENTER - DATE RANGE */}
-  <div className="d-flex align-items-center gap-2 ">
+  <div className="d-flex align-items-center gap-2 flex-wrap">
+    {isBranchViewActive && displayBranchName && (
+      <>
+        <span>Branch:</span>
+        <strong className="text-primary">{displayBranchName}</strong>
+        <span className="mx-1 text-muted">|</span>
+      </>
+    )}
     <span>Filtered From:</span>
-    <strong >
+    <strong>
       {formatDisplay(startDate)}</strong> to <strong>
       {formatDisplay(endDate)}
     </strong>
-    
   </div>
 
   {/* RIGHT - BUTTON */}

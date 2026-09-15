@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { getActiveBranch } from '../helpers/branch_helper';
 
 const Navdata = () => {
   const history = useNavigate();
@@ -14,6 +15,12 @@ const salesBranch = useSelector(
 const purchaseBranch = useSelector(
   (state) => state.PurchaseOrders?.filters?.branch
 );
+
+const stockBranch = useSelector((state) => state.StockInventory?.filters?.branch);
+
+const activeSalesBranch = salesBranch || getActiveBranch('sales');
+const activeStockBranch = stockBranch || getActiveBranch('stock');
+const activePurchaseBranch = purchaseBranch || getActiveBranch('purchase');
 
   // States
   const [isDashboard, setIsDashboard] = useState(false);
@@ -80,7 +87,7 @@ const purchaseBranch = useSelector(
       },
       subItems: [
         { id: 'dashboard', label: 'Dashboard', link: '/dashboard-sales', parentId: 'sales' },
-        { id: 'branchview', label: 'BranchView', link: salesBranch ? `/dashboard-sales/branch/${salesBranch}` : '#', disabled: !salesBranch, parentId: 'sales' },
+        { id: 'branchview', label: 'BranchView', link: activeSalesBranch ? `/dashboard-sales/branch/${activeSalesBranch}` : '#', disabled: !activeSalesBranch, parentId: 'sales' },
       ],
     },
     {
@@ -97,7 +104,7 @@ const purchaseBranch = useSelector(
       },
       subItems: [
         { id: 'dashboard-stock', label: 'Dashboard', link: '/dashboard-stock', parentId: 'stock' },
-        { id: 'branchview-stock', label: 'BranchView', link: `/dashboard-sales/branch/${branch}`, parentId: 'stock' },
+        { id: 'branchview-stock', label: 'BranchView', link: activeStockBranch ? `/dashboard-stock/branch/${activeStockBranch}` : '#', disabled: !activeStockBranch, parentId: 'stock' },
       ],
     },
     {
@@ -114,10 +121,10 @@ const purchaseBranch = useSelector(
       },
       subItems: [
         { id: 'dashboard-purchase-orders', label: 'Dashboard', link: '/dashboard-purchase-orders', parentId: 'purchase-orders' },
-        { id: 'branchview-purchase-orders', label: 'BranchView',link: purchaseBranch
-    ? `/dashboard-purchase-orders/branch/${purchaseBranch}`
+        { id: 'branchview-purchase-orders', label: 'BranchView', link: activePurchaseBranch
+    ? `/dashboard-purchase-orders/branch/${activePurchaseBranch}`
     : '#',
-  disabled: !purchaseBranch, parentId: 'purchase-orders' },
+  disabled: !activePurchaseBranch, parentId: 'purchase-orders' },
       ],
     },
   ];

@@ -3,6 +3,7 @@ import {
   getSalesTransactions as getSalesTransactionsApi,
   getMonthlySales as getMonthlySalesApi,
   getMonthToDateSales as getMonthToDateApi,
+  getBranches as getBranchesApi,
 } from "../../helpers/fakebackend_helper";
 
 // MAIN SALES
@@ -40,6 +41,19 @@ export const getMonthToDateSales = createAsyncThunk(
       return response.data || response;
     } catch (error) {
       return rejectWithValue(error.message);
+    }
+  }
+);
+
+// BRANCHES
+export const fetchBranches = createAsyncThunk(
+  "powerbi/fetchBranches",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getBranchesApi(params);
+      return response.data ?? response;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data?.message || error.message);
     }
   }
 );

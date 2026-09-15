@@ -19,10 +19,12 @@ import {
   getSalesTransactions,
   getMonthlySales,
   getMonthToDateSales,
+  fetchBranches,
 } from "../../slices/dashboardSales/thunk";
 
-import { clearSalesData } from "../../slices/dashboardSales/reducer";
+import { clearSalesData, setBranch } from "../../slices/dashboardSales/reducer";
 import useSalesAnalytics from "../../Components/Hooks/useSalesAnalytics";
+import { resolveBranchName, saveActiveBranch } from "../../helpers/branch_helper";
 
 const DashboardSales = () => {
 const dispatch = useDispatch();
@@ -39,13 +41,18 @@ const toggleRightColumn = () =>
     sales = [],
     monthlySales = [],
     monthToDateSales = [],
+    branches = [],
     filters,
   } = useSelector((state) => state.powerbi);
 
-const branchCode = branchId ?? null;
-const isBranchView = !!branchCode;
+  const branchCode = branchId ? Number(branchId) : null;
+  const isBranchView = !!branchCode;
 
-const {
+  const branchDisplayName = isBranchView
+    ? resolveBranchName(branchCode, branches, sales)
+    : "";
+
+  const {
     formatAmount,
     totalRevenue,
     revenueChange,
@@ -59,7 +66,7 @@ const {
     branchData,
     branchChartSeries,
     branchCategories,
-bottomProducts,
+    bottomProducts,
     salesmanData,
     topCustomersData,
     topProducts,
@@ -73,51 +80,64 @@ bottomProducts,
     filters
   );
 
- useEffect(() => {
+  // Sync URL branchId into Redux filters and persist active branch
+  useEffect(() => {
+    dispatch(setBranch(branchCode));
+    if (branchCode) {
+      saveActiveBranch("sales", branchCode);
+    }
+  }, [dispatch, branchCode]);
 
+  // Fetch branches once on mount
+  useEffect(() => {
+    dispatch(fetchBranches({ clientid: 1 }));
+  }, [dispatch]);
+
+ useEffect(() => {
     dispatch(
         getSalesTransactions({
-            clientid:1,
-            startDate:filters.startDate,
-            endDate:filters.endDate,
-            branchcode:branchId
+            clientid: 1,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+            branchcode: branchCode || null,
         })
     );
 
     dispatch(
         getMonthlySales({
-            clientid:1,
-            startDate:new Date(
+            clientid: 1,
+            startDate: new Date(
                 new Date().getFullYear(),
                 0,
                 1
             ).toLocaleDateString("en-GB"),
 
-            endDate:new Date().toLocaleDateString("en-GB"),
+            endDate: new Date().toLocaleDateString("en-GB"),
 
-            branchcode:branchId
+            branchcode: branchCode || null,
         })
     );
 
     dispatch(
         getMonthToDateSales({
-            clientid:1,
-            startDate:new Date(
+            clientid: 1,
+            startDate: new Date(
                 new Date().getFullYear(),
                 new Date().getMonth(),
                 1
             ).toLocaleDateString("en-GB"),
 
-            endDate:new Date().toLocaleDateString("en-GB"),
+            endDate: new Date().toLocaleDateString("en-GB"),
 
-            branchcode:branchId
+            branchcode: branchCode || null,
         })
     );
 
-},[
+}, [
     dispatch,
-    branchId,
-   
+    branchCode,
+    filters.startDate,
+    filters.endDate,
 ]);
 
   useEffect(() => {
@@ -127,26 +147,13 @@ bottomProducts,
   }, [dispatch]);
 
  const handleApplyFilters = () => {
+    setRightColumn(false);
 
-    dispatch(
-        getSalesTransactions({
-            clientid:1,
-            startDate:filters.startDate,
-            endDate:filters.endDate,
-            branchcode:filters.branch ?? null
-        })
-    );
-
-    if(filters.branch){
-
+    if (filters.branch) {
         navigate(`/dashboard-sales/branch/${filters.branch}`);
-
-    }else{
-
+    } else {
         navigate("/dashboard-sales");
-
     }
-
 };
 
 
@@ -166,13 +173,7 @@ bottomProducts,
 <BreadCrumb
     title="Sales"
     pageTitle="Dashboards"
-    subtitle={
-        isBranchView
-            ? sales.find(
-                  s => s.branch_ID === Number(branchCode)
-              )?.brancch_Name
-            : undefined
-    }
+    subtitle={isBranchView ? branchDisplayName : undefined}
 />
 
         <Row>
@@ -187,8 +188,9 @@ bottomProducts,
             creditPercentage={creditPercentage}
             revenueChange={revenueChange}
             cashInvoices={cashInvoices}
-            // branchMap={branchMap}
             rightClickBtn={toggleRightColumn}
+            isBranchView={isBranchView}
+            branchDisplayName={branchDisplayName}
           />
         </Row>
 <Row className="mt-4">

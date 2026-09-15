@@ -24,8 +24,8 @@ const WidgetsOne = ({ branchMap = {} }) => {
         loadingStock, loadingMovements, errorStock,
     } = useSelector((state) => state.StockInventory ?? {});
 
-    const { branch } = useSelector(
-        (state) => state.StockInventory?.dcsParams ?? {}
+    const branch = useSelector(
+        (state) => state.StockInventory?.filters?.branch
     );
 
     const branchName =

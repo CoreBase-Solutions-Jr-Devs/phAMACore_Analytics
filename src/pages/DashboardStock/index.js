@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
@@ -16,6 +17,8 @@ import {
     fetchDailyClosingStock,
     fetchStockMovements
 } from '../../slices/dashboardStock/thunk';
+import { setBranch } from '../../slices/dashboardStock/reducer';
+import { resolveBranchName, saveActiveBranch } from '../../helpers/branch_helper';
 
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
@@ -31,7 +34,17 @@ const DashboardStock = () => {
     const [sortAscending, setSortAscending] = useState(true);
 
     const dispatch = useDispatch();
-    const { stockMovements = [] } = useSelector((state) => state.StockInventory);
+    const navigate = useNavigate();
+    const { branchId } = useParams();
+
+    const branchCode = branchId ? Number(branchId) : null;
+    const isBranchView = !!branchCode;
+
+    const { stockMovements = [], dailyClosingStock = [], branches = [], filters } = useSelector((state) => state.StockInventory);
+
+    const branchDisplayName = isBranchView
+        ? resolveBranchName(branchCode, branches, stockMovements)
+        : "";
 
     const [rightColumn, setRightColumn] = useState(false);
 
@@ -39,40 +52,61 @@ const DashboardStock = () => {
         setRightColumn(prev => !prev);
     };
 
-    const { filters } = useSelector((state) => state.StockInventory);
     const formatDisplay = (date) => date || "";
 
-    const handleApplyFilters = () => {
+    // Sync URL branchId into Redux state and persist active branch when URL changes
+    useEffect(() => {
+        dispatch(setBranch(branchCode));
+        if (branchCode) {
+            saveActiveBranch("stock", branchCode);
+        }
+    }, [dispatch, branchCode]);
+
+    // Fetch branches once on mount
+    useEffect(() => {
+        dispatch(fetchBranches({ clientid: 1 }));
+    }, [dispatch]);
+
+    // Fetch data when branch or date filters change
+    useEffect(() => {
         const payload = {
             clientid: 1,
-            branchcode: filters.branch ?? 1,
+            branchcode: branchCode || null,
             startDate: filters.startDate,
             endDate: filters.endDate,
         };
 
-        // console.log("Filters:", filters);
-        // console.log("Payload:", payload);
         dispatch(fetchDailyClosingStock(payload));
-        dispatch(fetchStockMovements(payload));
         dispatch(fetchBatchExpiryNeo(payload));
+        // PowerBIStockMovements requires a valid branchcode: use branchCode if available, else default to 1
+        dispatch(fetchStockMovements({
+            clientid: 1,
+            branchcode: branchCode || 1,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+        }));
+    }, [dispatch, branchCode, filters.startDate, filters.endDate]);
 
+    const handleApplyFilters = () => {
         setRightColumn(false);
+
+        if (filters.branch) {
+            navigate(`/dashboard-stock/branch/${filters.branch}`);
+        } else {
+            navigate('/dashboard-stock');
+        }
     };
-
-    // Load with filters
-    useEffect(() => {
-        dispatch(fetchBranches({ clientid: 1 }));
-
-        setRightColumn(false);
-        handleApplyFilters();
-    }, []);
 
     return (
         <React.Fragment>
             <div className="page-content">
                 <Container fluid>
 
-                    <BreadCrumb title="Inventory/Stock" pageTitle="Dashboards" />
+                    <BreadCrumb
+                        title="Inventory/Stock"
+                        pageTitle="Dashboards"
+                        subtitle={isBranchView ? branchDisplayName : undefined}
+                    />
 
                     <div className="d-flex align-items-center justify-content-between flex-wrap mb-3">
 
@@ -80,7 +114,14 @@ const DashboardStock = () => {
                             KEY METRICS
                         </h4>
 
-                        <div className="d-flex align-items-center gap-2">
+                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                            {isBranchView && branchDisplayName && (
+                                <>
+                                    <span>Branch:</span>
+                                    <strong className="text-primary">{branchDisplayName}</strong>
+                                    <span className="mx-1 text-muted">|</span>
+                                </>
+                            )}
                             <span>Filtered From:</span>
                             <strong>{formatDisplay(filters.startDate)}</strong>
                             <span>to</span>
@@ -193,17 +234,14 @@ const DashboardStock = () => {
 
                                         <SimpleBar style={{ height: "242px" }} className="mx-n3">
                                             <SlowMovingStock
-                                                movements={mockSlowMovingStock}
-                                                searchTerm={searchTerm}
-                                                sortAscending={sortAscending}
-                                            />
-                                            {/* <SlowMovingStock
                                                 movements={
                                                     stockMovements?.length
                                                         ? stockMovements
                                                         : mockSlowMovingStock
                                                 }
-                                            /> */}
+                                                searchTerm={searchTerm}
+                                                sortAscending={sortAscending}
+                                            />
                                         </SimpleBar>
                                     </div>
                                 </CardBody>
@@ -219,7 +257,10 @@ const DashboardStock = () => {
                                     <p className="text-muted">Products where one branch is overstocked while another is critically low.</p>
 
                                     <SimpleBar style={{ height: "272px" }} className="mx-n3 px-3">
-                                        <ImbalanceAlerts />
+                                        <ImbalanceAlerts
+                                            stock={dailyClosingStock}
+                                            movements={stockMovements}
+                                        />
                                     </SimpleBar>
                                 </CardBody>
                             </Card>

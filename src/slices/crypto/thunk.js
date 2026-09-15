@@ -1,9 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 //Include Both Helper File with needed methods
-import {
-    getTransationList as getTransationListApi,
-    getOrderList as getOrderListApi
-} from "../../helpers/fakebackend_helper";
+// import {
+//     getTransationList as getTransationListApi,
+//     getOrderList as getOrderListApi
+// } from "../../helpers/fakebackend_helper";
 
 export const getTransationList = createAsyncThunk("crypto/getTransationList", async () => {
     try {

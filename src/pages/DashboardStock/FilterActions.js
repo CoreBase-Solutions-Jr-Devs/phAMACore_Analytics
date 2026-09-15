@@ -1,18 +1,30 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
 
 import { setBranch, setDateRange, setStartDate, setEndDate } from "../../slices/dashboardStock/reducer";
+import { getCachedBranchesMap } from "../../helpers/branch_helper";
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
     const dispatch = useDispatch();
 
     const {
-        branches = [],
+        branches: reduxBranches = [],
         filters: { branch, dateRange, startDate, endDate },
     } = useSelector((state) => state.StockInventory);
+
+    const branches = useMemo(() => {
+        if (reduxBranches && reduxBranches.length > 0) {
+            return reduxBranches;
+        }
+        const cachedMap = getCachedBranchesMap();
+        return Object.entries(cachedMap).map(([k, v]) => ({
+            branchCode: Number(k),
+            branchName: v,
+        }));
+    }, [reduxBranches]);
 
     const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Last Week", "This Week", "This Month", "Last Month", "This Year", "Last Year", "Custom"];
 

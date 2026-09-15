@@ -10,6 +10,7 @@ import {
 } from "../../slices/dashboardSales/reducer";
 import { useRef } from "react";
 import Flatpickr from "react-flatpickr";
+import { getCachedBranchesMap } from "../../helpers/branch_helper";
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
     const navigate = useNavigate();
@@ -18,29 +19,36 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const startRef = useRef(null);
 const endRef = useRef(null);
 const {
-  sales,
-  // branches,
+  sales = [],
+  branches: reduxBranches = [],
   loading,
   error,
   filters: { branch, dateRange, startDate, endDate },
 } = useSelector((state) => state.powerbi);
-  
-  const branches = (() => {
-    const map = {};
 
+  const branches = useMemo(() => {
+    if (reduxBranches && reduxBranches.length > 0) {
+      return reduxBranches;
+    }
+    const map = {};
     (sales || []).forEach((item) => {
       const code = item.branch_ID;
       const name = item.brancch_Name;
-
       if (code == null) return;
-
       map[code] = {
         branchCode: code,
         branchName: name,
       };
     });
-    return Object.values(map);
-  })();
+    const fromSales = Object.values(map);
+    if (fromSales.length > 0) return fromSales;
+
+    const cachedMap = getCachedBranchesMap();
+    return Object.entries(cachedMap).map(([k, v]) => ({
+      branchCode: Number(k),
+      branchName: v,
+    }));
+  }, [reduxBranches, sales]);
 
   const selectedBranchName =
   branches.find(b => b.branchCode === branch)?.branchName || "All Branches";
