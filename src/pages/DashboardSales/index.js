@@ -19,12 +19,10 @@ import {
   getSalesTransactions,
   getMonthlySales,
   getMonthToDateSales,
-  fetchBranches,
 } from "../../slices/dashboardSales/thunk";
 
-import { clearSalesData, setBranch } from "../../slices/dashboardSales/reducer";
+import { clearSalesData } from "../../slices/dashboardSales/reducer";
 import useSalesAnalytics from "../../Components/Hooks/useSalesAnalytics";
-import { resolveBranchName, saveActiveBranch } from "../../helpers/branch_helper";
 
 const DashboardSales = () => {
 const dispatch = useDispatch();
@@ -41,18 +39,13 @@ const toggleRightColumn = () =>
     sales = [],
     monthlySales = [],
     monthToDateSales = [],
-    branches = [],
     filters,
   } = useSelector((state) => state.powerbi);
 
-  const branchCode = branchId ? Number(branchId) : null;
-  const isBranchView = !!branchCode;
+const branchCode = branchId ?? null;
+const isBranchView = !!branchCode;
 
-  const branchDisplayName = isBranchView
-    ? resolveBranchName(branchCode, branches, sales)
-    : "";
-
-  const {
+const {
     formatAmount,
     totalRevenue,
     revenueChange,
@@ -66,7 +59,7 @@ const toggleRightColumn = () =>
     branchData,
     branchChartSeries,
     branchCategories,
-    bottomProducts,
+bottomProducts,
     salesmanData,
     topCustomersData,
     topProducts,
@@ -80,64 +73,51 @@ const toggleRightColumn = () =>
     filters
   );
 
-  // Sync URL branchId into Redux filters and persist active branch
-  useEffect(() => {
-    dispatch(setBranch(branchCode));
-    if (branchCode) {
-      saveActiveBranch("sales", branchCode);
-    }
-  }, [dispatch, branchCode]);
-
-  // Fetch branches once on mount
-  useEffect(() => {
-    dispatch(fetchBranches({ clientid: 1 }));
-  }, [dispatch]);
-
  useEffect(() => {
+
     dispatch(
         getSalesTransactions({
-            clientid: 1,
-            startDate: filters.startDate,
-            endDate: filters.endDate,
-            branchcode: branchCode || null,
+            clientid:1,
+            startDate:filters.startDate,
+            endDate:filters.endDate,
+            branchcode:branchId
         })
     );
 
     dispatch(
         getMonthlySales({
-            clientid: 1,
-            startDate: new Date(
+            clientid:1,
+            startDate:new Date(
                 new Date().getFullYear(),
                 0,
                 1
             ).toLocaleDateString("en-GB"),
 
-            endDate: new Date().toLocaleDateString("en-GB"),
+            endDate:new Date().toLocaleDateString("en-GB"),
 
-            branchcode: branchCode || null,
+            branchcode:branchId
         })
     );
 
     dispatch(
         getMonthToDateSales({
-            clientid: 1,
-            startDate: new Date(
+            clientid:1,
+            startDate:new Date(
                 new Date().getFullYear(),
                 new Date().getMonth(),
                 1
             ).toLocaleDateString("en-GB"),
 
-            endDate: new Date().toLocaleDateString("en-GB"),
+            endDate:new Date().toLocaleDateString("en-GB"),
 
-            branchcode: branchCode || null,
+            branchcode:branchId
         })
     );
 
-}, [
+},[
     dispatch,
-    branchCode,
-    filters.startDate,
-    filters.endDate,
+    branchId,
+   
 ]);
 
   useEffect(() => {
@@ -147,13 +127,26 @@ const toggleRightColumn = () =>
   }, [dispatch]);
 
  const handleApplyFilters = () => {
-    setRightColumn(false);
 
-    if (filters.branch) {
+    dispatch(
+        getSalesTransactions({
+            clientid:1,
+            startDate:filters.startDate,
+            endDate:filters.endDate,
+            branchcode:filters.branch ?? null
+        })
+    );
+
+    if(filters.branch){
+
         navigate(`/dashboard-sales/branch/${filters.branch}`);
-    } else {
+
+    }else{
+
         navigate("/dashboard-sales");
+
     }
+
 };
 
 
@@ -173,7 +166,13 @@ const toggleRightColumn = () =>
 <BreadCrumb
     title="Sales"
     pageTitle="Dashboards"
-    subtitle={isBranchView ? branchDisplayName : undefined}
+    subtitle={
+        isBranchView
+            ? sales.find(
+                  s => s.branch_ID === Number(branchCode)
+              )?.brancch_Name
+            : undefined
+    }
 />
 
         <Row>
@@ -188,9 +187,8 @@ const toggleRightColumn = () =>
             creditPercentage={creditPercentage}
             revenueChange={revenueChange}
             cashInvoices={cashInvoices}
+            // branchMap={branchMap}
             rightClickBtn={toggleRightColumn}
-            isBranchView={isBranchView}
-            branchDisplayName={branchDisplayName}
           />
         </Row>
 <Row className="mt-4">

@@ -18,9 +18,9 @@ const purchaseBranch = useSelector(
 
 const stockBranch = useSelector((state) => state.StockInventory?.filters?.branch);
 
-const activeSalesBranch = salesBranch || getActiveBranch('sales');
+// const activeSalesBranch = salesBranch || getActiveBranch('sales');
 const activeStockBranch = stockBranch || getActiveBranch('stock');
-const activePurchaseBranch = purchaseBranch || getActiveBranch('purchase');
+// const activePurchaseBranch = purchaseBranch || getActiveBranch('purchase');
 
   // States
   const [isDashboard, setIsDashboard] = useState(false);
@@ -87,7 +87,7 @@ const activePurchaseBranch = purchaseBranch || getActiveBranch('purchase');
       },
       subItems: [
         { id: 'dashboard', label: 'Dashboard', link: '/dashboard-sales', parentId: 'sales' },
-        { id: 'branchview', label: 'BranchView', link: activeSalesBranch ? `/dashboard-sales/branch/${activeSalesBranch}` : '#', disabled: !activeSalesBranch, parentId: 'sales' },
+        { id: 'branchview', label: 'BranchView', link: salesBranch ? `/dashboard-sales/branch/${salesBranch}` : '#', disabled: !salesBranch, parentId: 'sales' },
       ],
     },
     {
@@ -121,10 +121,10 @@ const activePurchaseBranch = purchaseBranch || getActiveBranch('purchase');
       },
       subItems: [
         { id: 'dashboard-purchase-orders', label: 'Dashboard', link: '/dashboard-purchase-orders', parentId: 'purchase-orders' },
-        { id: 'branchview-purchase-orders', label: 'BranchView', link: activePurchaseBranch
-    ? `/dashboard-purchase-orders/branch/${activePurchaseBranch}`
+        { id: 'branchview-purchase-orders', label: 'BranchView', link: purchaseBranch
+    ? `/dashboard-purchase-orders/branch/${purchaseBranch}`
     : '#',
-  disabled: !activePurchaseBranch, parentId: 'purchase-orders' },
+  disabled: !purchaseBranch, parentId: 'purchase-orders' },
       ],
     },
   ];

@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getPurchaseOrders, getActualSpend, getDailySpend, fetchBranches } from "./thunk";
-import { saveCachedBranches } from "../../helpers/branch_helper";
+import { getPurchaseOrders, getActualSpend, getDailySpend } from "./thunk";
 
   const formatDMY = (date) =>
   date.toLocaleDateString("en-GB");
@@ -9,7 +8,6 @@ const initialState = {
   PurchaseOrders: [],
    ActualSpend: [],
    DailySpend: [],
-  branches: [],
   loading: false,
   error: null,
 
@@ -153,13 +151,7 @@ case "Custom":
     setEndDate: (state, action) => {
       state.filters.endDate = action.payload;
     },
-    clearPurchaseOrdersData: (state) => {
-      state.PurchaseOrders = [];
-      state.ActualSpend = [];
-      state.DailySpend = [];
-      state.loading = false;
-      state.error = null;
-    },
+  clearPurchaseOrdersData: () => initialState,
   },
 
   extraReducers: (builder) => {
@@ -171,32 +163,7 @@ case "Custom":
 
       .addCase(getPurchaseOrders.fulfilled, (state, action) => {
         state.loading = false;
-        const data = action.payload?.result || action.payload || [];
-        state.PurchaseOrders = data;
-
-        if (!state.branches || state.branches.length === 0) {
-          const map = {};
-          data.forEach((item) => {
-            const code = item.branch_ID;
-            const name = item.branch_name;
-            if (code == null) return;
-            map[code] = {
-              branchCode: code,
-              branchName: name,
-            };
-          });
-          state.branches = Object.values(map);
-          saveCachedBranches(state.branches);
-        }
-      })
-
-      .addCase(fetchBranches.fulfilled, (state, action) => {
-        const branchList = action.payload?.result || action.payload || [];
-        state.branches = branchList.map((branch) => ({
-          branchCode: branch.bcode,
-          branchName: branch.brancH_NAME,
-        }));
-        saveCachedBranches(state.branches);
+        state.PurchaseOrders = action.payload?.result || action.payload || [];
       })
 
          .addCase(getActualSpend.fulfilled, (state, action) => {

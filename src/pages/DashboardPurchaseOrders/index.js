@@ -21,23 +21,20 @@ import {
   getPurchaseOrders,
   getActualSpend,
   getDailySpend,
-  fetchBranches,
 } from "../../slices/dashboardPurchase/thunk";
 
 import {
   clearPurchaseOrdersData,
-  setBranch,
 } from "../../slices/dashboardPurchase/reducer";
 
 import usePurchaseOrders from "../../Components/Hooks/usePurchaseOrders";
-import { resolveBranchName, saveActiveBranch } from "../../helpers/branch_helper";
 
 const DashboardPurchaseOrders = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
     const { branchId } = useParams();
     
-const branchCode = branchId ? Number(branchId) : null;
+const branchCode = branchId ?? null;
 const isBranchView = !!branchCode;
 
     const dispatch = useDispatch();
@@ -48,12 +45,8 @@ const isBranchView = !!branchCode;
     setRightColumn(!rightColumn);
   };
 
-   const { PurchaseOrders = [], ActualSpend = [], DailySpend = [], branches = [], filters } = useSelector(
+   const { PurchaseOrders = [], ActualSpend = [], DailySpend = [], filters } = useSelector(
       (state) => state.PurchaseOrders);
-
-  const branchDisplayName = isBranchView
-    ? resolveBranchName(branchCode, branches, PurchaseOrders)
-    : "";
   
       const {
   formatAmount,
@@ -72,55 +65,49 @@ const isBranchView = !!branchCode;
   ActualSpend,
   DailySpend
 );
-
-  // Sync URL branchId into Redux filters and persist active branch
-  useEffect(() => {
-    dispatch(setBranch(branchCode));
-    if (branchCode) {
-      saveActiveBranch("purchase", branchCode);
-    }
-  }, [dispatch, branchCode]);
-
-  // Fetch branches once on mount
-  useEffect(() => {
-    dispatch(fetchBranches({ clientid: 1 }));
-  }, [dispatch]);
  
   useEffect(() => {
+
     dispatch(
       getPurchaseOrders({
         clientid: 1,
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        branchcode: branchCode || null,  
-      })
+    startDate: filters.startDate,
+          endDate: filters.endDate,
+branchcode:branchId,  
+   })
     );
-    dispatch(
-      getActualSpend({
-        clientid: 1,
-        startDate: new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
-        endDate: new Date().toLocaleDateString("en-GB"),
-        branchcode: branchCode || null,  
+      dispatch(
+        getActualSpend({
+          clientid: 1,
+          startDate:  new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-GB"),
+            endDate: new Date().toLocaleDateString("en-GB"),
+branchcode:branchId,  
       })
-    );
-    dispatch(
-      getDailySpend({
-        clientid: 1,
-        startDate: new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          1
-        ).toLocaleDateString("en-GB"),
-        endDate: new Date().toLocaleDateString("en-GB"),
-        branchcode: branchCode || null,
-      })
-    );
-  }, [
-    dispatch,
-    branchCode,
-    filters.startDate,
-    filters.endDate,
-  ]);
+      );
+        dispatch(
+        getDailySpend({
+          clientid: 1,
+          startDate: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    ).toLocaleDateString("en-GB"),
+
+    endDate: new Date().toLocaleDateString("en-GB"),
+branchcode:branchId,
+        })
+      );
+  }, [   dispatch,
+    branchId,]);
+
+  // const branchMap = useMemo(() => {
+  //    if (!filters.branch) return null;
+  //   const map = {};
+  //   PurchaseOrders.forEach((item) => {
+  //     map[item.branch_ID] = item.branch_name;
+  //   });
+  //   return map;
+  // }, [PurchaseOrders]);
 
     useEffect(() => {
       return () => {
@@ -129,13 +116,25 @@ const isBranchView = !!branchCode;
     }, [dispatch]);
     
     const handleApplyFilters = () => {
-      setRightColumn(false);
+    
+     dispatch(
+        getPurchaseOrders({
+          clientid: 1,
+          startDate: filters.startDate  ,
+          endDate: filters.endDate,
+   branchcode:filters.branch ?? null,
+              })
+      );
 
       if (filters.branch) {
-        navigate(`/dashboard-purchase-orders/branch/${filters.branch}`);
-      } else {
-        navigate("/dashboard-purchase-orders");
-      }
+
+  navigate(`/dashboard-purchase-orders/branch/${filters.branch}`);
+
+} else {
+
+  navigate("/dashboard-purchase-orders");
+}
+
     };
 
  
@@ -143,24 +142,18 @@ const isBranchView = !!branchCode;
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-            <BreadCrumb
-              title="Purchases"
-              pageTitle="Dashboards"
-              subtitle={isBranchView ? branchDisplayName : undefined}
-            />
+            <BreadCrumb title="Purchases" pageTitle="Dashboards"     subtitle={isBranchView
+    ? PurchaseOrders.find(
+        (item) =>
+          item.branch_ID ===
+          Number(branchCode)
+      )?.branch_name
+    : undefined} />
           <Row>
             <Col>
               <div className="h-100">
                 <Row>
-                  <Widget
-                    rightClickBtn={toggleRightColumn}
-                    formatAmount={formatAmount}
-                    totalSpend={totalSpend}
-                    activeSuppliers={activeSuppliers}
-                    avgLeadTime={avgLeadTime}
-                    isBranchView={isBranchView}
-                    branchDisplayName={branchDisplayName}
-                  />
+                  <Widget rightClickBtn={toggleRightColumn} formatAmount={formatAmount} totalSpend={totalSpend} activeSuppliers={activeSuppliers} avgLeadTime={avgLeadTime} />
                 </Row>
              <Row>
 

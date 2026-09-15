@@ -11,7 +11,6 @@ import {
 import { useRef } from "react";
 import Flatpickr from "react-flatpickr";
 import { useNavigate } from "react-router-dom";
-import { getCachedBranchesMap } from "../../helpers/branch_helper";
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const navigate = useNavigate();
@@ -19,36 +18,28 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const startRef = useRef(null);
   const endRef = useRef(null);
   const {
-    PurchaseOrders = [],
-    branches: reduxBranches = [],
+    PurchaseOrders,
     loading,
     error,
     filters: { branch, dateRange, startDate, endDate },
   } = useSelector((state) => state.PurchaseOrders);
 
-  const branches = useMemo(() => {
-    if (reduxBranches && reduxBranches.length > 0) {
-      return reduxBranches;
-    }
+  const branches = (() => {
     const map = {};
+
     (PurchaseOrders || []).forEach((item) => {
       const code = item.branch_ID;
       const name = item.branch_name;
+
       if (code == null) return;
+
       map[code] = {
         branchCode: code,
         branchName: name,
       };
     });
-    const fromOrders = Object.values(map);
-    if (fromOrders.length > 0) return fromOrders;
-
-    const cachedMap = getCachedBranchesMap();
-    return Object.entries(cachedMap).map(([k, v]) => ({
-      branchCode: Number(k),
-      branchName: v,
-    }));
-  }, [reduxBranches, PurchaseOrders]);
+    return Object.values(map);
+  })();
 
   const selectedBranch =
     branches.find((b) => b.branchCode === branch)?.branchName || "All Branches";
