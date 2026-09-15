@@ -3,16 +3,16 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 //Include Both Helper File with needed methods
-import {
-  getFolders as getFoldersApi,
-  addNewFolder as addNewFolderApi,
-  updateFolder as updateFolderApi,
-  deleteFolder as deleteFolderApi,
-  getFiles as getFilesApi,
-  addNewFile as addNewFileApi,
-  updateFile as updateFileApi,
-  deleteFile as deleteFileApi,
-} from "../../helpers/fakebackend_helper";
+// import {
+//   getFolders as getFoldersApi,
+//   addNewFolder as addNewFolderApi,
+//   updateFolder as updateFolderApi,
+//   deleteFolder as deleteFolderApi,
+//   getFiles as getFilesApi,
+//   addNewFile as addNewFileApi,
+//   updateFile as updateFileApi,
+//   deleteFile as deleteFileApi,
+// } from "../../helpers/fakebackend_helper";
 
 export const getFolders = createAsyncThunk("fileManager/getFolders", async () => {
   try {

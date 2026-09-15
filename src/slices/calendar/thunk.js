@@ -1,14 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 //Include Both Helper File with needed methods
-import {
-  getEvents as getEventsApi,
-  addNewEvent as addNewEventApi,
-  updateEvent as updateEventApi,
-  deleteEvent as deleteEventApi,
-  getCategories as getCategoriesApi,
-  getUpCommingEvent as getUpCommingEventApi
-} from "../../helpers/fakebackend_helper";
+// import {
+//   getEvents as getEventsApi,
+//   addNewEvent as addNewEventApi,
+//   updateEvent as updateEventApi,
+//   deleteEvent as deleteEventApi,
+//   getCategories as getCategoriesApi,
+//   getUpCommingEvent as getUpCommingEventApi
+// } from "../../helpers/fakebackend_helper";
 
 export const getEvents = createAsyncThunk("calendar/getEvents", async () => {
   try {
