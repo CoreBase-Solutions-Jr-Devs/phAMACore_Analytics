@@ -3,21 +3,21 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 //Include Both Helper File with needed methods
-import {
-  getProducts as getProductsApi,
-  deleteProducts as deleteProductsApi,
-  getOrders as getOrdersApi,
-  getSellers as getSellersApi,
-  getCustomers as getCustomersApi,
-  updateOrder as updateOrderApi,
-  deleteOrder as deleteOrderApi,
-  addNewOrder as addNewOrderApi,
-  addNewCustomer as addNewCustomerApi,
-  updateCustomer as updateCustomerApi,
-  deleteCustomer as deleteCustomerApi,
-  addNewProduct as addNewProductApi,
-  updateProduct as updateProductApi
-} from "../../helpers/fakebackend_helper";
+// import {
+//   getProducts as getProductsApi,
+//   deleteProducts as deleteProductsApi,
+//   getOrders as getOrdersApi,
+//   getSellers as getSellersApi,
+//   getCustomers as getCustomersApi,
+//   updateOrder as updateOrderApi,
+//   deleteOrder as deleteOrderApi,
+//   addNewOrder as addNewOrderApi,
+//   addNewCustomer as addNewCustomerApi,
+//   updateCustomer as updateCustomerApi,
+//   deleteCustomer as deleteCustomerApi,
+//   addNewProduct as addNewProductApi,
+//   updateProduct as updateProductApi
+// } from "../../helpers/fakebackend_helper";
 
 export const getProducts = createAsyncThunk("ecommerce/getProducts", async () => {
   try {

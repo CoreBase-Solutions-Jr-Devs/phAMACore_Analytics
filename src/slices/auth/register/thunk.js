@@ -1,9 +1,9 @@
 //Include Both Helper File with needed methods
 import { getFirebaseBackend } from "../../../helpers/firebase_helper";
-import {
-  postFakeRegister,
-  postJwtRegister,
-} from "../../../helpers/fakebackend_helper";
+// import {
+//   postFakeRegister,
+//   postJwtRegister,
+// } from "../../../helpers/fakebackend_helper";
 
 // action
 import {

@@ -3,10 +3,10 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 //Include Both Helper File with needed methods
-import {
-  getMailDetails as getMailDetailsApi,
-  deleteMail as deleteMailApi
-} from "../../helpers/fakebackend_helper";
+// import {
+//   getMailDetails as getMailDetailsApi,
+//   deleteMail as deleteMailApi
+// } from "../../helpers/fakebackend_helper";
 
 export const getMailDetails = createAsyncThunk("mailbox/getMailDetails", async () => {
   try {

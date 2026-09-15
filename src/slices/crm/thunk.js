@@ -3,21 +3,21 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 //Include Both Helper File with needed methods
-import {
-  getContacts as getContactsApi,
-  getCompanies as getCompaniesApi,
-  getDeals as getDealsApi,
-  getLeads as getLeadsApi,
-  addNewCompanies as addNewCompaniesApi,
-  updateCompanies as updateCompaniesApi,
-  deleteCompanies as deleteCompaniesApi,
-  addNewContact as addNewContactApi,
-  updateContact as updateContactApi,
-  deleteContact as deleteContactApi,
-  addNewLead as addNewLeadApi,
-  updateLead as updateLeadApi,
-  deleteLead as deleteLeadApi
-} from "../../helpers/fakebackend_helper";
+// import {
+//   getContacts as getContactsApi,
+//   getCompanies as getCompaniesApi,
+//   getDeals as getDealsApi,
+//   getLeads as getLeadsApi,
+//   addNewCompanies as addNewCompaniesApi,
+//   updateCompanies as updateCompaniesApi,
+//   deleteCompanies as deleteCompaniesApi,
+//   addNewContact as addNewContactApi,
+//   updateContact as updateContactApi,
+//   deleteContact as deleteContactApi,
+//   addNewLead as addNewLeadApi,
+//   updateLead as updateLeadApi,
+//   deleteLead as deleteLeadApi
+// } from "../../helpers/fakebackend_helper";
 
 export const getContacts = createAsyncThunk("crm/getContacts" , async () => {
   try{

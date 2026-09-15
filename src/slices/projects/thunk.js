@@ -3,12 +3,12 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 //Include Both Helper File with needed methods
-import {
-    getProjectList as getProjectListApi,
-    addProjectList as addProjectListApi,
-    updateProjectList as updateProjectListApi,
-    deleteProjectList as deleteProjectListApi
-} from "../../helpers/fakebackend_helper";
+// import {
+//     getProjectList as getProjectListApi,
+//     addProjectList as addProjectListApi,
+//     updateProjectList as updateProjectListApi,
+//     deleteProjectList as deleteProjectListApi
+// } from "../../helpers/fakebackend_helper";
 
 export const getProjectList = createAsyncThunk("projects/getProjectList", async () => {
     try {

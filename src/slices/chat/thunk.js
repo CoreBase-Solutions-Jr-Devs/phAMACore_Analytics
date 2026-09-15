@@ -1,13 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 //Include Both Helper File with needed methods
-import {
-  getDirectContact as getDirectContactApi,
-  getMessages as getMessagesApi,
-  getChannels as getChannelsApi,
-  addMessage as addMessageApi,
-  deleteMessage as deleteMessageApi,
-} from "../../helpers/fakebackend_helper";
+// import {
+//   getDirectContact as getDirectContactApi,
+//   getMessages as getMessagesApi,
+//   getChannels as getChannelsApi,
+//   addMessage as addMessageApi,
+//   deleteMessage as deleteMessageApi,
+// } from "../../helpers/fakebackend_helper";
 
 export const getDirectContact = createAsyncThunk("chat/getDirectContact", async () => {
   try {
