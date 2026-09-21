@@ -6,6 +6,7 @@ import {
   getBatchExpiry as getBatchExpiryApi,
   getBatchExpiryNeo as getBatchExpiryNeoApi,
   getBranches as getBranchesApi,
+  getKPITotalStockValueByBranch as getKPITotalStockValueByBranchApi,
 }
   from "../../helpers/fakebackend_helper";
 
@@ -109,4 +110,73 @@ export const fetchBranches = createAsyncThunk(
             );
         }
     }
+);
+
+export const fetchKPITotalStockValueByBranch = createAsyncThunk(
+  "stockInventory/fetchKPITotalStockValueByBranch",
+  async (params = {}, { getState, rejectWithValue }) => {
+    try {
+      const {
+        clientid = 1,
+        whichcost = 1,
+        IncludeBlocked = false,
+        branchcode,
+      } = params;
+
+      if (branchcode) {
+        const response = await getKPITotalStockValueByBranchApi({
+          clientid,
+          whichcost,
+          IncludeBlocked,
+          branchcode,
+        });
+        const data = response.data ?? response;
+        return Array.isArray(data) ? data : [data];
+      }
+
+      // If branchcode is null/undefined, fetch for all branches to build comparison
+      let branchList = getState().StockInventory?.branches || [];
+      if (!branchList.length) {
+        const branchesRes = await getBranchesApi({ clientid });
+        const rawBranches = branchesRes.data?.result || branchesRes.data || [];
+        branchList = rawBranches.map((b) => ({
+          branchCode: b.bcode ?? b.branchCode ?? b.branch_ID,
+          branchName: b.brancH_NAME ?? b.branchName ?? b.branch_name,
+        }));
+      }
+
+      const results = await Promise.all(
+        branchList.map(async (b) => {
+          try {
+            const res = await getKPITotalStockValueByBranchApi({ clientid, whichcost, IncludeBlocked, branchcode: b.branchCode});
+            const data = res.data ?? res;
+            if (Array.isArray(data) && data.length > 0) {
+              return {
+                ...data[0],
+                branch_id: b.branchCode,
+                branch_name: b.branchName || data[0].branch_name,
+              };
+            }
+            return {
+              branch_id: b.branchCode,
+              branch_name: b.branchName,
+              total_stock_value: 0,
+            };
+          } catch (e) {
+            return {
+              branch_id: b.branchCode,
+              branch_name: b.branchName,
+              total_stock_value: 0,
+            };
+          }
+        })
+      );
+
+      return results;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data?.message || error?.response?.data ||
+        error.message || "Failed to fetch total stock value by branch!"
+      );
+    }
+  }
 );

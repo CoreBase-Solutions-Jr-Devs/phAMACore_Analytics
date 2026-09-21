@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 import { saveCachedBranches } from "../../helpers/branch_helper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
@@ -10,16 +10,19 @@ export const initialState = {
   batchExpiry: [],
   batchExpiryNeo: [],
   branches: [],
+  totalStockValueByBranch: [],
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
   loadingBatchExpiryNeo: false,
   loadingBranches: false, 
+  loadingTotalStockValueByBranch: false,
   errorBranches: null,
   errorStock: null,
   errorMovements: null,
   errorBatchExpiry: null,
   errorBatchExpiryNeo: null,
+  errorTotalStockValueByBranch: null,
   filters: {
     branch: null,
     dateRange: "Today",
@@ -257,6 +260,21 @@ const StockInventorySlice = createSlice({
           action.payload ||
           action.error?.message ||
           null;
+      });
+
+    builder
+      .addCase(fetchKPITotalStockValueByBranch.pending, (state) => {
+        state.loadingTotalStockValueByBranch = true;
+        state.errorTotalStockValueByBranch = null;
+      })
+      .addCase(fetchKPITotalStockValueByBranch.fulfilled, (state, action) => {
+        state.loadingTotalStockValueByBranch = false;
+        state.totalStockValueByBranch = action.payload;
+      })
+      .addCase(fetchKPITotalStockValueByBranch.rejected, (state, action) => {
+        state.loadingTotalStockValueByBranch = false;
+        state.errorTotalStockValueByBranch = action.payload?.message || action.payload ||
+          action.error?.message || "Failed to fetch total stock value by branch!";
       });
   },
 });
