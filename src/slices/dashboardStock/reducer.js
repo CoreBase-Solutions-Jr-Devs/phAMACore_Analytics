@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 import { saveCachedBranches } from "../../helpers/branch_helper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
@@ -11,18 +11,21 @@ export const initialState = {
   batchExpiryNeo: [],
   branches: [],
   totalStockValueByBranch: [],
+  stockHealth: [],
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
   loadingBatchExpiryNeo: false,
   loadingBranches: false, 
   loadingTotalStockValueByBranch: false,
+  loadingStockHealth: false,
   errorBranches: null,
   errorStock: null,
   errorMovements: null,
   errorBatchExpiry: null,
   errorBatchExpiryNeo: null,
   errorTotalStockValueByBranch: null,
+  errorStockHealth: null,
   filters: {
     branch: null,
     dateRange: "Today",
@@ -275,6 +278,24 @@ const StockInventorySlice = createSlice({
         state.loadingTotalStockValueByBranch = false;
         state.errorTotalStockValueByBranch = action.payload?.message || action.payload ||
           action.error?.message || "Failed to fetch total stock value by branch!";
+      });
+
+    builder
+      .addCase(fetchKPIStockHealth.pending, (state) => {
+        state.loadingStockHealth = true;
+        state.errorStockHealth = null;
+      })
+      .addCase(fetchKPIStockHealth.fulfilled, (state, action) => {
+        state.loadingStockHealth = false;
+        state.stockHealth = action.payload;
+      })
+      .addCase(fetchKPIStockHealth.rejected, (state, action) => {
+        state.loadingStockHealth = false;
+        state.errorStockHealth =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch stock health KPI!";
       });
   },
 });

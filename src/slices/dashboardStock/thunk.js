@@ -7,6 +7,7 @@ import {
   getBatchExpiryNeo as getBatchExpiryNeoApi,
   getBranches as getBranchesApi,
   getKPITotalStockValueByBranch as getKPITotalStockValueByBranchApi,
+  getKPIStockHealth as getKPIStockHealthApi,
 }
   from "../../helpers/fakebackend_helper";
 
@@ -180,3 +181,27 @@ export const fetchKPITotalStockValueByBranch = createAsyncThunk(
     }
   }
 );
+
+export const fetchKPIStockHealth = createAsyncThunk(
+  "stockInventory/fetchKPIStockHealth",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const { clientid = 1, branchcode = null } = params;
+      const payload = { clientid };
+      if (branchcode) {
+        payload.branchcode = branchcode;
+      }
+
+      const response = await getKPIStockHealthApi(payload);
+      const data = response.data ?? response;
+      return Array.isArray(data) ? data : [data];
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error.message ||
+        "Failed to fetch stock health KPI!"
+      );
+    }
+  }
+);
