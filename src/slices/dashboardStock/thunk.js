@@ -204,4 +204,58 @@ export const fetchKPIStockHealth = createAsyncThunk(
       );
     }
   }
-);
+);
+
+export const fetchKPICriticalStockouts = createAsyncThunk(
+  "stockInventory/fetchKPICriticalStockouts",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const {
+        clientid = 1,
+        branchcode = null,
+        GroupBy = "CRITICAL_STOCKOUTS",
+        TopN = 30,
+        AsOfDate = null,
+      } = params;
+
+      const payload = {
+        clientid,
+        GroupBy,
+        TopN,
+      };
+
+      if (branchcode) {
+        payload.branchcode = branchcode;
+      }
+
+      if (AsOfDate) {
+        // Date format DD/MM/YYYY
+        if (typeof AsOfDate === "string" && /^\d{2}\/\d{2}\/\d{4}$/.test(AsOfDate)) {
+          payload.AsOfDate = AsOfDate;
+        } else {
+          const d = new Date(AsOfDate);
+          if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const year = d.getFullYear();
+            payload.AsOfDate = `${day}/${month}/${year}`;
+          } else {
+            payload.AsOfDate = AsOfDate;
+          }
+        }
+      }
+
+      const response = await getKPIStockHealthApi(payload);
+      const data = response.data ?? response;
+      return Array.isArray(data) ? data : [data];
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error.message ||
+        "Failed to fetch critical stockouts!"
+      );
+    }
+  }
+);
+

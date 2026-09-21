@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 import { saveCachedBranches } from "../../helpers/branch_helper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
@@ -12,6 +12,7 @@ export const initialState = {
   branches: [],
   totalStockValueByBranch: [],
   stockHealth: [],
+  criticalStockouts: [],
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
@@ -19,6 +20,7 @@ export const initialState = {
   loadingBranches: false, 
   loadingTotalStockValueByBranch: false,
   loadingStockHealth: false,
+  loadingCriticalStockouts: false,
   errorBranches: null,
   errorStock: null,
   errorMovements: null,
@@ -26,6 +28,7 @@ export const initialState = {
   errorBatchExpiryNeo: null,
   errorTotalStockValueByBranch: null,
   errorStockHealth: null,
+  errorCriticalStockouts: null,
   filters: {
     branch: null,
     dateRange: "Today",
@@ -296,6 +299,24 @@ const StockInventorySlice = createSlice({
           action.payload ||
           action.error?.message ||
           "Failed to fetch stock health KPI!";
+      });
+
+    builder
+      .addCase(fetchKPICriticalStockouts.pending, (state) => {
+        state.loadingCriticalStockouts = true;
+        state.errorCriticalStockouts = null;
+      })
+      .addCase(fetchKPICriticalStockouts.fulfilled, (state, action) => {
+        state.loadingCriticalStockouts = false;
+        state.criticalStockouts = action.payload;
+      })
+      .addCase(fetchKPICriticalStockouts.rejected, (state, action) => {
+        state.loadingCriticalStockouts = false;
+        state.errorCriticalStockouts =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch critical stockouts!";
       });
   },
 });
