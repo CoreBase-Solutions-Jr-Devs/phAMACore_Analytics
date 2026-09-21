@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPISalesTransactions, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 import { saveCachedBranches } from "../../helpers/branch_helper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
@@ -13,6 +13,7 @@ export const initialState = {
   totalStockValueByBranch: [],
   stockHealth: [],
   criticalStockouts: [],
+  kpiSalesTransactions: [],
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
@@ -21,6 +22,7 @@ export const initialState = {
   loadingTotalStockValueByBranch: false,
   loadingStockHealth: false,
   loadingCriticalStockouts: false,
+  loadingKPISalesTransactions: false,
   errorBranches: null,
   errorStock: null,
   errorMovements: null,
@@ -29,6 +31,7 @@ export const initialState = {
   errorTotalStockValueByBranch: null,
   errorStockHealth: null,
   errorCriticalStockouts: null,
+  errorKPISalesTransactions: null,
   filters: {
     branch: null,
     dateRange: "Today",
@@ -317,6 +320,24 @@ const StockInventorySlice = createSlice({
           action.payload ||
           action.error?.message ||
           "Failed to fetch critical stockouts!";
+      });
+
+    builder
+      .addCase(fetchKPISalesTransactions.pending, (state) => {
+        state.loadingKPISalesTransactions = true;
+        state.errorKPISalesTransactions = null;
+      })
+      .addCase(fetchKPISalesTransactions.fulfilled, (state, action) => {
+        state.loadingKPISalesTransactions = false;
+        state.kpiSalesTransactions = action.payload;
+      })
+      .addCase(fetchKPISalesTransactions.rejected, (state, action) => {
+        state.loadingKPISalesTransactions = false;
+        state.errorKPISalesTransactions =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch sales transactions KPI!";
       });
   },
 });

@@ -8,6 +8,7 @@ import {
   getBranches as getBranchesApi,
   getKPITotalStockValueByBranch as getKPITotalStockValueByBranchApi,
   getKPIStockHealth as getKPIStockHealthApi,
+  getKPISalesTransactions as getKPISalesTransactionsApi,
 }
   from "../../helpers/fakebackend_helper";
 
@@ -258,4 +259,57 @@ export const fetchKPICriticalStockouts = createAsyncThunk(
     }
   }
 );
+
+export const fetchKPISalesTransactions = createAsyncThunk(
+  "stockInventory/fetchKPISalesTransactions",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const {
+        clientid = 1,
+        startDate,
+        endDate,
+        GroupBy = "BRANCH",
+        branchcode = null,
+      } = params;
+
+      const payload = {
+        clientid,
+        GroupBy,
+      };
+
+      if (startDate) {
+        payload.StartDate = startDate;
+      }
+      if (endDate) {
+        payload.EndDate = endDate;
+      }
+      if (branchcode) {
+        payload.branchcode = branchcode;
+      }
+
+      const response = await getKPISalesTransactionsApi(payload);
+      let data = response.data ?? response;
+      if (typeof data === "string") {
+        try {
+          data = JSON.parse(data);
+        } catch {
+          data = [];
+        }
+      }
+      return Array.isArray(data)
+        ? data
+        : data?.result
+        ? (Array.isArray(data.result) ? data.result : [data.result])
+        : [data];
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error.message ||
+        "Failed to fetch sales transactions KPI!"
+      );
+    }
+  }
+);
+
 
