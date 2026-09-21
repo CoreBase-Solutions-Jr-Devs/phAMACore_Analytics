@@ -52,8 +52,8 @@ const latestRowPerItem = (rows) => {
     return Array.from(map.values());
 };
 
-export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = [], stockValueByBranch = [], stockHealth = [], slowMovingStock = []) => {
-    if (!stockRows.length && !stockValueByBranch.length && !stockHealth.length && !slowMovingStock.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = [], stockValueByBranch = [], stockHealth = [], slowMovingStock = [], imbalanceAlerts = []) => {
+    if (!stockRows.length && !stockValueByBranch.length && !stockHealth.length && !slowMovingStock.length && !imbalanceAlerts.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
 
     const items = latestRowPerItem(stockRows);
     const today = new Date();
@@ -118,18 +118,69 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
         ? healthObj.overstocked_skus
         : items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) > OVERSTOCK_MULTIPLIER * Number(r.reorder_level)).length;
 
-    // Branch Imbalances (> 20% deviation from per-item network average)
-    const byItem = new Map();
-    for (const row of stockRows) {
-        if (!byItem.has(row.item_code)) byItem.set(row.item_code, []);
-        byItem.get(row.item_code).push(Number(row.closing_qty) || 0);
-    }
-    let branchImbalances = 0;
-    for (const qtys of byItem.values()) {
-        if (qtys.length < 2) continue;
-        const avg = qtys.reduce((a, b) => a + b, 0) / qtys.length;
-        if (avg > 0 && qtys.some(q => Math.abs(q - avg) / avg > 0.2)) branchImbalances++;
-    }
+    // Branch Imbalances (> 20% deviation or replenishment / transfer candidates)
+    const branchImbalances = (() => {
+        if (healthObj && (healthObj.branch_imbalance_skus !== undefined || healthObj.imbalance_skus !== undefined)) {
+            return Number(healthObj.branch_imbalance_skus ?? healthObj.imbalance_skus ?? 0);
+        }
+        if (Array.isArray(imbalanceAlerts) && imbalanceAlerts.length > 0) {
+            return imbalanceAlerts.length;
+        }
+
+        // Deduplicate latest snapshot per item per branch
+        const itemBranchMap = new Map();
+        for (const row of stockRows) {
+            const itemCode = row.item_code || row.item_Code || row.invCode || row.itemcode;
+            const branch = row.branch_Name || row.branch_name || row.branchName || row.branch_id;
+            if (!itemCode || !branch) continue;
+
+            const qty = Number(row.closing_qty ?? row.closing_Stock ?? row.closingStock ?? row.stockInNo ?? row.qtyBal ?? 0);
+            const reorderLevel = Number(row.reorder_level ?? row.effective_min_qty ?? 0);
+            const date = row.snapshot_date ? new Date(row.snapshot_date) : null;
+            const key = `${itemCode}__${branch}`;
+            const existing = itemBranchMap.get(key);
+
+            if (!existing || (date && existing.date && date > existing.date) || (!existing.date && date)) {
+                itemBranchMap.set(key, { itemCode, branch, qty, reorderLevel, date });
+            }
+        }
+
+        // Group by item
+        const byItem = new Map();
+        for (const entry of itemBranchMap.values()) {
+            if (!byItem.has(entry.itemCode)) byItem.set(entry.itemCode, []);
+            byItem.get(entry.itemCode).push(entry);
+        }
+
+        let count = 0;
+        for (const branches of byItem.values()) {
+            const qtys = branches.map((b) => b.qty);
+            const totalStock = qtys.reduce((a, b) => a + b, 0);
+            if (totalStock <= 0) continue; // Completely out of stock network-wide
+
+            if (branches.length >= 2) {
+                const max = Math.max(...qtys);
+                const min = Math.min(...qtys);
+                const avg = totalStock / branches.length;
+                const allLow = branches.every((b) =>
+                    b.reorderLevel > 0 ? b.qty <= b.reorderLevel : b.qty <= 5
+                );
+
+                if (allLow) {
+                    count++;
+                } else if (max > min && (min === 0 || (avg > 0 && (max - min) / max > 0.2))) {
+                    count++;
+                }
+            } else if (branches.length === 1) {
+                const single = branches[0];
+                if ((single.reorderLevel > 0 && single.qty <= single.reorderLevel) || single.qty <= 5) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    })();
 
     return { 
         1: totalSKUs, 

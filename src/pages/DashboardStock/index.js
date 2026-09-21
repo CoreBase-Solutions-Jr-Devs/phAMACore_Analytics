@@ -44,7 +44,7 @@ const DashboardStock = () => {
     const branchCode = branchId ? Number(branchId) : null;
     const isBranchView = !!branchCode;
 
-    const { stockMovements = [], dailyClosingStock = [], branches = [], filters } = useSelector((state) => state.StockInventory);
+    const { stockMovements = [], dailyClosingStock = [], batchExpiryNeo = [], branches = [], filters } = useSelector((state) => state.StockInventory);
 
     const branchDisplayName = isBranchView
         ? resolveBranchName(branchCode, branches, stockMovements)
@@ -300,6 +300,7 @@ const DashboardStock = () => {
                                         <ImbalanceAlerts
                                             stock={dailyClosingStock}
                                             movements={stockMovements}
+                                            expiry={batchExpiryNeo}
                                         />
                                     </SimpleBar>
                                 </CardBody>

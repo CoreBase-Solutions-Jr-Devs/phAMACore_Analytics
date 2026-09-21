@@ -4,6 +4,7 @@ import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useSelector } from "react-redux";
 import { KPI_META, computeKPIs, getTodayApi, getNDaysAgoApi} from "../utils/StockInventoryUtils";
+import { useImbalanceEngine } from "./components/ImbalanceAlerts/useImbalanceEngine";
 
 
 const KPI_ICON_MAP = {
@@ -33,9 +34,14 @@ const WidgetsOne = ({ branchMap = {} }) => {
             ? "All Branches"
             : branchMap?.[branch] || "Unknown Branch";
 
+    const alerts = useMemo(
+        () => useImbalanceEngine(dailyClosingStock, stockMovements, batchExpiryNeo),
+        [dailyClosingStock, stockMovements, batchExpiryNeo]
+    );
+
     const kpis = useMemo(
-        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock),
-        [dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock]
+        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock, alerts),
+        [dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock, alerts]
     );
 
     const isLoading = loadingStock || loadingMovements || loadingTotalStockValueByBranch || loadingStockHealth || loadingSlowMovingStock;
