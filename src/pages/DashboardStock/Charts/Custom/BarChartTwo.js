@@ -2,52 +2,59 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import ReactApexChart from "react-apexcharts";
 import { Spinner } from "reactstrap";
-import { mockDailyClosingStock } from "../../components/Sample/stockValueByBranch";
 
-const BRANCH_COLORS = { MAIN: "#405189", CENTRAL: "#4b9fd4", WESTLANDS: "#0ab39c", WAREHOUSE: "#299cdb", MOMBASA: "#2a9d8f", KAKAMEGA: "#e76f51", WAJIR: "#f4a261", KAMPALA: "#8e44ad" };
+const BRANCH_COLORS = { MAIN: "#405189", CENTRAL: "#4b9fd4", WESTLANDS: "#0ab39c", "WESTLANDS BRANCH": "#0ab39c", WAREHOUSE: "#299cdb", MOMBASA: "#2a9d8f", "MOMBASA BRANCH": "#2a9d8f", KAKAMEGA: "#e76f51", "KAKAMEGA BRANCH": "#e76f51", WAJIR: "#f4a261", "WAJIR BRANCH": "#f4a261", KAMPALA: "#8e44ad", "KAMPALA BRANCH": "#8e44ad", THIKA: "#f7b84b", "THIKA BRANCH": "#f7b84b", TESTING: "#556ee6", "TEST BRANCH": "#34c38f" };
 
-const FALLBACK_PALETTE = [ "#405189", "#4b9fd4", "#0ab39c", "#299cdb", "#f7b84b", "#f06548"];
+const FALLBACK_PALETTE = [ "#405189", "#4b9fd4", "#0ab39c", "#299cdb", "#f7b84b", "#f06548", "#8e44ad", "#e76f51", "#556ee6"];
+
+const resolveBranchColor = (branch, index) => {
+    if (!branch) return FALLBACK_PALETTE[index % FALLBACK_PALETTE.length];
+    const key = branch.toUpperCase().trim();
+    const shortKey = key.replace(/\s+BRANCH$/, "").trim();
+    return (
+        BRANCH_COLORS[key] || BRANCH_COLORS[shortKey] || FALLBACK_PALETTE[index % FALLBACK_PALETTE.length]
+    );
+};
 
 const BarChartTwo = () => {
-    const { dailyClosingStock = [], loadingStock } = useSelector(
-        (state) => state.StockInventory
-    );
-
-    const stockData = dailyClosingStock?.length ? dailyClosingStock : mockDailyClosingStock;
+    const {
+        totalStockValueByBranch = [],
+        loadingTotalStockValueByBranch,
+    } = useSelector((state) => state.StockInventory);
 
     const chartData = useMemo(() => {
-        if (!stockData?.length) {
+        if (!totalStockValueByBranch || !totalStockValueByBranch.length) {
             return {
                 branches: [],
                 values: [],
+                rawValues: [],
             };
         }
 
-        const branchTotals = stockData.reduce((acc, item) => {
-            const branch = item.branch_Name || "Unknown";
-            const value = Number(item.closing_value || 0);
-            acc[branch] = (acc[branch] || 0) + value;
-
-            return acc;
-        }, {});
-
-        const sorted = Object.entries(branchTotals)
-            .map(([branch, value]) => ({
-                branch,
-                value: value / 1000000,
-            }))
+        const sorted = [...totalStockValueByBranch]
+            .map((item) => {
+                const branch =
+                    item.branch_name || item.branchName ||
+                    `Branch ${item.branch_id ?? ""}`;
+                const rawValue = Number(item.total_stock_value || 0);
+                return {
+                    branch,
+                    value: rawValue / 1000000,
+                    rawValue,
+                };
+            })
             .sort((a, b) => b.value - a.value);
 
         return {
             branches: sorted.map((x) => x.branch),
             values: sorted.map((x) => Number(x.value.toFixed(2))),
+            rawValues: sorted.map((x) => x.rawValue),
         };
-    }, [stockData]);
+    }, [totalStockValueByBranch]);
 
-    const colors = chartData.branches.map((branch, i) => {
-        const key = branch.toUpperCase().trim();
-        return BRANCH_COLORS[key] || FALLBACK_PALETTE[i % FALLBACK_PALETTE.length];
-    });
+    const colors = chartData.branches.map((branch, i) =>
+        resolveBranchColor(branch, i)
+    );
 
     const axisMax =
         chartData.values.length > 0
@@ -76,6 +83,8 @@ const BarChartTwo = () => {
         };
     });
 
+    const isSingleBranch = chartData.branches.length === 1;
+
     const options = {
         chart: {
             type: "bar",
@@ -84,7 +93,7 @@ const BarChartTwo = () => {
         },
         plotOptions: {
             bar: {
-                barHeight: "45%",
+                barHeight: isSingleBranch ? "30%" : "55%",
                 distributed: true,
                 horizontal: true,
             },
@@ -109,13 +118,11 @@ const BarChartTwo = () => {
                 show: false,
             },
         },
-
         yaxis: {
             labels: {
                 maxWidth: 140,
             },
         },
-
         grid: {
             borderColor: "rgba(0,0,0,0.08)",
         },
@@ -124,23 +131,47 @@ const BarChartTwo = () => {
         },
         tooltip: {
             y: {
-                formatter: (val) =>
-                    `KES ${(val * 1000000).toLocaleString()}`,
+                formatter: (val, opts) => {
+                    const raw = chartData.rawValues?.[opts?.dataPointIndex];
+                    if (raw !== undefined) {
+                        return `KES ${raw.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}`;
+                    }
+                    return `KES ${(val * 1000000).toLocaleString()}`;
+                },
             },
         },
     };
 
     const series = [
         {
+            name: "Stock Value",
             data: chartData.values,
         },
     ];
 
-    if (loadingStock) {
+    if (loadingTotalStockValueByBranch) {
         return (
-            <div className="d-flex flex-column justify-content-center align-items-center py-5 my-3" style={{ height: "380px" }}>
-                <Spinner color="primary" className="mb-3"> Loading... </Spinner>
-                <div className="text-muted fw-semibold">Loading branch stock values...</div>
+            <div
+                className="d-flex flex-column justify-content-center align-items-center py-5 my-3"
+                style={{ height: "380px" }}
+            >
+                <Spinner color="primary" className="mb-3"> {" "} Loading...{" "}</Spinner>
+                <div className="text-muted fw-semibold"> Loading branch stock values...</div>
+            </div>
+        );
+    }
+
+    if (!chartData.branches.length) {
+        return (
+            <div
+                className="d-flex flex-column justify-content-center align-items-center py-5 my-3 text-center"
+                style={{ height: "380px" }}
+            >
+                <i className="ri-bar-chart-line text-muted display-4 mb-2"></i>
+                <div className="text-muted fw-medium"> No stock value data available</div>
             </div>
         );
     }

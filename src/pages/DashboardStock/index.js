@@ -15,6 +15,11 @@ import {
     fetchBatchExpiryNeo,
     fetchBranches,
     fetchDailyClosingStock,
+    fetchKPICriticalStockouts,
+    fetchKPISalesTransactions,
+    fetchKPISlowMovingStock,
+    fetchKPIStockHealth,
+    fetchKPITotalStockValueByBranch,
     fetchStockMovements
 } from '../../slices/dashboardStock/thunk';
 import { setBranch } from '../../slices/dashboardStock/reducer';
@@ -25,7 +30,6 @@ import SlowMovingStock from "./components/SlowMovingStock";
 import ImbalanceAlerts from './components/ImbalanceAlerts';
 
 import FilterActions from './FilterActions';
-import { mockSlowMovingStock } from './components/Sample/slowMovingStock';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -40,7 +44,7 @@ const DashboardStock = () => {
     const branchCode = branchId ? Number(branchId) : null;
     const isBranchView = !!branchCode;
 
-    const { stockMovements = [], dailyClosingStock = [], branches = [], filters } = useSelector((state) => state.StockInventory);
+    const { stockMovements = [], dailyClosingStock = [], batchExpiryNeo = [], branches = [], filters } = useSelector((state) => state.StockInventory);
 
     const branchDisplayName = isBranchView
         ? resolveBranchName(branchCode, branches, stockMovements)
@@ -78,12 +82,44 @@ const DashboardStock = () => {
 
         dispatch(fetchDailyClosingStock(payload));
         dispatch(fetchBatchExpiryNeo(payload));
+        dispatch(fetchKPITotalStockValueByBranch({
+            clientid: 1,
+            whichcost: 1,
+            IncludeBlocked: false,
+            branchcode: branchCode || null,
+        }));
+        dispatch(fetchKPIStockHealth({
+            clientid: 1,
+            branchcode: branchCode || null,
+        }));
+        dispatch(fetchKPICriticalStockouts({
+            clientid: 1,
+            branchcode: branchCode || null,
+            GroupBy: "CRITICAL_STOCKOUTS",
+            TopN: 30,
+            AsOfDate: filters.endDate,
+        }));
+        dispatch(fetchKPISlowMovingStock({
+            clientid: 1,
+            branchcode: branchCode || null,
+            GroupBy: "SLOW_MOVERS",
+            TopN: 50,
+            LookbackDays: 30,
+            AsOfDate: filters.endDate,
+        }));
         // PowerBIStockMovements requires a valid branchcode: use branchCode if available, else default to 1
         dispatch(fetchStockMovements({
             clientid: 1,
             branchcode: branchCode || 1,
             startDate: filters.startDate,
             endDate: filters.endDate,
+        }));
+        dispatch(fetchKPISalesTransactions({
+            clientid: 1,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+            GroupBy: "BRANCH",
+            branchcode: branchCode || null,
         }));
     }, [dispatch, branchCode, filters.startDate, filters.endDate]);
 
@@ -149,13 +185,16 @@ const DashboardStock = () => {
                         <Col xl={12}>
                             <Card>
                                 <CardHeader>
-                                    <h4 className="card-title mb-1">
-                                        Critical Stock Levels - MUST-NOT STOCKOUT items
-                                    </h4>
-
-                                    {/* <small className="text-warning">
-                                        Showing illustrative sample data while stock cover calculations are being validated.
-                                    </small> */}
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div>
+                                            <h4 className="card-title mb-1">
+                                                Critical Stock Levels - MUST-NOT STOCKOUT items
+                                            </h4>
+                                            <p className="text-muted mb-0 small">
+                                                Class A Revenue Drivers at Risk
+                                            </p>
+                                        </div>
+                                    </div>
                                 </CardHeader>
                                 <CardBody>
                                     <CriticalStockChart />
@@ -167,7 +206,11 @@ const DashboardStock = () => {
                         <Col lg={6} className="d-flex">
                             <Card className="flex-fill">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Stock Value By Branch</h4>
+                                    <h4 className="card-title mb-0">
+                                        {isBranchView && branchDisplayName
+                                            ? `Stock Value - ${branchDisplayName}`
+                                            : "Stock Value By Branch"}
+                                    </h4>
                                 </CardHeader>
                                 <CardBody>
                                     <BarChartTwo />
@@ -179,7 +222,9 @@ const DashboardStock = () => {
                             <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">
-                                        Stock VS Sales Velocity - Branch Coverage Ratio
+                                        {isBranchView && branchDisplayName
+                                            ? `Stock VS Sales Velocity - ${branchDisplayName}`
+                                            : "Stock VS Sales Velocity - Branch Coverage Ratio"}
                                     </h4>
                                 </CardHeader>
                                 <CardBody>
@@ -234,11 +279,6 @@ const DashboardStock = () => {
 
                                         <SimpleBar style={{ height: "242px" }} className="mx-n3">
                                             <SlowMovingStock
-                                                movements={
-                                                    stockMovements?.length
-                                                        ? stockMovements
-                                                        : mockSlowMovingStock
-                                                }
                                                 searchTerm={searchTerm}
                                                 sortAscending={sortAscending}
                                             />
@@ -260,6 +300,7 @@ const DashboardStock = () => {
                                         <ImbalanceAlerts
                                             stock={dailyClosingStock}
                                             movements={stockMovements}
+                                            expiry={batchExpiryNeo}
                                         />
                                     </SimpleBar>
                                 </CardBody>

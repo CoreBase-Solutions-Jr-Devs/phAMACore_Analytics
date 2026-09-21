@@ -4,6 +4,7 @@ import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useSelector } from "react-redux";
 import { KPI_META, computeKPIs, getTodayApi, getNDaysAgoApi} from "../utils/StockInventoryUtils";
+import { useImbalanceEngine } from "./components/ImbalanceAlerts/useImbalanceEngine";
 
 
 const KPI_ICON_MAP = {
@@ -20,8 +21,8 @@ const KPI_ICON_MAP = {
 const WidgetsOne = ({ branchMap = {} }) => {
 
     const {
-        dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [],
-        loadingStock, loadingMovements, errorStock,
+        dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [], totalStockValueByBranch = [], stockHealth = [], slowMovingStock = [],
+        loadingStock, loadingMovements, loadingTotalStockValueByBranch, loadingStockHealth, loadingSlowMovingStock, errorStock,
     } = useSelector((state) => state.StockInventory ?? {});
 
     const branch = useSelector(
@@ -33,12 +34,17 @@ const WidgetsOne = ({ branchMap = {} }) => {
             ? "All Branches"
             : branchMap?.[branch] || "Unknown Branch";
 
-    const kpis = useMemo(
-        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo),
+    const alerts = useMemo(
+        () => useImbalanceEngine(dailyClosingStock, stockMovements, batchExpiryNeo),
         [dailyClosingStock, stockMovements, batchExpiryNeo]
     );
 
-    const isLoading = loadingStock || loadingMovements;
+    const kpis = useMemo(
+        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock, alerts),
+        [dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock, alerts]
+    );
+
+    const isLoading = loadingStock || loadingMovements || loadingTotalStockValueByBranch || loadingStockHealth || loadingSlowMovingStock;
 
     return (
         <React.Fragment>
