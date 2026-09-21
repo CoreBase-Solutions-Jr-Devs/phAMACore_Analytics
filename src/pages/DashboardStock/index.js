@@ -15,6 +15,7 @@ import {
     fetchBatchExpiryNeo,
     fetchBranches,
     fetchDailyClosingStock,
+    fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
     fetchStockMovements
 } from '../../slices/dashboardStock/thunk';
@@ -83,6 +84,10 @@ const DashboardStock = () => {
             clientid: 1,
             whichcost: 1,
             IncludeBlocked: false,
+            branchcode: branchCode || null,
+        }));
+        dispatch(fetchKPIStockHealth({
+            clientid: 1,
             branchcode: branchCode || null,
         }));
         // PowerBIStockMovements requires a valid branchcode: use branchCode if available, else default to 1
