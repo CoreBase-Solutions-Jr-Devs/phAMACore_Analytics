@@ -190,3 +190,109 @@ export function transformBranchCoverageRatio(stockRows, periodDays) {
         colors: entries.map((e) => getCoverageRatioColor(e.daysCover)),
     };
 }
+
+// ─── BarChartThree — Stock VS Sales Velocity (Combined Bar & Line) ───────────
+
+/**
+ * Produces chart-ready data for the Stock VS Sales Velocity combined chart.
+ * Combines branch stock value from KPITotalStockValueByBranch and sales velocity
+ * from KPISalesTransactions (GroupBy=BRANCH).
+ *
+ * @param {Array}  stockRows   Array of branch stock objects (from totalStockValueByBranch)
+ * @param {Array}  salesRows   Array of branch sales objects (from kpiSalesTransactions)
+ * @param {number} periodDays  Days in the query period (defaults to 1)
+ * @returns {{ categories: string[], stock: number[], sales: number[], rawStock: number[], rawDailySales: number[], daysCover: number[] }}
+ */
+export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], periodDays = 1) {
+    const validPeriodDays = Math.max(Number(periodDays) || 1, 1);
+
+    if ((!stockRows || !stockRows.length) && (!salesRows || !salesRows.length)) {
+        return {
+            categories: [],
+            stock: [],
+            sales: [],
+            rawStock: [],
+            rawDailySales: [],
+            daysCover: [],
+        };
+    }
+
+    // Build map for sales by branch_id and normalized branch_name
+    const salesMap = new Map();
+    (salesRows || []).forEach((row) => {
+        if (!row) return;
+        const id = row.branch_id != null ? String(row.branch_id) : null;
+        const name = (row.branch_name || row.branchName || "").toUpperCase().trim();
+        const salesVal = Number(row.net_sales_incl ?? row.net_sales_excl ?? row.cash_sales_excl ?? 0);
+
+        if (id) salesMap.set(id, salesVal);
+        if (name) salesMap.set(name, salesVal);
+    });
+
+    const branchEntries = new Map();
+
+    // Ingest stock rows
+    (stockRows || []).forEach((row) => {
+        if (!row) return;
+        const id = row.branch_id != null ? String(row.branch_id) : `gen_${Math.random()}`;
+        const name = row.branch_name || row.branchName || `Branch ${id}`;
+        const rawStock = Number(row.total_stock_value ?? row.closing_value ?? 0);
+
+        branchEntries.set(id, {
+            id,
+            name,
+            rawStock,
+            normName: name.toUpperCase().trim(),
+        });
+    });
+
+    // Also include any branch that made sales but was missing from stock rows
+    (salesRows || []).forEach((row) => {
+        if (!row) return;
+        const id = row.branch_id != null ? String(row.branch_id) : null;
+        const name = row.branch_name || row.branchName || (id ? `Branch ${id}` : "Unknown");
+        if (id && !branchEntries.has(id)) {
+            branchEntries.set(id, {
+                id,
+                name,
+                rawStock: 0,
+                normName: name.toUpperCase().trim(),
+            });
+        }
+    });
+
+    const combinedList = Array.from(branchEntries.values()).map((entry) => {
+        const rawSales = salesMap.get(entry.id) ?? salesMap.get(entry.normName) ?? 0;
+        const rawDailySales = rawSales / validPeriodDays;
+        const stockM = entry.rawStock / 1_000_000;
+        const salesM = rawDailySales / 1_000_000;
+        const daysCover = rawDailySales > 0 ? Math.round(entry.rawStock / rawDailySales) : (entry.rawStock > 0 ? 999 : 0);
+
+        return {
+            name: entry.name,
+            rawStock: entry.rawStock,
+            rawDailySales,
+            stockM,
+            salesM,
+            daysCover,
+        };
+    });
+
+    // Sort descending by stock value (or sales if stock is 0)
+    combinedList.sort((a, b) => b.stockM - a.stockM || b.salesM - a.salesM);
+
+    return {
+        categories: combinedList.map((item) => item.name),
+        stock: combinedList.map((item) => Number(item.stockM.toFixed(2))),
+        sales: combinedList.map((item) => {
+            // Keep appropriate precision: if very small (< 0.01M), use 3 or 4 decimals so line doesn't flatten to 0
+            if (item.salesM > 0 && item.salesM < 0.01) {
+                return Number(item.salesM.toFixed(4));
+            }
+            return Number(item.salesM.toFixed(2));
+        }),
+        rawStock: combinedList.map((item) => item.rawStock),
+        rawDailySales: combinedList.map((item) => item.rawDailySales),
+        daysCover: combinedList.map((item) => item.daysCover),
+    };
+}

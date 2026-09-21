@@ -16,6 +16,7 @@ import {
     fetchBranches,
     fetchDailyClosingStock,
     fetchKPICriticalStockouts,
+    fetchKPISalesTransactions,
     fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
     fetchStockMovements
@@ -104,6 +105,13 @@ const DashboardStock = () => {
             branchcode: branchCode || 1,
             startDate: filters.startDate,
             endDate: filters.endDate,
+        }));
+        dispatch(fetchKPISalesTransactions({
+            clientid: 1,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+            GroupBy: "BRANCH",
+            branchcode: branchCode || null,
         }));
     }, [dispatch, branchCode, filters.startDate, filters.endDate]);
 
@@ -206,7 +214,9 @@ const DashboardStock = () => {
                             <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">
-                                        Stock VS Sales Velocity - Branch Coverage Ratio
+                                        {isBranchView && branchDisplayName
+                                            ? `Stock VS Sales Velocity - ${branchDisplayName}`
+                                            : "Stock VS Sales Velocity - Branch Coverage Ratio"}
                                     </h4>
                                 </CardHeader>
                                 <CardBody>
