@@ -2,11 +2,9 @@ import React, { useMemo } from "react";
 import { ListGroup, ListGroupItem, Spinner } from "reactstrap";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import moment from "moment";
 
 const SlowMovingStock = ({
     items,
-    movements = [],
     searchTerm = "",
     sortAscending = true,
 }) => {
@@ -17,50 +15,13 @@ const SlowMovingStock = ({
     } = useSelector((state) => state.StockInventory ?? {});
 
     const processed = useMemo(() => {
-        // 1. Determine data source: prop items -> Redux slowMovingStock -> legacy movements fallback
+        // 1. Determine data source: prop items -> Redux slowMovingStock
         let rawList = [];
 
         if (Array.isArray(items) && items.length > 0) {
             rawList = items;
         } else if (Array.isArray(slowMovingStock) && slowMovingStock.length > 0) {
             rawList = slowMovingStock;
-        } else if (Array.isArray(movements) && movements.length > 0) {
-            // Legacy client-side fallback from movements
-            const now = moment();
-            const DAYS_WINDOW = 30;
-            const last30Days = movements.filter((m) =>
-                moment(m.movement_date).isAfter(now.clone().subtract(DAYS_WINDOW, "days"))
-            );
-
-            const grouped = {};
-            last30Days.forEach((m) => {
-                const key = m.item_Code || m.item_code;
-                if (!grouped[key]) {
-                    grouped[key] = {
-                        item_code: key,
-                        item_name: m.item_Name || m.item_name,
-                        units_sold_window: 0,
-                        lastMovement: m.movement_date,
-                    };
-                }
-                grouped[key].units_sold_window += Math.abs(Number(m.quantity || 0));
-                if (moment(m.movement_date).isAfter(moment(grouped[key].lastMovement))) {
-                    grouped[key].lastMovement = m.movement_date;
-                }
-            });
-
-            rawList = Object.values(grouped).map((item) => {
-                const daysSince = now.diff(moment(item.lastMovement), "days");
-                let movement_category = "SLOW_MOVER";
-                if (item.units_sold_window === 0 || daysSince > 30) {
-                    movement_category = "DEAD_STOCK";
-                }
-                return {
-                    ...item,
-                    daysSince,
-                    movement_category,
-                };
-            });
         }
 
         // 2. Normalize items to uniform shape
@@ -119,7 +80,7 @@ const SlowMovingStock = ({
                 ? a.itemName.localeCompare(b.itemName)
                 : b.itemName.localeCompare(a.itemName);
         });
-    }, [items, slowMovingStock, movements, searchTerm, sortAscending]);
+    }, [items, slowMovingStock, searchTerm, sortAscending]);
 
     if (loadingSlowMovingStock && (!processed || processed.length === 0)) {
         return (

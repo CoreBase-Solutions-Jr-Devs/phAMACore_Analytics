@@ -52,8 +52,8 @@ const latestRowPerItem = (rows) => {
     return Array.from(map.values());
 };
 
-export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = [], stockValueByBranch = [], stockHealth = []) => {
-    if (!stockRows.length && !stockValueByBranch.length && !stockHealth.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = [], stockValueByBranch = [], stockHealth = [], slowMovingStock = []) => {
+    if (!stockRows.length && !stockValueByBranch.length && !stockHealth.length && !slowMovingStock.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
 
     const items = latestRowPerItem(stockRows);
     const today = new Date();
@@ -101,27 +101,15 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
     }, 0);
 
     // Slow Movers
-    const slowMovers = healthObj?.slow_mover_skus !== undefined && healthObj?.slow_mover_skus !== null
-        ? healthObj.slow_mover_skus
-        : (() => {
-            const slowItems = new Set();
-
-            movementsRows.forEach((row) => {
-                if (!row.receive_date || !row.movement_date) return;
-
-                const receiveDate = new Date(row.receive_date);
-                const movementDate = new Date(row.movement_date);
-
-                const daysToMove =
-                    (movementDate - receiveDate) / (1000 * 60 * 60 * 24);
-
-                if (daysToMove > 30) {
-                    slowItems.add(row.item_Code || row.item_code);
-                }
-            });
-
-            return slowItems.size;
-        })();
+    const slowMovers = (() => {
+        if (healthObj?.slow_mover_skus !== undefined && healthObj?.slow_mover_skus !== null) {
+            return Number(healthObj.slow_mover_skus);
+        }
+        if (Array.isArray(slowMovingStock) && slowMovingStock.length > 0) {
+            return slowMovingStock.length;
+        }
+        return 0;
+    })();
 
     // Overstocked
     const overstocked = healthObj?.overstocked_skus !== undefined && healthObj?.overstocked_skus !== null
