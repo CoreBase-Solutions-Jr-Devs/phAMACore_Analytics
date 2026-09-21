@@ -52,29 +52,37 @@ const latestRowPerItem = (rows) => {
     return Array.from(map.values());
 };
 
-export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = [], stockValueByBranch = []) => {
-    if (!stockRows.length && !stockValueByBranch.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = [], stockValueByBranch = [], stockHealth = []) => {
+    if (!stockRows.length && !stockValueByBranch.length && !stockHealth.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
 
     const items = latestRowPerItem(stockRows);
     const today = new Date();
     const in90d = new Date(today.getTime() + NINETY_DAYS_MS);
 
+    const healthObj = Array.isArray(stockHealth) && stockHealth.length > 0 ? stockHealth[0] : null;
+
     // Total SKUs
-    const totalSKUs = items.length;
+    const totalSKUs = healthObj?.total_catalog_skus ?? items.length;
 
     // Total Stock Value (millions)
     let totalStockValueM = 0;
     if (stockValueByBranch && stockValueByBranch.length > 0) {
         totalStockValueM = stockValueByBranch.reduce((sum, item) => sum + (Number(item.total_stock_value) || 0), 0) / 1_000_000;
+    } else if (healthObj?.total_stock_value !== undefined && healthObj?.total_stock_value !== null) {
+        totalStockValueM = Number(healthObj.total_stock_value || 0) / 1_000_000;
     } else {
         totalStockValueM = items.reduce((sum, r) => sum + (Number(r.closing_value) || 0), 0) / 1_000_000;
     }
 
     // Below Reorder Level
-    const belowReorder = items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) < Number(r.reorder_level)).length;
+    const belowReorder = healthObj?.min_breached_skus !== undefined && healthObj?.min_breached_skus !== null
+        ? healthObj.min_breached_skus
+        : items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) < Number(r.reorder_level)).length;
 
     // Out of Stock
-    const outOfStock = items.filter(r => Number(r.closing_qty) <= 0).length;
+    const outOfStock = healthObj?.out_of_stock_skus !== undefined && healthObj?.out_of_stock_skus !== null
+        ? healthObj.out_of_stock_skus
+        : items.filter(r => Number(r.closing_qty) <= 0).length;
 
     // Near Expiry
     const nearExpiry = batchExpiryRows.reduce((count, item) => {
@@ -93,28 +101,32 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
     }, 0);
 
     // Slow Movers
-    const slowMovers = (() => {
-        const slowItems = new Set();
+    const slowMovers = healthObj?.slow_mover_skus !== undefined && healthObj?.slow_mover_skus !== null
+        ? healthObj.slow_mover_skus
+        : (() => {
+            const slowItems = new Set();
 
-        movementsRows.forEach((row) => {
-            if (!row.receive_date || !row.movement_date) return;
+            movementsRows.forEach((row) => {
+                if (!row.receive_date || !row.movement_date) return;
 
-            const receiveDate = new Date(row.receive_date);
-            const movementDate = new Date(row.movement_date);
+                const receiveDate = new Date(row.receive_date);
+                const movementDate = new Date(row.movement_date);
 
-            const daysToMove =
-                (movementDate - receiveDate) / (1000 * 60 * 60 * 24);
+                const daysToMove =
+                    (movementDate - receiveDate) / (1000 * 60 * 60 * 24);
 
-            if (daysToMove > 30) {
-                slowItems.add(row.item_Code || row.item_code);
-            }
-        });
+                if (daysToMove > 30) {
+                    slowItems.add(row.item_Code || row.item_code);
+                }
+            });
 
-        return slowItems.size;
-    })();
+            return slowItems.size;
+        })();
 
     // Overstocked
-    const overstocked = items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) > OVERSTOCK_MULTIPLIER * Number(r.reorder_level)).length;
+    const overstocked = healthObj?.overstocked_skus !== undefined && healthObj?.overstocked_skus !== null
+        ? healthObj.overstocked_skus
+        : items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) > OVERSTOCK_MULTIPLIER * Number(r.reorder_level)).length;
 
     // Branch Imbalances (> 20% deviation from per-item network average)
     const byItem = new Map();
