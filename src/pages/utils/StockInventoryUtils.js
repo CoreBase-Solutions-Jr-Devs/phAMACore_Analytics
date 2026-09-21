@@ -52,8 +52,8 @@ const latestRowPerItem = (rows) => {
     return Array.from(map.values());
 };
 
-export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = []) => {
-    if (!stockRows.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = [], stockValueByBranch = []) => {
+    if (!stockRows.length && !stockValueByBranch.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
 
     const items = latestRowPerItem(stockRows);
     const today = new Date();
@@ -63,7 +63,12 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
     const totalSKUs = items.length;
 
     // Total Stock Value (millions)
-    const totalStockValueM = items.reduce((sum, r) => sum + (Number(r.closing_value) || 0), 0) / 1_000_000;
+    let totalStockValueM = 0;
+    if (stockValueByBranch && stockValueByBranch.length > 0) {
+        totalStockValueM = stockValueByBranch.reduce((sum, item) => sum + (Number(item.total_stock_value) || 0), 0) / 1_000_000;
+    } else {
+        totalStockValueM = items.reduce((sum, r) => sum + (Number(r.closing_value) || 0), 0) / 1_000_000;
+    }
 
     // Below Reorder Level
     const belowReorder = items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) < Number(r.reorder_level)).length;
