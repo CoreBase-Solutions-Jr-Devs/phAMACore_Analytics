@@ -20,8 +20,8 @@ const KPI_ICON_MAP = {
 const WidgetsOne = ({ branchMap = {} }) => {
 
     const {
-        dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [],
-        loadingStock, loadingMovements, errorStock,
+        dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [], totalStockValueByBranch = [],
+        loadingStock, loadingMovements, loadingTotalStockValueByBranch, errorStock,
     } = useSelector((state) => state.StockInventory ?? {});
 
     const branch = useSelector(
@@ -34,11 +34,11 @@ const WidgetsOne = ({ branchMap = {} }) => {
             : branchMap?.[branch] || "Unknown Branch";
 
     const kpis = useMemo(
-        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo),
-        [dailyClosingStock, stockMovements, batchExpiryNeo]
+        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch),
+        [dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch]
     );
 
-    const isLoading = loadingStock || loadingMovements;
+    const isLoading = loadingStock || loadingMovements || loadingTotalStockValueByBranch;
 
     return (
         <React.Fragment>
