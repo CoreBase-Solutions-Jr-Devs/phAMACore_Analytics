@@ -24,7 +24,7 @@ export const KPI_META = [
     { id: 3, label: "Items below Reorder Level", subtitle: "Need action now", icon: "ri-arrow-down-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 4, label: "Out of Stock Items", subtitle: "Units out of stock", icon: "ri-error-warning-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 5, label: "Near Expiry (\u2264 90 days)", subtitle: "Products at risk", icon: "ri-time-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 6, label: "Slow Movers (30d)", subtitle: "Below velocity threshold", icon: "ri-hourglass-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 6, label: "Slow Movers (30d)", subtitle: "Low velocity & dead stock", icon: "ri-hourglass-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 7, label: "Overstocked Items", subtitle: ">120 days cover", icon: "ri-stack-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 8, label: "Branch Imbalances (> 20%)", subtitle: "Transfer candidates", icon: "ri-git-branch-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
 ];
@@ -100,10 +100,12 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
         return count;
     }, 0);
 
-    // Slow Movers
+    // Slow Movers (Combines slow moving and dead stock SKUs)
     const slowMovers = (() => {
-        if (healthObj?.slow_mover_skus !== undefined && healthObj?.slow_mover_skus !== null) {
-            return Number(healthObj.slow_mover_skus);
+        if (healthObj && (healthObj.slow_mover_skus !== undefined || healthObj.dead_stock_skus !== undefined)) {
+            const slow = Number(healthObj.slow_mover_skus || 0);
+            const dead = Number(healthObj.dead_stock_skus || 0);
+            return slow + dead;
         }
         if (Array.isArray(slowMovingStock) && slowMovingStock.length > 0) {
             return slowMovingStock.length;
