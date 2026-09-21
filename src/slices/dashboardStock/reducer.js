@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPISalesTransactions, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 import { saveCachedBranches } from "../../helpers/branch_helper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
@@ -13,6 +13,7 @@ export const initialState = {
   totalStockValueByBranch: [],
   stockHealth: [],
   criticalStockouts: [],
+  slowMovingStock: [],
   kpiSalesTransactions: [],
   kpiSalesPeriodDays: 1,
   kpiSalesIsBaseline: false,
@@ -24,6 +25,7 @@ export const initialState = {
   loadingTotalStockValueByBranch: false,
   loadingStockHealth: false,
   loadingCriticalStockouts: false,
+  loadingSlowMovingStock: false,
   loadingKPISalesTransactions: false,
   errorBranches: null,
   errorStock: null,
@@ -33,6 +35,7 @@ export const initialState = {
   errorTotalStockValueByBranch: null,
   errorStockHealth: null,
   errorCriticalStockouts: null,
+  errorSlowMovingStock: null,
   errorKPISalesTransactions: null,
   filters: {
     branch: null,
@@ -322,6 +325,24 @@ const StockInventorySlice = createSlice({
           action.payload ||
           action.error?.message ||
           "Failed to fetch critical stockouts!";
+      });
+
+    builder
+      .addCase(fetchKPISlowMovingStock.pending, (state) => {
+        state.loadingSlowMovingStock = true;
+        state.errorSlowMovingStock = null;
+      })
+      .addCase(fetchKPISlowMovingStock.fulfilled, (state, action) => {
+        state.loadingSlowMovingStock = false;
+        state.slowMovingStock = action.payload;
+      })
+      .addCase(fetchKPISlowMovingStock.rejected, (state, action) => {
+        state.loadingSlowMovingStock = false;
+        state.errorSlowMovingStock =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch slow moving stock!";
       });
 
     builder

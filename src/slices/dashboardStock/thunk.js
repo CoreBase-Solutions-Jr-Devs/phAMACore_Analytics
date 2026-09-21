@@ -260,6 +260,62 @@ export const fetchKPICriticalStockouts = createAsyncThunk(
   }
 );
 
+export const fetchKPISlowMovingStock = createAsyncThunk(
+  "stockInventory/fetchKPISlowMovingStock",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const {
+        clientid = 1,
+        branchcode = null,
+        GroupBy = "SLOW_MOVERS",
+        TopN = 50,
+        LookbackDays = 30,
+        AsOfDate = null,
+      } = params;
+
+      const payload = {
+        clientid,
+        GroupBy,
+        TopN,
+        LookbackDays,
+      };
+
+      if (branchcode) {
+        payload.branchcode = branchcode;
+      }
+
+      if (AsOfDate) {
+        // Date format DD/MM/YYYY
+        if (typeof AsOfDate === "string" && /^\d{2}\/\d{2}\/\d{4}$/.test(AsOfDate)) {
+          payload.AsOfDate = AsOfDate;
+        } else {
+          const d = new Date(AsOfDate);
+          if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const year = d.getFullYear();
+            payload.AsOfDate = `${day}/${month}/${year}`;
+          } else {
+            payload.AsOfDate = AsOfDate;
+          }
+        }
+      }
+
+      const response = await getKPIStockHealthApi(payload);
+      const data = response.data ?? response;
+      return Array.isArray(data) ? data : [data];
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error.message ||
+        "Failed to fetch slow moving stock!"
+      );
+    }
+  }
+);
+
+
 const calculatePeriodDays = (startDate, endDate) => {
   if (!startDate || !endDate) return 1;
   const parse = (str) => {

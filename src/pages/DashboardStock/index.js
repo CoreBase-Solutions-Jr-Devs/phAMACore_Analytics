@@ -17,6 +17,7 @@ import {
     fetchDailyClosingStock,
     fetchKPICriticalStockouts,
     fetchKPISalesTransactions,
+    fetchKPISlowMovingStock,
     fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
     fetchStockMovements
@@ -29,7 +30,6 @@ import SlowMovingStock from "./components/SlowMovingStock";
 import ImbalanceAlerts from './components/ImbalanceAlerts';
 
 import FilterActions from './FilterActions';
-import { mockSlowMovingStock } from './components/Sample/slowMovingStock';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -97,6 +97,14 @@ const DashboardStock = () => {
             branchcode: branchCode || null,
             GroupBy: "CRITICAL_STOCKOUTS",
             TopN: 30,
+            AsOfDate: filters.endDate,
+        }));
+        dispatch(fetchKPISlowMovingStock({
+            clientid: 1,
+            branchcode: branchCode || null,
+            GroupBy: "SLOW_MOVERS",
+            TopN: 50,
+            LookbackDays: 30,
             AsOfDate: filters.endDate,
         }));
         // PowerBIStockMovements requires a valid branchcode: use branchCode if available, else default to 1
@@ -271,11 +279,6 @@ const DashboardStock = () => {
 
                                         <SimpleBar style={{ height: "242px" }} className="mx-n3">
                                             <SlowMovingStock
-                                                movements={
-                                                    stockMovements?.length
-                                                        ? stockMovements
-                                                        : mockSlowMovingStock
-                                                }
                                                 searchTerm={searchTerm}
                                                 sortAscending={sortAscending}
                                             />
