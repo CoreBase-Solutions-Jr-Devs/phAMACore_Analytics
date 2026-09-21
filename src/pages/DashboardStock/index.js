@@ -15,6 +15,7 @@ import {
     fetchBatchExpiryNeo,
     fetchBranches,
     fetchDailyClosingStock,
+    fetchKPITotalStockValueByBranch,
     fetchStockMovements
 } from '../../slices/dashboardStock/thunk';
 import { setBranch } from '../../slices/dashboardStock/reducer';
@@ -78,6 +79,12 @@ const DashboardStock = () => {
 
         dispatch(fetchDailyClosingStock(payload));
         dispatch(fetchBatchExpiryNeo(payload));
+        dispatch(fetchKPITotalStockValueByBranch({
+            clientid: 1,
+            whichcost: 1,
+            IncludeBlocked: false,
+            branchcode: branchCode || null,
+        }));
         // PowerBIStockMovements requires a valid branchcode: use branchCode if available, else default to 1
         dispatch(fetchStockMovements({
             clientid: 1,
@@ -167,7 +174,11 @@ const DashboardStock = () => {
                         <Col lg={6} className="d-flex">
                             <Card className="flex-fill">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Stock Value By Branch</h4>
+                                    <h4 className="card-title mb-0">
+                                        {isBranchView && branchDisplayName
+                                            ? `Stock Value - ${branchDisplayName}`
+                                            : "Stock Value By Branch"}
+                                    </h4>
                                 </CardHeader>
                                 <CardBody>
                                     <BarChartTwo />
