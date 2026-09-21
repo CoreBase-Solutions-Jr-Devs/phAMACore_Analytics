@@ -13,17 +13,22 @@ const BarChartThree = ({
     const {
         totalStockValueByBranch = [],
         kpiSalesTransactions = [],
+        kpiSalesPeriodDays = 1,
+        kpiSalesIsBaseline = false,
         loadingTotalStockValueByBranch,
         loadingKPISalesTransactions,
         filters = {},
     } = useSelector((state) => state.StockInventory ?? {});
 
     const periodDays = useMemo(() => {
+        if (kpiSalesPeriodDays && kpiSalesPeriodDays > 1) {
+            return kpiSalesPeriodDays;
+        }
         if (filters?.startDate && filters?.endDate) {
             return getPeriodDays(filters.startDate, filters.endDate);
         }
         return 1;
-    }, [filters?.startDate, filters?.endDate]);
+    }, [kpiSalesPeriodDays, filters?.startDate, filters?.endDate]);
 
     const chartData = useMemo(() => {
         // If caller explicitly passed props, respect them (e.g. storybook / tests / overrides)
@@ -139,7 +144,10 @@ const BarChartThree = ({
                     formatter: (val) => {
                         if (val == null) return "";
                         const num = Number(val);
-                        return num < 0.01 && num > 0 ? `${num.toFixed(3)}M` : `${num.toFixed(2)}M`;
+                        if (num === 0) return "0";
+                        if (num >= 0.01) return `${num.toFixed(2)}M`;
+                        if (num >= 0.001) return `${num.toFixed(3)}M`;
+                        return `${num.toFixed(4)}M`;
                     },
                 },
             },
@@ -178,9 +186,10 @@ const BarChartThree = ({
                             : "";
 
                         if (raw !== undefined) {
-                            const formattedVal = Number(val) < 0.01 && Number(val) > 0
-                                ? Number(val).toFixed(4)
-                                : Number(val).toFixed(2);
+                            let formattedVal = Number(val).toFixed(2);
+                            if (Number(val) > 0 && Number(val) < 0.01) {
+                                formattedVal = Number(val) < 0.0001 ? Number(val).toFixed(6) : Number(val).toFixed(4);
+                            }
                             return `KES ${raw.toLocaleString(undefined, {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
@@ -227,14 +236,22 @@ const BarChartThree = ({
     }
 
     return (
-        <ReactApexChart
-            dir="ltr"
-            className="apex-charts"
-            options={options}
-            series={series}
-            type="line"
-            height={height}
-        />
+        <div className="position-relative">
+            <ReactApexChart
+                dir="ltr"
+                className="apex-charts"
+                options={options}
+                series={series}
+                type="line"
+                height={height}
+            />
+            {kpiSalesIsBaseline && (
+                <div className="text-end text-muted pe-2 pb-1" style={{ fontSize: "11px" }}>
+                    <i className="ri-information-line me-1"></i>
+                    Daily sales velocity computed from baseline transactions history
+                </div>
+            )}
+        </div>
     );
 };
 

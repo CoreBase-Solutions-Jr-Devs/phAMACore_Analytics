@@ -260,6 +260,21 @@ export const fetchKPICriticalStockouts = createAsyncThunk(
   }
 );
 
+const calculatePeriodDays = (startDate, endDate) => {
+  if (!startDate || !endDate) return 1;
+  const parse = (str) => {
+    const parts = str.split('/');
+    if (parts.length === 3) {
+      const [d, m, y] = parts;
+      return new Date(`${y}-${m}-${d}`);
+    }
+    return new Date(str);
+  };
+  const diff = parse(endDate) - parse(startDate);
+  const days = Math.round(diff / (1000 * 60 * 60 * 24));
+  return Math.max(days, 1);
+};
+
 export const fetchKPISalesTransactions = createAsyncThunk(
   "stockInventory/fetchKPISalesTransactions",
   async (params = {}, { rejectWithValue }) => {
@@ -272,17 +287,28 @@ export const fetchKPISalesTransactions = createAsyncThunk(
         branchcode = null,
       } = params;
 
+      const isSingleDay = Boolean(startDate && endDate && startDate === endDate);
+      let queryStart = startDate;
+      let queryEnd = endDate;
+      let isBaseline = false;
+
+      // In inventory analysis, Sales Velocity cannot be based on a single day ("Today" / "Yesterday").
+      // When a single day is selected or dates are omitted, calculate velocity from the baseline data window.
+      if (isSingleDay || !queryStart || !queryEnd) {
+        queryStart = "01/01/2023";
+        queryEnd = endDate || new Date().toLocaleDateString("en-GB");
+        isBaseline = true;
+      }
+
+      let periodDays = calculatePeriodDays(queryStart, queryEnd);
+
       const payload = {
         clientid,
+        StartDate: queryStart,
+        EndDate: queryEnd,
         GroupBy,
       };
 
-      if (startDate) {
-        payload.StartDate = startDate;
-      }
-      if (endDate) {
-        payload.EndDate = endDate;
-      }
       if (branchcode) {
         payload.branchcode = branchcode;
       }
@@ -296,11 +322,50 @@ export const fetchKPISalesTransactions = createAsyncThunk(
           data = [];
         }
       }
-      return Array.isArray(data)
+
+      let rows = Array.isArray(data)
         ? data
         : data?.result
         ? (Array.isArray(data.result) ? data.result : [data.result])
         : [data];
+
+      // Fallback: If a user-selected multi-day range has zero transactions in the database,
+      // fallback to baseline so the chart never flatlines to zero.
+      if ((!rows || !rows.length) && !isBaseline) {
+        queryStart = "01/01/2023";
+        queryEnd = endDate || new Date().toLocaleDateString("en-GB");
+        periodDays = calculatePeriodDays(queryStart, queryEnd);
+        isBaseline = true;
+
+        const fallbackPayload = {
+          clientid,
+          StartDate: queryStart,
+          EndDate: queryEnd,
+          GroupBy,
+        };
+        if (branchcode) fallbackPayload.branchcode = branchcode;
+
+        const fbRes = await getKPISalesTransactionsApi(fallbackPayload);
+        let fbData = fbRes.data ?? fbRes;
+        if (typeof fbData === "string") {
+          try {
+            fbData = JSON.parse(fbData);
+          } catch {
+            fbData = [];
+          }
+        }
+        rows = Array.isArray(fbData)
+          ? fbData
+          : fbData?.result
+          ? (Array.isArray(fbData.result) ? fbData.result : [fbData.result])
+          : [fbData];
+      }
+
+      return {
+        data: (rows || []).filter(Boolean),
+        periodDays,
+        isBaseline,
+      };
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.message ||

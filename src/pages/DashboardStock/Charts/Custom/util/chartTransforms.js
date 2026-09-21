@@ -285,11 +285,11 @@ export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], pe
         categories: combinedList.map((item) => item.name),
         stock: combinedList.map((item) => Number(item.stockM.toFixed(2))),
         sales: combinedList.map((item) => {
-            // Keep appropriate precision: if very small (< 0.01M), use 3 or 4 decimals so line doesn't flatten to 0
-            if (item.salesM > 0 && item.salesM < 0.01) {
-                return Number(item.salesM.toFixed(4));
-            }
-            return Number(item.salesM.toFixed(2));
+            if (item.salesM <= 0) return 0;
+            if (item.salesM >= 0.01) return Number(item.salesM.toFixed(2));
+            if (item.salesM >= 0.001) return Number(item.salesM.toFixed(3));
+            if (item.salesM >= 0.0001) return Number(item.salesM.toFixed(4));
+            return Number(item.salesM.toFixed(6));
         }),
         rawStock: combinedList.map((item) => item.rawStock),
         rawDailySales: combinedList.map((item) => item.rawDailySales),
