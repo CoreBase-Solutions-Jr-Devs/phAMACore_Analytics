@@ -94,11 +94,13 @@ export const useImbalanceEngine = (stock = [], movements = [], expiry = []) => {
             if (isNaN(expDate.getTime())) return;
 
             const days = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+            const qty = Number(row.qtyBal ?? row.closing_qty ?? 0);
+            if (qty <= 0) return;
+
             if (days >= 0 && days <= 90) {
                 const code = row.item_code || row.item_Code || row.invCode || row.itemcode;
                 const name = row.item_Name || row.item_name || row.invName || row.name;
                 const branch = row.branch_Name || row.branch_name || row.branchName || "Main Branch";
-                const qty = Number(row.qtyBal ?? row.closing_qty ?? 0);
 
                 const key = code || name;
                 if (key) {
