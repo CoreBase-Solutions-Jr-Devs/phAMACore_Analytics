@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
-import SimpleBar from 'simplebar-react';
 
 const BarChartOne = ({
     categories = [],
@@ -8,8 +7,8 @@ const BarChartOne = ({
     colors = [],
     metadata = [],
     reorderLine = 14,
-    height = 460,
-    enableScroll = false,
+    height = 440,
+    paginationComponent = null,
 }) => {
     const resolvedCategories = categories || [];
     const resolvedData = data || [];
@@ -60,21 +59,21 @@ const BarChartOne = ({
 
     const series = [{ name: "Days of Cover", data: resolvedData }];
 
-    const isLargeList = resolvedCategories.length > 15 || enableScroll;
-    const chartHeight = isLargeList
-        ? Math.max(height, resolvedCategories.length * 30)
-        : height;
+    const dynamicHeight = Math.min(
+        Math.max(260, resolvedCategories.length * 30),
+        480
+    );
 
     const options = {
         chart: {
             type: 'bar',
-            height: chartHeight,
+            height: dynamicHeight,
             toolbar: { show: false },
             animations: { enabled: true },
         },
         plotOptions: {
             bar: {
-                barHeight: isLargeList ? '65%' : '52%',
+                barHeight: resolvedCategories.length <= 5 ? '35%' : '55%',
                 distributed: true,
                 horizontal: true,
                 dataLabels: { position: 'top' },
@@ -164,57 +163,49 @@ const BarChartOne = ({
         },
     ];
 
-    const chartElement = (
-        <ReactApexChart
-            dir="ltr"
-            className="apex-charts"
-            options={options}
-            series={series}
-            type="bar"
-            height={chartHeight}
-        />
-    );
-
     return (
         <div className="critical-stock-chart-wrapper">
-            {isLargeList ? (
-                <SimpleBar
-                    style={{ maxHeight: `${height}px`, overflowX: 'hidden' }}
-                    className="pe-2"
-                >
-                    {chartElement}
-                </SimpleBar>
-            ) : (
-                chartElement
-            )}
-            <hr className="my-3" />
+            <ReactApexChart
+                dir="ltr"
+                className="apex-charts"
+                options={options}
+                series={series}
+                type="bar"
+                height={dynamicHeight}
+            />
 
-            <div className="px-2">
-                <div className="fw-semibold mb-2">
-                    Live Stock vs. Safety Minimum — days of cover remaining
-                </div>
+            <div className="px-2 pt-3 mt-2 border-top">
+                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div>
+                        <div className="text-muted small mb-1">
+                            <strong>Threshold:</strong> Vertical Line = Reorder @ {reorderLine} days of cover.
+                        </div>
 
-                <div className="text-muted small">
-                    <strong>Vertical Line</strong> = Reorder threshold ({reorderLine} days of cover).
-                </div>
+                        <div className="d-flex flex-wrap gap-3 small">
+                            {legendItems.map(({ color, label }) => (
+                                <span
+                                    key={label}
+                                    className="d-flex align-items-center"
+                                >
+                                    <span
+                                        className="me-2 rounded-circle"
+                                        style={{
+                                            width: 10,
+                                            height: 10,
+                                            backgroundColor: color,
+                                        }}
+                                    />
+                                    {label}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
 
-                <div className="d-flex flex-wrap gap-3 mt-2 small">
-                    {legendItems.map(({ color, label }) => (
-                        <span
-                            key={label}
-                            className="d-flex align-items-center"
-                        >
-                            <span
-                                className="me-2 rounded-circle"
-                                style={{
-                                    width: 10,
-                                    height: 10,
-                                    backgroundColor: color,
-                                }}
-                            />
-                            {label}
-                        </span>
-                    ))}
+                    {paginationComponent && (
+                        <div className="ms-auto d-flex align-items-center">
+                            {paginationComponent}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
