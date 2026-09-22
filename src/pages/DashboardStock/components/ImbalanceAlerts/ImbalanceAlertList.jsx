@@ -2,7 +2,12 @@ import React from "react";
 import { ListGroup, Spinner } from "reactstrap";
 import ImbalanceAlertItem from "./ImbalanceAlertItem";
 
-const ImbalanceAlertList = ({ alerts = [], isLoading = false, error = null }) => {
+const ImbalanceAlertList = ({
+    alerts = [],
+    searchTerm = "",
+    isLoading = false,
+    error = null,
+}) => {
     if (isLoading && (!alerts || alerts.length === 0)) {
         return (
             <div
@@ -28,6 +33,21 @@ const ImbalanceAlertList = ({ alerts = [], isLoading = false, error = null }) =>
     }
 
     if (!alerts?.length) {
+        if (searchTerm) {
+            return (
+                <div
+                    className="d-flex flex-column align-items-center justify-content-center py-4 text-center text-muted"
+                    style={{ minHeight: "180px" }}
+                >
+                    <i className="ri-search-line display-6 mb-2"></i>
+                    <div className="fw-medium text-dark fs-13">No matching imbalance alerts</div>
+                    <small className="text-muted">
+                        No alerts match "{searchTerm}". Try adjusting your search query.
+                    </small>
+                </div>
+            );
+        }
+
         return (
             <div
                 className="d-flex flex-column align-items-center justify-content-center py-4 text-center text-muted"
