@@ -22,12 +22,37 @@ export const KPI_META = [
     { id: 1, label: "Total SKUs", subtitle: "Across all branches", icon: "ri-medicine-bottle-line text-primary", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 2, label: "Total Stock Value", subtitle: "KES - all branches", icon: "ri-money-dollar-circle-line text-success", decimals: 2, prefix: "KES ", suffix: "m", separator: "," },
     { id: 3, label: "Items below Reorder Level", subtitle: "Need action now", icon: "ri-arrow-down-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 4, label: "Out of Stock Items", subtitle: "Units out of stock", icon: "ri-error-warning-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 4, label: "Out of Stock Items", subtitle: "SKUs out of stock", icon: "ri-error-warning-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 5, label: "Near Expiry (\u2264 90 days)", subtitle: "Products at risk", icon: "ri-time-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 6, label: "Slow Movers (30d)", subtitle: "Low velocity & dead stock", icon: "ri-hourglass-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 7, label: "Overstocked Items", subtitle: ">120 days cover", icon: "ri-stack-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 7, label: "Overstocked Items", subtitle: "> Target max cover", icon: "ri-stack-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 8, label: "Branch Imbalances (> 20%)", subtitle: "Transfer candidates", icon: "ri-git-branch-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
 ];
+
+/**
+ * Returns dynamic KPI metadata tailored to current branch filter context
+ */
+export const getKPIMeta = ({ branchName = "All Branches", isBranchView = false, healthObj = null } = {}) => {
+    return KPI_META.map((widget) => {
+        if (widget.id === 1) {
+            const stockedCount = healthObj?.stocked_skus;
+            const branchSub = stockedCount !== undefined && stockedCount !== null
+                ? `Branch: ${branchName} (${stockedCount} stocked)`
+                : `Branch: ${branchName}`;
+            return {
+                ...widget,
+                subtitle: isBranchView ? branchSub : "Across all branches",
+            };
+        }
+        if (widget.id === 2) {
+            return {
+                ...widget,
+                subtitle: isBranchView ? `KES - ${branchName}` : "KES - all branches",
+            };
+        }
+        return widget;
+    });
+};
 
 // KPI COMPUTATION HELPERS
 
@@ -41,25 +66,81 @@ const parseExpiry = (val) => {
     return isNaN(d.getTime()) ? null : d;
 };
 
-// One row per item_code — whichever has the latest snapshot_date
-const latestRowPerItem = (rows) => {
+// Deduplicate rows per item per branch to get the latest snapshot date
+const latestRowPerItemBranch = (rows = []) => {
     const map = new Map();
     for (const row of rows) {
-        const existing = map.get(row.item_code);
-        if (!existing || new Date(row.snapshot_date) > new Date(existing.snapshot_date))
-            map.set(row.item_code, row);
+        const itemCode = row.item_code || row.item_Code || row.invCode || row.itemcode;
+        const branch = row.branch_id || row.branch_Name || row.branch_name || row.branchName || "1";
+        if (!itemCode) continue;
+
+        const key = `${itemCode}__${branch}`;
+        const existing = map.get(key);
+        const rowDate = row.snapshot_date ? new Date(row.snapshot_date) : null;
+        const existDate = existing?.snapshot_date ? new Date(existing.snapshot_date) : null;
+
+        if (!existing || (rowDate && existDate && rowDate > existDate) || (!existDate && rowDate)) {
+            map.set(key, row);
+        }
     }
     return Array.from(map.values());
 };
 
-export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = [], stockValueByBranch = [], stockHealth = [], slowMovingStock = [], imbalanceAlerts = []) => {
-    if (!stockRows.length && !stockValueByBranch.length && !stockHealth.length && !slowMovingStock.length && !imbalanceAlerts.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+// Aggregate items across all branches from deduplicated branch-level rows
+const aggregateItemsAcrossBranches = (branchRows = []) => {
+    const itemMap = new Map();
+    for (const row of branchRows) {
+        const itemCode = row.item_code || row.item_Code || row.invCode || row.itemcode;
+        if (!itemCode) continue;
 
-    const items = latestRowPerItem(stockRows);
+        const closingQty = Number(row.closing_qty ?? row.closing_Stock ?? row.closingStock ?? row.stockInNo ?? row.qtyBal ?? 0);
+        const unitCost = Number(row.unit_avg_cost ?? row.avgCost ?? 0);
+        const closingValue = Number(
+            row.closing_value ?? row.costValue ?? (closingQty > 0 && unitCost > 0 ? closingQty * unitCost : 0)
+        );
+        const reorderLevel = Number(row.reorder_level ?? row.effective_min_qty ?? 0);
+
+        const existing = itemMap.get(itemCode);
+        if (!existing) {
+            itemMap.set(itemCode, {
+                item_code: itemCode,
+                item_name: row.item_name || row.invName || itemCode,
+                closing_qty: closingQty,
+                closing_value: closingValue,
+                reorder_level: reorderLevel,
+            });
+        } else {
+            existing.closing_qty += closingQty;
+            existing.closing_value += closingValue;
+            existing.reorder_level += reorderLevel;
+        }
+    }
+    return Array.from(itemMap.values());
+};
+
+export const computeKPIs = (
+    stockRows = [],
+    movementsRows = [],
+    batchExpiryRows = [],
+    stockValueByBranch = [],
+    stockHealth = [],
+    slowMovingStock = [],
+    imbalanceAlerts = []
+) => {
+    if (!stockRows.length && !stockValueByBranch.length && !stockHealth.length && !slowMovingStock.length && !imbalanceAlerts.length) {
+        return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+    }
+
+    const branchRows = latestRowPerItemBranch(stockRows);
+    const items = aggregateItemsAcrossBranches(branchRows);
+
     const today = new Date();
-    const in90d = new Date(today.getTime() + NINETY_DAYS_MS);
+    today.setHours(0, 0, 0, 0);
+    const msPerDay = 1000 * 60 * 60 * 24;
 
-    const healthObj = Array.isArray(stockHealth) && stockHealth.length > 0 ? stockHealth[0] : null;
+    const healthObj = Array.isArray(stockHealth) && stockHealth.length > 0
+        ? stockHealth[0]
+        : (stockHealth && typeof stockHealth === "object" && !Array.isArray(stockHealth) ? stockHealth : null);
 
     // Total SKUs
     const totalSKUs = healthObj?.total_catalog_skus ?? items.length;
@@ -77,28 +158,35 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
     // Below Reorder Level
     const belowReorder = healthObj?.min_breached_skus !== undefined && healthObj?.min_breached_skus !== null
         ? healthObj.min_breached_skus
-        : items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) < Number(r.reorder_level)).length;
+        : items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) <= Number(r.reorder_level)).length;
 
-    // Out of Stock
+    // Out of Stock Items
     const outOfStock = healthObj?.out_of_stock_skus !== undefined && healthObj?.out_of_stock_skus !== null
         ? healthObj.out_of_stock_skus
         : items.filter(r => Number(r.closing_qty) <= 0).length;
 
-    // Near Expiry
-    const nearExpiry = batchExpiryRows.reduce((count, item) => {
-        if (!item.expirydate) return count;
+    // Near Expiry (<= 90 days) - distinct active products at risk
+    const nearExpiryProducts = new Set();
+    if (Array.isArray(batchExpiryRows) && batchExpiryRows.length > 0) {
+        batchExpiryRows.forEach((item) => {
+            const qty = Number(item.qtyBal ?? item.closing_qty ?? 0);
+            if (qty <= 0) return;
+            if (!item.expirydate) return;
 
-        const expiryDate = new Date(item.expirydate);
-        const daysToExpiry = Math.ceil(
-            (expiryDate - today) / (1000 * 60 * 60 * 24)
-        );
+            const expiryDate = new Date(item.expirydate);
+            if (isNaN(expiryDate.getTime())) return;
+            expiryDate.setHours(0, 0, 0, 0);
 
-        if (daysToExpiry >= 0 && daysToExpiry <= 90) {
-            return count + 1;
-        }
-
-        return count;
-    }, 0);
+            const daysToExpiry = Math.ceil((expiryDate - today) / msPerDay);
+            if (daysToExpiry >= 0 && daysToExpiry <= 90) {
+                const code = item.invCode || item.item_code || item.item_Code || item.invName;
+                if (code) {
+                    nearExpiryProducts.add(code);
+                }
+            }
+        });
+    }
+    const nearExpiry = nearExpiryProducts.size;
 
     // Slow Movers (Combines slow moving and dead stock SKUs)
     const slowMovers = (() => {
@@ -113,69 +201,47 @@ export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows 
         return 0;
     })();
 
-    // Overstocked
+    // Overstocked Items
     const overstocked = healthObj?.overstocked_skus !== undefined && healthObj?.overstocked_skus !== null
         ? healthObj.overstocked_skus
         : items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) > OVERSTOCK_MULTIPLIER * Number(r.reorder_level)).length;
 
-    // Branch Imbalances (> 20% deviation or replenishment / transfer candidates)
+    // Branch Imbalances (> 20% deviation - inter-branch transfer candidates)
     const branchImbalances = (() => {
         if (healthObj && (healthObj.branch_imbalance_skus !== undefined || healthObj.imbalance_skus !== undefined)) {
             return Number(healthObj.branch_imbalance_skus ?? healthObj.imbalance_skus ?? 0);
         }
         if (Array.isArray(imbalanceAlerts) && imbalanceAlerts.length > 0) {
-            return imbalanceAlerts.length;
+            return imbalanceAlerts.filter(a => a.type === "inter_branch").length;
         }
 
-        // Deduplicate latest snapshot per item per branch
-        const itemBranchMap = new Map();
-        for (const row of stockRows) {
-            const itemCode = row.item_code || row.item_Code || row.invCode || row.itemcode;
-            const branch = row.branch_Name || row.branch_name || row.branchName || row.branch_id;
-            if (!itemCode || !branch) continue;
-
-            const qty = Number(row.closing_qty ?? row.closing_Stock ?? row.closingStock ?? row.stockInNo ?? row.qtyBal ?? 0);
-            const reorderLevel = Number(row.reorder_level ?? row.effective_min_qty ?? 0);
-            const date = row.snapshot_date ? new Date(row.snapshot_date) : null;
-            const key = `${itemCode}__${branch}`;
-            const existing = itemBranchMap.get(key);
-
-            if (!existing || (date && existing.date && date > existing.date) || (!existing.date && date)) {
-                itemBranchMap.set(key, { itemCode, branch, qty, reorderLevel, date });
-            }
-        }
-
-        // Group by item
+        // Fallback calculation directly from branch-level records
         const byItem = new Map();
-        for (const entry of itemBranchMap.values()) {
-            if (!byItem.has(entry.itemCode)) byItem.set(entry.itemCode, []);
-            byItem.get(entry.itemCode).push(entry);
+        for (const entry of branchRows) {
+            const itemCode = entry.item_code || entry.item_Code || entry.invCode || entry.itemcode;
+            if (!itemCode) continue;
+            if (!byItem.has(itemCode)) byItem.set(itemCode, []);
+            byItem.get(itemCode).push({
+                branch: entry.branch_id || entry.branch_Name || entry.branch_name || entry.branchName,
+                qty: Number(entry.closing_qty ?? entry.closing_Stock ?? entry.qtyBal ?? 0),
+                reorderLevel: Number(entry.reorder_level ?? entry.effective_min_qty ?? 0),
+            });
         }
 
         let count = 0;
         for (const branches of byItem.values()) {
+            if (branches.length < 2) continue; // Requires at least two branches for an imbalance
+
             const qtys = branches.map((b) => b.qty);
             const totalStock = qtys.reduce((a, b) => a + b, 0);
             if (totalStock <= 0) continue; // Completely out of stock network-wide
 
-            if (branches.length >= 2) {
-                const max = Math.max(...qtys);
-                const min = Math.min(...qtys);
-                const avg = totalStock / branches.length;
-                const allLow = branches.every((b) =>
-                    b.reorderLevel > 0 ? b.qty <= b.reorderLevel : b.qty <= 5
-                );
+            const max = Math.max(...qtys);
+            const min = Math.min(...qtys);
+            const avg = totalStock / branches.length;
 
-                if (allLow) {
-                    count++;
-                } else if (max > min && (min === 0 || (avg > 0 && (max - min) / max > 0.2))) {
-                    count++;
-                }
-            } else if (branches.length === 1) {
-                const single = branches[0];
-                if ((single.reorderLevel > 0 && single.qty <= single.reorderLevel) || single.qty <= 5) {
-                    count++;
-                }
+            if (max > min && (min === 0 || (avg > 0 && (max - min) / max > 0.2))) {
+                count++;
             }
         }
 

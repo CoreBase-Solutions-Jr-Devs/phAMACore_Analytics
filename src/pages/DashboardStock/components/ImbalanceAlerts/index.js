@@ -2,7 +2,13 @@ import React from "react";
 import { useSelector } from "react-redux";
 import ImbalanceAlertsContainer from "./ImbalanceAlertsContainer";
 
-const ImbalanceAlerts = ({ stock, movements, expiry }) => {
+const ImbalanceAlerts = ({
+    stock,
+    movements,
+    expiry,
+    searchTerm = "",
+    sortAscending = true,
+}) => {
     const {
         dailyClosingStock = [],
         stockMovements = [],
@@ -20,6 +26,8 @@ const ImbalanceAlerts = ({ stock, movements, expiry }) => {
             stock={stockData}
             movements={movementsData}
             expiry={expiryData}
+            searchTerm={searchTerm}
+            sortAscending={sortAscending}
             isLoading={loadingStock}
             error={errorStock}
         />

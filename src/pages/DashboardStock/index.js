@@ -37,6 +37,9 @@ const DashboardStock = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortAscending, setSortAscending] = useState(true);
 
+    const [imbalanceSearchTerm, setImbalanceSearchTerm] = useState("");
+    const [imbalanceSortAscending, setImbalanceSortAscending] = useState(true);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { branchId } = useParams();
@@ -250,12 +253,12 @@ const DashboardStock = () => {
                     </Row>
                     <Row>
                         <Col lg={5}>
-                            <Card>
+                            <Card className="card-height-100">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">SLOW MOVING STOCK (30 DAYS)</h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <p className="text-muted">Low Sales Velocity Items (30 Days)</p>
+                                    <p className="text-muted text-truncate mb-3">Low Sales Velocity Items (30 Days)</p>
                                     <div id="users">
                                         <Row className="mb-3 align-items-center g-2">
                                             <Col>
@@ -288,19 +291,42 @@ const DashboardStock = () => {
                             </Card>
                         </Col>
                         <Col lg={7}>
-                            <Card>
+                            <Card className="card-height-100">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Inter-branch Imbalance Alerts</h4>
+                                    <h4 className="card-title mb-0">INTER-BRANCH IMBALANCE ALERTS</h4>
                                 </CardHeader>
 
                                 <CardBody>
-                                    <p className="text-muted">Products where one branch is overstocked while another is critically low.</p>
+                                    <p className="text-muted text-truncate mb-3">Products where one branch is overstocked while another is critically low.</p>
 
-                                    <SimpleBar style={{ height: "272px" }} className="mx-n3 px-3">
+                                    <Row className="mb-3 align-items-center g-2">
+                                        <Col>
+                                            <input
+                                                className="form-control"
+                                                placeholder="Search by product, branch, or code..."
+                                                value={imbalanceSearchTerm}
+                                                onChange={(e) => setImbalanceSearchTerm(e.target.value)}
+                                            />
+                                        </Col>
+
+                                        <Col xs="auto">
+                                            <button
+                                                className="btn btn-outline-secondary"
+                                                onClick={() => setImbalanceSortAscending((prev) => !prev)}
+                                                title={imbalanceSortAscending ? "Sort A–Z" : "Sort Z–A"}
+                                            >
+                                                {imbalanceSortAscending ? "A–Z ▲" : "Z–A ▼"}
+                                            </button>
+                                        </Col>
+                                    </Row>
+
+                                    <SimpleBar style={{ height: "242px" }} className="mx-n3 px-3">
                                         <ImbalanceAlerts
                                             stock={dailyClosingStock}
                                             movements={stockMovements}
                                             expiry={batchExpiryNeo}
+                                            searchTerm={imbalanceSearchTerm}
+                                            sortAscending={imbalanceSortAscending}
                                         />
                                     </SimpleBar>
                                 </CardBody>

@@ -16,7 +16,6 @@ export const initialState = {
   slowMovingStock: [],
   kpiSalesTransactions: [],
   kpiSalesPeriodDays: 1,
-  kpiSalesIsBaseline: false,
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
@@ -355,11 +354,9 @@ const StockInventorySlice = createSlice({
         if (action.payload && typeof action.payload === "object" && !Array.isArray(action.payload)) {
           state.kpiSalesTransactions = action.payload.data || [];
           state.kpiSalesPeriodDays = action.payload.periodDays || 1;
-          state.kpiSalesIsBaseline = Boolean(action.payload.isBaseline);
         } else {
           state.kpiSalesTransactions = action.payload || [];
           state.kpiSalesPeriodDays = 1;
-          state.kpiSalesIsBaseline = false;
         }
       })
       .addCase(fetchKPISalesTransactions.rejected, (state, action) => {

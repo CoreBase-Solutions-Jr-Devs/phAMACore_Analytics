@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useSelector } from "react-redux";
-import { KPI_META, computeKPIs, getTodayApi, getNDaysAgoApi} from "../utils/StockInventoryUtils";
+import { KPI_META, computeKPIs, getKPIMeta } from "../utils/StockInventoryUtils";
 import { useImbalanceEngine } from "./components/ImbalanceAlerts/useImbalanceEngine";
+import { resolveBranchName } from "../../helpers/branch_helper";
 
 
 const KPI_ICON_MAP = {
@@ -21,7 +22,7 @@ const KPI_ICON_MAP = {
 const WidgetsOne = ({ branchMap = {} }) => {
 
     const {
-        dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [], totalStockValueByBranch = [], stockHealth = [], slowMovingStock = [],
+        dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [], totalStockValueByBranch = [], stockHealth = [], slowMovingStock = [], branches = [],
         loadingStock, loadingMovements, loadingTotalStockValueByBranch, loadingStockHealth, loadingSlowMovingStock, errorStock,
     } = useSelector((state) => state.StockInventory ?? {});
 
@@ -29,10 +30,10 @@ const WidgetsOne = ({ branchMap = {} }) => {
         (state) => state.StockInventory?.filters?.branch
     );
 
-    const branchName =
-        !branch || branch === "All Branches"
-            ? "All Branches"
-            : branchMap?.[branch] || "Unknown Branch";
+    const isBranchView = Boolean(branch && branch !== "All Branches");
+    const branchDisplayName = isBranchView
+        ? (branchMap?.[branch] || resolveBranchName(branch, branches, stockMovements) || `Branch ${branch}`)
+        : "All Branches";
 
     const alerts = useMemo(
         () => useImbalanceEngine(dailyClosingStock, stockMovements, batchExpiryNeo),
@@ -44,13 +45,22 @@ const WidgetsOne = ({ branchMap = {} }) => {
         [dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock, alerts]
     );
 
+    const healthObj = Array.isArray(stockHealth) && stockHealth.length > 0
+        ? stockHealth[0]
+        : (stockHealth && typeof stockHealth === "object" && !Array.isArray(stockHealth) ? stockHealth : null);
+
+    const meta = useMemo(
+        () => getKPIMeta({ branchName: branchDisplayName, isBranchView, healthObj }),
+        [branchDisplayName, isBranchView, healthObj]
+    );
+
     const isLoading = loadingStock || loadingMovements || loadingTotalStockValueByBranch || loadingStockHealth || loadingSlowMovingStock;
 
     return (
         <React.Fragment>
 
             <Row className="g-2 mb-2">
-                {KPI_META.map((widget) => {
+                {meta.map((widget) => {
                     const { icon, color } =
                         KPI_ICON_MAP[widget.id] ?? { icon: "activity", color: "primary" };
 

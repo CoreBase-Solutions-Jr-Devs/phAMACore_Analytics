@@ -37,7 +37,7 @@ const ImbalanceAlertItem = ({ data, index }) => {
         <ListGroupItem data-id={index} className="px-3 py-2" title={tooltipTitle}>
             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div className="d-flex align-items-center flex-wrap gap-2 min-w-0">
-                    <span className="fw-medium text-body fs-13 text-truncate" style={{ maxWidth: "220px" }}>
+                    <span className="fw-medium text-body fs-13 text-truncate" style={{ maxWidth: "220px" }} title={data.product}>
                         {data.product}
                     </span>
 

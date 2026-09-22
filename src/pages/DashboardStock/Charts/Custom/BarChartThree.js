@@ -14,7 +14,6 @@ const BarChartThree = ({
         totalStockValueByBranch = [],
         kpiSalesTransactions = [],
         kpiSalesPeriodDays = 1,
-        kpiSalesIsBaseline = false,
         loadingTotalStockValueByBranch,
         loadingKPISalesTransactions,
         filters = {},
@@ -236,22 +235,14 @@ const BarChartThree = ({
     }
 
     return (
-        <div className="position-relative">
-            <ReactApexChart
-                dir="ltr"
-                className="apex-charts"
-                options={options}
-                series={series}
-                type="line"
-                height={height}
-            />
-            {kpiSalesIsBaseline && (
-                <div className="text-end text-muted pe-2 pb-1" style={{ fontSize: "11px" }}>
-                    <i className="ri-information-line me-1"></i>
-                    Daily sales velocity computed from baseline transactions history
-                </div>
-            )}
-        </div>
+        <ReactApexChart
+            dir="ltr"
+            className="apex-charts"
+            options={options}
+            series={series}
+            type="line"
+            height={height}
+        />
     );
 };
 

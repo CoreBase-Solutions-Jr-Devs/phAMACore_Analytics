@@ -133,7 +133,7 @@ const SlowMovingStock = ({
                     <div className="d-flex align-items-center">
                         <div className="flex-grow-1 min-w-0 me-2">
                             <h5 className="fs-13 mb-1 text-truncate">
-                                <Link to="#" className="link name text-body">
+                                <Link to="#" className="link name text-body" title={item.itemName}>
                                     {item.itemName}
                                 </Link>
                             </h5>
