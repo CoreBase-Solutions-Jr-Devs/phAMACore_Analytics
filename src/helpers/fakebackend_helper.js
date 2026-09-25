@@ -89,4 +89,14 @@ export const getBatchExpiryNeo = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_BATCH_EXPIRY_NEO, { params });
 export const getBranches = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_BRANCHES, { params });
+export const getKPIOverdueAccounts = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_OVERDUE_ACCOUNTS, { params });
+export const getKPISalesTransactions = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_SALESTRANSACTIONS, { params });
+export const getKPITotalStockValueByBranch = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_TOTALSTOCKVALUEBYBRANCH, { params });
+export const getKPIPurchases = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_PURCHASES, { params });
+export const getKPIStockHealth = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_STOCKHEALTH, { params });
 

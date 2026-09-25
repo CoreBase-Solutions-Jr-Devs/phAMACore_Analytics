@@ -16,26 +16,40 @@ const WidgetsTwo = () => {
     );
 
     const widgetData = useMemo(() => {
-        let days0to30 = 0;
-        let days31to60 = 0;
-        let days61to90 = 0;
-
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const msPerDay = 1000 * 60 * 60 * 24;
 
-        batchExpiryNeo.forEach((item) => {
+        // Map each product to its earliest positive-balance expiry date within 90 days
+        const productEarliestExpiry = new Map();
+
+        (batchExpiryNeo || []).forEach((item) => {
+            const qty = Number(item.qtyBal ?? item.closing_qty ?? 0);
+            if (qty <= 0) return;
             if (!item.expirydate) return;
 
             const expiryDate = new Date(item.expirydate);
+            if (isNaN(expiryDate.getTime())) return;
             expiryDate.setHours(0, 0, 0, 0);
 
             const daysToExpiry = Math.ceil((expiryDate - today) / msPerDay);
-
             if (daysToExpiry < 0 || daysToExpiry > 90) return;
 
-            if (daysToExpiry <= 30) days0to30++;
-            else if (daysToExpiry <= 60) days31to60++;
+            const productKey = item.invCode || item.item_code || item.item_Code || item.invName;
+            if (!productKey) return;
+
+            if (!productEarliestExpiry.has(productKey) || daysToExpiry < productEarliestExpiry.get(productKey)) {
+                productEarliestExpiry.set(productKey, daysToExpiry);
+            }
+        });
+
+        let days0to30 = 0;
+        let days31to60 = 0;
+        let days61to90 = 0;
+
+        productEarliestExpiry.forEach((days) => {
+            if (days <= 30) days0to30++;
+            else if (days <= 60) days31to60++;
             else days61to90++;
         });
 

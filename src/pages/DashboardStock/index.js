@@ -15,6 +15,11 @@ import {
     fetchBatchExpiryNeo,
     fetchBranches,
     fetchDailyClosingStock,
+    fetchKPICriticalStockouts,
+    fetchKPISalesTransactions,
+    fetchKPISlowMovingStock,
+    fetchKPIStockHealth,
+    fetchKPITotalStockValueByBranch,
     fetchStockMovements
 } from '../../slices/dashboardStock/thunk';
 import { setBranch } from '../../slices/dashboardStock/reducer';
@@ -25,13 +30,15 @@ import SlowMovingStock from "./components/SlowMovingStock";
 import ImbalanceAlerts from './components/ImbalanceAlerts';
 
 import FilterActions from './FilterActions';
-import { mockSlowMovingStock } from './components/Sample/slowMovingStock';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
 
     const [searchTerm, setSearchTerm] = useState("");
     const [sortAscending, setSortAscending] = useState(true);
+
+    const [imbalanceSearchTerm, setImbalanceSearchTerm] = useState("");
+    const [imbalanceSortAscending, setImbalanceSortAscending] = useState(true);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -40,7 +47,7 @@ const DashboardStock = () => {
     const branchCode = branchId ? Number(branchId) : null;
     const isBranchView = !!branchCode;
 
-    const { stockMovements = [], dailyClosingStock = [], branches = [], filters } = useSelector((state) => state.StockInventory);
+    const { stockMovements = [], dailyClosingStock = [], batchExpiryNeo = [], branches = [], filters } = useSelector((state) => state.StockInventory);
 
     const branchDisplayName = isBranchView
         ? resolveBranchName(branchCode, branches, stockMovements)
@@ -78,12 +85,44 @@ const DashboardStock = () => {
 
         dispatch(fetchDailyClosingStock(payload));
         dispatch(fetchBatchExpiryNeo(payload));
+        dispatch(fetchKPITotalStockValueByBranch({
+            clientid: 1,
+            whichcost: 1,
+            IncludeBlocked: false,
+            branchcode: branchCode || null,
+        }));
+        dispatch(fetchKPIStockHealth({
+            clientid: 1,
+            branchcode: branchCode || null,
+        }));
+        dispatch(fetchKPICriticalStockouts({
+            clientid: 1,
+            branchcode: branchCode || null,
+            GroupBy: "CRITICAL_STOCKOUTS",
+            TopN: 30,
+            AsOfDate: filters.endDate,
+        }));
+        dispatch(fetchKPISlowMovingStock({
+            clientid: 1,
+            branchcode: branchCode || null,
+            GroupBy: "SLOW_MOVERS",
+            TopN: 50,
+            LookbackDays: 30,
+            AsOfDate: filters.endDate,
+        }));
         // PowerBIStockMovements requires a valid branchcode: use branchCode if available, else default to 1
         dispatch(fetchStockMovements({
             clientid: 1,
             branchcode: branchCode || 1,
             startDate: filters.startDate,
             endDate: filters.endDate,
+        }));
+        dispatch(fetchKPISalesTransactions({
+            clientid: 1,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+            GroupBy: "BRANCH",
+            branchcode: branchCode || null,
         }));
     }, [dispatch, branchCode, filters.startDate, filters.endDate]);
 
@@ -149,13 +188,16 @@ const DashboardStock = () => {
                         <Col xl={12}>
                             <Card>
                                 <CardHeader>
-                                    <h4 className="card-title mb-1">
-                                        Critical Stock Levels - MUST-NOT STOCKOUT items
-                                    </h4>
-
-                                    {/* <small className="text-warning">
-                                        Showing illustrative sample data while stock cover calculations are being validated.
-                                    </small> */}
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div>
+                                            <h4 className="card-title mb-1">
+                                                Critical Stock Levels - MUST-NOT STOCKOUT items
+                                            </h4>
+                                            <p className="text-muted mb-0 small">
+                                                Class A Revenue Drivers at Risk
+                                            </p>
+                                        </div>
+                                    </div>
                                 </CardHeader>
                                 <CardBody>
                                     <CriticalStockChart />
@@ -167,7 +209,11 @@ const DashboardStock = () => {
                         <Col lg={6} className="d-flex">
                             <Card className="flex-fill">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Stock Value By Branch</h4>
+                                    <h4 className="card-title mb-0">
+                                        {isBranchView && branchDisplayName
+                                            ? `Stock Value - ${branchDisplayName}`
+                                            : "Stock Value By Branch"}
+                                    </h4>
                                 </CardHeader>
                                 <CardBody>
                                     <BarChartTwo />
@@ -179,7 +225,9 @@ const DashboardStock = () => {
                             <Card className="flex-fill">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">
-                                        Stock VS Sales Velocity - Branch Coverage Ratio
+                                        {isBranchView && branchDisplayName
+                                            ? `Stock VS Sales Velocity - ${branchDisplayName}`
+                                            : "Stock VS Sales Velocity - Branch Coverage Ratio"}
                                     </h4>
                                 </CardHeader>
                                 <CardBody>
@@ -205,12 +253,12 @@ const DashboardStock = () => {
                     </Row>
                     <Row>
                         <Col lg={5}>
-                            <Card>
+                            <Card className="card-height-100">
                                 <CardHeader>
                                     <h4 className="card-title mb-0">SLOW MOVING STOCK (30 DAYS)</h4>
                                 </CardHeader>
                                 <CardBody>
-                                    <p className="text-muted">Low Sales Velocity Items (30 Days)</p>
+                                    <p className="text-muted text-truncate mb-3">Low Sales Velocity Items (30 Days)</p>
                                     <div id="users">
                                         <Row className="mb-3 align-items-center g-2">
                                             <Col>
@@ -234,11 +282,6 @@ const DashboardStock = () => {
 
                                         <SimpleBar style={{ height: "242px" }} className="mx-n3">
                                             <SlowMovingStock
-                                                movements={
-                                                    stockMovements?.length
-                                                        ? stockMovements
-                                                        : mockSlowMovingStock
-                                                }
                                                 searchTerm={searchTerm}
                                                 sortAscending={sortAscending}
                                             />
@@ -248,18 +291,42 @@ const DashboardStock = () => {
                             </Card>
                         </Col>
                         <Col lg={7}>
-                            <Card>
+                            <Card className="card-height-100">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Inter-branch Imbalance Alerts</h4>
+                                    <h4 className="card-title mb-0">INTER-BRANCH IMBALANCE ALERTS</h4>
                                 </CardHeader>
 
                                 <CardBody>
-                                    <p className="text-muted">Products where one branch is overstocked while another is critically low.</p>
+                                    <p className="text-muted text-truncate mb-3">Products where one branch is overstocked while another is critically low.</p>
 
-                                    <SimpleBar style={{ height: "272px" }} className="mx-n3 px-3">
+                                    <Row className="mb-3 align-items-center g-2">
+                                        <Col>
+                                            <input
+                                                className="form-control"
+                                                placeholder="Search by product, branch, or code..."
+                                                value={imbalanceSearchTerm}
+                                                onChange={(e) => setImbalanceSearchTerm(e.target.value)}
+                                            />
+                                        </Col>
+
+                                        <Col xs="auto">
+                                            <button
+                                                className="btn btn-outline-secondary"
+                                                onClick={() => setImbalanceSortAscending((prev) => !prev)}
+                                                title={imbalanceSortAscending ? "Sort A–Z" : "Sort Z–A"}
+                                            >
+                                                {imbalanceSortAscending ? "A–Z ▲" : "Z–A ▼"}
+                                            </button>
+                                        </Col>
+                                    </Row>
+
+                                    <SimpleBar style={{ height: "242px" }} className="mx-n3 px-3">
                                         <ImbalanceAlerts
                                             stock={dailyClosingStock}
                                             movements={stockMovements}
+                                            expiry={batchExpiryNeo}
+                                            searchTerm={imbalanceSearchTerm}
+                                            sortAscending={imbalanceSortAscending}
                                         />
                                     </SimpleBar>
                                 </CardBody>
