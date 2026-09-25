@@ -14,13 +14,14 @@ branchData = [],
     : null;
 
   return (
+    <React.Fragment>
     <Card className="card-height-100">
 <CardHeader className="align-items-center d-flex">
         <h4 className="card-title mb-0 flex-grow-1">
           Branch Performance-Revenue by Branch
         </h4>
 </CardHeader>
-      <CardBody >
+      <CardBody  style={{ minHeight: "250px" }}>
  {chartSeries.length === 0 ? (
         <div className="text-center py-5">
           <h6 className="text-muted mb-2">
@@ -61,6 +62,7 @@ branchData = [],
       )}
       </CardBody>
     </Card>
+    </React.Fragment>
   );
 };
 

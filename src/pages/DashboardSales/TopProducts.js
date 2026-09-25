@@ -8,6 +8,7 @@ const TopProducts = ({ data = [], }) => {
     : null;
    
   return (
+  <React.Fragment>
     <Card className="card-height-100">
       <CardHeader className="align-items-center d-flex">
         <h4 className="card-title mb-0 flex-grow-1">
@@ -16,7 +17,7 @@ const TopProducts = ({ data = [], }) => {
 
       </CardHeader>
 
-      <CardBody>
+      <CardBody style={{ minHeight: "250px" }}>
 
         {data.length === 0 ? (
           <div className="text-center py-5">
@@ -40,7 +41,7 @@ const TopProducts = ({ data = [], }) => {
                   : "bg-danger";
 
               return (
-                <div key={index} className="mb-3">
+                <div key={index} className="mb-2 py-2">
 
                   <div className="d-flex justify-content-between">
                     <span className="text-uppercase">
@@ -85,6 +86,7 @@ const TopProducts = ({ data = [], }) => {
 
       </CardBody>
     </Card>
+    </React.Fragment>
   );
 };
 

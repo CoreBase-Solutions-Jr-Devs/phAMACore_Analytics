@@ -52,18 +52,32 @@ export const forgotPasswordAPI = (data) => {
 // Power BI APIs
 export const getSalesTransactions = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
+export const getKPISalesTransactions = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_KPISALES, { params });
 export const getMonthlySales = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
+export const getLastYearMonthlySales = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
 export const getMonthToDateSales = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
+export const getLastYearMonthToDateSales = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
 console.log("POWER BI URL:", url.GET_POWERBI_SALES);
+export const getKPIOverdueAccounts = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_KPIOverdueAccounts, { params });
 export const getPurchaseOrders = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_PURCHASE_ORDERS, { params });
+export const getKPIPurchases = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_KPIPURCHASES, { params });
 export const getActualSpend = (params) =>
-  PowerBIAPI.get(url.GET_POWERBI_PURCHASE_ORDERS, { params });
+  PowerBIAPI.get(url.GET_POWERBI_KPIPURCHASES, { params });
+export const getLastYearActualSpend = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_KPIPURCHASES, { params });
 console.log("POWER BI URL:", url.GET_POWERBI_PURCHASE_ORDERS);
 export const getDailySpend = (params) =>
-  PowerBIAPI.get(url.GET_POWERBI_PURCHASE_ORDERS, { params });
+  PowerBIAPI.get(url.GET_POWERBI_KPIPURCHASES, { params });
+export const getLastYearDailySpend = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_KPIPURCHASES, { params });
 console.log("POWER BI URL:", url.GET_POWERBI_PURCHASE_ORDERS);
 export const getDailyClosingStock = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_STOCK, { params });
@@ -75,14 +89,10 @@ export const getBatchExpiryNeo = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_BATCH_EXPIRY_NEO, { params });
 export const getBranches = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_BRANCHES, { params });
-export const getKPIOverdueAccounts = (params) => 
-  PowerBIAPI.get(url.GET_POWERBI_KPI_OVERDUE_ACCOUNTS, { params });
-export const getKPISalesTransactions = (params) => 
-  PowerBIAPI.get(url.GET_POWERBI_KPI_SALESTRANSACTIONS, { params });
+
 export const getKPITotalStockValueByBranch = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_KPI_TOTALSTOCKVALUEBYBRANCH, { params });
-export const getKPIPurchases = (params) => 
-  PowerBIAPI.get(url.GET_POWERBI_KPI_PURCHASES, { params });
+
 export const getKPIStockHealth = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_KPI_STOCKHEALTH, { params });
 

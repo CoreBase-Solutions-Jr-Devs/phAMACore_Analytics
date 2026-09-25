@@ -25,8 +25,17 @@ export const POST_FORGOT_PASSWORD = "/auth/reset-token";
 export const GET_POWERBI_SALES =
   "/api/PowerBi/PowerBISalesTransactions";
 
+  export const GET_POWERBI_KPISALES =
+  "/api/PowerBi/PowerBIKPISalesTransactions";
+
+  export const GET_POWERBI_KPIOverdueAccounts =
+  "/api/PowerBi/PowerBIKPIOverdueAccounts";
+
 export const GET_POWERBI_PURCHASE_ORDERS =
   "/api/PowerBi/PowerBIPurchaseOrders";
+
+    export const GET_POWERBI_KPIPURCHASES =
+  "/api/PowerBi/PowerBIKPIPurchases";
 
 export const GET_POWERBI_STOCK =
   "/api/PowerBi/PowerBIDailyClosingStock";
@@ -46,14 +55,12 @@ export const GET_POWERBI_BRANCHES =
 export const GET_POWERBI_KPI_OVERDUE_ACCOUNTS =
   "/api/PowerBi/PowerBIKPIOverdueAccounts";
 
-export const GET_POWERBI_KPI_SALESTRANSACTIONS =
-  "/api/PowerBi/PowerBIKPISalesTransactions";
+
 
 export const GET_POWERBI_KPI_TOTALSTOCKVALUEBYBRANCH =
   "/api/PowerBi/PowerBIKPITotalStockValueByBranch";
 
-export const GET_POWERBI_KPI_PURCHASES =
-  "/api/PowerBi/PowerBIKPIPurchases";
+
 
 export const GET_POWERBI_KPI_STOCKHEALTH = 
   "/api/PowerBi/PowerBIKPIStockHealth";

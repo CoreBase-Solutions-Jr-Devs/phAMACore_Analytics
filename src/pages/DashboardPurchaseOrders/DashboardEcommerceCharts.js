@@ -5,64 +5,71 @@ import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 const RevenueCharts = ({
   dataColors,
   series,
-  categories,
+  categories = [],
   formatAmount,
 }) => {
+  const colors = getChartColorsArray(dataColors);
 
-  var linechartcustomerColors =
-    getChartColorsArray(dataColors);
+ const options = {
+  chart: {
+    height: 370,
+    type: "line",
+    toolbar: {
+      show: false,
+    },
+  },
 
-  var options = {
-    chart: {
-      height: 370,
-      type: "bar",
-      toolbar: {
-        show: false,
-      },
+  stroke: {
+    curve: "smooth",
+    width: 3,
+    dashArray: [0, 6],
+  },
+
+  dataLabels: {
+    enabled: false,
+  },
+
+  colors: [colors[0], colors[0]],
+
+  legend: {
+    show: false,
+  },
+
+  xaxis: {
+    categories,
+
+    axisTicks: {
+      show: false,
     },
 
-    plotOptions: {
-      bar: {
-        columnWidth: "50%",
-        borderRadius: 4,
-      },
+    axisBorder: {
+      show: false,
     },
+  },
 
-    dataLabels: {
-      enabled: false,
+  yaxis: {
+    min: 0,
+    forceNiceScale: true,
+    tickAmount: 5,
+
+    labels: {
+      formatter: (val) => formatAmount(val),
     },
+  },
 
-    xaxis: {
-      categories: categories || [],
-      axisTicks: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
+  tooltip: {
+    y: {
+      formatter: (val) => formatAmount(val),
     },
-
-    yaxis: {
-      min: 0,
-      forceNiceScale: true,
-      tickAmount: 5,
-
-      labels: {
-        formatter: (val) => formatAmount(val),
-      },
-    },
-
-    colors: linechartcustomerColors,
-  };
+  },
+};
 
   return (
     <ReactApexChart
-      dir="ltr"
       options={options}
       series={series}
-      type="bar"
-      height={370}
-      className="apex-charts"
+      type="line"
+      height={350}
     />
   );
 };
@@ -70,64 +77,72 @@ const RevenueCharts = ({
 const MonthToDateCharts = ({
   dataColors,
   series,
-  categories,
+  categories = [],
   formatAmount,
 }) => {
+  const colors = getChartColorsArray(dataColors);
 
-  var linechartcustomerColors =
-    getChartColorsArray(dataColors);
+ const options = {
+  chart: {
+    height: 370,
+    type: "line",
+    toolbar: {
+      show: false,
+    },
+  },
 
-  var options = {
-    chart: {
-      height: 370,
-      type: "bar",
-      toolbar: {
-        show: false,
-      },
+  stroke: {
+    curve: "smooth",
+    width: 3,
+    dashArray: [0, 6],
+  },
+
+  dataLabels: {
+    enabled: false,
+  },
+
+  colors: [colors[0], colors[0]],
+
+  legend: {
+    show: false,
+  },
+
+  xaxis: {
+    categories,
+
+    axisTicks: {
+      show: false,
     },
 
-    plotOptions: {
-      bar: {
-        columnWidth: "50%",
-        borderRadius: 4,
-      },
+    axisBorder: {
+      show: false,
     },
+  },
 
-    dataLabels: {
-      enabled: false,
+  yaxis: {
+    min: 0,
+    forceNiceScale: true,
+    tickAmount: 5,
+
+    labels: {
+      formatter: (val) => formatAmount(val),
     },
+  },
 
-    xaxis: {
-      categories: categories || [],
-      axisTicks: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
+  tooltip: {
+    y: {
+      formatter: (val) => formatAmount(val),
     },
-
-    yaxis: {
-      min: 0,
-      forceNiceScale: true,
-      tickAmount: 5,
-
-      labels: {
-        formatter: (val) => formatAmount(val),
-      },
-    },
-
-    colors: linechartcustomerColors,
-  };
+  },
+};
 
   return (
     <ReactApexChart
-      dir="ltr"
+      // dir="ltr"
       options={options}
       series={series}
-      type="bar"
-      height={370}
-      className="apex-charts"
+      type="line"
+      height={350}
     />
   );
 };
@@ -247,50 +262,69 @@ height={500}
   );
 };
 
-const StoreVisitsCharts = ({ dataColors }) => {
-  var chartDonutBasicColors = getChartColorsArray(dataColors);
-const series = [44, 25, 18, 9, 4];
-  var options = {
-   labels: [
-  "Antibiotics",
-  "ARVs",
-  "Antimalarials",
-  "Chronic Disease",
-  "OTC/Supp"
-],
+const StoreVisitsCharts = ({
+  dataColors,
+  categories = [],
+  series = [],
+  formatAmount,
+  amounts = [],
+}) => {
+  const chartPieBasicColors =
+    getChartColorsArray(dataColors);
 
-dataLabels: {
-  enabled: true,
-  formatter: (val) => `${val.toFixed(0)}%`,
-  dropShadow: {
-    enabled: false,
-  },
-},
+  console.log("Pie categories:", categories);
+  console.log("Pie series:", series);
+  console.log("Pie amounts:", amounts);
+
+  const options = {
+    labels: categories,
+
     chart: {
       height: 333,
       type: "donut",
     },
+
     legend: {
       position: "bottom",
+      formatter: (seriesName, opts) => {
+        const amount = amounts[opts.seriesIndex] || 0;
+
+        return `${seriesName}: ${formatAmount(amount)}`;
+      },
     },
+
     stroke: {
       show: false,
     },
+
     dataLabels: {
+      enabled: true,
+      formatter: (val) => `${val.toFixed(1)}%`,
       dropShadow: {
         enabled: false,
       },
     },
-    colors: chartDonutBasicColors,
+
+    tooltip: {
+  y: {
+    formatter: (val, { seriesIndex }) => {
+      const amount = amounts[seriesIndex] || 0;
+
+      return `KES ${formatAmount(amount)}`;
+    },
+  },
+},
+
+    colors: chartPieBasicColors,
   };
+
   return (
     <React.Fragment>
-      <ReactApexChart dir="ltr"
+      <ReactApexChart
         options={options}
         series={series}
         type="donut"
         height="333"
-        className="apex-charts"
       />
     </React.Fragment>
   );

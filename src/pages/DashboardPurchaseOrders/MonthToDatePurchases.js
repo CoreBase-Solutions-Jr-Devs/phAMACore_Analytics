@@ -34,7 +34,7 @@ const MonthToDatePurchases = ({categories, series, formatAmount}) => {
     <React.Fragment>
       <Card>
         <CardHeader className="border-0 align-items-center d-flex">
-          <h4 className="card-title mb-0 flex-grow-1">Month to Date Purchases Trend(MTD) </h4>
+          <h4 className="card-title mb-0 flex-grow-1">Month to Date Comparative Purchases Line Graph(MTD) </h4>
           {/* <div className="d-flex gap-1">
             <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { onChangeChartPeriod("all"); }}>
               ALL
@@ -54,6 +54,29 @@ const MonthToDatePurchases = ({categories, series, formatAmount}) => {
         <CardBody className="p-0 pb-2">
           <div className="w-100">
             <div dir="ltr">
+              <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2">
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "25px",
+        borderTop: "3px solid var(--vz-primary)",
+      }}
+    />
+    <span className="text-muted">2026</span>
+  </div>
+
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "25px",
+        borderTop: "3px dashed var(--vz-primary)",
+      }}
+    />
+    <span className="text-muted">2025</span>
+  </div>
+</div>
               <MonthToDateCharts categories={categories} series={series} formatAmount={formatAmount} dataColors='["--vz-primary", "--vz-success", "--vz-danger"]' />
             </div>
           </div>
