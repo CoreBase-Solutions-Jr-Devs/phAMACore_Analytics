@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 import { saveCachedBranches } from "../../helpers/branch_helper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
@@ -10,16 +10,32 @@ export const initialState = {
   batchExpiry: [],
   batchExpiryNeo: [],
   branches: [],
+  totalStockValueByBranch: [],
+  stockHealth: [],
+  criticalStockouts: [],
+  slowMovingStock: [],
+  kpiSalesTransactions: [],
+  kpiSalesPeriodDays: 1,
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
   loadingBatchExpiryNeo: false,
   loadingBranches: false, 
+  loadingTotalStockValueByBranch: false,
+  loadingStockHealth: false,
+  loadingCriticalStockouts: false,
+  loadingSlowMovingStock: false,
+  loadingKPISalesTransactions: false,
   errorBranches: null,
   errorStock: null,
   errorMovements: null,
   errorBatchExpiry: null,
   errorBatchExpiryNeo: null,
+  errorTotalStockValueByBranch: null,
+  errorStockHealth: null,
+  errorCriticalStockouts: null,
+  errorSlowMovingStock: null,
+  errorKPISalesTransactions: null,
   filters: {
     branch: null,
     dateRange: "Today",
@@ -257,6 +273,99 @@ const StockInventorySlice = createSlice({
           action.payload ||
           action.error?.message ||
           null;
+      });
+
+    builder
+      .addCase(fetchKPITotalStockValueByBranch.pending, (state) => {
+        state.loadingTotalStockValueByBranch = true;
+        state.errorTotalStockValueByBranch = null;
+      })
+      .addCase(fetchKPITotalStockValueByBranch.fulfilled, (state, action) => {
+        state.loadingTotalStockValueByBranch = false;
+        state.totalStockValueByBranch = action.payload;
+      })
+      .addCase(fetchKPITotalStockValueByBranch.rejected, (state, action) => {
+        state.loadingTotalStockValueByBranch = false;
+        state.errorTotalStockValueByBranch = action.payload?.message || action.payload ||
+          action.error?.message || "Failed to fetch total stock value by branch!";
+      });
+
+    builder
+      .addCase(fetchKPIStockHealth.pending, (state) => {
+        state.loadingStockHealth = true;
+        state.errorStockHealth = null;
+      })
+      .addCase(fetchKPIStockHealth.fulfilled, (state, action) => {
+        state.loadingStockHealth = false;
+        state.stockHealth = action.payload;
+      })
+      .addCase(fetchKPIStockHealth.rejected, (state, action) => {
+        state.loadingStockHealth = false;
+        state.errorStockHealth =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch stock health KPI!";
+      });
+
+    builder
+      .addCase(fetchKPICriticalStockouts.pending, (state) => {
+        state.loadingCriticalStockouts = true;
+        state.errorCriticalStockouts = null;
+      })
+      .addCase(fetchKPICriticalStockouts.fulfilled, (state, action) => {
+        state.loadingCriticalStockouts = false;
+        state.criticalStockouts = action.payload;
+      })
+      .addCase(fetchKPICriticalStockouts.rejected, (state, action) => {
+        state.loadingCriticalStockouts = false;
+        state.errorCriticalStockouts =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch critical stockouts!";
+      });
+
+    builder
+      .addCase(fetchKPISlowMovingStock.pending, (state) => {
+        state.loadingSlowMovingStock = true;
+        state.errorSlowMovingStock = null;
+      })
+      .addCase(fetchKPISlowMovingStock.fulfilled, (state, action) => {
+        state.loadingSlowMovingStock = false;
+        state.slowMovingStock = action.payload;
+      })
+      .addCase(fetchKPISlowMovingStock.rejected, (state, action) => {
+        state.loadingSlowMovingStock = false;
+        state.errorSlowMovingStock =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch slow moving stock!";
+      });
+
+    builder
+      .addCase(fetchKPISalesTransactions.pending, (state) => {
+        state.loadingKPISalesTransactions = true;
+        state.errorKPISalesTransactions = null;
+      })
+      .addCase(fetchKPISalesTransactions.fulfilled, (state, action) => {
+        state.loadingKPISalesTransactions = false;
+        if (action.payload && typeof action.payload === "object" && !Array.isArray(action.payload)) {
+          state.kpiSalesTransactions = action.payload.data || [];
+          state.kpiSalesPeriodDays = action.payload.periodDays || 1;
+        } else {
+          state.kpiSalesTransactions = action.payload || [];
+          state.kpiSalesPeriodDays = 1;
+        }
+      })
+      .addCase(fetchKPISalesTransactions.rejected, (state, action) => {
+        state.loadingKPISalesTransactions = false;
+        state.errorKPISalesTransactions =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch sales transactions KPI!";
       });
   },
 });
