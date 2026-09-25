@@ -3,14 +3,14 @@ import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useSelector } from "react-redux";
-import { KPI_META, computeKPIs, getKPIMeta } from "../utils/StockInventoryUtils";
+import { computeKPIs, getKPIMeta } from "../utils/StockInventoryUtils";
 import { useImbalanceEngine } from "./components/ImbalanceAlerts/useImbalanceEngine";
 import { resolveBranchName } from "../../helpers/branch_helper";
 
 
 const KPI_ICON_MAP = {
     1: { icon: "package", color: "primary" }, // Total SKUs
-    2: { icon: "dollar-sign", color: "success" }, // Total Stock Value
+    2: { icon: "ksh", color: "success" }, // Total Stock Value
     3: { icon: "alert-triangle", color: "warning" }, // Below Reorder Level
     4: { icon: "x-circle", color: "danger" }, // Out of Stock
     5: { icon: "clock", color: "danger" }, // Near Expiry
@@ -100,7 +100,13 @@ const WidgetsOne = ({ branchMap = {} }) => {
                                             <span
                                                 className={`avatar-title bg-${color}-subtle rounded-circle fs-2`}
                                             >
-                                                <FeatherIcon icon={icon} className={`text-${color}`} />
+                                                {icon === "ksh" ? (
+                                                    <span className={`fw-bold fs-5 text-${color} lh-1`} style={{ letterSpacing: "-0.5px", userSelect: "none" }}>
+                                                        KSh
+                                                    </span>
+                                                ) : (
+                                                    <FeatherIcon icon={icon} className={`text-${color}`} />
+                                                )}
                                             </span>
                                         </div>
                                     </div>

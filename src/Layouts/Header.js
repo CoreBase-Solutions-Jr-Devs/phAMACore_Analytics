@@ -30,11 +30,11 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
     const selectDashboardData = createSelector(
         (state) => state.Layout,
         (state) => ({
-            sidebarVisibilitytype: state.sidebarVisibilitytype})
-      );
+            sidebarVisibilitytype: state.sidebarVisibilitytype
+        })
+    );
     // Inside your component
-    const {sidebarVisibilitytype} = useSelector(selectDashboardData);
-    
+    const { sidebarVisibilitytype } = useSelector(selectDashboardData);
 
     const [search, setSearch] = useState(false);
     const toogleSearch = () => {
@@ -114,7 +114,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                 onClick={toogleMenuBtn}
                                 type="button"
                                 className="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger text-danger"
-                               style={{ color: "#c58c4f" }}
+                                style={{ color: "#c58c4f" }}
                                 id="topnav-hamburger-icon">
                                 <span className="hamburger-icon">
                                     <span></span>
@@ -126,18 +126,18 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
 
                             {/* <SearchOption /> */}
                         </div>
- <div className="d-none d-md-flex justify-content-center flex-grow-1">
-            <span
-                className="fw-bold"
-                style={{
-                    color: "#c58c4f",
-                    fontSize: "18px",
-                    // letterSpacing: "1px"
-                }}
-            >
-                COREBASE SOLUTIONS LTD
-            </span>
-        </div>
+                        <div className="d-none d-md-flex justify-content-center flex-grow-1">
+                            <span
+                                className="fw-bold"
+                                style={{
+                                    color: "#c58c4f",
+                                    fontSize: "18px",
+                                    // letterSpacing: "1px"
+                                }}
+                            >
+                                COREBASE SOLUTIONS LTD
+                            </span>
+                        </div>
                         <div className="d-flex align-items-center">
                             <Dropdown isOpen={search} toggle={toogleSearch} className="d-md-none topbar-head-dropdown header-item">
                                 <DropdownToggle type="button" tag="button" className="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle">
