@@ -30,7 +30,7 @@ const SalesmanRevenue = ({ data = [], formatAmount  }) => {
                     <th>Rep</th>
                     <th>Branch</th>
                     <th>Revenue</th>
-                    <th className="text-end">Rate</th>
+                    {/* <th className="text-end">Rate</th> */}
                   </tr>
                 </thead>
 
@@ -45,13 +45,13 @@ const SalesmanRevenue = ({ data = [], formatAmount  }) => {
                         {formatAmount(item.revenue)}
                       </td>
 
-                      <td className="text-end">
+                      {/* <td className="text-end">
                         <span
                           className={`badge rounded-pill bg-${item.rateClass}-subtle text-${item.rateClass} px-3 py-2`}
                         >
                           {item.rate}
                         </span>
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>

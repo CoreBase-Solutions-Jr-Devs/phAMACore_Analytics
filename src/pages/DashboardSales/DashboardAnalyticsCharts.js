@@ -293,26 +293,35 @@ const ProgressiveSalesChart = ({
     chart: {
       height: 370,
       type: "line",
-      toolbar: { show: false },
-      // zoom: { enabled: false },
+      toolbar: {
+        show: false,
+      },
     },
 
     stroke: {
       curve: "smooth",
       width: 3,
+      dashArray: [0, 6], // 2026 solid, 2025 dashed
     },
 
     dataLabels: {
       enabled: false,
     },
 
-    colors,
+    // Same color for both years
+    colors: [colors[0], colors[0]],
+
+   legend: {
+  show: false,
+},
 
     xaxis: {
       categories,
-         axisTicks: {
+
+      axisTicks: {
         show: false,
       },
+
       axisBorder: {
         show: false,
       },
@@ -322,19 +331,11 @@ const ProgressiveSalesChart = ({
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
+
       labels: {
         formatter: (val) => formatAmount(val),
       },
-      
     },
-
-    // grid: {
-    //   yaxis: {
-    //     lines: {
-    //       show: true,
-    //     },
-    //   },
-    // },
   };
 
   return (
@@ -508,9 +509,15 @@ const MonthToDateSalesChart = ({
     stroke: {
       curve: "smooth",
       width: 3,
+      dashArray: [0, 6], // 2026 solid, 2025 dashed
     },
 
-    colors,
+    // Same color for both lines
+    colors: [colors[0], colors[0]],
+
+   legend: {
+  show: false,
+},
 
     xaxis: {
       categories,
@@ -520,6 +527,7 @@ const MonthToDateSalesChart = ({
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
+
       labels: {
         formatter: (val) => formatAmount(val),
       },

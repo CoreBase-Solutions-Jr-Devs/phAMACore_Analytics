@@ -45,7 +45,7 @@ const {
   const selectedBranchName =
   branches.find(b => b.branchCode === branch)?.branchName || "All Branches";
   
-  const dateOptions = ["Today", "Yesterday", "This Week", "Last Week", "This Month" , "Last Month", "This Year", "Last Year", "Custom"];
+  const dateOptions = ["Today", "Yesterday", "This Week", "Last Week", "This Month" , "Last Month", "Month To Date", "This Year", "Year To Date", "Last Year", "Custom"];
   
 const formatDisplay = (date) => date || "";
 
@@ -62,28 +62,6 @@ const formatDisplay = (date) => date || "";
   
   <CardBody className="d-flex flex-column h-100">
    <div className="containerFluid">
-  <div className="row mb-3 align-items-center">
-            <label className="col-4 col-form-label">Branch</label>
-              <div className="col-8">
-            <select
-              className="form-select "
-              value={branch ?? ""}
-                onChange={(e) => {
-                                    const value = e.target.value;
-     dispatch(setBranch(value === "" ? null : Number(value)));
-                                    // navigate(`/Dashboard-Analytics/${branchId}`);
-                                  }}
-            >
-              <option value="">All Branches</option>
-
-              {branches.map((b) => (
-                <option key={b.branchCode} value={b.branchCode}>
-                  {b.branchName}
-                </option>
-              ))}
-            </select>
-          </div>
-</div>
 
         <div className="row mb-3 align-items-center">
             <label className="col-4 col-form-label">Date Range</label>
@@ -134,30 +112,87 @@ const formatDisplay = (date) => date || "";
 <div className="row mb-3 align-items-center">
   <label className="col-4 col-form-label">End Date</label>
   <div className="col-8">
-  <Flatpickr
-    ref={endRef}
-    options={{
-      dateFormat: "d/m/Y",
-    allowInput: dateRange === "Custom",
-    clickOpens: dateRange === "Custom",
-    }}
-    value={dateRange === "Custom" ? endDate : endDate}
-    onChange={(selectedDates) => {
-      const end = selectedDates[0];
+<Flatpickr
+  ref={endRef}
+  options={{
+    dateFormat: "d/m/Y",
+    allowInput:
+      dateRange === "Custom" ||
+      dateRange === "Month To Date" ||
+      dateRange === "Year To Date",
 
-      dispatch(setEndDate(end.toLocaleDateString("en-GB")) );
+    clickOpens:
+      dateRange === "Custom" ||
+      dateRange === "Month To Date" ||
+      dateRange === "Year To Date",
+  }}
+  value={endDate}
+  onChange={(selectedDates) => {
+    const end = selectedDates[0];
+
+    if (!end) return;
+
+    dispatch(
+      setEndDate(end.toLocaleDateString("en-GB"))
+    );
+
+    // Only switch to Custom when the user
+    // is actually using a Custom range.
+    if (dateRange === "Custom") {
       dispatch(setDateRange("Custom"));
-      if (startRef.current) {
-        startRef.current.flatpickr.set("maxDate", end);
-      }
-    }}
-     className={`form-control ${dateRange !== "Custom" ? "bg-light text-primary" : "text-muted"}`}
-    style={{ cursor: dateRange !== "Custom" ? "not-allowed" : "pointer" }}
-  readOnly={dateRange !== "Custom"}
-  />
+    }
+
+    if (startRef.current) {
+      startRef.current.flatpickr.set("maxDate", end);
+    }
+  }}
+  className={`form-control ${
+    dateRange !== "Custom" &&
+    dateRange !== "Month To Date" &&
+    dateRange !== "Year To Date"
+      ? "bg-light text-primary"
+      : "text-muted"
+  }`}
+  style={{
+    cursor:
+      dateRange === "Custom" ||
+      dateRange === "Month To Date" ||
+      dateRange === "Year To Date"
+        ? "pointer"
+        : "not-allowed",
+  }}
+  placeholder="dd/mm/yyyy"
+  readOnly={
+    dateRange !== "Custom" &&
+    dateRange !== "Month To Date" &&
+    dateRange !== "Year To Date"
+  }
+/>
 </div>
         </div>
+        
+  <div className="row mb-3 align-items-center">
+            <label className="col-4 col-form-label">Branch</label>
+              <div className="col-8">
+            <select
+              className="form-select "
+              value={branch ?? ""}
+                onChange={(e) => {
+                                    const value = e.target.value;
+     dispatch(setBranch(value === "" ? null : Number(value)));
+                                    // navigate(`/Dashboard-Analytics/${branchId}`);
+                                  }}
+            >
+              <option value="">All Branches</option>
 
+              {branches.map((b) => (
+                <option key={b.branchCode} value={b.branchCode}>
+                  {b.branchName}
+                </option>
+              ))}
+            </select>
+          </div>
+</div>
         <hr className="mb-2 mt-3" />
         <div className="d-flex justify-content-end mb-2" >
                   <button className="btn btn-success me-2" onClick={onApply}>

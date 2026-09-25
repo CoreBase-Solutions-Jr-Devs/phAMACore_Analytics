@@ -30,19 +30,41 @@ const MonthToDateSales = ({ series, categories, formatAmount }) => {
                 <Col xxl={12}>
                   <div className="">
                     <CardHeader className="border-0 align-items-center d-flex">
-                      <h4 className="card-title mb-0 flex-grow-1">
-                        {" "}
-                        Month To Date Sales Performance Trend (MTD)
-                      </h4>
-                      <div className="d-flex gap-1">
-                      </div>
-                    </CardHeader>
-                    <MonthToDateSalesChart
-                      series={series}
-                      categories={categories}
-                      formatAmount={formatAmount}
-                      dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
-                    />{" "}
+  <h4 className="card-title mb-0 flex-grow-1">
+    Month To Date Sales Comparative Graph (MTD)
+  </h4>
+</CardHeader>
+
+<div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2">
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "25px",
+        borderTop: "3px solid var(--vz-primary)",
+      }}
+    />
+    <span className="text-muted">2026</span>
+  </div>
+
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "25px",
+        borderTop: "3px dashed var(--vz-primary)",
+      }}
+    />
+    <span className="text-muted">2025</span>
+  </div>
+</div>
+
+<MonthToDateSalesChart
+  series={series}
+  categories={categories}
+  formatAmount={formatAmount}
+  dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
+/>
                   </div>
                 </Col>
               </Row>

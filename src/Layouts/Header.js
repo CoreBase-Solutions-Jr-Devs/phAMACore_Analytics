@@ -90,8 +90,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     <span className="logo-lg d-flex align-items-center gap-2">
                                         <img src={phamacoreImage} alt="" height="20" />
                                         <span className="logo-text d-flex flex-column lh-1" style={{ color: "#c58c4f" }}>
-                                            <span className="fw-bold fs-4">phAMACore</span>
-                                            <span className="fw-medium ">Analytics</span>
+                                            <span className="fw-bold fs-4">phAMABI</span>
+                                            {/* <span className="fw-medium ">Analytics</span> */}
                                         </span>
                                     </span>
                                 </Link>
@@ -103,8 +103,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     <span className="logo-lg d-flex align-items-center gap-2">
                                         <img src={phamacoreImage} alt="" height="20" />
                                         <span className="logo-text d-flex flex-column lh-1">
-                                            <span className="fw-bold text-white fs-4">phAMACore</span>
-                                            <span className="fw-medium text-white "className=" text-white">Analytics</span>
+                                            <span className="fw-bold text-white fs-4">phAMABI</span>
+                                            {/* <span className="fw-medium text-white "className=" text-white">Analytics</span> */}
                                         </span>
                                     </span>
                                 </Link>
@@ -158,7 +158,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                             </Dropdown>
 
                             {/* LanguageDropdown */}
-                            <LanguageDropdown />
+                            {/* <LanguageDropdown /> */}
 
                             {/* WebAppsDropdown */}
                             {/* <WebAppsDropdown /> */}
