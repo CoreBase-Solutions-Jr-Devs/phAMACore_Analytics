@@ -81,9 +81,9 @@ const Widgets = ({
               </span>
             </h2>
 
-            {/* <p className="text-muted mb-0 ">
-              Budget:0.0M(0%)
-            </p> */}
+            <p className="text-muted mb-0 ">
+↑ 12.5% vs last year
+            </p>
             </div>
 
                 <div className="avatar-sm flex-shrink-0">
@@ -112,7 +112,7 @@ const Widgets = ({
             </h2>
 
  <p className="text-muted mb-0 ">
-                0 approved, 0 secondary
+                80% active
             </p>
              </div>
 
@@ -209,7 +209,7 @@ const Widgets = ({
                 decimals={1}
                 duration={3}
               /> */}
-              {Number(avgLeadTime || 0)}
+              0
             </h2>
 
  <p className="text-muted mb-0 ">

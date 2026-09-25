@@ -1,9 +1,48 @@
 import { useMemo } from "react";
-
 const usePurchaseOrders = (
   PurchaseOrders = [],
-  ActualSpend = [],
-  DailySpend = []
+
+  KPIPurchases = [],
+  KPISummary = [],
+  KPICategory = [],
+  KPISupplier = [],
+  KPIBranch = [],
+  KPIMonthly = [],
+  KPIType = [],
+
+   ActualSpend = [],
+  ActualSpendSummary = [],
+  ActualSpendCategory = [],
+  ActualSpendSupplier = [],
+  ActualSpendBranch = [],
+  ActualSpendMonthly = [],
+  ActualSpendType = [],
+
+  DailySpend = [],
+  DailySpendSummary = [],
+  DailySpendCategory = [],
+  DailySpendSupplier = [],
+  DailySpendBranch = [],
+  DailySpendMonthly = [],
+  DailySpendType = [],
+
+ LastYearActualSpend = [],
+  LastYearActualSpendSummary = [],
+  LastYearActualSpendCategory = [],
+  LastYearActualSpendSupplier = [],
+  LastYearActualSpendBranch = [],
+  LastYearActualSpendMonthly = [],
+  LastYearActualSpendType = [],
+
+  LastYearDailySpend = [],
+  LastYearDailySpendSummary = [],
+  LastYearDailySpendCategory = [],
+  LastYearDailySpendSupplier = [],
+  LastYearDailySpendBranch = [],
+  LastYearDailySpendMonthly = [],
+  LastYearDailySpendType = [],
+
+  filters = {}
 ) => {
 
   // ============================================================
@@ -38,29 +77,29 @@ const usePurchaseOrders = (
 
 
   // ============================================================
-  // TOTAL SPEND
-  // Calculates the total value of all purchase orders
-  // ============================================================
-  const totalSpend = useMemo(() => {
-    return PurchaseOrders.reduce(
-      (sum, item) =>
-        sum + Number(item?.total_lpo_value || 0),
-      0
-    );
-  }, [PurchaseOrders]);
+ // ============================================================
+// TOTAL SPEND & ACTIVE SUPPLIERS
+// Values come directly from the KPI API.
+// No calculations are performed in the frontend.
+// ============================================================
 
 
-  // ============================================================
-  // ACTIVE SUPPLIERS
-  // Counts the number of unique suppliers
-  // ============================================================
-  const activeSuppliers = useMemo(() => {
-    return new Set(
-      PurchaseOrders
-        .map((item) => item?.supplier_id)
-        .filter(Boolean)
-    ).size;
-  }, [PurchaseOrders]);
+
+
+// ============================================================
+// SUMMARY
+// ============================================================
+
+const totalSpend = Number(
+  KPISummary?.[0]?.net_purchases_incl || 0
+);
+
+const activeSuppliers = Number(
+  KPISummary?.[0]?.unique_suppliers || 0
+);
+
+
+
 
 
   // ============================================================
@@ -117,31 +156,56 @@ const usePurchaseOrders = (
 
   }, [PurchaseOrders]);
 
+  const branchData = useMemo(() => {
+  const grouped = (KPIBranch || []).reduce((acc, item) => {
+    const group = item?.branch_name || "Unknown";
+    const spend = Number(item?.net_purchases_incl || 0);
+
+    if (!acc[group]) {
+      acc[group] = 0;
+    }
+
+    acc[group] += spend;
+
+    return acc;
+  }, {});
+
+  console.log("Spend by Branch:", grouped);
+  console.log("Total Spend:", totalSpend);
+
+  const amounts = Object.values(grouped);
+
+  return {
+    categories: Object.keys(grouped),
+
+    // Percentage of total spend
+    series: amounts.map((spend) =>
+      totalSpend > 0
+        ? (spend / totalSpend) * 100
+        : 0
+    ),
+
+    // Actual spend values
+    amounts: amounts,
+  };
+}, [KPIBranch, totalSpend]);
 
   // ============================================================
   // SPEND BY SUPPLIER
   // Groups purchase-order spend by supplier
   // ============================================================
-  const spendBySupplier = useMemo(() => {
+const spendBySupplier = useMemo(() => {
+  return (KPISupplier || [])
+    .filter(Boolean)
+    .reduce((acc, item) => {
+      const supplier = item?.supplier_name || "Unknown";
+      const value = Number(item?.net_purchases_incl || 0);
 
-    return PurchaseOrders
-      .filter(Boolean)
-      .reduce((acc, item) => {
+      acc[supplier] = value;
 
-        const supplier =
-          item?.supplier_Name || "Unknown";
-
-        const value =
-          Number(item?.total_lpo_value || 0);
-
-        acc[supplier] =
-          (acc[supplier] || 0) + value;
-
-        return acc;
-
-      }, {});
-
-  }, [PurchaseOrders]);
+      return acc;
+    }, {});
+}, [KPISupplier]);
 
 
   // ============================================================
@@ -196,33 +260,34 @@ const usePurchaseOrders = (
   // SPEND BY BRANCH
   // Groups purchase-order spend by branch
   // ============================================================
-  const branchData = useMemo(() => {
+const spendByCategory = useMemo(() => {
+  console.log("KPICategory:", KPICategory);
 
-    const spendByBranch = PurchaseOrders.reduce(
-      (acc, item) => {
+  const grouped = (KPICategory || [])
+    .filter(Boolean)
+    .reduce((acc, item) => {
+      const name = item?.item_group || "Unknown";
+      const value = Number(item?.net_purchases_incl || 0);
 
-        const branch =
-          item?.branch_name || "Unknown";
+      if (!acc[name]) {
+        acc[name] = 0;
+      }
 
-        const value =
-          Number(item?.total_lpo_value || 0);
+      acc[name] += value;
 
-        acc[branch] =
-          (acc[branch] || 0) + value;
+      return acc;
+    }, {});
 
-        return acc;
+  const data = Object.entries(grouped).map(([name, value]) => ({
+    name,
+    value,
+  }));
 
-      },
-      {}
-    );
+  console.log("SpendByCategory:", data);
 
-    return Object.entries(spendByBranch)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }));
+  return data;
+}, [KPICategory]);
 
-  }, [PurchaseOrders]);
 
 
   // ============================================================
@@ -231,70 +296,122 @@ const usePurchaseOrders = (
   // Creates monthly spend from January
   // up to the current month.
   // ============================================================
-  const actualSpendChart = useMemo(() => {
+const actualSpendChart = useMemo(() => {
+  const now = new Date();
 
-    const currentMonth =
-      new Date().getMonth() + 1;
+  const currentYear = now.getFullYear();
+  const lastYear = currentYear - 1;
 
-    const months = Array.from(
-      { length: currentMonth },
-      (_, i) =>
-        new Date(
-          2000,
-          i,
-          1
-        ).toLocaleString("en-US", {
-          month: "short",
-        })
+  // Use selected end date if available
+  let endDate = now;
+
+  if (filters?.endDate) {
+    const [day, month, year] = filters.endDate.split("/").map(Number);
+    endDate = new Date(year, month - 1, day);
+  }
+
+  const endMonth = endDate.getMonth() + 1;
+
+  // January → selected month
+  const months = Array.from(
+    { length: endMonth },
+    (_, i) =>
+      new Date(2000, i, 1).toLocaleString("en-US", {
+        month: "short",
+      })
+  );
+
+  const currentYearMap = Object.fromEntries(
+    months.map((month) => [month, 0])
+  );
+
+  const lastYearMap = Object.fromEntries(
+    months.map((month) => [month, 0])
+  );
+
+  // =========================
+  // CURRENT YEAR
+  // =========================
+
+  (ActualSpendMonthly || []).forEach((item) => {
+    if (!item?.year || !item?.month) return;
+
+    if (Number(item.year) !== currentYear) return;
+
+    const monthIndex = Number(item.month) - 1;
+
+    const month = new Date(2000, monthIndex, 1).toLocaleString(
+      "en-US",
+      {
+        month: "short",
+      }
     );
 
-    const map = Object.fromEntries(
-      months.map((month) => [
-        month,
-        0,
-      ])
+    const spend = Number(item.net_purchases_incl || 0);
+
+    if (currentYearMap[month] !== undefined) {
+      currentYearMap[month] += spend;
+    }
+  });
+
+  // =========================
+  // LAST YEAR
+  // =========================
+
+  (LastYearActualSpendMonthly || []).forEach((item) => {
+    if (!item?.year || !item?.month) return;
+
+    if (Number(item.year) !== lastYear) return;
+
+    const monthIndex = Number(item.month) - 1;
+
+    const month = new Date(2000, monthIndex, 1).toLocaleString(
+      "en-US",
+      {
+        month: "short",
+      }
     );
 
-    ActualSpend.forEach((item) => {
+    const spend = Number(item.net_purchases_incl || 0);
 
-      if (!item?.lpo_date) {
-        return;
-      }
+    if (lastYearMap[month] !== undefined) {
+      lastYearMap[month] += spend;
+    }
+  });
 
-      const date =
-        new Date(item.lpo_date);
+  console.log("ActualSpendMonthly:", ActualSpendMonthly);
+  console.log(
+    "LastYearActualSpendMonthly:",
+    LastYearActualSpendMonthly
+  );
 
-      const month =
-        date.toLocaleString(
-          "en-US",
-          { month: "short" }
-        );
+  console.log("Current Year Map:", currentYearMap);
+  console.log("Last Year Map:", lastYearMap);
 
-      const spend =
-        Number(
-          item?.total_lpo_value || 0
-        );
+  return {
+    categories: months,
 
-      if (map[month] !== undefined) {
-        map[month] += spend;
-      }
-
-    });
-
-    return {
-      categories: months,
-
-      series: [
-        {
-          name: "Actual Spend",
-          data: months.map(
-            (month) => map[month]
-          ),
-        },
-      ],
-    };
-
-  }, [ActualSpend]);
+    series: [
+      {
+        name: `${currentYear}`,
+        data: months.map((month) =>
+          Number(currentYearMap[month] || 0)
+        ),
+      },
+      {
+        name: `${lastYear}`,
+        data: months.map((month) =>
+          Number(lastYearMap[month] || 0)
+        ),
+      },
+    ],
+  };
+}, [
+  ActualSpendMonthly,
+  LastYearActualSpendMonthly,
+  filters,
+  
+]);
 
 
   // ============================================================
@@ -303,77 +420,99 @@ const usePurchaseOrders = (
   // Creates daily spend from the first day
   // of the current month up to today.
   // ============================================================
-  const monthToDateChart = useMemo(() => {
+const monthToDateChart = useMemo(() => {
+  const now = new Date();
 
-    const now = new Date();
+  const currentYear = now.getFullYear();
+  const lastYear = currentYear - 1;
 
-    const currentYear =
-      now.getFullYear();
+  const currentMonth = now.getMonth();
+  const today = now.getDate();
 
-    const currentMonth =
-      now.getMonth();
+  // Days 1 -> today
+  const DAYS = Array.from(
+    { length: today },
+    (_, i) => i + 1
+  );
 
-    const today =
-      now.getDate();
+  // Maps for current year and last year
+  const currentYearMap = DAYS.reduce((acc, day) => {
+    acc[day] = 0;
+    return acc;
+  }, {});
 
-    // Create days 1 -> today
-    const DAYS = Array.from(
-      { length: today },
-      (_, i) => i + 1
-    );
+  const lastYearMap = DAYS.reduce((acc, day) => {
+    acc[day] = 0;
+    return acc;
+  }, {});
 
-    // Initialize every day to zero
-    const map = DAYS.reduce(
-      (acc, day) => {
-        acc[day] = 0;
-        return acc;
+  // =========================
+  // CURRENT YEAR
+  // =========================
+  (DailySpend || []).forEach((item) => {
+    if (!item?.period_start) return;
+
+    const date = new Date(item.period_start);
+
+    if (
+      date.getFullYear() !== currentYear ||
+      date.getMonth() !== currentMonth
+    ) {
+      return;
+    }
+
+    const day = date.getDate();
+
+    if (currentYearMap[day] !== undefined) {
+      currentYearMap[day] += Number(
+        item?.net_purchases_incl || 0
+      );
+    }
+  });
+
+  // =========================
+  // LAST YEAR
+  // =========================
+  (LastYearDailySpend || []).forEach((item) => {
+    if (!item?.period_start) return;
+
+    const date = new Date(item.period_start);
+
+    if (
+      date.getFullYear() !== lastYear ||
+      date.getMonth() !== currentMonth
+    ) {
+      return;
+    }
+
+    const day = date.getDate();
+
+    if (lastYearMap[day] !== undefined) {
+      lastYearMap[day] += Number(
+        item?.net_purchases_incl || 0
+      );
+    }
+  });
+
+  return {
+    categories: DAYS.map(String),
+
+    series: [
+      {
+        name: `${currentYear}`,
+        data: DAYS.map(
+          (day) => Number(currentYearMap[day] || 0)
+        ),
       },
-      {}
-    );
-
-    DailySpend.forEach((item) => {
-
-      if (!item?.lpo_date) {
-        return;
-      }
-
-      const date =
-        new Date(item.lpo_date);
-
-      // Only current month and year
-      if (
-        date.getFullYear() !== currentYear ||
-        date.getMonth() !== currentMonth
-      ) {
-        return;
-      }
-
-      const day =
-        date.getDate();
-
-      if (map[day] !== undefined) {
-        map[day] += Number(
-          item?.total_lpo_value || 0
-        );
-      }
-
-    });
-
-    return {
-      categories: DAYS.map(String),
-
-      series: [
-        {
-          name: "Daily Spend",
-          data: DAYS.map(
-            (day) =>
-              Number(map[day] || 0)
-          ),
-        },
-      ],
-    };
-
-  }, [DailySpend]);
+      {
+        name: `${lastYear}`,
+        data: DAYS.map(
+          (day) => Number(lastYearMap[day] || 0)
+        ),
+      },
+    ],
+  };
+}, [DailySpend, LastYearDailySpend]);
 
 
   // ============================================================
@@ -509,6 +648,7 @@ const usePurchaseOrders = (
     actualSpendChart,
     monthToDateChart,
     OverdueAccounts,
+    spendByCategory,
   };
 };
 

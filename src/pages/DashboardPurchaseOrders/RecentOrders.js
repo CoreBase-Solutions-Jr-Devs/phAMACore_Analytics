@@ -26,57 +26,11 @@ const firstOverdue = OverdueAccounts?.[0];
             </thead>
 
             <tbody>
-                {OverdueAccounts.length === 0 ? (
-    <tr>
-      <td colSpan="6" className="text-center py-5">
-        <h6 className="text-muted mb-0">
-          No overdue invoices found
-        </h6>
-      
-      </td>
-    </tr>
-  ) : (
-              OverdueAccounts.map((item, key) => (
-                <tr key={key} className="mb-0">
-                  <td>
-                    <div className="fw-medium">
-                      {item.supplier}
-                      <div className="text-muted fs-12">{item.invoice}</div>
-                    </div>
-                  </td>
-
-                  <td className="fw-semibold">{item.amount}</td>
-
-                  <td>{item.dueDate}</td>
-
-                  <td className="text-danger">{item.daysOverdueLabel}</td>
-
-                  <td></td>
-
-                  <td>
-                    <span
-                      className={`badge bg-${item.actionClass}-subtle text-${item.actionClass}`}
-                    >
-                      {/* {item.action} */}
-                    </span>
-                  </td>
-                </tr>
-                ))
-  )}
+ 
 
             </tbody>
 <tfoot>
-  {firstOverdue && (
-    <tr>
-      <td colSpan="6">
-        <div className="text-center ">
-          <p className="mb-1 ">
-            <strong className="text-danger">{firstOverdue.supplier}</strong> will switch to cash on delivery if not delivered by <strong className="text-danger">{firstOverdue.dueDate}</strong>
-          </p>
-        </div>
-      </td>
-    </tr>
-  )}
+
 </tfoot>
           </table>
         </div>
