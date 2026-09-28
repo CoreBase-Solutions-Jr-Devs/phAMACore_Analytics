@@ -39,6 +39,43 @@ const calculateProfit = (data) => {
     }, 0);
 };
 
+const calculateSales = (data) => {
+    if (!data) return 0;
+
+    const items = Array.isArray(data) ? data : (data.result || []);
+    if (!Array.isArray(items) || items.length === 0) {
+        if (typeof data === "number") return data;
+        if (typeof data === "object") {
+            const val = data.salesValueExcl ?? data.salesValueIncl ?? data.totalSales ?? data.sales ?? data.salesRevenue;
+            if (val !== undefined) return Number(val) || 0;
+        }
+        return 0;
+    }
+
+    // Check if the response is summary metrics array (e.g. from GroupBy=SUMMARY)
+    const summarySalesItem = items.find((item) =>
+        item.metric_name && (
+            item.metric_name.toLowerCase().includes("sales revenue") ||
+            item.metric_name.toLowerCase().includes("total sales")
+        )
+    ) || items.find((item) =>
+        item.metric_name &&
+        item.metric_name.toLowerCase().includes("sales") &&
+        !item.metric_name.toLowerCase().includes("loss")
+    ) || items.find((item) => item.metric_order === 1);
+
+    if (summarySalesItem && summarySalesItem.metric_value) {
+        const parsed = parseFloat(String(summarySalesItem.metric_value).replace(/[^0-9.-]+/g, ""));
+        if (!isNaN(parsed)) return parsed;
+    }
+
+    // Default: sum sales across all user rows
+    return items.reduce((acc, curr) => {
+        const val = curr.salesValueExcl ?? curr.salesValueIncl ?? curr.totalSales ?? curr.sales ?? curr.salesRevenue ?? 0;
+        return acc + (Number(val) || 0);
+    }, 0);
+};
+
 const calculateCollections = (data) => {
     if (!data) return 0;
 
@@ -99,6 +136,10 @@ export default function Widgets() {
         );
     }, [dispatch]);
 
+    const salesValue = useMemo(() => {
+        return calculateSales(inventoryProfitSummaryUser);
+    }, [inventoryProfitSummaryUser]);
+
     const incomeStatementValue = useMemo(() => {
         return calculateProfit(inventoryProfitSummaryUser);
     }, [inventoryProfitSummaryUser]);
@@ -137,12 +178,14 @@ export default function Widgets() {
         },
         {
             title: "Sales",
-            value: 0,
+            value: salesValue,
             prefix: "KES ",
             suffix: "",
             icon: "trending-up",
             color: "primary",
-            subtitle: "Current period sales"
+            subtitle: "Current period sales",
+            loading: loadingProfitSummary,
+            decimals: 2
         },
         {
             title: "Stock Profit",
