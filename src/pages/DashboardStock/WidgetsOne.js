@@ -73,7 +73,7 @@ const WidgetsOne = ({ branchMap = {} }) => {
                                         <div>
                                             <p className="font-medium mb-0">{widget.label}</p>
 
-                                            <h2 className={`mt-4 ff-secondary fw-semibold text-${color}`}>
+                                            <h2 className={`mt-2 ff-secondary fw-semibold text-${color}`}>
                                                 {isLoading ? (
                                                     <span className="placeholder-glow">
                                                         <span className="placeholder col-6 rounded" />
@@ -96,13 +96,13 @@ const WidgetsOne = ({ branchMap = {} }) => {
                                             </p>
                                         </div>
 
-                                        <div className="avatar-sm flex-shrink-0">
+                                        {/* <div className="avatar-sm flex-shrink-0">
                                             <span
                                                 className={`avatar-title bg-${color}-subtle rounded-circle fs-2`}
                                             >
                                                 <FeatherIcon icon={icon} className={`text-${color}`} />
                                             </span>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </CardBody>
                             </Card>

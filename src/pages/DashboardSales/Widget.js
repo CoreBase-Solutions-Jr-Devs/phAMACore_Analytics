@@ -23,6 +23,8 @@ const Widget = ({
   overdueDebtorsCount=0,
   salesInvoicesPercentage = 0,
   cashInvoicesPercentage = 0,
+  creditNotesPercentage = 0,
+  lastYearRevenue= 0,
   revenueChange = 0,
   branchMap = {},
   rightClickBtn,
@@ -69,8 +71,8 @@ const Widget = ({
         <div>
           <p className="font-medium mb-0">Total Revenue</p>
 
-          <h2 className="mt-4 ff-secondary fw-semibold text-success">
-            {formatAmount(Number(totalRevenue || 0))}
+          <h2 className="mt-2 ff-secondary fw-semibold text-success">
+            KES {formatAmount(Number(totalRevenue || 0))}
           </h2>
 
           <p className="mb-0 text-muted">
@@ -84,15 +86,15 @@ const Widget = ({
               } align-middle`}
             ></i>
             {` ${Math.abs(revenueChange).toFixed(1)}% vs yesterday`} */}
-              Including tax
+               Tax inclusive
           </p>
         </div>
 
-        <div className="avatar-sm flex-shrink-0">
-          <span className="avatar-title bg-success-subtle rounded-circle fs-1">
-            <FeatherIcon icon="dollar-sign" className="text-success" />
-          </span>
-        </div>
+        {/* <div className="avatar-sm flex-shrink-0">
+      <span className="avatar-title bg-success-subtle rounded-circle fs-6 fw-bold text-success">
+  KSh
+</span>
+        </div> */}
       </div>
     </CardBody>
   </Card>
@@ -104,7 +106,7 @@ const Widget = ({
       <div className="d-flex justify-content-between align-items-center">
         <div>
                   <p className="font-medium  mb-0">Cash Sales</p>
-                  <h2 className="mt-4 ff-secondary fw-semibold text-info">
+                  <h2 className="mt-2 ff-secondary fw-semibold text-info">
                     <span className="counter-value">
                       {/* <CountUp
                                         start={0}
@@ -113,7 +115,7 @@ const Widget = ({
                                         duration={3}
                                         formattingFn={(value) => formatAmount(value)}
                                     /> */}
-                      {formatAmount(Number(cashSales || 0))}
+                      KES {formatAmount(Number(cashSales || 0))}
                     </span>
                   </h2>
                   <p className="mb-0 text-muted">
@@ -121,11 +123,11 @@ const Widget = ({
                   </p>
                 </div>
 
-                <div className="avatar-sm flex-shrink-0">
+                {/* <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-info-subtle rounded-circle fs-2">
                     <FeatherIcon icon="shopping-cart" className="text-info" />
                   </span>
-                </div>
+                </div> */}
               </div>
             </CardBody>
           </Card>
@@ -137,7 +139,7 @@ const Widget = ({
       <div className="d-flex justify-content-between align-items-center">
         <div>
                   <p className="font-medium  mb-0">Sales Invoices</p>
-                  <h2 className="mt-4 ff-secondary fw-semibold text-danger">
+                  <h2 className="mt-2 ff-secondary fw-semibold text-danger">
                     <span className="counter-value">
                       {/* <CountUp
                                         start={0}
@@ -146,7 +148,7 @@ const Widget = ({
                                         duration={3}
                                         formattingFn={(value) => formatAmount(value)}
                                     /> */}
-                      {formatAmount(Number(salesInvoices || 0))}
+                      KES {formatAmount(Number(salesInvoices || 0))}
                     </span>
                   </h2>
                   <p className="mb-0 text-muted">
@@ -155,11 +157,11 @@ const Widget = ({
                   </p>
                 </div>
 
-                <div className="avatar-sm flex-shrink-0">
+                {/* <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-danger-subtle rounded-circle fs-2">
                     <FeatherIcon icon="credit-card" className="text-danger" />
                   </span>
-                </div>
+                </div> */}
               </div>
             </CardBody>
           </Card>
@@ -171,7 +173,7 @@ const Widget = ({
       <div className="d-flex justify-content-between align-items-center">
         <div>
                   <p className="font-medium  mb-0">Cash invoices</p>
-                  <h2 className="mt-4 ff-secondary fw-semibold text-warning">
+                  <h2 className="mt-2 ff-secondary fw-semibold text-warning">
                     <span className="counter-value">
                       {/* <CountUp
                                         start={0}
@@ -179,7 +181,7 @@ const Widget = ({
                                         decimals={1}
                                         duration={3}
                                     /> */}
-                      {formatAmount(Number(cashInvoices || 0))}
+                      KES {formatAmount(Number(cashInvoices || 0))}
                     </span>
                     
                   </h2>
@@ -188,11 +190,11 @@ const Widget = ({
                   </p>
                 </div>
 
-                <div className="avatar-sm flex-shrink-0">
+                {/* <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-warning-subtle rounded-circle fs-2">
                     <FeatherIcon icon="briefcase" className="text-warning" />
                   </span>
-                </div>
+                </div> */}
               </div>
             </CardBody>
           </Card>
@@ -228,19 +230,21 @@ const Widget = ({
       <div className="d-flex justify-content-between align-items-center">
         <div>
                   <p className="font-medium  mb-0">Credit Notes </p>
-                  <h2 className="mt-4 ff-secondary fw-semibold text-info">
+                  <h2 className="mt-2 ff-secondary fw-semibold text-info">
                     <span className="counter-value">
-                      {formatAmount(Number(creditNotes || 0))}
+                      KES {formatAmount(Number(creditNotes || 0))}
                     </span>
                   </h2>
-                  <p className="mb-0 text-muted">Reversed invoices</p>
+                  <p className="mb-0 text-muted">
+                    {creditNotesPercentage.toFixed(1)}% of total
+                  </p>
                 </div>
-
+{/* 
                 <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-info-subtle rounded-circle fs-2">
                     <FeatherIcon icon="users" className="text-info" />
                   </span>
-                </div>
+                </div> */}
               </div>
             </CardBody>
           </Card>
@@ -277,19 +281,19 @@ const Widget = ({
       <div className="d-flex justify-content-between align-items-center">
         <div>
                   <p className="font-medium  mb-0">Overdue Accounts</p>
-                  <h2 className="mt-4 ff-secondary fw-semibold text-warning">
+                  <h2 className="mt-2 ff-secondary fw-semibold text-warning">
                     <span className="counter-value">
-                      {formatAmount(Number(overdueDebtorsCount|| 0))}
+                      KES {formatAmount(Number(overdueDebtorsCount|| 0))}
                     </span>
                   </h2>
                   <p className="mb-0 text-muted">At risk</p>
                 </div>
 
-                <div className="avatar-sm flex-shrink-0">
+                {/* <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-warning-subtle rounded-circle fs-2">
                     <FeatherIcon icon="clock" className="text-warning" />
                   </span>
-                </div>
+                </div> */}
               </div>
             </CardBody>
           </Card>
