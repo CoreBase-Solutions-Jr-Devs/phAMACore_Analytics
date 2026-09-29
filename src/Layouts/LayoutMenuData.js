@@ -60,19 +60,19 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
   }, [iscurrentState]);
 
   const menuItems = [
-    // {
-    //   id: 'my business',
-    //   label: 'My Business',
-    //   icon: 'ri-home-4-line',
-    //   link: '/dashboard',
-    //   stateVariables: isMyBusiness,
-    //   click: function (e) {
-    //     e.preventDefault();
-    //     setIsMyBusiness(!isMyBusiness); // Fixed bug here
-    //     setIscurrentState('MyBusiness');
-    //     updateIconSidebar(e);
-    //   },
-    // },
+    {
+      id: 'my business',
+      label: 'My Business',
+      icon: 'ri-home-4-line',
+      link: '/dashboard',
+      stateVariables: isMyBusiness,
+      click: function (e) {
+        e.preventDefault();
+        setIsMyBusiness(!isMyBusiness); // Fixed bug here
+        setIscurrentState('MyBusiness');
+        updateIconSidebar(e);
+      },
+    },
     {
       id: 'sales',
       label: 'Sales',
