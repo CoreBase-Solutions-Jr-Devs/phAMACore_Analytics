@@ -64,7 +64,9 @@ export const getLastYearMonthToDateSales = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_SALES, { params });
 console.log("POWER BI URL:", url.GET_POWERBI_SALES);
 export const getKPIOverdueAccounts = (params) =>
-  PowerBIAPI.get(url.GET_POWERBI_KPIOverdueAccounts, { params });
+  PowerBIAPI.get(url.GET_POWERBI_KPI_OVERDUE_ACCOUNTS, { params });
+export const getAccountBalance = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_ACCOUNT_BALANCE, { params });
 export const getPurchaseOrders = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_PURCHASE_ORDERS, { params });
 export const getKPIPurchases = (params) =>
@@ -95,8 +97,21 @@ export const getKPIStockHealth = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_KPI_STOCKHEALTH, { params });
 export const getInventoryProfitSummaryUser = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_INVENTORY_PROFIT_SUMMARY_USER, { params });
-export const getAccountBalance = (params) => 
-  PowerBIAPI.get(url.GET_POWERBI_ACCOUNT_BALANCE, { params });
+
 export const getCashbookSummary = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_CASHBOOK_SUMMARY, { params });
+export const getKPIMaverickSpend = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_MAVERICK_SPEND, { params });
+
+export const getKPIPriceAlerts = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_PRICE_ALERTS, { params });
+
+export const getKPILeadTime = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_LEAD_TIME, { params });
+
+export const getGoodsReceived = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_GOODS_RECEIVED, { params });
+
+export const getBestPricePerSupplier = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_BEST_PRICE, { params });
 

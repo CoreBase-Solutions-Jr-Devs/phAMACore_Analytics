@@ -28,8 +28,8 @@ export const GET_POWERBI_SALES =
 export const GET_POWERBI_KPISALES =
   "/api/PowerBi/PowerBIKPISalesTransactions";
 
-  export const GET_POWERBI_KPIOverdueAccounts =
-  "/api/PowerBi/PowerBIKPIOverdueAccounts";
+  // export const GET_POWERBI_KPIOverdueAccounts =
+  // "/api/PowerBi/PowerBIKPIOverdueAccounts";
 
 export const GET_POWERBI_PURCHASE_ORDERS =
   "/api/PowerBi/PowerBIPurchaseOrders";
@@ -52,9 +52,9 @@ export const GET_POWERBI_BATCH_EXPIRY_NEO =
 export const GET_POWERBI_BRANCHES = 
   "/api/PowerBi/PowerBIBranches";
 
-// export const GET_POWERBI_KPI_OVERDUE_ACCOUNTS =
-//   "/api/PowerBi/PowerBIKPIOverdueAccounts";
-
+export const GET_POWERBI_KPI_OVERDUE_ACCOUNTS =
+  "/api/PowerBi/PowerBIAccountBalance";
+  
 export const GET_POWERBI_KPI_TOTALSTOCKVALUEBYBRANCH =
   "/api/PowerBi/PowerBIKPITotalStockValueByBranch";
 
@@ -67,9 +67,19 @@ export const GET_POWERBI_INVENTORY_PROFIT_SUMMARY_USER =
 export const GET_POWERBI_ACCOUNT_BALANCE = 
   "/api/PowerBi/PowerBIAccountBalance";
 
-export const GET_POWERBI_CASHBOOK_SUMMARY = 
-  "/api/PowerBi/PowerBICashbookSummary";
+export const GET_POWERBI_MAVERICK_SPEND = 
+  "/api/PowerBi/PowerBIKPIMaverickSpend";
+  export const GET_POWERBI_PRICE_ALERTS = 
+  "/api/PowerBi/PowerBIKPIPriceChangeAlerts";
+  export const GET_POWERBI_LEAD_TIME = 
+  "/api/PowerBi/PowerBIKPILeadTime";
+  export const GET_POWERBI_GOODS_RECEIVED = 
+  "/api/PowerBI/PowerBIGoodsReceived";
 
+   export const GET_POWERBI_CASHBOOK_SUMMARY = 
+  "/api/PowerBi/PowerBICashbookSummary";
+   export const GET_POWERBI_BEST_PRICE= 
+  "/api/PowerBi/PowerBIKPIBestPricePerSupplier";
 //PROFILE
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
 export const POST_EDIT_PROFILE = "/user";
