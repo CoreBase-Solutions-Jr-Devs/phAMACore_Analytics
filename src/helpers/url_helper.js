@@ -28,7 +28,7 @@ export const GET_POWERBI_SALES =
 export const GET_POWERBI_KPISALES =
   "/api/PowerBi/PowerBIKPISalesTransactions";
 
-export const GET_POWERBI_KPIOverdueAccounts =
+  export const GET_POWERBI_KPIOverdueAccounts =
   "/api/PowerBi/PowerBIKPIOverdueAccounts";
 
 export const GET_POWERBI_PURCHASE_ORDERS =
@@ -52,8 +52,8 @@ export const GET_POWERBI_BATCH_EXPIRY_NEO =
 export const GET_POWERBI_BRANCHES = 
   "/api/PowerBi/PowerBIBranches";
 
-export const GET_POWERBI_KPI_OVERDUE_ACCOUNTS =
-  "/api/PowerBi/PowerBIKPIOverdueAccounts";
+// export const GET_POWERBI_KPI_OVERDUE_ACCOUNTS =
+//   "/api/PowerBi/PowerBIKPIOverdueAccounts";
 
 export const GET_POWERBI_KPI_TOTALSTOCKVALUEBYBRANCH =
   "/api/PowerBi/PowerBIKPITotalStockValueByBranch";

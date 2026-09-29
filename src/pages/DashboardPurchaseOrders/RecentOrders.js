@@ -1,41 +1,200 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 
-const RecentOrders = ({ data = [], OverdueAccounts = [] }) => {
-  const today = new Date();
-const firstOverdue = OverdueAccounts?.[0];
+const RecentOrders = ({
+  overdueSupplierAccounts = [],
+  currentReceivables = 0,
+  overdue31To60 = 0,
+  overdue61To90 = 0,
+  overdue91To120 = 0,
+  overdue120Plus = 0,
+  formatAmount,
+}) => {
+  const hasAgeingData =
+    Number(currentReceivables ?? 0) > 0 ||
+    Number(overdue31To60 ?? 0) > 0 ||
+    Number(overdue61To90 ?? 0) > 0 ||
+    Number(overdue91To120 ?? 0) > 0 ||
+    Number(overdue120Plus ?? 0) > 0;
+
+    
   return (
+    <React.Fragment>
+
     <Card className="card-height-100">
-      <CardHeader className="align-items-center d-flex">
-        <h4 className="card-title mb-0 flex-grow-1">
-          OVERDUE INVOICES 
-        </h4>
+     <CardHeader className="card-header align-items-center d-flex">
+                             <h4 className="card-title mb-0 flex-grow-1">
+                              Overdue Invoices</h4>
       </CardHeader>
+
       <CardBody>
-        <div className="table-responsive table-card">
-          <table className="table table-borderless table-centered table-nowrap mb-0">
-            <thead className="text-muted table-light">
-              <tr>
-                <th>Supplier - Invoice</th>
-                <th>Amount</th>
-                <th>Due date</th>
-                <th>Days overdue</th>
-                <th>Terms</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+        {!hasAgeingData  && overdueSupplierAccounts.length === 0 ? (
+          <div className="text-center py-4">
+           
+            <h6 className="text-muted mb-1">
+             
+              No receivables ageing data available
+            </h6>
+          
+          </div>
+        ) : (
+          <>
+          <div className="row g-2 mb-3">
+            <div className="col-6 col-md-4 col-sm-6">
+              <div className="rounded-3 text-center bg-success-subtle p-2">
+                <p className="text-success fw-semibold mb-1 small">
+                  <small>Current</small>
+                </p>
 
-            <tbody>
- 
+                <h6 className="mb-0 text-success fw-bold">
+                  {formatAmount(currentReceivables)}
+                </h6>
+              </div>
+            </div>
 
-            </tbody>
-<tfoot>
+            <div className="col-6 col-md-4 col-sm-6">
+              <div className="rounded-3 text-center bg-warning-subtle p-2">
+                <p className="text-warning fw-semibold mb-1 small">
+                  <small>31–60 days</small>
+                </p>
 
-</tfoot>
-          </table>
+                <h6 className="mb-0 text-warning fw-bold">
+                  {formatAmount(overdue31To60)}
+                </h6>
+              </div>
+            </div>
+
+            <div className="col-6 col-md-4 col-sm-6">
+              <div className="rounded-3 text-center bg-danger-subtle p-2">
+                <p className="text-danger fw-semibold mb-1 small">
+                  <small>61–90 days</small>
+                </p>
+
+                <h6 className="mb-0 text-danger fw-bold">
+                  {formatAmount(overdue61To90)}
+                </h6>
+              </div>
+            </div>
+
+            <div className="col-6 col-md-4 col-sm-6">
+              <div className="rounded-3 text-center bg-info-subtle p-2">
+                <p className="text-info fw-semibold mb-1 small">
+                  <small>91–120 days</small>
+                </p>
+
+                <h6 className="mb-0 text-info fw-bold">
+                  {formatAmount(overdue91To120)}
+                </h6>
+              </div>
+            </div>
+
+            <div className="col-6 col-md-4 col-sm-6">
+              <div className="rounded-3 text-center bg-info-subtle p-2">
+                <p className="text-info fw-semibold mb-1 small">
+                  <small>120+ days</small>
+                </p>
+
+                <h6 className="mb-0 text-info fw-bold">
+                  {formatAmount(overdue120Plus)}
+                </h6>
+              </div>
+            </div>
+          </div>
+       
+        {/* SUPPLIER TABLE */}
+        <div>
+          {overdueSupplierAccounts.length === 0 ? (
+            <div className="text-center py-4">
+              <h6 className="text-muted mb-1">No supplier data available</h6>
+
+            </div>
+          ) : (
+            <div className="table-responsive table-card">
+              <table className="table table-borderless table-centered table-nowrap mb-0">
+                <thead className="text-muted table-light">
+                  <tr>
+                    <th>Supplier-Invoice</th>
+                    <th>Outstanding</th>
+                    <th>Last Invoice</th>
+                    {/* <th>Ageing</th> */}
+                    <th>Last Payment</th>
+                    {/* <th>Action</th> */}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {overdueSupplierAccounts.map((item, index) => (
+                    <tr key={index}>
+                      <td>
+                        <div className="fw-medium">{item.supplier}</div>
+
+                        <div className="text-muted">{item.cuscode}</div>
+                      </td>
+
+                      <td>{formatAmount(item.outstanding)}</td>
+
+                      <td>
+                        {item.lastInvoice
+                          ? new Date(item.lastInvoice).toLocaleDateString(
+                              "en-GB",
+                            )
+                          : "-"}
+                      </td>
+
+                      {/* <td>
+                        <div className="small">
+
+                          <div>
+                            0–30:{" "}
+                            {formatAmount(item.ageing.current)}
+                          </div>
+
+                          <div>
+                            31–60:{" "}
+                            {formatAmount(item.ageing.days31To60)}
+                          </div>
+
+                          <div>
+                            61–90:{" "}
+                            {formatAmount(item.ageing.days61To90)}
+                          </div>
+
+                          <div>
+                            91–120:{" "}
+                            {formatAmount(item.ageing.days91To120)}
+                          </div>
+
+                          <div>
+                            120+:{" "}
+                            {formatAmount(item.ageing.over120)}
+                          </div>
+
+                        </div>
+                      </td> */}
+
+                      <td>
+                        {item.lastPayment
+                          ? new Date(item.lastPayment).toLocaleDateString(
+                              "en-GB",
+                            )
+                          : "-"}
+                      </td>
+
+                      {/* <td>
+                        {item.action}
+                      </td> */}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
+        </>
+         )}
       </CardBody>
     </Card>
+    </React.Fragment>
   );
 };
 

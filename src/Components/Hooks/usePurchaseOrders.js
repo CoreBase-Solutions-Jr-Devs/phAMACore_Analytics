@@ -42,6 +42,7 @@ const usePurchaseOrders = (
   LastYearDailySpendMonthly = [],
   LastYearDailySpendType = [],
 
+    kpiOverdueAccounts = [],
   filters = {}
 ) => {
 
@@ -277,11 +278,13 @@ const spendByCategory = useMemo(() => {
 
       return acc;
     }, {});
-
-  const data = Object.entries(grouped).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  const data = Object.entries(grouped)
+    .map(([name, value]) => ({
+      name,
+      value,
+    }))
+    .sort((a, b) => b.value - a.value) // highest first
+    .slice(0, 5); // top 5
 
   console.log("SpendByCategory:", data);
 
@@ -523,114 +526,67 @@ const monthToDateChart = useMemo(() => {
   // - Earliest due date
   // - Worst overdue value
   // ============================================================
-  const OverdueAccounts = useMemo(() => {
+const overdue = kpiOverdueAccounts || [];
 
-    const groupedMap = new Map();
+// Ageing totals
+const currentReceivables = overdue.reduce(
+  (sum, item) => sum + Number(item.current_0_30 || 0),
+  0
+);
 
-    PurchaseOrders.forEach((item) => {
+const overdue31To60 = overdue.reduce(
+  (sum, item) => sum + Number(item.days_31_60 || 0),
+  0
+);
 
-      const supplier =
-        item?.supplier_Name || "Unknown";
+const overdue61To90 = overdue.reduce(
+  (sum, item) => sum + Number(item.days_61_90 || 0),
+  0
+);
 
-      const dueDate =
-        new Date(item?.expected_date);
+const overdue91To120 = overdue.reduce(
+  (sum, item) => sum + Number(item.days_91_120 || 0),
+  0
+);
 
-      if (Number.isNaN(dueDate.getTime())) {
-        return;
-      }
+const overdue120Plus = overdue.reduce(
+  (sum, item) => sum + Number(item.over_120 || 0),
+  0
+);
 
-      const today = new Date();
+const totalPayables = overdue.reduce(
+  (sum, item) => sum + Number(item.total_balance || 0),
+  0
+);
 
-      const daysOverdue = Math.max(
-        0,
-        Math.floor(
-          (today - dueDate) /
-          (1000 * 60 * 60 * 24)
-        )
-      );
+// Data for overdue supplier table
+const overdueSupplierAccounts = overdue
+  .slice()
+  .sort(
+    (a, b) =>
+      Number(b.total_balance || 0) -
+      Number(a.total_balance || 0)
+  )
+  .slice(0, 5)
+  .map((item) => ({
+    supplier: item.cusname,
+ cuscode: item.cuscode,
+    outstanding: Number(item.total_balance || 0),
 
-      if (!groupedMap.has(supplier)) {
+    lastInvoice: item.last_invoice_date,
 
-        groupedMap.set(supplier, {
-          supplier,
-          amount:
-            Number(
-              item?.total_lpo_value || 0
-            ),
-          dueDate,
-          daysOverdue,
-        });
+    ageing: {
+      current: Number(item.current_0_30 || 0),
+      days31To60: Number(item.days_31_60 || 0),
+      days61To90: Number(item.days_61_90 || 0),
+      days91To120: Number(item.days_91_120 || 0),
+      over120: Number(item.over_120 || 0),
+    },
 
-      } else {
+    lastPayment: item.last_payment_date,
 
-        const existing =
-          groupedMap.get(supplier);
-
-        // Combine supplier amounts
-        existing.amount +=
-          Number(
-            item?.total_lpo_value || 0
-          );
-
-        // Keep worst overdue value
-        existing.daysOverdue =
-          Math.max(
-            existing.daysOverdue,
-            daysOverdue
-          );
-
-        // Keep earliest due date
-        if (
-          dueDate <
-          existing.dueDate
-        ) {
-          existing.dueDate =
-            dueDate;
-        }
-
-      }
-
-    });
-
-    return Array.from(
-      groupedMap.values()
-    )
-      .map((item) => ({
-
-        supplier:
-          item.supplier,
-
-        amount:
-          formatAmount(item.amount),
-
-        dueDate:
-          item.dueDate.toLocaleDateString(
-            "en-GB"
-          ),
-
-        daysOverdue:
-          item.daysOverdue,
-
-        daysOverdueLabel:
-          `${item.daysOverdue} days`,
-
-        actionClass:
-          item.daysOverdue > 30
-            ? "danger"
-            : item.daysOverdue > 7
-            ? "warning"
-            : "success",
-
-      }))
-      .sort(
-        (a, b) =>
-          b.daysOverdue -
-          a.daysOverdue
-      )
-      .slice(0, 10);
-
-  }, [PurchaseOrders]);
-
+    action: item.action_insight,
+  }));
 
   // ============================================================
   // RETURN ALL CALCULATED VALUES
@@ -646,8 +602,14 @@ const monthToDateChart = useMemo(() => {
     top2Suppliers,
     branchData,
     actualSpendChart,
+    overdueSupplierAccounts,
     monthToDateChart,
-    OverdueAccounts,
+    currentReceivables,
+    overdue31To60,
+    overdue61To90,
+    overdue91To120,
+    overdue120Plus,
+    // OverdueAccounts,
     spendByCategory,
   };
 };

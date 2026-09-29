@@ -31,7 +31,7 @@ const top2Total =
 
                     <CardHeader className="card-header align-items-center d-flex">
                         <h4 className="card-title mb-0 flex-grow-1">
-                         Spend by supplier
+                         Spend by Supplier
                         </h4>
                         </CardHeader>
                     <div className="card-body p-3">
@@ -89,9 +89,9 @@ const top2Total =
       <strong>{top2Suppliers[0].name} + {top2Suppliers[1].name}</strong> ={" "}
       {top2Percent}% of total spend
     </p>
-    <p className="text-danger small mb-0">
+    {/* <p className="text-danger small mb-0">
       Concentration is within the safe range (≤ 75%).
-    </p>
+    </p> */}
   </div>
 )}
 </div>

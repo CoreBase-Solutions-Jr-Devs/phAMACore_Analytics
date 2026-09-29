@@ -9,6 +9,10 @@ import {
   getLastYearActualSpend,
 } from "./thunk";
 
+import {
+  getKPIOverdueAccounts,
+} from "../dashboardSales/thunk";
+
 const formatDMY = (date) =>
   date.toLocaleDateString("en-GB");
 
@@ -54,6 +58,8 @@ const initialState = {
   LastYearDailySpendBranch: [],
   LastYearDailySpendMonthly: [],
   LastYearDailySpendType: [],
+
+    kpiOverdueAccounts: [],
 
   loading: false,
   error: null,
@@ -323,6 +329,7 @@ const PurchaseOrdersSlice = createSlice({
         }
       )
 
+      
       .addCase(
         getPurchaseOrders.rejected,
         (state, action) => {
@@ -611,7 +618,20 @@ const PurchaseOrdersSlice = createSlice({
             action.error.message ||
             "Error loading last year daily spend";
         }
-      );
+      )
+
+      .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
+        state.kpiOverdueAccounts =
+          action.payload?.result || action.payload || [];
+      })
+      
+      .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
+             state.loading = false;
+             state.error =
+               action.payload?.message ||
+               action.error.message ||
+               "Error loading data";
+           });
   },
 });
 

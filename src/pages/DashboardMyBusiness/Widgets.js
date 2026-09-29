@@ -238,12 +238,12 @@ export default function Widgets() {
                 </h4>
             </div>
 
-            <Row className="g-2 mb-2">
-                {kpis.map((item, index) => (
-                    <Col xl={3} lg={4} md={6} sm={12} key={index}>
-                        <Card className="card-animate h-100">
-                            <CardBody className="p-2">
-                                <div className="d-flex justify-content-between align-items-center">
+  <Row className="g-2 mb-2">
+    {kpis.map((item, index) => (
+        <Col xl={3} lg={4} md={6} sm={12} key={index}>
+            <Card className="card-animate h-100">
+                <CardBody className="p-2">
+                    <div className="d-flex justify-content-between align-items-center">
 
                                     {/* Left content */}
                                     <div>
@@ -251,40 +251,28 @@ export default function Widgets() {
                                             {item.title}
                                         </p>
 
-                                        <h2 className={`mt-4 ff-secondary fw-semibold text-${item.color}`}>
-                                            {item.loading ? (
-                                                <span className="placeholder-glow">
-                                                    <span className="placeholder col-6 rounded" />
-                                                </span>
-                                            ) : (
-                                                <span className="counter-value">
-                                                    <CountUp
-                                                        start={0}
-                                                        end={Number(item.value || 0)}
-                                                        separator=","
-                                                        decimals={item.decimals !== undefined ? item.decimals : (item.value && item.value % 1 !== 0 ? 2 : 0)}
-                                                        prefix={item.prefix}
-                                                        suffix={item.suffix}
-                                                        duration={1.5}
-                                                    />
-                                                </span>
-                                            )}
-                                        </h2>
+                            <h2 className={`mt-4 ff-secondary fw-semibold text-${item.color}`}>
+                                <span className="counter-value">
+                                    {item.prefix}
+                                    {Number(item.value || 0)}
+                                    {item.suffix}
+                                </span>
+                            </h2>
 
                                         <p className="mb-0 text-muted">
                                             {item.subtitle}
                                         </p>
                                     </div>
 
-                                    {/* Right icon */}
-                                    <div className="avatar-sm flex-shrink-0">
-                                        <span className={`avatar-title bg-${item.color}-subtle rounded-circle fs-2`}>
-                                            <FeatherIcon
-                                                icon={item.icon}
-                                                className={`text-${item.color}`}
-                                            />
-                                        </span>
-                                    </div>
+                        {/* Right icon */}
+                        <div className="avatar-sm flex-shrink-0">
+                            <span className={`avatar-title bg-${item.color}-subtle rounded-circle fs-2`}>
+                                <FeatherIcon
+                                    icon={item.icon}
+                                    className={`text-${item.color}`}
+                                />
+                            </span>
+                        </div>
 
                                 </div>
                             </CardBody>
