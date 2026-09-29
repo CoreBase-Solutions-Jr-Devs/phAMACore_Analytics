@@ -2,6 +2,7 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 
 import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
+import { formatCompact, formatCurrency } from "../utils/formatHelper";
 
 const AudiencesCharts = ({ dataColors, series }) => {
   let chartAudienceColumnChartsColors = [];
@@ -315,6 +316,19 @@ const RevenueExpensesChart = ({
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
+      labels: {
+        // Formats large y-axis tick values compactly (e.g., KES 1.5M, KES 500K)
+        formatter: (val) => `KES ${formatCompact(val)}`,
+      },
+    },
+
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        // Formats the hover tooltip with full currency presentation (e.g., KES 1,234,567.89)
+        formatter: (val) => formatCurrency(val, "KES", 2),
+      },
     },
   };
 
