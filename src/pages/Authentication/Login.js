@@ -99,7 +99,7 @@ const Login = (props) => {
         if (authUser.requirePasswordChange) {
           navigate("/change-password");
         } else {
-          navigate("/dashboard-sales");
+          navigate("/dashboard");
         }
       } catch (error) {
         console.error(error);
