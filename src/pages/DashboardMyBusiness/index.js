@@ -2,7 +2,7 @@ import React from 'react';
 import { Container, Row, Col } from "reactstrap";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
 import Widgets from "./Widgets";
-import RevenueExpenses from "./RevenueExpenses"
+import RevenueExpenses from "./RevenueExpenses";
 import StockPurchases from './StockPurchases';
 // import CashFlowSummary from "./CashFlowSummary";
 import ReceivablesAgeing from "./ReceivablesAgeing";
@@ -10,7 +10,6 @@ import StockMovements from './StockMovements';
 import SalesCollection from './SalesCollection';
 // import PayablesAgeing from "./PayablesAgeing";
 // import ProfitabilitySummary from "./ProfitabilitySummary";
-
 
 export default function DashboardMyBusiness() {
     document.title = "My Business | phAMACore Analytics";
@@ -24,29 +23,29 @@ export default function DashboardMyBusiness() {
 
                 <Row>
                     <Col xl={6}>
-                  <RevenueExpenses/>
+                        <RevenueExpenses />
                     </Col>
 
                     <Col xl={6}>
-                      < StockPurchases />
+                        <StockPurchases />
                     </Col>
                 </Row>
 
-                 <Row>
-                     <Col xl={6}>
-                         <ReceivablesAgeing />
-                     </Col>
+                <Row>
+                    <Col xl={6}>
+                        <ReceivablesAgeing />
+                    </Col>
 
-                     <Col xl={6}>
+                    <Col xl={6}>
                         <StockMovements />
-                     </Col>
-                </Row> 
+                    </Col>
+                </Row>
                 <Row>
                     <Col>
-                    <SalesCollection />
+                        <SalesCollection />
                     </Col>
                 </Row>
             </Container>
         </div>
-    )
+    );
 }

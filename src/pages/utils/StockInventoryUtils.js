@@ -20,7 +20,7 @@ export const getNDaysAgoApi = (n) => {
 
 export const KPI_META = [
     { id: 1, label: "Total SKUs", subtitle: "Across all branches", icon: "ri-medicine-bottle-line text-primary", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 2, label: "Total Stock Value", subtitle: "KES - all branches", icon: "ri-money-dollar-circle-line text-success", decimals: 2, prefix: "KES ", suffix: "m", separator: "," },
+    { id: 2, label: "Total Stock Value", subtitle: "KES - all branches", icon: "ri-coins-line text-success", decimals: 2, prefix: "KES ", suffix: "m", separator: "," },
     { id: 3, label: "Items below Reorder Level", subtitle: "Need action now", icon: "ri-arrow-down-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 4, label: "Out of Stock Items", subtitle: "SKUs out of stock", icon: "ri-error-warning-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 5, label: "Near Expiry (\u2264 90 days)", subtitle: "Products at risk", icon: "ri-time-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },

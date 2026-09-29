@@ -69,3 +69,27 @@ export const getLast7DaysInput = () => {
     endDate: formatToInputDate(end),
   };
 };
+
+// ===============================
+// YEAR TO DATE
+// ===============================
+
+export const getYearToDateApi = () => {
+  const today = new Date();
+  const start = new Date(today.getFullYear(), 0, 1);
+
+  return {
+    startDate: formatToApiDate(start),
+    endDate: formatToApiDate(today),
+  };
+};
+
+export const getYearToDateInput = () => {
+  const today = new Date();
+  const start = new Date(today.getFullYear(), 0, 1);
+
+  return {
+    startDate: formatToInputDate(start),
+    endDate: formatToInputDate(today),
+  };
+};
