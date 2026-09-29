@@ -198,6 +198,7 @@ const formatDisplay = (date) => date || "";
                   <button className="btn btn-success me-2" onClick={onApply}>
                 Select
               </button>
+              
                 <button className="btn btn-danger " onClick={hideRightColumn}>
                 Close
               </button>

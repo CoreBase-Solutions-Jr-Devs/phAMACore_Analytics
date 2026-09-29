@@ -333,8 +333,8 @@ const ProgressiveSalesChart = ({
       tickAmount: 5,
 
       labels: {
-        formatter: (val) => formatAmount(val),
-      },
+  formatter: (val) =>
+          Number(val || 0).toLocaleString("en-KE"),      },
     },
   };
 
@@ -434,7 +434,6 @@ const BranchPerformanceChart = ({
   dataColors,
   series = [],
   categories = [],
-  formatAmount,
 }) => {
   const chartDonutBasicColors =
     getChartColorsArray(dataColors);
@@ -447,13 +446,14 @@ const BranchPerformanceChart = ({
       type: "donut",
     },
 
-   legend: {
-  position: "bottom",
-  formatter: (seriesName, opts) => {
-    const value = opts.w.globals.series[opts.seriesIndex];
-    return `${seriesName}: ${formatAmount(value)}`;
-  },
-},
+    legend: {
+      position: "bottom",
+      formatter: (seriesName, opts) => {
+        const value = opts.w.globals.series[opts.seriesIndex];
+
+        return `${seriesName}: ${Number(value || 0).toLocaleString("en-KE")}`;
+      },
+    },
 
     stroke: {
       show: false,
@@ -461,7 +461,7 @@ const BranchPerformanceChart = ({
 
     dataLabels: {
       enabled: true,
-      formatter: (val) => `${formatAmount(val)}`,
+      formatter: (val) => `${Number(val || 0).toFixed(1)}%`,
       dropShadow: {
         enabled: false,
       },
@@ -469,7 +469,8 @@ const BranchPerformanceChart = ({
 
     tooltip: {
       y: {
-        formatter: (val) => `${formatAmount(val)}`,
+        formatter: (val) =>
+          Number(val || 0).toLocaleString("en-KE"),
       },
     },
 
@@ -529,7 +530,8 @@ const MonthToDateSalesChart = ({
       tickAmount: 5,
 
       labels: {
-        formatter: (val) => formatAmount(val),
+        formatter: (val) =>
+          Number(val || 0).toLocaleString("en-KE"),
       },
     },
   };
