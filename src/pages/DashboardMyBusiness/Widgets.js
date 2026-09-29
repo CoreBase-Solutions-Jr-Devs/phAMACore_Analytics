@@ -76,6 +76,67 @@ const calculateSales = (data) => {
     }, 0);
 };
 
+const parseMetricValue = (val) => {
+    if (val === undefined || val === null) return 0;
+    if (typeof val === "number") return val;
+    const str = String(val).trim();
+    const isNegative = (str.startsWith("(") && str.endsWith(")")) || str.startsWith("-");
+    const cleaned = str.replace(/[^0-9.]/g, "");
+    if (!cleaned) return 0;
+    const num = parseFloat(cleaned);
+    if (isNaN(num)) return 0;
+    return isNegative ? -num : num;
+};
+
+const calculateCashAvailable = (data) => {
+    if (!data) return 0;
+
+    const items = Array.isArray(data) ? data : (data.result || []);
+    if (!Array.isArray(items) || items.length === 0) {
+        if (typeof data === "number") return data;
+        if (typeof data === "object") {
+            const val = data["Total Cash Collections"] ??
+                data.totalCashCollections ??
+                data.total_cash_collections ??
+                data.metric_value ??
+                data.value;
+            if (val !== undefined && val !== null) {
+                return parseMetricValue(val);
+            }
+        }
+        return 0;
+    }
+
+    // Check if the response is summary metrics array (e.g. from GroupBy=SUMMARY)
+    // Find metric where metric_name is 'Total Cash Collections'
+    const totalCashCollectionsItem = items.find((item) => {
+        const rawName = (item.metric_name || item.metricName || item.MetricName || item.name || "");
+        const normalized = rawName.toLowerCase().replace(/[^a-z0-9]/g, "");
+        return normalized === "totalcashcollections" || normalized === "totalcashcollection";
+    }) || items.find((item) => {
+        const rawName = (item.metric_name || item.metricName || item.MetricName || item.name || "").toLowerCase();
+        return rawName.includes("total cash collections");
+    }) || items.find((item) => {
+        const rawName = (item.metric_name || item.metricName || item.MetricName || item.name || "").toLowerCase();
+        return rawName.includes("cash collections") || rawName.includes("total collections");
+    });
+
+    if (totalCashCollectionsItem) {
+        const rawVal = totalCashCollectionsItem.metric_value ??
+            totalCashCollectionsItem.metricValue ??
+            totalCashCollectionsItem.response ??
+            totalCashCollectionsItem.numericalResponse ??
+            totalCashCollectionsItem.value ??
+            totalCashCollectionsItem.amount ??
+            totalCashCollectionsItem.total;
+        if (rawVal !== undefined && rawVal !== null) {
+            return parseMetricValue(rawVal);
+        }
+    }
+
+    return 0;
+};
+
 const calculateCollections = (data) => {
     if (!data) return 0;
 
@@ -89,16 +150,20 @@ const calculateCollections = (data) => {
         return 0;
     }
 
-    // 1. Look for metric_name containing "Total Collections" or "Collections"
-    const totalCollectionsItem = items.find((item) =>
-        item.metric_name && item.metric_name.toLowerCase().includes("total collections")
-    ) || items.find((item) =>
-        item.metric_name && item.metric_name.toLowerCase().includes("collections")
-    ) || items.find((item) => item.metric_order === 1);
+    // 1. Look for metric_name containing "Total Cash Collections", "Total Collections" or "Collections"
+    const totalCollectionsItem = items.find((item) => {
+        const name = (item.metric_name || item.metricName || item.MetricName || item.name || "").toLowerCase();
+        return name.includes("total cash collections") || name.includes("total collections") || name.includes("collections");
+    }) || items.find((item) => item.metric_order === 1);
 
-    if (totalCollectionsItem && totalCollectionsItem.metric_value) {
-        const parsed = parseFloat(String(totalCollectionsItem.metric_value).replace(/[^0-9.-]+/g, ""));
-        if (!isNaN(parsed)) return parsed;
+    if (totalCollectionsItem) {
+        const rawVal = totalCollectionsItem.metric_value ??
+            totalCollectionsItem.metricValue ??
+            totalCollectionsItem.response ??
+            totalCollectionsItem.value;
+        if (rawVal !== undefined && rawVal !== null) {
+            return parseMetricValue(rawVal);
+        }
     }
 
     return 0;
@@ -110,6 +175,7 @@ export default function Widgets() {
     const {
         inventoryProfitSummaryUser = [],
         cashbookSummary = [],
+        cashbookSummaryMetrics = [],
         loadingProfitSummary = false,
         loadingCashbookSummary = false,
     } = useSelector((state) => state.DashboardMyBusiness || state.MyBusiness || {});
@@ -125,7 +191,7 @@ export default function Widgets() {
             })
         );
 
-        // 2. Collections KPI: PowerBI Cashbook Summary API - Year to Date & GroupBy SUMMARY
+        // 2. Cash Available & Collections KPI: PowerBI Cashbook Summary API - Year to Date & GroupBy SUMMARY
         dispatch(
             getCashbookSummary({
                 clientid: 1,
@@ -144,9 +210,15 @@ export default function Widgets() {
         return calculateProfit(inventoryProfitSummaryUser);
     }, [inventoryProfitSummaryUser]);
 
+    const cashAvailableValue = useMemo(() => {
+        const data = (cashbookSummary && cashbookSummary.length > 0) ? cashbookSummary : cashbookSummaryMetrics;
+        return calculateCashAvailable(data);
+    }, [cashbookSummary, cashbookSummaryMetrics]);
+
     const collectionsValue = useMemo(() => {
-        return calculateCollections(cashbookSummary);
-    }, [cashbookSummary]);
+        const data = (cashbookSummary && cashbookSummary.length > 0) ? cashbookSummary : cashbookSummaryMetrics;
+        return calculateCollections(data);
+    }, [cashbookSummary, cashbookSummaryMetrics]);
 
     const kpis = [
         {
@@ -169,12 +241,14 @@ export default function Widgets() {
         },
         {
             title: "Cash Available",
-            value: 0,
+            value: cashAvailableValue,
             prefix: "KES ",
             suffix: "",
             icon: "dollar-sign",
             color: "success",
-            subtitle: "Available cash position"
+            subtitle: "Available cash position",
+            loading: loadingCashbookSummary,
+            decimals: 2
         },
         {
             title: "Sales",
@@ -189,24 +263,25 @@ export default function Widgets() {
         },
         {
             title: "Stock Profit",
-            value: 0,
+            value: incomeStatementValue,
             prefix: "KES ",
             suffix: "",
             icon: "package",
             color: "warning",
+            loading: loadingProfitSummary,
             subtitle: "Estimated stock profit"
         },
-        {
-            title: "Income Statement",
-            value: incomeStatementValue,
-            prefix: "KES ",
-            suffix: "",
-            icon: "bar-chart-2",
-            color: "secondary",
-            subtitle: "Net profit after expenses",
-            loading: loadingProfitSummary,
-            decimals: 2
-        },
+        // {
+        //     title: "Income Statement",
+        //     value: 0,
+        //     prefix: "KES ",
+        //     suffix: "",
+        //     icon: "bar-chart-2",
+        //     color: "secondary",
+        //     subtitle: "Net profit after expenses",
+        //     // loading: loadingProfitSummary,
+        //     decimals: 2
+        // },
         {
             title: "Collections",
             value: collectionsValue,
@@ -218,15 +293,15 @@ export default function Widgets() {
             loading: loadingCashbookSummary,
             decimals: 2
         },
-        {
-            title: "Ageing",
-            value: 0,
-            prefix: "",
-            suffix: "",
-            icon: "clock",
-            color: "info",
-            subtitle: "Invoices over 90 days"
-        }
+        // {
+        //     title: "Ageing",
+        //     value: 0,
+        //     prefix: "",
+        //     suffix: "",
+        //     icon: "clock",
+        //     color: "info",
+        //     subtitle: "Invoices over 90 days"
+        // }
     ];
 
     return (
@@ -238,12 +313,12 @@ export default function Widgets() {
                 </h4>
             </div>
 
-  <Row className="g-2 mb-2">
-    {kpis.map((item, index) => (
-        <Col xl={3} lg={4} md={6} sm={12} key={index}>
-            <Card className="card-animate h-80 w-100">
-                <CardBody className="p-2">
-                    <div className="d-flex justify-content-between align-items-center">
+            <Row className="g-2 mb-2">
+                {kpis.map((item, index) => (
+                    <Col xl={3} lg={3} md={6} sm={12} key={index}>
+                        <Card className="card-animate h-80 w-100">
+                            <CardBody className="p-2">
+                                <div className="d-flex justify-content-between align-items-center">
 
                                     {/* Left content */}
                                     <div>
@@ -251,21 +326,21 @@ export default function Widgets() {
                                             {item.title}
                                         </p>
 
-                            <h2 className={`mt-2 ff-secondary fw-semibold text-${item.color}`}>
-                                <span className="counter-value">
-                                    {item.prefix}
-                                    {Number(item.value || 0)}
-                                    {item.suffix}
-                                </span>
-                            </h2>
+                                        <h2 className={`mt-2 ff-secondary fw-semibold text-${item.color}`}>
+                                            <span className="counter-value">
+                                                {item.prefix}
+                                                {Number(item.value || 0)}
+                                                {item.suffix}
+                                            </span>
+                                        </h2>
 
                                         <p className="mb-0 text-muted">
                                             {item.subtitle}
                                         </p>
                                     </div>
 
-                        {/* Right icon */}
-                        {/* <div className="avatar-sm flex-shrink-0">
+                                    {/* Right icon */}
+                                    {/* <div className="avatar-sm flex-shrink-0">
                             <span className={`avatar-title bg-${item.color}-subtle rounded-circle fs-2`}>
                                 <FeatherIcon
                                     icon={item.icon}
