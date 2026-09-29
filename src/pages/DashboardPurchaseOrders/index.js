@@ -23,6 +23,11 @@ import {
   getLastYearActualSpend,
   getLastYearDailySpend,
   getKPIPurchases,
+    getKPIMaverickSpend,
+    getKPIPriceAlerts,
+    getKPILeadTime,
+    getGoodsReceived,
+     getBestPricePerSupplier,
 } from "../../slices/dashboardPurchase/thunk";
 import {
 getKPIOverdueAccounts
@@ -30,6 +35,7 @@ getKPIOverdueAccounts
 import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
 
 import usePurchaseOrders from "../../Components/Hooks/usePurchaseOrders";
+import BestPrices from "./BestPrices";
 
 // --------------------------------------------------
 // GROUP BY CONFIGURATION
@@ -80,6 +86,25 @@ const LAST_YEAR_DAILY_SPEND_GROUP_BYS = [
   "BRANCH",
 ];
 
+const LEAD_TIME_GROUP_BYS = [
+  "SUMMARY",
+  "SUPPLIER",
+  "PO_DETAILS",
+  "MONTH",
+  "BRANCH",
+];
+const PRICE_ALERTS_GROUP_BYS = [
+  "SUMMARY",
+  "ITEM_ALERTS",
+  "ITEM_HISTORY",
+];
+const MAVERICK_SPEND_GROUP_BYS = [
+  "SUMMARY",
+  "SUPPLIER",
+  "BRANCH",
+  "OFF_PO_INVOICES",
+  "PO_PRICE_VARIANCE",
+];
 // --------------------------------------------------
 // COMPONENT
 // --------------------------------------------------
@@ -101,11 +126,12 @@ const DashboardPurchaseOrders = () => {
     setRightColumn(!rightColumn);
   };
 
- const {
+const {
   PurchaseOrders = [],
 
-   KPIPurchases = [],
-     kpiOverdueAccounts = [],
+  KPIPurchases = [],
+  kpiOverdueAccounts = [],
+
   KPISummary = [],
   KPICategory = [],
   KPISupplier = [],
@@ -113,7 +139,36 @@ const DashboardPurchaseOrders = () => {
   KPIMonthly = [],
   KPIType = [],
 
-   ActualSpend = [],
+  // Maverick Spend
+  KPIMaverickSpend = [],
+  KPIMaverickSpendSummary = [],
+  KPIMaverickSpendSupplier = [],
+  KPIMaverickSpendBranch = [],
+  KPIMaverickSpendOffPOInvoices = [],
+  KPIMaverickSpendPOPriceVariance = [],
+
+  // Price Alerts
+  KPIPriceAlerts = [],
+  KPIPriceAlertsSummary = [],
+  KPIPriceAlertsItems = [],
+  KPIPriceAlertsHistory = [],
+
+  // Best Price Per Supplier
+  BestPricePerSupplier = [],
+
+  // Lead Time
+  KPILeadTime = [],
+  KPILeadTimeSummary = [],
+  KPILeadTimeSupplier = [],
+  KPILeadTimePODetails = [],
+  KPILeadTimeMonth = [],
+  KPILeadTimeBranch = [],
+
+  // Goods Received
+  GoodsReceived = [],
+  LastYearGoodsReceived = [],
+
+  ActualSpend = [],
   ActualSpendSummary = [],
   ActualSpendCategory = [],
   ActualSpendSupplier = [],
@@ -121,7 +176,7 @@ const DashboardPurchaseOrders = () => {
   ActualSpendMonthly = [],
   ActualSpendType = [],
 
-   DailySpend = [],
+  DailySpend = [],
   DailySpendSummary = [],
   DailySpendCategory = [],
   DailySpendSupplier = [],
@@ -129,7 +184,7 @@ const DashboardPurchaseOrders = () => {
   DailySpendMonthly = [],
   DailySpendType = [],
 
-   LastYearActualSpend =[],
+  LastYearActualSpend = [],
   LastYearActualSpendSummary = [],
   LastYearActualSpendCategory = [],
   LastYearActualSpendSupplier = [],
@@ -137,7 +192,7 @@ const DashboardPurchaseOrders = () => {
   LastYearActualSpendMonthly = [],
   LastYearActualSpendType = [],
 
-   LastYearDailySpend = [],
+  LastYearDailySpend = [],
   LastYearDailySpendSummary = [],
   LastYearDailySpendCategory = [],
   LastYearDailySpendSupplier = [],
@@ -153,6 +208,9 @@ const DashboardPurchaseOrders = () => {
     totalSpend,
     activeSuppliers,
     avgLeadTime,
+      priceAlerts,
+  maverickSpend,
+  maverickSpendPercentage,
     topSuppliers,
     top2Suppliers,
     branchData,
@@ -167,6 +225,7 @@ const DashboardPurchaseOrders = () => {
     overdue91To120,
     overdue120Plus,
     overdueSupplierAccounts,
+    bestPricePerSupplier,
   } = usePurchaseOrders(
   PurchaseOrders,
 
@@ -178,7 +237,36 @@ const DashboardPurchaseOrders = () => {
   KPIMonthly,
   KPIType,
 
-   ActualSpend,
+  // Maverick Spend
+  KPIMaverickSpend,
+  KPIMaverickSpendSummary,
+  KPIMaverickSpendSupplier,
+  KPIMaverickSpendBranch,
+  KPIMaverickSpendOffPOInvoices,
+  KPIMaverickSpendPOPriceVariance,
+
+  // Price Alerts
+  KPIPriceAlerts,
+  KPIPriceAlertsSummary,
+  KPIPriceAlertsItems,
+  KPIPriceAlertsHistory,
+
+  // Best Price Per Supplier
+  BestPricePerSupplier,
+
+  // Lead Time
+  KPILeadTime,
+  KPILeadTimeSummary,
+  KPILeadTimeSupplier,
+  KPILeadTimePODetails,
+  KPILeadTimeMonth,
+  KPILeadTimeBranch,
+
+  // Goods Received
+  GoodsReceived,
+  LastYearGoodsReceived,
+
+  ActualSpend,
   ActualSpendSummary,
   ActualSpendCategory,
   ActualSpendSupplier,
@@ -186,7 +274,7 @@ const DashboardPurchaseOrders = () => {
   ActualSpendMonthly,
   ActualSpendType,
 
-   DailySpend,
+  DailySpend,
   DailySpendSummary,
   DailySpendCategory,
   DailySpendSupplier,
@@ -194,7 +282,7 @@ const DashboardPurchaseOrders = () => {
   DailySpendMonthly,
   DailySpendType,
 
-   LastYearActualSpend,
+  LastYearActualSpend,
   LastYearActualSpendSummary,
   LastYearActualSpendCategory,
   LastYearActualSpendSupplier,
@@ -202,15 +290,15 @@ const DashboardPurchaseOrders = () => {
   LastYearActualSpendMonthly,
   LastYearActualSpendType,
 
-   LastYearDailySpend,
+  LastYearDailySpend,
   LastYearDailySpendSummary,
   LastYearDailySpendCategory,
   LastYearDailySpendSupplier,
   LastYearDailySpendBranch,
   LastYearDailySpendMonthly,
   LastYearDailySpendType,
-    kpiOverdueAccounts,
 
+  kpiOverdueAccounts,
   filters
 );
   // --------------------------------------------------
@@ -313,6 +401,40 @@ useEffect(() => {
     })
   );
 
+  dispatch(
+  getBestPricePerSupplier({
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: branchId,
+    itemCode: "",
+    supplierCode: "",
+    groupBy: "ITEM_MATRIX",
+    includeZeroPrice: false,
+    topN: 0,
+  })
+);
+
+const goodsReceivedParams = {
+  clientid: 1,
+  branchcode: branchId,
+};
+
+dispatch(
+  getGoodsReceived({
+    ...goodsReceivedParams,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+  })
+);
+
+dispatch(
+  getGoodsReceived({
+    ...goodsReceivedParams,
+    startDate: getPreviousYearDate(filters.startDate),
+    endDate: getPreviousYearDate(filters.endDate),
+  })
+);
   // ----------------------------------------------
   // ACTUAL SPEND - CURRENT YEAR YTD
   // ----------------------------------------------
@@ -393,7 +515,7 @@ useEffect(() => {
         getKPIOverdueAccounts({
           clientid: 1,
         mode: "AGING",
-        accountType: "AGEING",
+        accountType: "SUPPLIER",
           branchcode: branchId,
       dateFrom:  filters.startDate,
     dateTo:  filters.endDate,
@@ -402,6 +524,46 @@ useEffect(() => {
     includeZeroBal: false,
         }),
       );
+
+      dispatchGroupByRequests(
+  getKPILeadTime,
+  {
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: branchId,
+    supplier_code: "",
+    TopN: 0,
+  },
+  LEAD_TIME_GROUP_BYS
+);
+
+dispatchGroupByRequests(
+  getKPIPriceAlerts,
+  {
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: branchId,
+    ThresholdPerc: 10,
+    ChangeType: "ALL",
+    ItemCode: "",
+    IncludeZeroPrice: false,
+    TopN: 0,
+  },
+  PRICE_ALERTS_GROUP_BYS
+);
+dispatchGroupByRequests(
+  getKPIMaverickSpend,
+  {
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: branchId,
+    TopN: 0,
+  },
+  MAVERICK_SPEND_GROUP_BYS
+);
 
 }, [dispatch, branchId]);
 
@@ -433,6 +595,26 @@ const handleApplyFilters = () => {
     })
   );
 
+const goodsReceivedParams = {
+  clientid: 1,
+  branchcode: filters.branch ?? null,
+};
+
+dispatch(
+  getGoodsReceived({
+    ...goodsReceivedParams,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+  })
+);
+
+dispatch(
+  getGoodsReceived({
+    ...goodsReceivedParams,
+    startDate: getPreviousYearDate(filters.startDate),
+    endDate: getPreviousYearDate(filters.endDate),
+  })
+);
   // ----------------------------------------------
   // KPI PURCHASES
   // ----------------------------------------------
@@ -454,7 +636,7 @@ const handleApplyFilters = () => {
           clientid: 1,
         mode: "AGING",
         accountType: "SUPPLIER",
-          branchcode: branchId,
+          branchcode: filters.branch ?? null,
       dateFrom:  filters.startDate,
     dateTo:  filters.endDate,
     periodFrom: getPeriod(filters.startDate),
@@ -462,6 +644,48 @@ const handleApplyFilters = () => {
     includeZeroBal: false,
         }),
       );
+
+           dispatchGroupByRequests(
+  getKPILeadTime,
+  {
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: filters.branch ?? null,
+    supplier_code: "",
+    TopN: 0,
+  },
+  LEAD_TIME_GROUP_BYS
+);
+
+dispatchGroupByRequests(
+  getKPIPriceAlerts,
+  {
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: filters.branch ?? null,
+    ThresholdPerc: 10,
+    ChangeType: "ALL",
+    ItemCode: "",
+    IncludeZeroPrice: false,
+    TopN: 0,
+  },
+  PRICE_ALERTS_GROUP_BYS
+);
+  dispatch(
+  getBestPricePerSupplier({
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: filters.branch ?? null,
+    itemCode: "",
+    supplierCode: "",
+    groupBy: "ITEM_MATRIX",
+    includeZeroPrice: false,
+    topN: 0,
+  })
+);
 
   // ----------------------------------------------
   // YEAR TO DATE
@@ -492,7 +716,17 @@ const handleApplyFilters = () => {
       LAST_YEAR_ACTUAL_SPEND_GROUP_BYS
     );
   }
-
+dispatchGroupByRequests(
+  getKPIMaverickSpend,
+  {
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: filters.branch ?? null,
+    TopN: 0,
+  },
+  MAVERICK_SPEND_GROUP_BYS
+);
   // ----------------------------------------------
   // MONTH TO DATE
   // ----------------------------------------------
@@ -556,13 +790,16 @@ const handleApplyFilters = () => {
             <Col>
               <div className="h-100">
                 <Row>
-                  <Widget
-                    rightClickBtn={toggleRightColumn}
-                    formatAmount={formatAmount}
-                    totalSpend={totalSpend}
-                    activeSuppliers={activeSuppliers}
-                    avgLeadTime={avgLeadTime}
-                  />
+              <Widget
+  rightClickBtn={toggleRightColumn}
+  formatAmount={formatAmount}
+  totalSpend={totalSpend}
+  activeSuppliers={activeSuppliers}
+  avgLeadTime={avgLeadTime}
+  priceAlerts={priceAlerts}
+  maverickSpend={maverickSpend}
+  maverickSpendPercentage={maverickSpendPercentage}
+/>
                 </Row>
                 <Row>
                   <Col xl={6}>
@@ -594,17 +831,22 @@ const handleApplyFilters = () => {
                     )}
                   </Col>
                   <Row>
-                    <Col xl={6}>
+                    <Col xl={4}>
                       <SupplierSpend
                         supplierData={topSuppliers}
                         formatAmount={formatAmount}
                         top2Suppliers={top2Suppliers}
                         totalSpend={totalSpend}
                       />
+                      </Col>
+                    <Col xl={4}>
+                      <BestPrices 
+                      bestPricePerSupplier = {bestPricePerSupplier}
+                      />
                     </Col>
-                    <Col xl={6}>
+                    <Col xl={4}>
                       <RecentOrders
-                        data={PurchaseOrders}
+                        // data={PurchaseOrders}
                         formatAmount={formatAmount}
                         overdueSupplierAccounts={overdueSupplierAccounts}
                          currentReceivables={currentReceivables}

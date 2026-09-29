@@ -42,8 +42,7 @@ const SalesmanRevenue = ({ data = [], formatAmount  }) => {
                       <td className="text-muted font-semibold">{item.branch}</td>
 
                       <td >
-                        {formatAmount(item.revenue)}
-                      </td>
+{Number(item.revenue || 0).toLocaleString("en-KE")}                      </td>
 
                       {/* <td className="text-end">
                         <span

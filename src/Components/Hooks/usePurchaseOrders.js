@@ -10,7 +10,37 @@ const usePurchaseOrders = (
   KPIMonthly = [],
   KPIType = [],
 
-   ActualSpend = [],
+  // Maverick Spend
+  KPIMaverickSpend = [],
+  KPIMaverickSpendSummary = [],
+  KPIMaverickSpendSupplier = [],
+  KPIMaverickSpendBranch = [],
+  KPIMaverickSpendOffPOInvoices = [],
+  KPIMaverickSpendPOPriceVariance = [],
+
+  // Price Change Alerts
+  KPIPriceAlerts = [],
+  KPIPriceAlertsSummary = [],
+  KPIPriceAlertsItems = [],
+  KPIPriceAlertsHistory = [],
+
+  // Best Price Per Supplier
+  BestPricePerSupplier = [],
+
+  // Lead Time
+  KPILeadTime = [],
+  KPILeadTimeSummary = [],
+  KPILeadTimeSupplier = [],
+  KPILeadTimePODetails = [],
+  KPILeadTimeMonth = [],
+  KPILeadTimeBranch = [],
+
+  // Goods Received
+  GoodsReceived = [],
+  LastYearGoodsReceived = [],
+
+  // Actual Spend
+  ActualSpend = [],
   ActualSpendSummary = [],
   ActualSpendCategory = [],
   ActualSpendSupplier = [],
@@ -18,6 +48,7 @@ const usePurchaseOrders = (
   ActualSpendMonthly = [],
   ActualSpendType = [],
 
+  // Daily Spend
   DailySpend = [],
   DailySpendSummary = [],
   DailySpendCategory = [],
@@ -26,7 +57,8 @@ const usePurchaseOrders = (
   DailySpendMonthly = [],
   DailySpendType = [],
 
- LastYearActualSpend = [],
+  // Last Year Actual Spend
+  LastYearActualSpend = [],
   LastYearActualSpendSummary = [],
   LastYearActualSpendCategory = [],
   LastYearActualSpendSupplier = [],
@@ -34,6 +66,7 @@ const usePurchaseOrders = (
   LastYearActualSpendMonthly = [],
   LastYearActualSpendType = [],
 
+  // Last Year Daily Spend
   LastYearDailySpend = [],
   LastYearDailySpendSummary = [],
   LastYearDailySpendCategory = [],
@@ -42,7 +75,7 @@ const usePurchaseOrders = (
   LastYearDailySpendMonthly = [],
   LastYearDailySpendType = [],
 
-    kpiOverdueAccounts = [],
+  kpiOverdueAccounts = [],
   filters = {}
 ) => {
 
@@ -113,50 +146,26 @@ const activeSuppliers = Number(
   // We calculate it once per LPO so duplicate rows
   // belonging to the same LPO do not affect the average.
   // ============================================================
-  const avgLeadTime = useMemo(() => {
+  const priceAlertSummary = KPIPriceAlertsSummary?.[0] || {};
 
-    const lpoMap = {};
+const priceAlerts = Number(
+  priceAlertSummary.alert_items_count || 0
+);
 
-    PurchaseOrders.forEach((item) => {
+const maverickSpendSummary = KPIMaverickSpendSummary?.[0] || {};
 
-      const id = item?.lpo_id;
+const maverickSpend = Number(
+  maverickSpendSummary.maverick_off_po_spend || 0
+);
 
-      if (!id || lpoMap[id] !== undefined) {
-        return;
-      }
+const maverickSpendPercentage = Number(
+  maverickSpendSummary.maverick_spend_perc || 0
+);
+ const leadTimeSummary = KPILeadTimeSummary?.[0] || {};
 
-      const start = new Date(item?.lpo_date);
-      const end = new Date(item?.expected_date);
-
-      if (
-        Number.isNaN(start.getTime()) ||
-        Number.isNaN(end.getTime())
-      ) {
-        return;
-      }
-
-      const diffDays =
-        (end - start) /
-        (1000 * 60 * 60 * 24);
-
-      lpoMap[id] = diffDays;
-    });
-
-    const leadTimes = Object.values(lpoMap);
-
-    if (!leadTimes.length) {
-      return 0;
-    }
-
-    return Math.round(
-      leadTimes.reduce(
-        (sum, value) => sum + value,
-        0
-      ) / leadTimes.length
-    );
-
-  }, [PurchaseOrders]);
-
+const avgLeadTime = Number(
+  leadTimeSummary.avg_lead_time_days || 0
+);
   const branchData = useMemo(() => {
   const grouped = (KPIBranch || []).reduce((acc, item) => {
     const group = item?.branch_name || "Unknown";
@@ -452,10 +461,10 @@ const monthToDateChart = useMemo(() => {
   // =========================
   // CURRENT YEAR
   // =========================
-  (DailySpend || []).forEach((item) => {
-    if (!item?.period_start) return;
+  (GoodsReceived || []).forEach((item) => {
+    if (!item?.received_date) return;
 
-    const date = new Date(item.period_start);
+    const date = new Date(item.received_date);
 
     if (
       date.getFullYear() !== currentYear ||
@@ -468,7 +477,7 @@ const monthToDateChart = useMemo(() => {
 
     if (currentYearMap[day] !== undefined) {
       currentYearMap[day] += Number(
-        item?.net_purchases_incl || 0
+        item?.total_grn_value || 0
       );
     }
   });
@@ -476,10 +485,10 @@ const monthToDateChart = useMemo(() => {
   // =========================
   // LAST YEAR
   // =========================
-  (LastYearDailySpend || []).forEach((item) => {
-    if (!item?.period_start) return;
+  (LastYearGoodsReceived || []).forEach((item) => {
+    if (!item?.received_date) return;
 
-    const date = new Date(item.period_start);
+    const date = new Date(item.received_date);
 
     if (
       date.getFullYear() !== lastYear ||
@@ -492,7 +501,7 @@ const monthToDateChart = useMemo(() => {
 
     if (lastYearMap[day] !== undefined) {
       lastYearMap[day] += Number(
-        item?.net_purchases_incl || 0
+        item?.total_grn_value || 0
       );
     }
   });
@@ -515,7 +524,7 @@ const monthToDateChart = useMemo(() => {
       },
     ],
   };
-}, [DailySpend, LastYearDailySpend]);
+}, [GoodsReceived, LastYearGoodsReceived]);
 
 
   // ============================================================
@@ -588,6 +597,27 @@ const overdueSupplierAccounts = overdue
     action: item.action_insight,
   }));
 
+const bestPriceData = BestPricePerSupplier || [];
+
+const bestPricePerSupplier = bestPriceData
+  .map((item) => ({
+    itemCode: item.item_code,
+    itemName: item.item_name,
+    supplierName: item.supplier_name,
+    bestUnitPrice: Number(item.best_unit_price || 0),
+    latestUnitPrice: Number(item.latest_unit_price || 0),
+    priceRank: Number(item.price_rank || 0),
+    totalSuppliers: Number(item.total_suppliers_for_item || 0),
+    premiumPercentage: Number(item.premium_over_best_perc || 0),
+    quantityPurchased: Number(item.total_pieces_purchased || 0),
+    totalSpend: Number(item.total_spend_exc || 0),
+    potentialSavings: Number(item.potential_savings_realizable || 0),
+    priceStatus: item.price_status,
+    lastPurchasedDate: item.last_purchased_date,
+    actionInsight: item.action_insight,
+  }))
+  .sort((a, b) => b.premiumPercentage - a.premiumPercentage)
+  .slice(0, 10);
   // ============================================================
   // RETURN ALL CALCULATED VALUES
   // ============================================================
@@ -601,6 +631,9 @@ const overdueSupplierAccounts = overdue
     topSuppliers,
     top2Suppliers,
     branchData,
+    priceAlerts,
+    maverickSpendPercentage,
+    maverickSpend,
     actualSpendChart,
     overdueSupplierAccounts,
     monthToDateChart,
@@ -609,6 +642,7 @@ const overdueSupplierAccounts = overdue
     overdue61To90,
     overdue91To120,
     overdue120Plus,
+    bestPricePerSupplier,
     // OverdueAccounts,
     spendByCategory,
   };

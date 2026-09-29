@@ -70,7 +70,7 @@ const topBranch =
 
             <p >
               Spend:
-              <strong> KES {formatAmount(Number(topBranch.amount))}</strong>
+              <strong> KES {Number(topBranch.amount).toLocaleString("en-KE")}</strong>
             </p>
           </div>
         )}

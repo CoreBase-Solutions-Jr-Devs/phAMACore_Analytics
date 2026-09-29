@@ -46,7 +46,7 @@ const ReceivablesAgeing = ({
                       <small>Current</small>
                     </p>
                     <h6 className="mb-0 text-success fw-bold">
-                      {formatAmount(currentReceivables)}
+                      <small>{Number(currentReceivables).toLocaleString("en-KE")}</small>
                     </h6>
                   </div>
                 </div>
@@ -68,7 +68,7 @@ const ReceivablesAgeing = ({
                       <small>31–60 days</small>
                     </p>
                     <h6 className="mb-0 text-warning fw-bold">
-                      {formatAmount(overdue31To60)}
+                      <small>{Number(overdue31To60).toLocaleString("en-KE")}</small>
                     </h6>
                   </div>
                 </div>
@@ -79,7 +79,7 @@ const ReceivablesAgeing = ({
                       <small>61–90 days</small>
                     </p>
                     <h6 className="mb-0 text-danger fw-bold">
-                      {formatAmount(overdue61To90)}
+                      <small>{Number(overdue61To90).toLocaleString("en-KE")}</small>
                     </h6>
                   </div>
                 </div>
@@ -90,7 +90,7 @@ const ReceivablesAgeing = ({
                       <small>91–120 days</small>
                     </p>
                     <h6 className="mb-0 text-info fw-bold">
-                      {formatAmount(overdue91To120)}
+                      <small>{Number(overdue91To120).toLocaleString("en-KE")}</small>
                     </h6>
                   </div>
                 </div>
@@ -101,7 +101,7 @@ const ReceivablesAgeing = ({
                       <small>120+ days</small>
                     </p>
                     <h6 className="mb-0 text-info fw-bold">
-                      {formatAmount(overdue120Plus)}
+                      <small>{Number(overdue120Plus).toLocaleString("en-KE")}</small>
                     </h6>
                   </div>
                 </div>
@@ -128,7 +128,7 @@ const ReceivablesAgeing = ({
                       </span>
 
                       <span className="badge bg-danger-subtle text-danger">
-                        {formatAmount(debtor.amount)}
+                        {Number(debtor.amount).toLocaleString("en-KE")}
                       </span>
                     </div>
                   ))

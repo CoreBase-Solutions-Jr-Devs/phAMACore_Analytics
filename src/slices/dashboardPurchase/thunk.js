@@ -8,6 +8,11 @@ import {
   getKPIPurchases as getKPIPurchasesApi,
   getLastYearActualSpend as getLastYearActualSpendApi,
   getLastYearDailySpend as getLastYearDailySpendApi,
+  getKPIMaverickSpend as getKPIMaverickSpendApi,
+  getKPIPriceAlerts as getKPIPriceAlertsApi,
+  getKPILeadTime as getKPILeadTimeApi,
+  getGoodsReceived as getGoodsReceivedApi,
+  getBestPricePerSupplier as getBestPricePerSupplierApi,
 } from "../../helpers/fakebackend_helper";
 
 // GET PURCHASE ORDERS
@@ -25,7 +30,7 @@ export const getPurchaseOrders = createAsyncThunk(
 
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // KPI PURCHASES
@@ -39,7 +44,7 @@ export const getKPIPurchases = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // ACTUAL SPEND
@@ -57,7 +62,7 @@ export const getActualSpend = createAsyncThunk(
 
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // LAST YEAR ACTUAL SPEND
@@ -75,7 +80,7 @@ export const getLastYearActualSpend = createAsyncThunk(
 
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // DAILY SPEND
@@ -93,7 +98,7 @@ export const getDailySpend = createAsyncThunk(
 
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // LAST YEAR DAILY SPEND
@@ -111,5 +116,74 @@ export const getLastYearDailySpend = createAsyncThunk(
 
       return rejectWithValue(error.message);
     }
-  }
+  },
+);
+
+export const getGoodsReceived = createAsyncThunk(
+  "powerbi/getGoodsReceived",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getGoodsReceivedApi(params);
+      return response.data || response;
+    } catch (error) {
+      toast.error("Failed to fetch goods received", { autoClose: 3000 });
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const getKPILeadTime = createAsyncThunk(
+  "powerbi/getKPILeadTime",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getKPILeadTimeApi(params);
+      return response.data || response;
+    } catch (error) {
+      toast.error("Failed to fetch lead time", { autoClose: 3000 });
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const getKPIPriceAlerts = createAsyncThunk(
+  "powerbi/getKPIPriceAlerts",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getKPIPriceAlertsApi(params);
+      return response.data || response;
+    } catch (error) {
+      toast.error("Failed to fetch price alerts", { autoClose: 3000 });
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const getKPIMaverickSpend = createAsyncThunk(
+  "powerbi/getKPIMaverickSpend",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getKPIMaverickSpendApi(params);
+      return response.data || response;
+    } catch (error) {
+      toast.error("Failed to fetch maverick spend", { autoClose: 3000 });
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const getBestPricePerSupplier = createAsyncThunk(
+  "powerbi/getBestPricePerSupplier",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getBestPricePerSupplierApi(params);
+
+      return response.data || response;
+    } catch (error) {
+      toast.error("Failed to fetch best price per supplier", {
+        autoClose: 3000,
+      });
+
+      return rejectWithValue(error.message);
+    }
+  },
 );

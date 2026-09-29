@@ -65,17 +65,16 @@ const Widget = ({
       </div>
 <Row className="g-2  row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6">
   <Col className="d-flex">
-  <Card className="card-animate w-100 h-80">
-    <CardBody className="p-2">
-      <div className="d-flex justify-content-between align-items-center">
+<Card className="card-animate w-100 h-80">
+            <CardBody className="p-2 d-flex flex-column">
         <div>
           <p className="font-medium mb-0">Total Revenue</p>
 
           <h2 className="mt-2 ff-secondary fw-semibold text-success">
-            KES {formatAmount(Number(totalRevenue || 0))}
+            KES {Number(totalRevenue || 0).toLocaleString("en-KE")}
           </h2>
-
-          <p className="mb-0 text-muted">
+</div>
+          <p className="mb-0 text-muted mt-auto">
             {/* <i
               className={`${
                 revenueChange > 0
@@ -88,22 +87,21 @@ const Widget = ({
             {` ${Math.abs(revenueChange).toFixed(1)}% vs yesterday`} */}
                Tax inclusive
           </p>
-        </div>
+       
 
         {/* <div className="avatar-sm flex-shrink-0">
       <span className="avatar-title bg-success-subtle rounded-circle fs-6 fw-bold text-success">
   KSh
 </span>
         </div> */}
-      </div>
+     
     </CardBody>
   </Card>
 </Col>
 
 <Col className="d-flex">
-          <Card className="card-animate w-100 h-80">
-    <CardBody className="p-2">
-      <div className="d-flex justify-content-between align-items-center">
+       <Card className="card-animate w-100 h-80">
+            <CardBody className="p-2 d-flex flex-column">
         <div>
                   <p className="font-medium  mb-0">Cash Sales</p>
                   <h2 className="mt-2 ff-secondary fw-semibold text-info">
@@ -115,28 +113,28 @@ const Widget = ({
                                         duration={3}
                                         formattingFn={(value) => formatAmount(value)}
                                     /> */}
-                      KES {formatAmount(Number(cashSales || 0))}
+                      KES {Number(cashSales || 0).toLocaleString("en-KE")}
                     </span>
                   </h2>
-                  <p className="mb-0 text-muted">
+                  </div>
+                  <p className="mb-0 text-muted mt-auto">
                     {cashSalesPercentage.toFixed(1)}% of total
                   </p>
-                </div>
+             
 
                 {/* <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-info-subtle rounded-circle fs-2">
                     <FeatherIcon icon="shopping-cart" className="text-info" />
                   </span>
                 </div> */}
-              </div>
+             
             </CardBody>
           </Card>
         </Col>
 
 <Col className="d-flex">
-          <Card className="card-animate w-100 h-80">
-    <CardBody className="p-2">
-      <div className="d-flex justify-content-between align-items-center">
+   <Card className="card-animate w-100 h-80">
+            <CardBody className="p-2 d-flex flex-column">
         <div>
                   <p className="font-medium  mb-0">Sales Invoices</p>
                   <h2 className="mt-2 ff-secondary fw-semibold text-danger">
@@ -148,29 +146,29 @@ const Widget = ({
                                         duration={3}
                                         formattingFn={(value) => formatAmount(value)}
                                     /> */}
-                      KES {formatAmount(Number(salesInvoices || 0))}
+                      KES {Number(salesInvoices || 0).toLocaleString("en-KE")}
                     </span>
                   </h2>
-                  <p className="mb-0 text-muted">
+                  </div>
+                  <p className="mb-0 text-muted mt-auto">
                     {" "}
                     {salesInvoicesPercentage.toFixed(1)}% of total
                   </p>
-                </div>
+              
 
                 {/* <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-danger-subtle rounded-circle fs-2">
                     <FeatherIcon icon="credit-card" className="text-danger" />
                   </span>
                 </div> */}
-              </div>
+              
             </CardBody>
           </Card>
         </Col>
 
 <Col className="d-flex">
-          <Card className="card-animate w-100 h-80">
-    <CardBody className="p-2">
-      <div className="d-flex justify-content-between align-items-center">
+         <Card className="card-animate h-80 w-100">
+         <CardBody className="p-2 d-flex flex-column">
         <div>
                   <p className="font-medium  mb-0">Cash invoices</p>
                   <h2 className="mt-2 ff-secondary fw-semibold text-warning">
@@ -181,21 +179,21 @@ const Widget = ({
                                         decimals={1}
                                         duration={3}
                                     /> */}
-                      KES {formatAmount(Number(cashInvoices || 0))}
+                      KES {Number(cashInvoices || 0).toLocaleString("en-KE")}
                     </span>
                     
                   </h2>
-                  <p className="mb-0 text-muted">
+                   </div>
+                  <p className="mb-0 text-muted mt-auto">
                     {cashInvoicesPercentage.toFixed(1)}% of total
                   </p>
-                </div>
+               
 
                 {/* <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-warning-subtle rounded-circle fs-2">
                     <FeatherIcon icon="briefcase" className="text-warning" />
                   </span>
                 </div> */}
-              </div>
             </CardBody>
           </Card>
         </Col>
@@ -225,27 +223,26 @@ const Widget = ({
         </Col> */}
 
 <Col className="d-flex">
-          <Card className="card-animate w-100 h-80">
-    <CardBody className="p-2">
-      <div className="d-flex justify-content-between align-items-center">
+            <Card className="card-animate w-100 h-80">
+            <CardBody className="p-2 d-flex flex-column">
         <div>
                   <p className="font-medium  mb-0">Credit Notes </p>
                   <h2 className="mt-2 ff-secondary fw-semibold text-info">
                     <span className="counter-value">
-                      KES {formatAmount(Number(creditNotes || 0))}
+                      KES {Number(creditNotes || 0).toLocaleString("en-KE")}
                     </span>
                   </h2>
-                  <p className="mb-0 text-muted">
+                  </div>
+                  <p className="mb-0 text-muted mt-auto">
                     {creditNotesPercentage.toFixed(1)}% of total
                   </p>
-                </div>
+                
 {/* 
                 <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-info-subtle rounded-circle fs-2">
                     <FeatherIcon icon="users" className="text-info" />
                   </span>
                 </div> */}
-              </div>
             </CardBody>
           </Card>
         </Col>
@@ -277,8 +274,7 @@ const Widget = ({
 
 <Col className="d-flex">
           <Card className="card-animate w-100 h-80">
-    <CardBody className="p-2">
-      <div className="d-flex justify-content-between align-items-center">
+          <CardBody className="p-2 d-flex flex-column">
         <div>
                   <p className="font-medium  mb-0">Overdue Accounts</p>
                   <h2 className="mt-2 ff-secondary fw-semibold text-warning">
@@ -286,15 +282,16 @@ const Widget = ({
                       KES {formatAmount(Number(overdueDebtorsCount|| 0))}
                     </span>
                   </h2>
-                  <p className="mb-0 text-muted">At risk</p>
-                </div>
+                    </div>
+                  <p className="mb-0 text-muted mt-auto">At risk</p>
+              
 
                 {/* <div className="avatar-sm flex-shrink-0">
                   <span className="avatar-title bg-warning-subtle rounded-circle fs-2">
                     <FeatherIcon icon="clock" className="text-warning" />
                   </span>
                 </div> */}
-              </div>
+           
             </CardBody>
           </Card>
         </Col>

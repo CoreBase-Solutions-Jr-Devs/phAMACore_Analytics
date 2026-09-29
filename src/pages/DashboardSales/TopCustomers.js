@@ -48,7 +48,7 @@ const TopCustomers = ({ data = [], formatAmount }) => {
                       <td className="text-muted font-semibold">{item.branch}</td>
 
                       <td >
-                        {formatAmount(item.revenue)}
+                        {Number(item.revenue).toLocaleString("en-KE")}
                       </td>
 
                       {/* <td className="text-end">

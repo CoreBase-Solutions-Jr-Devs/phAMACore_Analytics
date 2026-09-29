@@ -5,15 +5,15 @@ import { Card, CardBody, Col, Row } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 
 const Widgets = ({
+  rightClickBtn,
+  formatAmount,
   totalSpend = 0,
   budgetLeft = 0,
   activeSuppliers = 0,
   priceAlerts = 0,
   maverickSpend = 0,
+  maverickSpendPercentage = 0,
   avgLeadTime = 0,
-    formatAmount,
-    // branchMap = {},
-    rightClickBtn,
 }) => {
    const { branch, dateRange, startDate, endDate } = useSelector(
           (state) => state.PurchaseOrders.filters
@@ -60,9 +60,8 @@ const Widgets = ({
  <Row className="g-2 mb-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
       {/* Total Spend */}
       <Col className="d-flex">
-        <Card className="card-animate h-80 w-100">     
-        <CardBody className="p-2">
-        <div className="d-flex justify-content-between align-items-center">
+        <Card className="card-animate h-80 w-100">
+    <CardBody className="p-2 d-flex flex-column">
                                     <div>
             <p className=" font-medium mb-0">
               Total Spend
@@ -77,30 +76,30 @@ const Widgets = ({
                 duration={4}
                 formattingFn={(value) => formatAmount(value)}
               /> */}
-              KES {formatAmount(Number(totalSpend))}
+KES {Number(totalSpend || 0).toLocaleString("en-KE")}
               </span>
             </h2>
-
-            <p className="text-muted mb-0 ">
+</div>
+            <p className="text-muted mb-0 mt-auto">
  Tax inclusive
             </p>
-            </div>
+            
 
                 {/* <div className="avatar-sm flex-shrink-0">
                             <span className="avatar-title bg-success-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="dollar-sign" className="text-success" />
                             </span>
                         </div> */}
-                    </div>
+                    
           </CardBody>
         </Card>
       </Col>
 
       {/* Active Suppliers */}
       <Col  className="d-flex">
-        <Card className="card-animate h-80 w-100">     
-        <CardBody className="p-2">
-        <div className="d-flex justify-content-between align-items-center">
+         <Card className="card-animate h-80 w-100">
+    <CardBody className="p-2 d-flex flex-column">
+       
                                     <div>
             <p className=" font-medium mb-0">
               Active Suppliers
@@ -110,116 +109,93 @@ const Widgets = ({
               {/* <CountUp end={Number(activeSuppliers || 0)} start={0} duration={2} /> */}
               {Number(activeSuppliers || 0)}
             </h2>
-
- <p className="text-muted mb-0 ">
+ </div>
+ <p className="text-muted mb-0 mt-auto">
                  Suppliers with purchases
             </p>
-             </div>
+           
 
                 {/* <div className="avatar-sm flex-shrink-0">
                             <span className="avatar-title bg-info-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="users" className="text-info" />
                             </span>
                         </div> */}
-                    </div>
+                   
           </CardBody>
         </Card>
       </Col>
 
       {/* Price Alerts */}
       <Col className="d-flex">
-         <Card className="card-animate h-80 w-100">     
-        <CardBody className="p-2">
-        <div className="d-flex justify-content-between align-items-center">
+           <Card className="card-animate h-80 w-100">
+    <CardBody className="p-2 d-flex flex-column">
+        
                                     <div>
  <p className=" font-medium mb-0">
                 Price Alerts
             </p>
 
             <h2 className="mt-2 ff-secondary fw-semibold text-danger">
-           0
+         {Number(priceAlerts || 0)}
             </h2>
-
- <p className="text-muted mb-0 ">
+</div>
+ <p className="text-muted mb-0 mt-auto">
              Recent price changes
             </p>
             
-             </div>
+            
 
                 {/* <div className="avatar-sm flex-shrink-0">
                             <span className="avatar-title bg-danger-subtle rounded-circle fs-1">
                                 <FeatherIcon icon="alert-triangle" className="text-danger" />
                             </span>
                         </div> */}
-                    </div>
+                    
           </CardBody>
         </Card>
       </Col>
 
-      {/* Maverick Spend */}
-      <Col className="d-flex">
-        <Card className="card-animate h-80 w-100">     
-        <CardBody className="p-2">
-        <div className="d-flex justify-content-between align-items-center">
-                                    <div>
- <p className=" font-medium mb-0">
-              Maverick Spend
-            </p>
+    {/* Maverick Spend */}
+<Col className="d-flex">
+  <Card className="card-animate h-80 w-100">
+    <CardBody className="p-2 d-flex flex-column">
+      <div>
+        <p className="font-medium mb-0">
+          Maverick Spend
+        </p>
 
-            <h2 className="mt-2 ff-secondary fw-semibold text-warning">
-           KES 0
-            </h2>
+        <h2 className="mt-2 ff-secondary fw-semibold text-warning">
+          KES {Number(maverickSpend || 0).toLocaleString("en-KE")}
+        </h2>
+      </div>
 
- <p className="text-muted mb-0 ">
-              0% of total
-            </p>
-            </div>
+      <p className="text-muted mb-0 mt-auto">
+        {Number(maverickSpendPercentage || 0).toFixed(2)}% of total
+      </p>
+    </CardBody>
+  </Card>
+</Col>
 
-                {/* <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-warning-subtle rounded-circle fs-1">
-                                <FeatherIcon icon="trending-up" className="text-warning" />
-                            </span>
-                        </div> */}
-                    </div>
-          </CardBody>
-        </Card>
-      </Col>
+{/* Avg Lead Time */}
+<Col className="d-flex">
+  <Card className="card-animate h-80 w-100">
+    <CardBody className="p-2 d-flex flex-column">
+      <div>
+        <p className="font-medium mb-0">
+          Avg Lead Time
+        </p>
 
-      {/* Avg Lead Time */}
-      <Col className="d-flex">
-        <Card className="card-animate h-80 w-100">     
-        <CardBody className="p-2">
-        <div className="d-flex justify-content-between align-items-center">
-                                    <div>
- <p className=" font-medium mb-0">
-                Avg Lead Time
-            </p>
+        <h2 className="mt-2 ff-secondary fw-semibold text-success">
+          {Number(avgLeadTime || 0).toFixed(1)} days
+        </h2>
+      </div>
 
-            <h2 className="mt-2 ff-secondary fw-semibold text-success">
-              {/* <CountUp
-                end={Number(avgLeadTime || 0)}
-                start={0}
-                suffix=" days"
-                decimals={1}
-                duration={3}
-              /> */}
-             KES 0
-            </h2>
-
- <p className="text-muted mb-0 ">
-              Delivery time
-            </p>
-                </div>
-
-                {/* <div className="avatar-sm flex-shrink-0">
-                            <span className="avatar-title bg-success-subtle rounded-circle fs-1">
-                                <FeatherIcon icon="clock" className="text-success" />
-                            </span>
-                        </div> */}
-                    </div>
-          </CardBody>
-        </Card>
-      </Col>
+      <p className="text-muted mb-0 mt-auto">
+        Delivery time
+      </p>
+    </CardBody>
+  </Card>
+</Col>
     </Row>
 </React.Fragment>
   );
