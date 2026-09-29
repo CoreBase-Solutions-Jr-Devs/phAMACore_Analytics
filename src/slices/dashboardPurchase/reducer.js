@@ -7,6 +7,11 @@ import {
   getKPIPurchases,
   getLastYearDailySpend,
   getLastYearActualSpend,
+  getKPIMaverickSpend,
+  getKPIPriceAlerts,
+  getKPILeadTime,
+  getGoodsReceived,
+    getBestPricePerSupplier,
 } from "./thunk";
 
 import {
@@ -27,6 +32,31 @@ const initialState = {
   KPIMonthly: [],
   KPIType: [],
 
+  
+// Maverick Spend
+KPIMaverickSpend: [],
+KPIMaverickSpendSummary: [],
+KPIMaverickSpendSupplier: [],
+KPIMaverickSpendBranch: [],
+KPIMaverickSpendOffPOInvoices: [],
+KPIMaverickSpendPOPriceVariance: [],
+
+// Price Change Alerts
+KPIPriceAlerts: [],
+KPIPriceAlertsSummary: [],
+KPIPriceAlertsItems: [],
+KPIPriceAlertsHistory: [],
+
+// Lead Time
+KPILeadTime: [],
+KPILeadTimeSummary: [],
+KPILeadTimeSupplier: [],
+KPILeadTimePODetails: [],
+KPILeadTimeMonth: [],
+KPILeadTimeBranch: [],
+GoodsReceived: [],
+LastYearGoodsReceived: [],
+BestPricePerSupplier: [],
   ActualSpend: [],
   ActualSpendSummary: [],
   ActualSpendCategory: [],
@@ -631,8 +661,209 @@ const PurchaseOrdersSlice = createSlice({
                action.payload?.message ||
                action.error.message ||
                "Error loading data";
-           });
-  },
+           })
+ 
+
+  // ------------------------------------------
+// KPI MAVERICK SPEND
+// ------------------------------------------
+
+.addCase(getKPIMaverickSpend.fulfilled, (state, action) => {
+  state.loading = false;
+
+  const groupBy = action.meta.arg?.groupBy;
+  const data = action.payload?.result || action.payload || [];
+
+  switch (groupBy) {
+    case "SUMMARY":
+      state.KPIMaverickSpendSummary = data;
+      break;
+
+    case "SUPPLIER":
+      state.KPIMaverickSpendSupplier = data;
+      break;
+
+    case "BRANCH":
+      state.KPIMaverickSpendBranch = data;
+      break;
+
+    case "OFF_PO_INVOICES":
+      state.KPIMaverickSpendOffPOInvoices = data;
+      break;
+
+    case "PO_PRICE_VARIANCE":
+      state.KPIMaverickSpendPOPriceVariance = data;
+      break;
+
+    default:
+      state.KPIMaverickSpend = data;
+  }
+})
+
+.addCase(
+  getKPIMaverickSpend.rejected,
+  (state, action) => {
+    state.loading = false;
+
+    state.error =
+      action.payload?.message ||
+      action.error.message ||
+      "Error loading maverick spend";
+  }
+)
+
+// ------------------------------------------
+// KPI PRICE ALERTS
+// ------------------------------------------
+
+.addCase(getKPIPriceAlerts.fulfilled, (state, action) => {
+  state.loading = false;
+
+  const groupBy = action.meta.arg?.groupBy;
+  const data = action.payload?.result || action.payload || [];
+
+  switch (groupBy) {
+    case "SUMMARY":
+      state.KPIPriceAlertsSummary = data;
+      break;
+
+    case "ITEM_ALERTS":
+      state.KPIPriceAlertsItems = data;
+      break;
+
+    case "ITEM_HISTORY":
+      state.KPIPriceAlertsHistory = data;
+      break;
+
+    default:
+      state.KPIPriceAlerts = data;
+  }
+})
+
+.addCase(
+  getKPIPriceAlerts.rejected,
+  (state, action) => {
+    state.loading = false;
+
+    state.error =
+      action.payload?.message ||
+      action.error.message ||
+      "Error loading price alerts";
+  }
+)
+
+// ------------------------------------------
+// KPI LEAD TIME
+// ------------------------------------------
+
+.addCase(getKPILeadTime.fulfilled, (state, action) => {
+  state.loading = false;
+
+  const groupBy = action.meta.arg?.groupBy;
+  const data = action.payload?.result || action.payload || [];
+
+  switch (groupBy) {
+    case "SUMMARY":
+      state.KPILeadTimeSummary = data;
+      break;
+
+    case "SUPPLIER":
+      state.KPILeadTimeSupplier = data;
+      break;
+
+    case "PO_DETAILS":
+      state.KPILeadTimePODetails = data;
+      break;
+
+    case "MONTH":
+      state.KPILeadTimeMonth = data;
+      break;
+
+    case "BRANCH":
+      state.KPILeadTimeBranch = data;
+      break;
+
+    default:
+      state.KPILeadTime = data;
+  }
+})
+
+.addCase(
+  getKPILeadTime.rejected,
+  (state, action) => {
+    state.loading = false;
+
+    state.error =
+      action.payload?.message ||
+      action.error.message ||
+      "Error loading lead time";
+  }
+)
+
+// ------------------------------------------
+// GOODS RECEIVED
+// ------------------------------------------
+
+.addCase(
+  getGoodsReceived.fulfilled,
+  (state, action) => {
+    state.loading = false;
+
+    const data =
+      action.payload?.result ||
+      action.payload ||
+      [];
+
+    const period = action.meta.arg?.period;
+
+    if (period === "LAST_YEAR") {
+      state.LastYearGoodsReceived = data;
+    } else {
+      state.GoodsReceived = data;
+    }
+  }
+)
+
+.addCase(
+  getGoodsReceived.rejected,
+  (state, action) => {
+    state.loading = false;
+
+    state.error =
+      action.payload?.message ||
+      action.error.message ||
+      "Error loading goods received";
+  }
+)
+
+// ------------------------------------------
+// BEST PRICE PER SUPPLIER
+// ------------------------------------------
+
+.addCase(
+  getBestPricePerSupplier.fulfilled,
+  (state, action) => {
+    state.loading = false;
+
+    state.BestPricePerSupplier =
+      action.payload?.result ||
+      action.payload ||
+      [];
+  }
+)
+
+.addCase(
+  getBestPricePerSupplier.rejected,
+  (state, action) => {
+    state.loading = false;
+
+    state.error =
+      action.payload?.message ||
+      action.error.message ||
+      "Error loading best price per supplier";
+  }
+);
+ }
 });
 
 export const {

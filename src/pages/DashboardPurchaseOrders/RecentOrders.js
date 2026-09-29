@@ -47,7 +47,7 @@ const RecentOrders = ({
                 </p>
 
                 <h6 className="mb-0 text-success fw-bold">
-                  {formatAmount(currentReceivables)}
+                  {Number(currentReceivables).toLocaleString("en-KE")}
                 </h6>
               </div>
             </div>
@@ -59,7 +59,7 @@ const RecentOrders = ({
                 </p>
 
                 <h6 className="mb-0 text-warning fw-bold">
-                  {formatAmount(overdue31To60)}
+                  {Number(overdue31To60).toLocaleString("en-KE")}
                 </h6>
               </div>
             </div>
@@ -71,7 +71,7 @@ const RecentOrders = ({
                 </p>
 
                 <h6 className="mb-0 text-danger fw-bold">
-                  {formatAmount(overdue61To90)}
+                  {Number(overdue61To90).toLocaleString("en-KE")}
                 </h6>
               </div>
             </div>
@@ -83,7 +83,7 @@ const RecentOrders = ({
                 </p>
 
                 <h6 className="mb-0 text-info fw-bold">
-                  {formatAmount(overdue91To120)}
+                  {Number(overdue91To120).toLocaleString("en-KE")}
                 </h6>
               </div>
             </div>
@@ -95,7 +95,7 @@ const RecentOrders = ({
                 </p>
 
                 <h6 className="mb-0 text-info fw-bold">
-                  {formatAmount(overdue120Plus)}
+                  {Number(overdue120Plus).toLocaleString("en-KE")}
                 </h6>
               </div>
             </div>
@@ -114,7 +114,7 @@ const RecentOrders = ({
                 <thead className="text-muted table-light">
                   <tr>
                     <th>Supplier-Invoice</th>
-                    <th>Outstanding</th>
+                    <th>Outstanding(KES)</th>
                     <th>Last Invoice</th>
                     {/* <th>Ageing</th> */}
                     <th>Last Payment</th>
@@ -131,7 +131,7 @@ const RecentOrders = ({
                         <div className="text-muted">{item.cuscode}</div>
                       </td>
 
-                      <td>{formatAmount(item.outstanding)}</td>
+                      <td>{Number(item.outstanding).toLocaleString("en-KE")}</td>
 
                       <td>
                         {item.lastInvoice

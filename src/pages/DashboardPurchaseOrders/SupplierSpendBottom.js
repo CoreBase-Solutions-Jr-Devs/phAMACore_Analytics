@@ -60,7 +60,7 @@ const SupplierSpendBottom = ({ supplierData,  formatAmount }) => {
                       {item.name}
                     </span>
   <span className="text-muted">
-                KES {formatAmount(item.value)}
+                KES {Number(item.value).toLocaleString("en-KE")}
           </span>
         </div>
 

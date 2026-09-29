@@ -67,7 +67,7 @@ const SalesByLocations = ({
                     </span>
 
                     <span className="text-muted">
-                      {formatAmount(item.value)}
+                      {Number(item.value).toLocaleString("en-KE")}
                     </span>
                   </div>
 
@@ -99,7 +99,7 @@ const SalesByLocations = ({
                 <p>
                   Spend:
                   <strong>
-                    KES {formatAmount(Number(topCategory.value))}
+                    KES {Number(topCategory.value).toLocaleString("en-KE")}
                   </strong>
                 </p>
               </div>

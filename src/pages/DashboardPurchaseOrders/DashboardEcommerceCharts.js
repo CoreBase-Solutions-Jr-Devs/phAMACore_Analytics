@@ -123,14 +123,14 @@ const MonthToDateCharts = ({
     forceNiceScale: true,
     tickAmount: 5,
 
-    labels: {
-      formatter: (val) => formatAmount(val),
-    },
+ labels: {
+  formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
+},
   },
 
   tooltip: {
     y: {
-      formatter: (val) => formatAmount(val),
+  formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
     },
   },
 };
