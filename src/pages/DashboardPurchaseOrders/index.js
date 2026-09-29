@@ -24,7 +24,9 @@ import {
   getLastYearDailySpend,
   getKPIPurchases,
 } from "../../slices/dashboardPurchase/thunk";
-
+import {
+getKPIOverdueAccounts
+} from "../../slices/dashboardSales/thunk";
 import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
 
 import usePurchaseOrders from "../../Components/Hooks/usePurchaseOrders";
@@ -103,6 +105,7 @@ const DashboardPurchaseOrders = () => {
   PurchaseOrders = [],
 
    KPIPurchases = [],
+     kpiOverdueAccounts = [],
   KPISummary = [],
   KPICategory = [],
   KPISupplier = [],
@@ -155,9 +158,15 @@ const DashboardPurchaseOrders = () => {
     branchData,
     actualSpendChart,
     monthToDateChart,
-    OverdueAccounts,
+    // OverdueAccounts,
     bottomSuppliers,
     spendByCategory,
+     currentReceivables,
+    overdue31To60,
+    overdue61To90,
+    overdue91To120,
+    overdue120Plus,
+    overdueSupplierAccounts,
   } = usePurchaseOrders(
   PurchaseOrders,
 
@@ -200,6 +209,7 @@ const DashboardPurchaseOrders = () => {
   LastYearDailySpendBranch,
   LastYearDailySpendMonthly,
   LastYearDailySpendType,
+    kpiOverdueAccounts,
 
   filters
 );
@@ -212,7 +222,10 @@ const DashboardPurchaseOrders = () => {
 
     return `${day}/${month}/${Number(year) - 1}`;
   };
-
+  const getPeriod = (dateString) => {
+  const [day, month, year] = dateString.split("/");
+  return `${year}${month}`;
+};
 const getDateRanges = () => {
   const today = new Date();
 
@@ -375,6 +388,21 @@ useEffect(() => {
     },
     KPI_GROUP_BYS
   );
+
+   dispatch(
+        getKPIOverdueAccounts({
+          clientid: 1,
+        mode: "AGING",
+        accountType: "AGEING",
+          branchcode: branchId,
+      dateFrom:  filters.startDate,
+    dateTo:  filters.endDate,
+    periodFrom: getPeriod(filters.startDate),
+      periodTo: getPeriod(filters.endDate),
+    includeZeroBal: false,
+        }),
+      );
+
 }, [dispatch, branchId]);
 
   // --------------------------------------------------
@@ -420,6 +448,20 @@ const handleApplyFilters = () => {
     },
     KPI_GROUP_BYS
   );
+
+   dispatch(
+        getKPIOverdueAccounts({
+          clientid: 1,
+        mode: "AGING",
+        accountType: "SUPPLIER",
+          branchcode: branchId,
+      dateFrom:  filters.startDate,
+    dateTo:  filters.endDate,
+    periodFrom: getPeriod(filters.startDate),
+      periodTo: getPeriod(filters.endDate),
+    includeZeroBal: false,
+        }),
+      );
 
   // ----------------------------------------------
   // YEAR TO DATE
@@ -563,7 +605,13 @@ const handleApplyFilters = () => {
                     <Col xl={6}>
                       <RecentOrders
                         data={PurchaseOrders}
-                        OverdueAccounts={OverdueAccounts}
+                        formatAmount={formatAmount}
+                        overdueSupplierAccounts={overdueSupplierAccounts}
+                         currentReceivables={currentReceivables}
+    overdue31To60={overdue31To60}
+    overdue61To90={overdue61To90}
+    overdue91To120={overdue91To120}
+    overdue120Plus={overdue120Plus}
                       />
                     </Col>
                   </Row>

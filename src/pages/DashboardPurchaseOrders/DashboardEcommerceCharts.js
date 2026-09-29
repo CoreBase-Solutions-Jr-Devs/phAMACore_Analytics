@@ -2,76 +2,75 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 
-const RevenueCharts = ({
-  dataColors,
-  series,
-  categories = [],
-  formatAmount,
-}) => {
-  const colors = getChartColorsArray(dataColors);
-
- const options = {
-  chart: {
-    height: 370,
-    type: "line",
-    toolbar: {
-      show: false,
-    },
-  },
-
-  stroke: {
-    curve: "smooth",
-    width: 3,
-    dashArray: [0, 6],
-  },
-
-  dataLabels: {
-    enabled: false,
-  },
-
-  colors: [colors[0], colors[0]],
-
-  legend: {
-    show: false,
-  },
-
-  xaxis: {
-    categories,
-
-    axisTicks: {
-      show: false,
-    },
-
-    axisBorder: {
-      show: false,
-    },
-  },
-
-  yaxis: {
-    min: 0,
-    forceNiceScale: true,
-    tickAmount: 5,
-
-    labels: {
-      formatter: (val) => formatAmount(val),
-    },
-  },
-
-  tooltip: {
-    y: {
-      formatter: (val) => formatAmount(val),
-    },
-  },
-};
-
-  return (
-    <ReactApexChart
-      options={options}
-      series={series}
-      type="line"
-      height={350}
-    />
-  );
+const RevenueCharts = ({ 
+  dataColors, 
+  series, 
+  categories = [], 
+}) => { 
+  const colors = getChartColorsArray(dataColors); 
+ 
+  const options = { 
+    chart: { 
+      height: 370, 
+      type: "line", 
+      toolbar: { 
+        show: false, 
+      }, 
+    }, 
+ 
+    stroke: { 
+      curve: "smooth", 
+      width: 3, 
+      dashArray: [0, 6], 
+    }, 
+ 
+    dataLabels: { 
+      enabled: false, 
+    }, 
+ 
+    colors: [colors[0], colors[0]], 
+ 
+    legend: { 
+      show: false, 
+    }, 
+ 
+    xaxis: { 
+      categories, 
+ 
+      axisTicks: { 
+        show: false, 
+      }, 
+ 
+      axisBorder: { 
+        show: false, 
+      }, 
+    }, 
+ 
+    yaxis: { 
+      min: 0, 
+      forceNiceScale: true, 
+      tickAmount: 5, 
+ 
+      labels: { 
+        formatter: (val) => Number(val).toLocaleString(), 
+      }, 
+    }, 
+ 
+    tooltip: { 
+      y: { 
+        formatter: (val) => Number(val).toLocaleString(), 
+      }, 
+    }, 
+  }; 
+ 
+  return ( 
+    <ReactApexChart 
+      options={options} 
+      series={series} 
+      type="line" 
+      height={350} 
+    /> 
+  ); 
 };
 
 const MonthToDateCharts = ({
