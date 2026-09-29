@@ -241,7 +241,7 @@ export default function Widgets() {
   <Row className="g-2 mb-2">
     {kpis.map((item, index) => (
         <Col xl={3} lg={4} md={6} sm={12} key={index}>
-            <Card className="card-animate h-100">
+            <Card className="card-animate h-80 w-100">
                 <CardBody className="p-2">
                     <div className="d-flex justify-content-between align-items-center">
 
@@ -251,7 +251,7 @@ export default function Widgets() {
                                             {item.title}
                                         </p>
 
-                            <h2 className={`mt-4 ff-secondary fw-semibold text-${item.color}`}>
+                            <h2 className={`mt-2 ff-secondary fw-semibold text-${item.color}`}>
                                 <span className="counter-value">
                                     {item.prefix}
                                     {Number(item.value || 0)}
@@ -265,14 +265,14 @@ export default function Widgets() {
                                     </div>
 
                         {/* Right icon */}
-                        <div className="avatar-sm flex-shrink-0">
+                        {/* <div className="avatar-sm flex-shrink-0">
                             <span className={`avatar-title bg-${item.color}-subtle rounded-circle fs-2`}>
                                 <FeatherIcon
                                     icon={item.icon}
                                     className={`text-${item.color}`}
                                 />
                             </span>
-                        </div>
+                        </div> */}
 
                                 </div>
                             </CardBody>
