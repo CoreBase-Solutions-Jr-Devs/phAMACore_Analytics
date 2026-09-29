@@ -21,9 +21,6 @@ const initialState = {
   branches: [],
   kpiSales: [],
   kpiOverdueAccounts: [],
-  overdueSummary: [],
-  overdueCustomers: [],
-  overdueCategories: [],
 
   salesSummary: [],
   salesBranch: [],
@@ -278,22 +275,10 @@ if (groupBy === "BRANCH_TYPE") {
         state.lastYearMonthToDateSales =
           action.payload?.result || action.payload || [];
       })
-
-      .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
-  const groupBy = action.meta.arg?.groupBy;
-  const result = action.payload?.result || action.payload || [];
-  if (groupBy === "SUMMARY") {
-  state.overdueSummary = result;
-}
-
-if (groupBy === "CUSTOMER") {
-  state.overdueCustomers = result;
-}
-
-if (groupBy === "CATEGORY") {
-  state.overdueCategories = result;
-}        
-      })
+.addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
+  state.kpiOverdueAccounts =
+    action.payload?.result || action.payload || [];
+})
 
       .addCase(getSalesTransactions.rejected, (state, action) => {
         state.loading = false;

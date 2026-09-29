@@ -4,9 +4,6 @@ const useSalesAnalytics = (
   sales = [],
   kpiSales = [],
   kpiOverdueAccounts = [],
-  overdueSummary = [],
-  overdueCustomers = [],
-  overdueCategories = [],
     salesType: [],
   salesBranch: [],
   salesBranch_Type: [],
@@ -78,31 +75,29 @@ const useSalesAnalytics = (
   const cashSalesPercentage =
     totalRevenue > 0 ? (cashSales / totalRevenue) * 100 : 0;
 
+    const creditNotesPercentage =
+  totalRevenue > 0 ? (creditNotes / totalRevenue) * 100 : 0;
+
   const ordersReceived = new Set(
     sales
       .filter((item) => item.invoice_Number)
       .map((item) => item.invoice_Number),
   ).size;
 
-  // Revenue grouped by Branch.
-  const branchTotals = sales.reduce((acc, item) => {
-    const branchName = item.brancch_Name || "UNKNOWN BRANCH";
-    const revenue = Number(item.revenue || 0);
-    acc[branchName] = (acc[branchName] || 0) + revenue;
-    return acc;
-  }, {});
+ const branchData = salesBranch.map((item) => ({
+  name: item.branch_name || "UNKNOWN BRANCH",
+  amount: Number(item.net_sales_incl || 0),
+}));
 
-  const branchData = Object.keys(branchTotals).map((branch) => ({
-    name: branch,
-    amount: branchTotals[branch],
-  }));
-  console.log(branchTotals);
+const branchChartSeries = branchData.map((branch) =>
+  Number(branch.amount || 0)
+);
 
-  const branchChartSeries = branchData.map((branch) =>
-    Number(branch.amount || 0),
-  );
+const branchCategories = branchData.map((branch) => branch.name);
 
-  const branchCategories = branchData.map((branch) => branch.name);
+console.log("Branch Data:", branchData);
+console.log("Chart Series:", branchChartSeries);
+console.log("Categories:", branchCategories);
   /* -------------------------------------------------------
    * Revenue grouped by Sales Representative.
    * Used in the Salesman Revenue widget.
@@ -147,52 +142,51 @@ const useSalesAnalytics = (
   const topCustomersData = Object.values(customerTotals)
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 10);
+const overdue = Array.isArray(kpiOverdueAccounts)
+  ? kpiOverdueAccounts
+  : [];
 
-    // Overdue Accounts
-    console.log("overdueOverdueAccounts:", kpiOverdueAccounts);
-console.log("overdueSummary:", overdueSummary);
-
-// const overdue = kpiSummary[0] || {}; 
-const overdue = overdueSummary[0] || {};
-
-const currentReceivables = Number(
-  overdue.totalCurrentBalance ?? 0
+const currentReceivables = overdue.reduce(
+  (sum, item) => sum + Number(item.current_0_30 || 0),
+  0
 );
 
-const overdue1To30 = Number(
-  overdue.overdue_1_30 ?? 0
+const overdue31To60 = overdue.reduce(
+  (sum, item) => sum + Number(item.days_31_60 || 0),
+  0
 );
 
-const overdue31To60 = Number(
-  overdue.overdue_31_60 ?? 0
+const overdue61To90 = overdue.reduce(
+  (sum, item) => sum + Number(item.days_61_90 || 0),
+  0
 );
 
-const overdue61To90 = Number(
-  overdue.overdue_61_90 ?? 0
+const overdue91To120 = overdue.reduce(
+  (sum, item) => sum + Number(item.days_91_120 || 0),
+  0
 );
 
-const overdue91To120 =
-  Number(overdue.overdue_91_120 ?? 0);
-
-  const overdue120Plus =
-  Number(overdue.overdue_120_Plus ?? 0);
-
-  const overdueDebtorsCount = 
-  Number(overdue.overdueDebtorsCount ?? 0
+const overdue120Plus = overdue.reduce(
+  (sum, item) => sum + Number(item.over_120 || 0),
+  0
 );
 
-// top debtors
-const topDebtors = (overdueCustomers || [])
+const overdueDebtorsCount = overdue.filter(
+  (item) => Number(item.total_balance || 0) > 0
+).length;
+
+const topDebtors = (kpiOverdueAccounts || [])
   .slice()
   .sort(
     (a, b) =>
-      Number(b.overdueAmount ?? 0) -
-      Number(a.overdueAmount ?? 0)
+      Number(b.total_balance ?? 0) -
+      Number(a.total_balance ?? 0)
   )
-  .slice(0, 3)
+  .slice(0, 10)
   .map((customer) => ({
-    name: customer.cuS_DESC,
-    amount: Number(customer.overdueAmount ?? 0),
+    name: customer.cusname,
+    amount: Number(customer.total_balance ?? 0),
+    actionInsight: customer.action_insight,
   }));
 
   /* -------------------------------------------------------
@@ -459,11 +453,12 @@ const topDebtors = (overdueCustomers || [])
     cashInvoicesPercentage,
     salesInvoicesPercentage,
     cashSalesPercentage,
+    creditNotesPercentage,
     cashInvoices,
     ordersReceived,
     branchData,
     currentReceivables,
-    overdue1To30,
+    // overdue1To30,
     overdue31To60,
     overdue61To90,
     overdue91To120,

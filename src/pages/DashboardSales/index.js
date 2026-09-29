@@ -64,12 +64,14 @@ const DashboardSales = () => {
   const {
     formatAmount,
     totalRevenue,
-    // revenueChange,
+    revenueChange,
+    lastYearRevenue,
     cashSales,
     salesInvoices,
     cashInvoicesPercentage,
     salesInvoicesPercentage,
     cashSalesPercentage,
+    creditNotesPercentage,
     // creditInvoicesPercentage,
     cashInvoices,
     ordersReceived,
@@ -77,7 +79,6 @@ const DashboardSales = () => {
     branchChartSeries,
     branchCategories,
     currentReceivables,
-    overdue1To30,
     overdue31To60,
     overdue61To90,
     overdue91To120,
@@ -95,9 +96,6 @@ const DashboardSales = () => {
     sales,
     kpiSales,
     kpiOverdueAccounts,
-    overdueSummary,
-    overdueCustomers,
-    overdueCategories,
       salesType,
   salesBranch,
   salesBranch_Type,
@@ -107,6 +105,11 @@ const DashboardSales = () => {
     lastYearMonthlySales,
     filters,
   );
+
+  const getPeriod = (dateString) => {
+  const [day, month, year] = dateString.split("/");
+  return `${year}${month}`;
+};
 
   useEffect(() => {
     dispatch(
@@ -185,49 +188,49 @@ const DashboardSales = () => {
       }),
     );
 
-    dispatch(
-      getKPISalesTransactions({
-        clientid: 1,
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        branchcode: branchId,
-        groupBy: "SUMMARY",
-      }),
-    );
-
-   {
     const params = {
-      clientid: 1,
-      AsOfDate: filters.endDate,
+  clientid: 1,
+  startDate: filters.startDate,
+  endDate: filters.endDate,
+  branchcode: branchId ,
+};
+
+dispatch(
+  getKPISalesTransactions({
+    ...params,
+    groupBy: "TYPE",
+  }),
+);
+
+dispatch(
+  getKPISalesTransactions({
+    ...params,
+    groupBy: "BRANCH",
+  }),
+);
+
+dispatch(
+  getKPISalesTransactions({
+    ...params,
+    groupBy: "BRANCH_TYPE",
+  }),
+);
+
+    dispatch(
+      getKPIOverdueAccounts({
+        clientid: 1,
+      mode: "AGING",
+      accountType: "CUSTOMER",
         branchcode: branchId,
-      OverdueOnly: true,
-      MinBalance: 0,
-    };
-
-    dispatch(
-      getKPIOverdueAccounts({
-        ...params,
-        groupBy: "SUMMARY",
+    dateFrom:  filters.startDate,
+  dateTo:  filters.endDate,
+  periodFrom: getPeriod(filters.startDate),
+    periodTo: getPeriod(filters.endDate),
+  includeZeroBal: false,
       }),
     );
-
-    dispatch(
-      getKPIOverdueAccounts({
-        ...params,
-        groupBy: "CUSTOMER",
-      }),
-    );
-
-    dispatch(
-      getKPIOverdueAccounts({
-        ...params,
-        groupBy: "CATEGORY",
-      }),
-    );
-}
-
   }, [dispatch, branchId]);
-
+console.log("KPI OVERDUE ACCOUNTS:", kpiOverdueAccounts);
   useEffect(() => {
     return () => {
       dispatch(clearSalesData());
@@ -278,36 +281,21 @@ dispatch(
     groupBy: "BRANCH_TYPE",
   }),
 );
-{
-    const params = {
-      clientid: 1,
-      AsOfDate: filters.endDate,
-      branchcode,
-      OverdueOnly: true,
-      MinBalance: 0,
-    };
 
-    dispatch(
+ dispatch(
       getKPIOverdueAccounts({
-        ...params,
-        groupBy: "SUMMARY",
+        clientid: 1,
+      mode: "AGING",
+      accountType: "CUSTOMER",
+        branchcode: branchId,
+    dateFrom:  filters.startDate,
+  dateTo:  filters.endDate,
+  periodFrom: getPeriod(filters.startDate),
+    periodTo: getPeriod(filters.endDate),
+  includeZeroBal: "false",
       }),
     );
 
-    dispatch(
-      getKPIOverdueAccounts({
-        ...params,
-        groupBy: "CUSTOMER",
-      }),
-    );
-
-    dispatch(
-      getKPIOverdueAccounts({
-        ...params,
-        groupBy: "CATEGORY",
-      }),
-    );
-}
     // Year To Date
     if (filters.dateRange === "Year To Date") {
       dispatch(
@@ -391,9 +379,10 @@ dispatch(
             ordersReceived={ordersReceived}
             formatAmount={formatAmount}
             cashInvoicesPercentage={cashInvoicesPercentage}
-            salesPercentage={salesInvoicesPercentage}
+salesInvoicesPercentage={salesInvoicesPercentage}
             cashSalesPercentage={cashSalesPercentage}
             overdueDebtorsCount={overdueDebtorsCount}
+            creditNotesPercentage={creditNotesPercentage}
             creditNotes={creditNotes}
             // revenueChange={revenueChange}
             cashInvoices={cashInvoices}
@@ -401,7 +390,7 @@ dispatch(
             rightClickBtn={toggleRightColumn}
           />
         </Row>
-        <Row className="mt-4">
+        <Row >
           <Col xl={6}>
             {isBranchView ? (
               <TopProducts data={topProducts} />
@@ -438,7 +427,7 @@ dispatch(
             <ReceivablesAgeing
               kpiOverdueAccounts={kpiOverdueAccounts}
               currentReceivables={currentReceivables}
-              overdue1To30={overdue1To30}
+              // overdue1To30={overdue1To30}
               overdue31To60={overdue31To60}
               overdue61To90={overdue61To90}
               overdue91To120={overdue91To120}

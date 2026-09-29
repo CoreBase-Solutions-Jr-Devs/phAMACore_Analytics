@@ -51,7 +51,7 @@ const ReceivablesAgeing = ({
                   </div>
                 </div>
 
-                <div className="col-6 col-md-4 col-sm-6">
+                {/* <div className="col-6 col-md-4 col-sm-6">
                   <div className="rounded-3 text-center bg-primary-subtle p-2">
                     <p className="text-primary fw-semibold mb-1 small">
                       <small>1–30 days</small>
@@ -60,7 +60,7 @@ const ReceivablesAgeing = ({
                       {formatAmount(overdue1To30)}
                     </h6>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="col-6 col-md-4 col-sm-6">
                   <div className="rounded-3 text-center bg-warning-subtle p-2">
@@ -115,9 +115,7 @@ const ReceivablesAgeing = ({
                     <h6 className="text-muted mb-1">
                       No debtor data available
                     </h6>
-                    <small className="text-muted">
-                      There are no overdue customers for the selected period.
-                    </small>
+                   
                   </div>
                 ) : (
                   topDebtors.map((debtor, index) => (
