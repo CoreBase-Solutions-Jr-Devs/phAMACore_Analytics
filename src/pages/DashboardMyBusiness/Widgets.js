@@ -5,6 +5,7 @@ import FeatherIcon from "feather-icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getInventoryProfitSummaryUser, getCashbookSummary } from "../../slices/thunks";
 import { getYearToDateApi } from "../utils/dateHelper";
+import { formatAmount } from "../../helpers/format_helper";
 
 const calculateProfit = (data) => {
     if (!data) return 0;
@@ -224,131 +225,128 @@ export default function Widgets() {
         {
             title: "Receivables",
             value: 0,
-            prefix: "KES ",
+            prefix: "KES",
             suffix: "",
             icon: "credit-card",
             color: "success",
-            subtitle: "Customer balances"
+            subtitle: "Customer balances",
+            decimals: 2,
         },
         {
             title: "Payables",
             value: 0,
-            prefix: "KES ",
+            prefix: "KES",
             suffix: "",
             icon: "shopping-bag",
             color: "danger",
-            subtitle: "Supplier balances"
+            subtitle: "Supplier balances",
+            decimals: 2,
         },
         {
             title: "Cash Available",
             value: cashAvailableValue,
-            prefix: "KES ",
+            prefix: "KES",
             suffix: "",
             icon: "dollar-sign",
             color: "success",
             subtitle: "Available cash position",
             loading: loadingCashbookSummary,
-            decimals: 2
+            decimals: 2,
         },
         {
             title: "Sales",
             value: salesValue,
-            prefix: "KES ",
+            prefix: "KES",
             suffix: "",
             icon: "trending-up",
             color: "primary",
             subtitle: "Current period sales",
             loading: loadingProfitSummary,
-            decimals: 2
+            decimals: 2,
         },
         {
             title: "Stock Profit",
             value: incomeStatementValue,
-            prefix: "KES ",
+            prefix: "KES",
             suffix: "",
             icon: "package",
             color: "warning",
             loading: loadingProfitSummary,
-            subtitle: "Estimated stock profit"
+            subtitle: "Estimated stock profit",
+            decimals: 2,
         },
-        // {
-        //     title: "Income Statement",
-        //     value: 0,
-        //     prefix: "KES ",
-        //     suffix: "",
-        //     icon: "bar-chart-2",
-        //     color: "secondary",
-        //     subtitle: "Net profit after expenses",
-        //     // loading: loadingProfitSummary,
-        //     decimals: 2
-        // },
         {
             title: "Collections",
             value: collectionsValue,
-            prefix: "KES ",
+            prefix: "KES",
             suffix: "",
             icon: "archive",
             color: "success",
             subtitle: "Customer payments received",
             loading: loadingCashbookSummary,
-            decimals: 2
+            decimals: 2,
         },
-        // {
-        //     title: "Ageing",
-        //     value: 0,
-        //     prefix: "",
-        //     suffix: "",
-        //     icon: "clock",
-        //     color: "info",
-        //     subtitle: "Invoices over 90 days"
-        // }
     ];
 
     return (
         <React.Fragment>
-            <div className="d-flex align-items-center justify-content-between flex-wrap mb-4">
+            <div className="d-flex align-items-center justify-content-between flex-wrap mb-3">
                 <h4 className="card-title mb-0">
                     KEY METRICS
-                    {/* {branchName !== "All Branches" && ` - ${branchName}`} */}
                 </h4>
             </div>
 
             <Row className="g-2 mb-2">
                 {kpis.map((item, index) => (
-                    <Col xl={3} lg={3} md={6} sm={12} key={index}>
-                        <Card className="card-animate h-80 w-100">
-                            <CardBody className="p-2">
-                                <div className="d-flex justify-content-between align-items-center">
+                    <Col xl={2} lg={4} md={4} sm={6} xs={12} key={index} className="d-flex">
+                        <Card className="card-animate w-100 h-100 mb-0 d-flex flex-column">
+                            <CardBody className="p-3 d-flex flex-column justify-content-between">
+                                {/* Title */}
+                                <div>
+                                    <p className="font-medium text-truncate mb-0">
+                                        {item.title}
+                                    </p>
+                                </div>
 
-                                    {/* Left content */}
-                                    <div>
-                                        <p className="font-medium mb-0">
-                                            {item.title}
-                                        </p>
+                                {/* Metric value with prefix & suffix */}
+                                <div className="d-flex align-items-baseline flex-wrap my-2">
+                                    {item.prefix && (
+                                        <span className="fs-12 fw-medium text-muted me-1">
+                                            {item.prefix.trim()}
+                                        </span>
+                                    )}
+                                    <h4 className={`mb-0 ff-secondary fw-semibold text-${item.color} fs-18`}>
+                                        <span className="counter-value">
+                                            {item.loading ? (
+                                                <span className="placeholder-glow">
+                                                    <span className="placeholder col-6 rounded" />
+                                                </span>
+                                            ) : (
+                                                <CountUp
+                                                    start={0}
+                                                    end={Number(item.value || 0)}
+                                                    separator=","
+                                                    decimals={item.decimals !== undefined ? item.decimals : 2}
+                                                    duration={2}
+                                                    formattingFn={(val) =>
+                                                        formatAmount(val, item.decimals !== undefined ? item.decimals : 2)
+                                                    }
+                                                />
+                                            )}
+                                        </span>
+                                    </h4>
+                                    {item.suffix && (
+                                        <span className="fs-12 fw-medium text-muted ms-1">
+                                            {item.suffix.trim()}
+                                        </span>
+                                    )}
+                                </div>
 
-                                        <h2 className={`mt-2 ff-secondary fw-semibold text-${item.color}`}>
-                                            <span className="counter-value">
-                                                {item.prefix}
-                                                {Number(item.value || 0)}
-                                                {item.suffix}
-                                            </span>
-                                        </h2>
-
-                                        <p className="mb-0 text-muted">
-                                            {item.subtitle}
-                                        </p>
-                                    </div>
-
-                                    {/* Right icon */}
-                                    {/* <div className="avatar-sm flex-shrink-0">
-                            <span className={`avatar-title bg-${item.color}-subtle rounded-circle fs-2`}>
-                                <FeatherIcon
-                                    icon={item.icon}
-                                    className={`text-${item.color}`}
-                                />
-                            </span>
-                        </div> */}
-
+                                {/* Subtitle */}
+                                <div>
+                                    <p className="mb-0 text-muted fs-11 text-truncate" title={item.subtitle}>
+                                        {item.subtitle}
+                                    </p>
                                 </div>
                             </CardBody>
                         </Card>
@@ -358,3 +356,4 @@ export default function Widgets() {
         </React.Fragment>
     );
 }
+
