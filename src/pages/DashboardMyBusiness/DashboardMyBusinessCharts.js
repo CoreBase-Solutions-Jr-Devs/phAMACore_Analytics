@@ -2,6 +2,8 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 
 import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
+import { formatCompact, formatCurrency } from "../utils/formatHelper";
+import { formatAmount, formatNumber } from "../utils/formatHelper";
 
 const AudiencesCharts = ({ dataColors, series }) => {
   let chartAudienceColumnChartsColors = [];
@@ -315,6 +317,19 @@ const RevenueExpensesChart = ({
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
+      labels: {
+        // Formats large y-axis tick values compactly (e.g., KES 1.5M, KES 500K)
+        formatter: (val) => `KES ${formatCompact(val)}`,
+      },
+    },
+
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        // Formats the hover tooltip with full currency presentation (e.g., KES 1,234,567.89)
+        formatter: (val) => formatCurrency(val, "KES", 2),
+      },
     },
   };
 
@@ -677,9 +692,15 @@ const UsersByDeviceCharts = ({ dataColors, series }) => {
 const StockPurchasesCharts = ({
   dataColors,
   series,
-  categories,
+  categories = [],
 }) => {
-  const linechartcustomerColors = getChartColorsArray(dataColors);
+  const chartColors = getChartColorsArray(dataColors);
+
+  // Fallback to series' category count if categories is missing
+  const safeCategories =
+    categories && categories.length > 0
+      ? categories
+      : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const options = {
     chart: {
@@ -689,31 +710,71 @@ const StockPurchasesCharts = ({
         show: false,
       },
     },
-
     plotOptions: {
       bar: {
-        columnWidth: "50%",
+        horizontal: false,
+        columnWidth: "40%",
         borderRadius: 4,
       },
     },
-
     dataLabels: {
       enabled: false,
     },
-
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ["transparent"],
+    },
+    colors: chartColors,
     xaxis: {
-      categories: categories || [],
+      categories: safeCategories,
       axisTicks: { show: false },
       axisBorder: { show: false },
+      labels: {
+        style: {
+          fontSize: "12px",
+          colors: "#878a99",
+        },
+      },
     },
-
     yaxis: {
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
+      labels: {
+        formatter: (val) => {
+          if (val === null || val === undefined || isNaN(val)) return "KES 0";
+          if (Math.abs(val) >= 1_000_000) {
+            return `KES ${(val / 1_000_000).toFixed(1)}M`;
+          }
+          if (Math.abs(val) >= 1_000) {
+            return `KES ${(val / 1_000).toFixed(0)}K`;
+          }
+          return `KES ${formatAmount(val, 0)}`;
+        },
+        style: {
+          colors: ["#878a99"],
+        },
+      },
     },
-
-    colors: linechartcustomerColors,
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        formatter: (val) =>
+          val !== undefined && !isNaN(val)
+            ? `KES ${formatAmount(val, 2)}`
+            : "KES 0.00",
+      },
+    },
+    legend: {
+      position: "top",
+      horizontalAlign: "right",
+      offsetY: -5,
+    },
+    grid: {
+      borderColor: "#f1f1f1",
+    },
   };
 
   return (
@@ -728,64 +789,136 @@ const StockPurchasesCharts = ({
   );
 };
 
-const SalesCollectionCharts = ({ dataColors, series, categories }) => {
-  const colors = getChartColorsArray(dataColors);
+const SalesCollectionCharts = ({
+  dataColors,
+  series,
+  categories,
+}) => {
+  const chartColors = getChartColorsArray(dataColors);
 
   const options = {
     chart: {
-      height: 374,
       type: "line",
       stacked: false,
       toolbar: {
         show: false,
       },
     },
-
     stroke: {
+      width: [0, 0, 3], // 0 for the two bar series, 3 for the line series
       curve: "smooth",
-      width: [0, 0, 3], // only revenue line visible thicker
     },
-
     plotOptions: {
       bar: {
         columnWidth: "40%",
+        borderRadius: 4,
       },
     },
-
+    colors: chartColors,
     fill: {
-      opacity: [1, 1, 1],
+      opacity: [0.85, 0.85, 1],
     },
-
-    dataLabels: {
-      enabled: false,
+    markers: {
+      size: [0, 0, 5],
+      strokeWidth: 2,
+      hover: {
+        size: 7,
+      },
     },
-
     xaxis: {
       categories: categories,
-      axisTicks: { show: false },
-      axisBorder: { show: false },
+      axisTicks: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
     },
-
-    yaxis: {
-      min: 0,
-      forceNiceScale: true,
-      tickAmount: 5,
+    // Dual y-axis setup
+    yaxis: [
+      {
+        // LHS: Monetary Value (Revenue & Collections)
+        seriesName: "Revenue",
+        title: {
+          text: "Amount (KES)",
+          style: {
+            color: "#878a99",
+            fontWeight: 500,
+          },
+        },
+        labels: {
+          formatter: (val) => {
+            if (val === null || val === undefined) return "KES 0";
+            if (Math.abs(val) >= 1_000_000) {
+              return `KES ${(val / 1_000_000).toFixed(1)}M`;
+            }
+            if (Math.abs(val) >= 1_000) {
+              return `KES ${(val / 1_000).toFixed(0)}K`;
+            }
+            return `KES ${formatAmount(val, 0)}`;
+          },
+          style: {
+            colors: ["#878a99"],
+          },
+        },
+      },
+      {
+        // Connect Collections scale to LHS
+        seriesName: "Revenue",
+        show: false,
+      },
+      {
+        // RHS: Physical Unit Count (Sales Volume)
+        opposite: true,
+        seriesName: "Sales Volume",
+        title: {
+          text: "Units Dispensed",
+          style: {
+            color: "#878a99",
+            fontWeight: 500,
+          },
+        },
+        labels: {
+          formatter: (val) => `${formatNumber(val, 0)} pcs`,
+          style: {
+            colors: ["#878a99"],
+          },
+        },
+      },
+    ],
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        formatter: (val, { seriesIndex }) => {
+          if (val === undefined || val === null) return "0";
+          // If seriesIndex is 2 (Sales Volume line), format as units
+          if (seriesIndex === 2) {
+            return `${formatNumber(val, 0)} Units`;
+          }
+          // Otherwise, format as Currency
+          return `KES ${formatAmount(val, 2)}`;
+        },
+      },
     },
-
     legend: {
-      show: true,
       position: "top",
+      horizontalAlign: "right",
+      offsetY: -5,
     },
-
-    colors,
+    grid: {
+      borderColor: "#f1f1f1",
+    },
   };
 
   return (
     <ReactApexChart
+      dir="ltr"
       options={options}
       series={series}
       type="line"
-      height={374}
+      height={350}
+      className="apex-charts"
     />
   );
 };
