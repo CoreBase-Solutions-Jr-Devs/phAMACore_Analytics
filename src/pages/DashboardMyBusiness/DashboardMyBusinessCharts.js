@@ -692,9 +692,15 @@ const UsersByDeviceCharts = ({ dataColors, series }) => {
 const StockPurchasesCharts = ({
   dataColors,
   series,
-  categories,
+  categories = [],
 }) => {
-  const linechartcustomerColors = getChartColorsArray(dataColors);
+  const chartColors = getChartColorsArray(dataColors);
+
+  // Fallback to series' category count if categories is missing
+  const safeCategories =
+    categories && categories.length > 0
+      ? categories
+      : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const options = {
     chart: {
@@ -704,31 +710,71 @@ const StockPurchasesCharts = ({
         show: false,
       },
     },
-
     plotOptions: {
       bar: {
-        columnWidth: "50%",
+        horizontal: false,
+        columnWidth: "40%",
         borderRadius: 4,
       },
     },
-
     dataLabels: {
       enabled: false,
     },
-
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ["transparent"],
+    },
+    colors: chartColors,
     xaxis: {
-      categories: categories || [],
+      categories: safeCategories,
       axisTicks: { show: false },
       axisBorder: { show: false },
+      labels: {
+        style: {
+          fontSize: "12px",
+          colors: "#878a99",
+        },
+      },
     },
-
     yaxis: {
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
+      labels: {
+        formatter: (val) => {
+          if (val === null || val === undefined || isNaN(val)) return "KES 0";
+          if (Math.abs(val) >= 1_000_000) {
+            return `KES ${(val / 1_000_000).toFixed(1)}M`;
+          }
+          if (Math.abs(val) >= 1_000) {
+            return `KES ${(val / 1_000).toFixed(0)}K`;
+          }
+          return `KES ${formatAmount(val, 0)}`;
+        },
+        style: {
+          colors: ["#878a99"],
+        },
+      },
     },
-
-    colors: linechartcustomerColors,
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        formatter: (val) =>
+          val !== undefined && !isNaN(val)
+            ? `KES ${formatAmount(val, 2)}`
+            : "KES 0.00",
+      },
+    },
+    legend: {
+      position: "top",
+      horizontalAlign: "right",
+      offsetY: -5,
+    },
+    grid: {
+      borderColor: "#f1f1f1",
+    },
   };
 
   return (
