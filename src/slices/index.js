@@ -79,6 +79,9 @@ import StockInventoryReducer from "./dashboardStock/reducer";
 
  import PurchaseOrdersReducer from "./dashboardPurchase/reducer";
 
+// Dashboard My Business
+import DashboardMyBusinessReducer from "./dashboardMyBusiness/reducer";
+
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
     Login: LoginReducer,
@@ -111,6 +114,8 @@ const rootReducer = combineReducers({
     powerbi: PowerBIReducer,
     PurchaseOrders: PurchaseOrdersReducer,
     StockInventory: StockInventoryReducer,
+    DashboardMyBusiness: DashboardMyBusinessReducer,
+    MyBusiness: DashboardMyBusinessReducer,
 });
 
 export default rootReducer;

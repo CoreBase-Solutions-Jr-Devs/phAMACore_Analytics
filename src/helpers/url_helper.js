@@ -25,16 +25,16 @@ export const POST_FORGOT_PASSWORD = "/auth/reset-token";
 export const GET_POWERBI_SALES =
   "/api/PowerBi/PowerBISalesTransactions";
 
-  export const GET_POWERBI_KPISALES =
+export const GET_POWERBI_KPISALES =
   "/api/PowerBi/PowerBIKPISalesTransactions";
 
   export const GET_POWERBI_KPIOverdueAccounts =
-  "/api/PowerBI/PowerBIAccountBalance";
+  "/api/PowerBi/PowerBIKPIOverdueAccounts";
 
 export const GET_POWERBI_PURCHASE_ORDERS =
   "/api/PowerBi/PowerBIPurchaseOrders";
 
-    export const GET_POWERBI_KPIPURCHASES =
+export const GET_POWERBI_KPIPURCHASES =
   "/api/PowerBi/PowerBIKPIPurchases";
 
 export const GET_POWERBI_STOCK =
@@ -55,15 +55,20 @@ export const GET_POWERBI_BRANCHES =
 // export const GET_POWERBI_KPI_OVERDUE_ACCOUNTS =
 //   "/api/PowerBi/PowerBIKPIOverdueAccounts";
 
-
-
 export const GET_POWERBI_KPI_TOTALSTOCKVALUEBYBRANCH =
   "/api/PowerBi/PowerBIKPITotalStockValueByBranch";
 
-
-
 export const GET_POWERBI_KPI_STOCKHEALTH = 
   "/api/PowerBi/PowerBIKPIStockHealth";
+
+export const GET_POWERBI_INVENTORY_PROFIT_SUMMARY_USER = 
+  "/api/PowerBi/PowerBIInventoryProfitSummaryUser";
+
+export const GET_POWERBI_ACCOUNT_BALANCE = 
+  "/api/PowerBi/PowerBIAccountBalance";
+
+export const GET_POWERBI_CASHBOOK_SUMMARY = 
+  "/api/PowerBi/PowerBICashbookSummary";
 
 //PROFILE
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
