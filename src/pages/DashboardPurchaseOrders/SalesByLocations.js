@@ -67,7 +67,7 @@ const SalesByLocations = ({
                     </span>
 
                     <span className="text-muted">
-                      {Number(item.value).toLocaleString("en-KE")}
+                      KES {Number(item.value).toLocaleString("en-KE")}
                     </span>
                   </div>
 

@@ -288,7 +288,7 @@ const StoreVisitsCharts = ({
       formatter: (seriesName, opts) => {
         const amount = amounts[opts.seriesIndex] || 0;
 
-        return `${seriesName}: ${formatAmount(amount)}`;
+        return `${seriesName}: ${Number(amount).toLocaleString("en-KE")}`;
       },
     },
 
@@ -309,8 +309,7 @@ const StoreVisitsCharts = ({
     formatter: (val, { seriesIndex }) => {
       const amount = amounts[seriesIndex] || 0;
 
-      return `KES ${formatAmount(amount)}`;
-    },
+  return `KES ${Number(amount).toLocaleString("en-KE")}`;    },
   },
 },
 

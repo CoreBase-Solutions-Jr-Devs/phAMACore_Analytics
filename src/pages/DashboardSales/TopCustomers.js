@@ -33,7 +33,7 @@ const TopCustomers = ({ data = [], formatAmount }) => {
                   <tr className="text-muted">
                     <th>Name</th>
                     <th>Branch</th>
-                    <th>Revenue</th>
+                    <th>Revenue (KES)</th>
                     {/* <th className="text-end">Rate</th> */}
                   </tr>
                 </thead>

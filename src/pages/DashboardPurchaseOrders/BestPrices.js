@@ -21,10 +21,11 @@ const BestPrices = ({
               </h6>
             </div>
           ) : (
-            <div className="table-responsive table-card">
-              <table className="table table-borderless table-centered table-nowrap mb-0">
-                <thead className="text-muted table-light">
-                  <tr>
+        <div className="table-responsive table-card">
+              <table className="table align-middle table-nowrap mb-0">
+                <thead className="table-light">
+                  <tr className="text-muted">
+                
                     <th>Supplier</th>
                     <th>Spend(KES)</th>
                   </tr>
