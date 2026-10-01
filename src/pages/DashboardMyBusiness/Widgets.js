@@ -343,6 +343,7 @@ export default function Widgets() {
         accountBalance = [],
         cashbookSummary = [],
         cashbookSummaryMetrics = [],
+        filters,
 
         loadingProfitSummary = false,
         loadingAccountBalance = false,
@@ -360,12 +361,16 @@ export default function Widgets() {
      */
     useEffect(() => {
         const ytd = getYearToDateApi();
+        const startDate = filters?.startDate || ytd.startDate;
+        const endDate = filters?.endDate || ytd.endDate;
 
-        // 1. Income Statement KPI
+        // 1. Income Statement KPI (Sales and Stock Profit)
         dispatch(
             getInventoryProfitSummaryUser({
                 clientid: 1,
                 GroupBy: "SUMMARY",
+                StartDate: startDate,
+                EndDate: endDate,
             })
         );
 
@@ -374,11 +379,11 @@ export default function Widgets() {
             getCashbookSummary({
                 clientid: 1,
                 GroupBy: "SUMMARY",
-                StartDate: ytd.startDate,
-                EndDate: ytd.endDate,
+                StartDate: startDate,
+                EndDate: endDate,
             })
         );
-    }, [dispatch]);
+    }, [dispatch, filters?.startDate, filters?.endDate]);
 
 
     /**
