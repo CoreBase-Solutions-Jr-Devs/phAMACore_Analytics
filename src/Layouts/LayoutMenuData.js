@@ -87,7 +87,7 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
       },
       subItems: [
         { id: 'dashboard', label: 'Dashboard', link: '/dashboard-sales', parentId: 'sales' },
-        { id: 'branchview', label: 'BranchView', link: salesBranch ? `/dashboard-sales/branch/${salesBranch}` : '#', disabled: !salesBranch, parentId: 'sales' },
+        { id: 'branchview', label: 'BranchView',  link: `/dashboard-sales/branch/${salesBranch}`, parentId: 'sales' },
       ],
     },
     {
@@ -104,7 +104,7 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
       },
       subItems: [
         { id: 'dashboard-stock', label: 'Dashboard', link: '/dashboard-stock', parentId: 'stock' },
-        { id: 'branchview-stock', label: 'BranchView', link: activeStockBranch ? `/dashboard-stock/branch/${activeStockBranch}` : '#', disabled: !activeStockBranch, parentId: 'stock' },
+        { id: 'branchview-stock', label: 'BranchView',  link: `/dashboard-stock/branch/${activeStockBranch}` ,  parentId: 'stock' },
       ],
     },
     {
@@ -121,10 +121,8 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
       },
       subItems: [
         { id: 'dashboard-purchase-orders', label: 'Dashboard', link: '/dashboard-purchase-orders', parentId: 'purchase-orders' },
-        { id: 'branchview-purchase-orders', label: 'BranchView', link: purchaseBranch
-    ? `/dashboard-purchase-orders/branch/${purchaseBranch}`
-    : '#',
-  disabled: !purchaseBranch, parentId: 'purchase-orders' },
+        { id: 'branchview-purchase-orders', label: 'BranchView', link: `/dashboard-purchase-orders/branch/${purchaseBranch}`,
+   parentId: 'purchase-orders' },
       ],
     },
   ];
