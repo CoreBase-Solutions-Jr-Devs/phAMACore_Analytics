@@ -20,36 +20,34 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const startRef = useRef(null);
   const endRef = useRef(null);
   const {
-    PurchaseOrders,
-    kpiPurchases,
-    loading,
-    error,
-    filters: { branch, dateRange, startDate, endDate,  topN },
-  } = useSelector((state) => state.PurchaseOrders);
+  KPIBranch,
+  filters: { branch, dateRange, startDate, endDate, topN },
+} = useSelector((state) => state.PurchaseOrders);
 
-  const branches = (() => {
-    const map = {};
+const branches = (() => {
+  const map = {};
 
-    (PurchaseOrders || []).forEach((item) => {
-      const code = item.branch_ID;
-      const name = item.branch_name;
+  (KPIBranch || []).forEach((item) => {
+    const code = item.branch_id;
+    const name = item.branch_name;
 
-      if (code == null) return;
+    if (code == null) return;
 
-      map[code] = {
-        branchCode: code,
-        branchName: name,
-      };
-    });
-    return Object.values(map);
-  })();
+    map[code] = {
+      branchCode: code,
+      branchName: name,
+    };
+  });
+
+  return Object.values(map);
+})();
 
   const selectedBranch =
     branches.find((b) => b.branchCode === branch)?.branchName || "All Branches";
 
  const dateOptions = ["Today", "Yesterday", "This Week", "Last Week", "This Month" , "Last Month", "Month To Date", "This Year", "Year To Date", "Last Year", "Custom"];
   const formatDisplay = (date) => date || "";
-
+console.log("KPIBranch in FilterActions:", KPIBranch);
   return (
     <React.Fragment>
       <div

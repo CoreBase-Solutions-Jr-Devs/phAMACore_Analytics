@@ -392,14 +392,14 @@ useEffect(() => {
   // PURCHASE ORDERS
   // ----------------------------------------------
 
-  dispatch(
-    getPurchaseOrders({
-      clientid: 1,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      branchcode: branchId ,
-    })
-  );
+  // dispatch(
+  //   getPurchaseOrders({
+  //     clientid: 1,
+  //     startDate: filters.startDate,
+  //     endDate: filters.endDate,
+  //     branchcode: branchId ,
+  //   })
+  // );
 
   dispatch(
   getBestPricePerSupplier({
@@ -586,14 +586,14 @@ const handleApplyFilters = () => {
   // PURCHASE ORDERS
   // ----------------------------------------------
 
-  dispatch(
-    getPurchaseOrders({
-      clientid: 1,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      branchcode: filters.branch ?? null,
-    })
-  );
+  // dispatch(
+  //   getPurchaseOrders({
+  //     clientid: 1,
+  //     startDate: filters.startDate,
+  //     endDate: filters.endDate,
+  //     branchcode: filters.branch ?? null,
+  //   })
+  // );
 
 const goodsReceivedParams = {
   clientid: 1,
@@ -691,31 +691,31 @@ dispatchGroupByRequests(
   // YEAR TO DATE
   // ----------------------------------------------
 
-  if (filters.dateRange === "Year To Date") {
-    // Current year YTD
-    dispatchGroupByRequests(
-      getActualSpend,
-      {
-        clientid: 1,
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        branchcode: filters.branch ?? null,
-      },
-      ACTUAL_SPEND_GROUP_BYS
-    );
+  // if (filters.dateRange === "Year To Date") {
+  //   // Current year YTD
+  //   dispatchGroupByRequests(
+  //     getActualSpend,
+  //     {
+  //       clientid: 1,
+  //       startDate: filters.startDate,
+  //       endDate: filters.endDate,
+  //       branchcode: filters.branch ?? null,
+  //     },
+  //     ACTUAL_SPEND_GROUP_BYS
+  //   );
 
-    // Previous year YTD
-    dispatchGroupByRequests(
-      getLastYearActualSpend,
-      {
-        clientid: 1,
-        startDate: getPreviousYearDate(filters.startDate),
-        endDate: getPreviousYearDate(filters.endDate),
-        branchcode: filters.branch ?? null,
-      },
-      LAST_YEAR_ACTUAL_SPEND_GROUP_BYS
-    );
-  }
+  //   // Previous year YTD
+  //   dispatchGroupByRequests(
+  //     getLastYearActualSpend,
+  //     {
+  //       clientid: 1,
+  //       startDate: getPreviousYearDate(filters.startDate),
+  //       endDate: getPreviousYearDate(filters.endDate),
+  //       branchcode: filters.branch ?? null,
+  //     },
+  //     LAST_YEAR_ACTUAL_SPEND_GROUP_BYS
+  //   );
+  // }
 dispatchGroupByRequests(
   getKPIMaverickSpend,
   {
@@ -727,35 +727,36 @@ dispatchGroupByRequests(
   },
   MAVERICK_SPEND_GROUP_BYS
 );
+console.log("KPIBranch from Redux:", KPIBranch);
   // ----------------------------------------------
   // MONTH TO DATE
   // ----------------------------------------------
 
-  if (filters.dateRange === "Month To Date") {
-    // Current year MTD
-    dispatchGroupByRequests(
-      getDailySpend,
-      {
-        clientid: 1,
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        branchcode: filters.branch ?? null,
-      },
-      DAILY_SPEND_GROUP_BYS
-    );
+  // if (filters.dateRange === "Month To Date") {
+  //   // Current year MTD
+  //   dispatchGroupByRequests(
+  //     getDailySpend,
+  //     {
+  //       clientid: 1,
+  //       startDate: filters.startDate,
+  //       endDate: filters.endDate,
+  //       branchcode: filters.branch ?? null,
+  //     },
+  //     DAILY_SPEND_GROUP_BYS
+  //   );
 
-    // Previous year MTD
-    dispatchGroupByRequests(
-      getLastYearDailySpend,
-      {
-        clientid: 1,
-        startDate: getPreviousYearDate(filters.startDate),
-        endDate: getPreviousYearDate(filters.endDate),
-        branchcode: filters.branch ?? null,
-      },
-      LAST_YEAR_DAILY_SPEND_GROUP_BYS
-    );
-  }
+  //   // Previous year MTD
+  //   dispatchGroupByRequests(
+  //     getLastYearDailySpend,
+  //     {
+  //       clientid: 1,
+  //       startDate: getPreviousYearDate(filters.startDate),
+  //       endDate: getPreviousYearDate(filters.endDate),
+  //       branchcode: filters.branch ?? null,
+  //     },
+  //     LAST_YEAR_DAILY_SPEND_GROUP_BYS
+  //   );
+  // }
 
   // ----------------------------------------------
   // NAVIGATION
@@ -804,10 +805,11 @@ dispatchGroupByRequests(
                 <Row>
                   <Col xl={6}>
                     {isBranchView ? (
-                      <StoreVisits
-                        data={branchData}
-                        formatAmount={formatAmount}
-                      />
+                                   <SalesByLocations 
+  data={spendByCategory} 
+  totalSpend={totalSpend} 
+  formatAmount={formatAmount} 
+/>
                     ) : (
                       <StoreVisits
                         data={branchData}
