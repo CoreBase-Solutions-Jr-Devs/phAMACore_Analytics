@@ -11,6 +11,7 @@ import {
   getKPISalesTransactions as getKPISalesTransactionsApi,
 }
   from "../../helpers/fakebackend_helper";
+import { cleanBranchName } from "../../helpers/branch_helper";
 
 export const fetchDailyClosingStock = createAsyncThunk(
   "stockInventory/fetchDailyClosingStock",
@@ -133,7 +134,11 @@ export const fetchKPITotalStockValueByBranch = createAsyncThunk(
           branchcode,
         });
         const data = response.data ?? response;
-        return Array.isArray(data) ? data : [data];
+        const list = Array.isArray(data) ? data : [data];
+        return list.map((item) => ({
+          ...item,
+          branch_name: cleanBranchName(item.branch_name || item.branchName),
+        }));
       }
 
       // If branchcode is null/undefined, fetch for all branches to build comparison
@@ -143,7 +148,7 @@ export const fetchKPITotalStockValueByBranch = createAsyncThunk(
         const rawBranches = branchesRes.data?.result || branchesRes.data || [];
         branchList = rawBranches.map((b) => ({
           branchCode: b.bcode ?? b.branchCode ?? b.branch_ID,
-          branchName: b.brancH_NAME ?? b.branchName ?? b.branch_name,
+          branchName: cleanBranchName(b.brancH_NAME ?? b.branchName ?? b.branch_name),
         }));
       }
 
@@ -156,18 +161,18 @@ export const fetchKPITotalStockValueByBranch = createAsyncThunk(
               return {
                 ...data[0],
                 branch_id: b.branchCode,
-                branch_name: b.branchName || data[0].branch_name,
+                branch_name: cleanBranchName(b.branchName || data[0].branch_name),
               };
             }
             return {
               branch_id: b.branchCode,
-              branch_name: b.branchName,
+              branch_name: cleanBranchName(b.branchName),
               total_stock_value: 0,
             };
           } catch (e) {
             return {
               branch_id: b.branchCode,
-              branch_name: b.branchName,
+              branch_name: cleanBranchName(b.branchName),
               total_stock_value: 0,
             };
           }

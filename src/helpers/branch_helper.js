@@ -2,11 +2,33 @@ const BRANCHES_CACHE_KEY = "phAMACore_cached_branches";
 const ACTIVE_BRANCH_PREFIX = "phAMACore_active_branch_";
 
 /**
+ * Strips company prefixes from branch names (e.g. "AXCESS PHARMACY - SYOKIMAU MSA RD" -> "SYOKIMAU MSA RD").
+ * Handles various dash/colon/pipe separators and extra spacing.
+ */
+export const cleanBranchName = (rawName) => {
+  if (!rawName || typeof rawName !== "string") return rawName || "";
+  const trimmed = rawName.trim();
+  if (!trimmed) return "";
+
+  // Match "[Company Name] - [Branch Name]" where separator is preceded or followed by whitespace
+  const match = trimmed.match(/^.+?(?:\s+[-–—:|]\s*|\s*[-–—:|]\s+)(.+)$/);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+
+  return trimmed;
+};
+
+const isLocalStorageAvailable = () => {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+};
+
+/**
  * Persists an array or map of branch objects into localStorage.
  * Handles different branch API key variants (branchCode, bcode, branch_ID, branchName, brancH_NAME, branch_name).
  */
 export const saveCachedBranches = (branches) => {
-  if (!branches) return;
+  if (!branches || !isLocalStorageAvailable()) return;
   try {
     const list = Array.isArray(branches) ? branches : Object.values(branches);
     if (!list.length) return;
@@ -15,12 +37,13 @@ export const saveCachedBranches = (branches) => {
     list.forEach((b) => {
       if (!b) return;
       const code = b.branchCode ?? b.bcode ?? b.branch_ID;
-      const name = b.branchName ?? b.brancH_NAME ?? b.branch_name;
+      const rawName = b.branchName ?? b.brancH_NAME ?? b.branch_name;
+      const name = cleanBranchName(rawName);
       if (code != null && name) {
         existing[String(code)] = String(name).trim();
       }
     });
-    localStorage.setItem(BRANCHES_CACHE_KEY, JSON.stringify(existing));
+    window.localStorage.setItem(BRANCHES_CACHE_KEY, JSON.stringify(existing));
   } catch (e) {
     console.error("Error saving cached branches to localStorage:", e);
   }
@@ -30,9 +53,16 @@ export const saveCachedBranches = (branches) => {
  * Retrieves the cached branch map { [branchCode]: branchName } from localStorage.
  */
 export const getCachedBranchesMap = () => {
+  if (!isLocalStorageAvailable()) return {};
   try {
-    const data = localStorage.getItem(BRANCHES_CACHE_KEY);
-    return data ? JSON.parse(data) : {};
+    const data = window.localStorage.getItem(BRANCHES_CACHE_KEY);
+    if (!data) return {};
+    const parsed = JSON.parse(data);
+    const cleaned = {};
+    for (const [k, v] of Object.entries(parsed)) {
+      cleaned[k] = cleanBranchName(v);
+    }
+    return cleaned;
   } catch (e) {
     return {};
   }
@@ -44,19 +74,19 @@ export const getCachedBranchesMap = () => {
 export const getCachedBranchName = (branchCode) => {
   if (branchCode == null) return "";
   const map = getCachedBranchesMap();
-  return map[String(branchCode)] || "";
+  return cleanBranchName(map[String(branchCode)] || "");
 };
 
 /**
  * Saves the active/selected branch code for a specific section (e.g., 'sales', 'stock', 'purchase').
  */
 export const saveActiveBranch = (section, branchCode) => {
-  if (!section) return;
+  if (!section || !isLocalStorageAvailable()) return;
   try {
     if (branchCode == null) {
-      localStorage.removeItem(`${ACTIVE_BRANCH_PREFIX}${section}`);
+      window.localStorage.removeItem(`${ACTIVE_BRANCH_PREFIX}${section}`);
     } else {
-      localStorage.setItem(`${ACTIVE_BRANCH_PREFIX}${section}`, String(branchCode));
+      window.localStorage.setItem(`${ACTIVE_BRANCH_PREFIX}${section}`, String(branchCode));
     }
   } catch (e) {
     console.error("Error saving active branch to localStorage:", e);
@@ -67,9 +97,9 @@ export const saveActiveBranch = (section, branchCode) => {
  * Gets the active/selected branch code for a specific section from localStorage.
  */
 export const getActiveBranch = (section) => {
-  if (!section) return null;
+  if (!section || !isLocalStorageAvailable()) return null;
   try {
-    const val = localStorage.getItem(`${ACTIVE_BRANCH_PREFIX}${section}`);
+    const val = window.localStorage.getItem(`${ACTIVE_BRANCH_PREFIX}${section}`);
     return val ? Number(val) : null;
   } catch (e) {
     return null;
@@ -92,8 +122,9 @@ export const resolveBranchName = (branchCode, branchesList = [], fallbackList = 
     const match = branchesList.find(
       (b) => Number(b?.branchCode ?? b?.bcode ?? b?.branch_ID) === codeNum
     );
-    const name = match?.branchName ?? match?.brancH_NAME ?? match?.branch_name;
-    if (name) {
+    const rawName = match?.branchName ?? match?.brancH_NAME ?? match?.branch_name;
+    if (rawName) {
+      const name = cleanBranchName(rawName);
       // Refresh cache
       saveCachedBranches([{ branchCode: codeNum, branchName: name }]);
       return name;
@@ -105,8 +136,9 @@ export const resolveBranchName = (branchCode, branchesList = [], fallbackList = 
     const match = fallbackList.find(
       (item) => Number(item?.branch_ID ?? item?.branchcode ?? item?.branchCode) === codeNum
     );
-    const name = match?.brancch_Name ?? match?.branch_name ?? match?.branchName;
-    if (name) {
+    const rawName = match?.brancch_Name ?? match?.branch_name ?? match?.branchName;
+    if (rawName) {
+      const name = cleanBranchName(rawName);
       // Refresh cache
       saveCachedBranches([{ branchCode: codeNum, branchName: name }]);
       return name;
@@ -116,7 +148,7 @@ export const resolveBranchName = (branchCode, branchesList = [], fallbackList = 
   // 3. Persistent LocalStorage cache
   const cached = getCachedBranchName(codeNum);
   if (cached) {
-    return cached;
+    return cleanBranchName(cached);
   }
 
   return `Branch ${codeNum}`;

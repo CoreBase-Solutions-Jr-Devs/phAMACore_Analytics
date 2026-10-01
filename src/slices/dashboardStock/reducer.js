@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
-import { saveCachedBranches } from "../../helpers/branch_helper";
+import { saveCachedBranches, cleanBranchName } from "../../helpers/branch_helper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
@@ -260,8 +260,8 @@ const StockInventorySlice = createSlice({
 
         const branchList = action.payload?.result || action.payload || [];
         state.branches = branchList.map((branch) => ({
-          branchCode: branch.bcode,
-          branchName: branch.brancH_NAME,
+          branchCode: branch.bcode ?? branch.branchCode ?? branch.branch_ID,
+          branchName: cleanBranchName(branch.brancH_NAME ?? branch.branchName ?? branch.branch_name),
         }));
         saveCachedBranches(state.branches);
       })

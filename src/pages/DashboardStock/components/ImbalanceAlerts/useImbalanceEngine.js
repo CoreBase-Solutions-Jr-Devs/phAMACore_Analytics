@@ -8,6 +8,8 @@
  * 3. Near-expiry stock promotions (Batches expiring soon needing urgent promotion)
  */
 
+import { cleanBranchName } from "../../../../helpers/branch_helper";
+
 export const useImbalanceEngine = (stock = [], movements = [], expiry = []) => {
     if (!Array.isArray(stock) || !stock.length) {
         return [];
@@ -23,11 +25,12 @@ export const useImbalanceEngine = (stock = [], movements = [], expiry = []) => {
 
         const itemName =
             row.item_Name || row.item_name || row.invName || row.name || itemCode;
-        const branchName =
+        const rawBranchName =
             row.branch_Name ||
             row.branch_name ||
             row.branchName ||
             (row.branch_id ? `Branch ${row.branch_id}` : "Main Branch");
+        const branchName = cleanBranchName(rawBranchName);
 
         const qty = Number(
             row.closing_qty ??

@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { ListGroup, ListGroupItem, Spinner } from "reactstrap";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { cleanBranchName } from "../../../helpers/branch_helper";
 
 const SlowMovingStock = ({
     items,
@@ -56,7 +57,7 @@ const SlowMovingStock = ({
                 unitsSold: item.units_sold_window !== undefined ? Number(item.units_sold_window) : (item.totalQty ?? 0),
                 currentStock: item.current_stock_qty !== undefined ? Number(item.current_stock_qty) : undefined,
                 tiedUpCapital: item.tied_up_capital !== undefined ? Number(item.tied_up_capital) : undefined,
-                branchName: item.branch_name,
+                branchName: cleanBranchName(item.branch_name || item.branchName),
                 daysSince: item.daysSince !== undefined ? item.daysSince : null,
                 actionInsight: item.action_insight,
             };

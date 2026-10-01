@@ -23,7 +23,7 @@ import {
     fetchStockMovements
 } from '../../slices/dashboardStock/thunk';
 import { setBranch } from '../../slices/dashboardStock/reducer';
-import { resolveBranchName, saveActiveBranch } from '../../helpers/branch_helper';
+import { resolveBranchName, saveActiveBranch, cleanBranchName } from '../../helpers/branch_helper';
 
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
@@ -50,7 +50,7 @@ const DashboardStock = () => {
     const { stockMovements = [], dailyClosingStock = [], batchExpiryNeo = [], branches = [], filters } = useSelector((state) => state.StockInventory);
 
     const branchDisplayName = isBranchView
-        ? resolveBranchName(branchCode, branches, stockMovements)
+        ? cleanBranchName(resolveBranchName(branchCode, branches, stockMovements))
         : "";
 
     const [rightColumn, setRightColumn] = useState(false);

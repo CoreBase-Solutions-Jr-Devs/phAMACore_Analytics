@@ -5,7 +5,7 @@ import { Card, CardBody, Col, Row } from "reactstrap";
 import { useSelector } from "react-redux";
 import { computeKPIs, getKPIMeta } from "../utils/StockInventoryUtils";
 import { useImbalanceEngine } from "./components/ImbalanceAlerts/useImbalanceEngine";
-import { resolveBranchName } from "../../helpers/branch_helper";
+import { resolveBranchName, cleanBranchName } from "../../helpers/branch_helper";
 
 
 const KPI_ICON_MAP = {
@@ -32,7 +32,7 @@ const WidgetsOne = ({ branchMap = {} }) => {
 
     const isBranchView = Boolean(branch && branch !== "All Branches");
     const branchDisplayName = isBranchView
-        ? (branchMap?.[branch] || resolveBranchName(branch, branches, stockMovements) || `Branch ${branch}`)
+        ? cleanBranchName(branchMap?.[branch] || resolveBranchName(branch, branches, stockMovements) || `Branch ${branch}`)
         : "All Branches";
 
     const alerts = useMemo(

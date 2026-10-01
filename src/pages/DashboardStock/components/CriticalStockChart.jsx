@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Spinner } from "reactstrap";
 import BarChartOne from "../Charts/Custom/BarChartOne";
 import Pagination from "../../../Components/Common/Pagination";
+import { cleanBranchName } from "../../../helpers/branch_helper";
 
 const ITEMS_PER_PAGE = 15;
 
@@ -59,7 +60,7 @@ const CriticalStockChart = () => {
                 (Number(item.days_of_inventory ?? 0) <= 6
                     ? "CRITICAL"
                     : "REORDER"),
-            branch: item.branch_name,
+            branch: cleanBranchName(item.branch_name || item.branchName),
             insight: item.action_insight,
         }));
 

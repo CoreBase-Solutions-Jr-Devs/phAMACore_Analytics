@@ -11,6 +11,8 @@
  * }
  */
 
+import { cleanBranchName } from '../../../../../helpers/branch_helper';
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
@@ -130,7 +132,8 @@ export function transformStockValueByBranch(stockRows) {
 
     const branchMap = {};
     stockRows.forEach((row) => {
-        const branch = row.branch_Name || `Branch ${row.branch_id}`;
+        const rawBranch = row.branch_Name || `Branch ${row.branch_id}`;
+        const branch = cleanBranchName(rawBranch);
         if (!branchMap[branch]) branchMap[branch] = 0;
         branchMap[branch] += row.closing_value || 0;
     });
@@ -170,7 +173,8 @@ export function transformBranchCoverageRatio(stockRows, periodDays) {
 
     const branchMap = {};
     stockRows.forEach((row) => {
-        const branch = row.branch_Name || `Branch ${row.branch_id}`;
+        const rawBranch = row.branch_Name || `Branch ${row.branch_id}`;
+        const branch = cleanBranchName(rawBranch);
         if (!branchMap[branch]) branchMap[branch] = { closing_qty: 0, qty_sold: 0 };
         branchMap[branch].closing_qty += row.closing_qty || 0;
         branchMap[branch].qty_sold    += row.qty_sold    || 0;
@@ -222,7 +226,8 @@ export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], pe
     (salesRows || []).forEach((row) => {
         if (!row) return;
         const id = row.branch_id != null ? String(row.branch_id) : null;
-        const name = (row.branch_name || row.branchName || "").toUpperCase().trim();
+        const rawName = row.branch_name || row.branchName || "";
+        const name = cleanBranchName(rawName).toUpperCase().trim();
         const salesVal = Number(row.net_sales_incl ?? row.net_sales_excl ?? row.cash_sales_excl ?? 0);
 
         if (id) salesMap.set(id, salesVal);
@@ -235,7 +240,8 @@ export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], pe
     (stockRows || []).forEach((row) => {
         if (!row) return;
         const id = row.branch_id != null ? String(row.branch_id) : `gen_${Math.random()}`;
-        const name = row.branch_name || row.branchName || `Branch ${id}`;
+        const rawName = row.branch_name || row.branchName || `Branch ${id}`;
+        const name = cleanBranchName(rawName);
         const rawStock = Number(row.total_stock_value ?? row.closing_value ?? 0);
 
         branchEntries.set(id, {
@@ -250,7 +256,8 @@ export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], pe
     (salesRows || []).forEach((row) => {
         if (!row) return;
         const id = row.branch_id != null ? String(row.branch_id) : null;
-        const name = row.branch_name || row.branchName || (id ? `Branch ${id}` : "Unknown");
+        const rawName = row.branch_name || row.branchName || (id ? `Branch ${id}` : "Unknown");
+        const name = cleanBranchName(rawName);
         if (id && !branchEntries.has(id)) {
             branchEntries.set(id, {
                 id,

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Alert, Input } from "reactstrap";
 import TableContainer from "../../../../Components/Common/TableContainerReactTable";
 import { useSelector } from "react-redux";
+import { cleanBranchName } from "../../../../helpers/branch_helper";
 
 const CustomTableOne = () => {
     const { batchExpiryNeo, loadingBatchExpiryNeo, errorBatchExpiryNeo } = useSelector(
@@ -62,7 +63,7 @@ const CustomTableOne = () => {
 
                 return {
                     product: item.invName,
-                    branch: item.branchName,
+                    branch: cleanBranchName(item.branchName || item.branch_name),
                     date: expiryDate
                         ? new Date(expiryDate).toLocaleDateString()
                         : "-",
