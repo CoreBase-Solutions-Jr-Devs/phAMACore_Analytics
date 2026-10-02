@@ -16,6 +16,8 @@ export const getNDaysAgoApi = (n) => {
     return formatToApiDate(d);
 };
 
+import { cleanBranchName } from "../../helpers/branch_helper";
+
 // KPI CARD METADATA
 
 export const KPI_META = [
@@ -33,12 +35,13 @@ export const KPI_META = [
  * Returns dynamic KPI metadata tailored to current branch filter context
  */
 export const getKPIMeta = ({ branchName = "All Branches", isBranchView = false, healthObj = null } = {}) => {
+    const cleanName = cleanBranchName(branchName);
     return KPI_META.map((widget) => {
         if (widget.id === 1) {
             const stockedCount = healthObj?.stocked_skus;
             const branchSub = stockedCount !== undefined && stockedCount !== null
-                ? `Branch: ${branchName} (${stockedCount} stocked)`
-                : `Branch: ${branchName}`;
+                ? `Branch: ${cleanName} (${stockedCount} stocked)`
+                : `Branch: ${cleanName}`;
             return {
                 ...widget,
                 subtitle: isBranchView ? branchSub : "Across all branches",
@@ -47,7 +50,7 @@ export const getKPIMeta = ({ branchName = "All Branches", isBranchView = false, 
         if (widget.id === 2) {
             return {
                 ...widget,
-                subtitle: isBranchView ? `KES - ${branchName}` : "KES - all branches",
+                subtitle: isBranchView ? `KES - ${cleanName}` : "KES - all branches",
             };
         }
         return widget;

@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Spinner } from "reactstrap";
 import { getKPIStockHealth } from "../../helpers/fakebackend_helper";
 import { formatNumber } from "../utils/formatHelper";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 const formatDMY = (date) => {
   const d = String(date.getDate()).padStart(2, "0");
@@ -34,6 +37,10 @@ const StockMovements = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { filters = {} } = useSelector(
+    (state) => state.DashboardMyBusiness || state.MyBusiness || {}
+  );
+
   useEffect(() => {
     let isMounted = true;
 
@@ -46,9 +53,10 @@ const StockMovements = () => {
 
         const response = await getKPIStockHealth({
           clientid: 1,
-          AsOfDate: todayFormatted,
+          AsOfDate: filters.endDate || todayFormatted,
           GroupBy: "CRITICAL_STOCKOUTS",
           TopN: 30,
+          branchcode: filters.branch ?? null,
         });
 
         let data = response?.data ?? response;
@@ -85,17 +93,38 @@ const StockMovements = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [filters.branch, filters.endDate]);
+
+  const handleExportExcel = () => {
+    const rows = (stockAlerts || []).map((item) => ({
+      Product: item.item_name || item.item_code || "",
+      Category: item.item_group || "-",
+      Stock: Number(item.current_stock_qty || 0).toLocaleString(),
+      "Min Reorder": Number(item.branch_min_qty || 0).toLocaleString(),
+      "Monthly Demand": Number(item.monthly_demand || 0).toLocaleString(),
+      Branch: item.branch_name || "-",
+      Status: item.stockout_risk_status || "Unknown",
+    }));
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Stock_Alerts_Movements_${todayStr}`);
+  };
 
   return (
-    <Card className="card-height-100">
-      <CardHeader className="align-items-center d-flex">
-        <h4 className="card-title mb-0 flex-grow-1">
+    <Card className="card-height-100" id="stock-movements-card">
+      <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
+        <h4 className="card-title mb-0">
           Stock Alerts & Movement Tracking
         </h4>
-        <span className="badge bg-danger-subtle text-danger">
-          Top 30 Critical Stockouts
-        </span>
+        <div className="d-flex align-items-center gap-2">
+          <span className="badge bg-danger-subtle text-danger">
+            Top 30 Critical Stockouts
+          </span>
+          <CardExportButtons
+            onExport={handleExportExcel}
+            targetId="stock-movements-card"
+            title="Stock Alerts & Movements"
+          />
+        </div>
       </CardHeader>
 
       <CardBody>

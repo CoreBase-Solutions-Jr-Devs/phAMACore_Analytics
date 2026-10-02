@@ -2,6 +2,7 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import ReactApexChart from "react-apexcharts";
 import { Spinner } from "reactstrap";
+import { cleanBranchName } from "../../../../helpers/branch_helper";
 
 const BRANCH_COLORS = { MAIN: "#405189", CENTRAL: "#4b9fd4", WESTLANDS: "#0ab39c", "WESTLANDS BRANCH": "#0ab39c", WAREHOUSE: "#299cdb", MOMBASA: "#2a9d8f", "MOMBASA BRANCH": "#2a9d8f", KAKAMEGA: "#e76f51", "KAKAMEGA BRANCH": "#e76f51", WAJIR: "#f4a261", "WAJIR BRANCH": "#f4a261", KAMPALA: "#8e44ad", "KAMPALA BRANCH": "#8e44ad", THIKA: "#f7b84b", "THIKA BRANCH": "#f7b84b", TESTING: "#556ee6", "TEST BRANCH": "#34c38f" };
 
@@ -36,9 +37,10 @@ const BarChartTwo = () => {
 
         const sorted = [...totalStockValueByBranch]
             .map((item) => {
-                const branch =
+                const rawBranch =
                     item.branch_name || item.branchName ||
                     `Branch ${item.branch_id ?? ""}`;
+                const branch = cleanBranchName(rawBranch);
                 const rawValue = Number(item.total_stock_value || 0);
                 return {
                     branch,

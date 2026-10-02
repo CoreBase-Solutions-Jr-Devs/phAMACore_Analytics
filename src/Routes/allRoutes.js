@@ -63,6 +63,7 @@ import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardMyBusiness /> },
+  { path: "/dashboard/branch/:branchId", component: <DashboardMyBusiness /> },
     // { path: "/index", component: <DashboardMyBusiness /> },
   { path: "/dashboard-sales", component: <DashboardSales /> },
   { path: "/dashboard-sales/branch/:branchId", component: <DashboardSales /> },

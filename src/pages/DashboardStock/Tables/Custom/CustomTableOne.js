@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Alert, Input } from "reactstrap";
 import TableContainer from "../../../../Components/Common/TableContainerReactTable";
 import { useSelector } from "react-redux";
+import { cleanBranchName } from "../../../../helpers/branch_helper";
+import { exportToExcel } from "../../../../helpers/export_helper";
 
 const CustomTableOne = () => {
     const { batchExpiryNeo, loadingBatchExpiryNeo, errorBatchExpiryNeo } = useSelector(
@@ -62,7 +64,7 @@ const CustomTableOne = () => {
 
                 return {
                     product: item.invName,
-                    branch: item.branchName,
+                    branch: cleanBranchName(item.branchName || item.branch_name),
                     date: expiryDate
                         ? new Date(expiryDate).toLocaleDateString()
                         : "-",
@@ -176,26 +178,51 @@ const CustomTableOne = () => {
         );
     }
 
+    const handleExportTable = () => {
+        const rows = (filteredTable || []).map((r) => ({
+            "Product": r.product,
+            "Branch": r.branch,
+            "Expiry Date": r.date,
+            "Qty Balance": r.total,
+            "Action": r.status,
+            "Cost Value (KES)": r.value,
+        }));
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `ExpiryWatch_Stock_${todayStr}`);
+    };
+
     return (
         <React.Fragment>
-            <div className="app-search d-block p-0 mb-2">
-                <div className="position-relative">
-                    <Input
-                        type="text"
-                        className="form-control"
-                        placeholder="Search Products..."
-                        id="table-search-options"
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                    />
-                    <span className="mdi mdi-magnify search-widget-icon"></span>
-                    <span
-                        className={`mdi mdi-close-circle search-widget-icon search-widget-icon-close ${searchValue ? "" : "d-none"}`}
-                        id="table-search-close-options"
-                        role="button"
-                        onClick={() => setSearchValue("")}
-                    ></span>
+            <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <div className="app-search d-block p-0 flex-grow-1" style={{ maxWidth: "320px" }}>
+                    <div className="position-relative">
+                        <Input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search Products..."
+                            id="table-search-options"
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                        />
+                        <span className="mdi mdi-magnify search-widget-icon"></span>
+                        <span
+                            className={`mdi mdi-close-circle search-widget-icon search-widget-icon-close ${searchValue ? "" : "d-none"}`}
+                            id="table-search-close-options"
+                            role="button"
+                            onClick={() => setSearchValue("")}
+                        ></span>
+                    </div>
                 </div>
+
+                <button
+                    type="button"
+                    className="btn btn-sm btn-soft-success d-flex align-items-center gap-1 no-print"
+                    onClick={handleExportTable}
+                    title="Export this table to Excel"
+                >
+                    <i className="ri-file-excel-2-line align-middle"></i>
+                    <span>Export Table</span>
+                </button>
             </div>
 
             <TableContainer

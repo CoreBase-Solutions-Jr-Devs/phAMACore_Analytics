@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Spinner } from "reactstrap";
 import { getAccountBalance } from "../../helpers/fakebackend_helper";
 import { formatCompact, formatCurrency } from "../utils/formatHelper";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 // Helper to format Date objects to DD/MM/YYYY
 const formatDMY = (date) => {
@@ -73,6 +76,10 @@ const ReceivablesAgeing = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { filters = {} } = useSelector(
+    (state) => state.DashboardMyBusiness || state.MyBusiness || {}
+  );
+
   useEffect(() => {
     let isMounted = true;
 
@@ -92,8 +99,9 @@ const ReceivablesAgeing = () => {
           Mode: "AGING",
           AccountType: "CUSTOMER",
           IncludeZeroBal: "false",
-          DateFrom: dateFrom,
-          DateTo: dateTo,
+          DateFrom: filters.startDate || dateFrom,
+          DateTo: filters.endDate || dateTo,
+          branchcode: filters.branch ?? 0,
         });
 
         let data = response?.data ?? response;
@@ -147,15 +155,37 @@ const ReceivablesAgeing = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [filters.branch, filters.startDate, filters.endDate]);
+
+  const handleExportExcel = () => {
+    const rows = (receivables || []).map((r) => ({
+      "Customer Code": r.customerCode || "",
+      "Customer": r.customer || "",
+      "Last Invoiced": r.lastInvoiceDate || "-",
+      "Last Payment": r.lastPaymentDate || "-",
+      "Days Bracket": r.days || "",
+      "Balance (KES)": Number(r.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      "Aging Status": r.status || "",
+      "Risk": r.risk || "",
+    }));
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Receivables_Ageing_${todayStr}`);
+  };
 
   return (
-    <Card className="card-height-100">
-      <CardHeader className="align-items-center d-flex">
-        <h4 className="card-title mb-0 flex-grow-1">
+    <Card className="card-height-100" id="receivables-ageing-card">
+      <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
+        <h4 className="card-title mb-0">
           Receivables / Debtors (Cash Risk Table)
         </h4>
-        <span className="badge bg-light text-muted">YTD Aging</span>
+        <div className="d-flex align-items-center gap-2">
+          <span className="badge bg-light text-muted">YTD Aging</span>
+          <CardExportButtons
+            onExport={handleExportExcel}
+            targetId="receivables-ageing-card"
+            title="Receivables Ageing"
+          />
+        </div>
       </CardHeader>
 
       <CardBody>

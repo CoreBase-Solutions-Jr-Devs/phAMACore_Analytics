@@ -4,7 +4,7 @@ import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
 
 import { setBranch, setDateRange, setStartDate, setEndDate } from "../../slices/dashboardStock/reducer";
-import { getCachedBranchesMap } from "../../helpers/branch_helper";
+import { getCachedBranchesMap, cleanBranchName } from "../../helpers/branch_helper";
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
@@ -17,12 +17,15 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
     const branches = useMemo(() => {
         if (reduxBranches && reduxBranches.length > 0) {
-            return reduxBranches;
+            return reduxBranches.map((b) => ({
+                ...b,
+                branchName: cleanBranchName(b.branchName),
+            }));
         }
         const cachedMap = getCachedBranchesMap();
         return Object.entries(cachedMap).map(([k, v]) => ({
             branchCode: Number(k),
-            branchName: v,
+            branchName: cleanBranchName(v),
         }));
     }, [reduxBranches]);
 
