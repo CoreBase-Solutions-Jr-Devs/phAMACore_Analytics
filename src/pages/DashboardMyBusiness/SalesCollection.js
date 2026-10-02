@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Spinner } from "reactstrap";
 import { SalesCollectionCharts } from "./DashboardMyBusinessCharts";
 import {
@@ -59,6 +60,10 @@ const SalesCollection = () => {
     { name: "Sales Volume", type: "line", data: [] },
   ]);
 
+  const { filters = {} } = useSelector(
+    (state) => state.DashboardMyBusiness || state.MyBusiness || {}
+  );
+
   const today = new Date();
   const currentMonthIdx = today.getMonth(); // 0-based
   const categories = monthNames.slice(0, currentMonthIdx + 1);
@@ -72,6 +77,7 @@ const SalesCollection = () => {
         setError(null);
 
         const currentYear = today.getFullYear();
+        const branchCode = filters.branch ?? 0;
 
         // Construct exact month start and end boundaries
         const monthlyWindows = [];
@@ -93,13 +99,14 @@ const SalesCollection = () => {
               clientid: 1,
               StartDate: startDate,
               EndDate: endDate,
-              branchcode: 0,
+              branchcode: branchCode,
               GroupBy: "SUMMARY",
             }),
             getCashbookSummary({
               clientid: 1,
               StartDate: startDate,
               EndDate: endDate,
+              branchcode: branchCode,
               GroupBy: "SUMMARY",
             }),
           ]);
@@ -175,7 +182,7 @@ const SalesCollection = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [currentMonthIdx, filters.branch]);
 
   return (
     <React.Fragment>

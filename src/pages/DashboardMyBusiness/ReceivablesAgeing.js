@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Spinner } from "reactstrap";
 import { getAccountBalance } from "../../helpers/fakebackend_helper";
 import { formatCompact, formatCurrency } from "../utils/formatHelper";
@@ -73,6 +74,10 @@ const ReceivablesAgeing = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { filters = {} } = useSelector(
+    (state) => state.DashboardMyBusiness || state.MyBusiness || {}
+  );
+
   useEffect(() => {
     let isMounted = true;
 
@@ -92,8 +97,9 @@ const ReceivablesAgeing = () => {
           Mode: "AGING",
           AccountType: "CUSTOMER",
           IncludeZeroBal: "false",
-          DateFrom: dateFrom,
-          DateTo: dateTo,
+          DateFrom: filters.startDate || dateFrom,
+          DateTo: filters.endDate || dateTo,
+          branchcode: filters.branch ?? 0,
         });
 
         let data = response?.data ?? response;
@@ -147,7 +153,7 @@ const ReceivablesAgeing = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [filters.branch, filters.startDate, filters.endDate]);
 
   return (
     <Card className="card-height-100">

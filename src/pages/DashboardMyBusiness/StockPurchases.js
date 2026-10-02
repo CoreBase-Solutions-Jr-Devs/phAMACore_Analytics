@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Spinner } from "reactstrap";
 import { StockPurchasesCharts } from "./DashboardMyBusinessCharts";
 import {
@@ -39,6 +40,10 @@ const monthNames = [
 const StockPurchases = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { filters = {} } = useSelector(
+    (state) => state.DashboardMyBusiness || state.MyBusiness || {}
+  );
   
   const today = new Date();
   const currentMonthIdx = today.getMonth(); // 0-indexed (Jan = 0)
@@ -69,10 +74,12 @@ const StockPurchases = () => {
             AccountType: "SUPPLIER",
             DateFrom: dateFrom,
             DateTo: dateTo,
+            branchcode: filters.branch ?? 0,
           }),
           getKPITotalStockValueByBranch({
             clientid: 1,
             whichcost: 1,
+            branchcode: filters.branch ?? null,
           }),
         ]);
 
@@ -180,7 +187,7 @@ const StockPurchases = () => {
     return () => {
       isMounted = false;
     };
-  }, [currentMonthIdx]);
+  }, [currentMonthIdx, filters.branch]);
 
   return (
     <Card className="card-height-100">

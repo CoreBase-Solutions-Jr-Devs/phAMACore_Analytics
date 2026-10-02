@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Spinner } from "reactstrap";
 import { getKPIStockHealth } from "../../helpers/fakebackend_helper";
 import { formatNumber } from "../utils/formatHelper";
@@ -34,6 +35,10 @@ const StockMovements = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { filters = {} } = useSelector(
+    (state) => state.DashboardMyBusiness || state.MyBusiness || {}
+  );
+
   useEffect(() => {
     let isMounted = true;
 
@@ -46,9 +51,10 @@ const StockMovements = () => {
 
         const response = await getKPIStockHealth({
           clientid: 1,
-          AsOfDate: todayFormatted,
+          AsOfDate: filters.endDate || todayFormatted,
           GroupBy: "CRITICAL_STOCKOUTS",
           TopN: 30,
+          branchcode: filters.branch ?? null,
         });
 
         let data = response?.data ?? response;
@@ -85,7 +91,7 @@ const StockMovements = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [filters.branch, filters.endDate]);
 
   return (
     <Card className="card-height-100">

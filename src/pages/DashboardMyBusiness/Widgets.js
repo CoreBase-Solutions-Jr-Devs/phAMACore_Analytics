@@ -326,7 +326,7 @@ const calculateAccountBalance = (data) => {
 };
 
 
-export default function Widgets() {
+export default function Widgets({ onKpiComputed }) {
     const dispatch = useDispatch();
 
     /*
@@ -363,6 +363,7 @@ export default function Widgets() {
         const ytd = getYearToDateApi();
         const startDate = filters?.startDate || ytd.startDate;
         const endDate = filters?.endDate || ytd.endDate;
+        const branchCode = filters?.branch ?? null;
 
         // 1. Income Statement KPI (Sales and Stock Profit)
         dispatch(
@@ -371,6 +372,7 @@ export default function Widgets() {
                 GroupBy: "SUMMARY",
                 StartDate: startDate,
                 EndDate: endDate,
+                branchcode: branchCode,
             })
         );
 
@@ -381,9 +383,10 @@ export default function Widgets() {
                 GroupBy: "SUMMARY",
                 StartDate: startDate,
                 EndDate: endDate,
+                branchcode: branchCode,
             })
         );
-    }, [dispatch, filters?.startDate, filters?.endDate]);
+    }, [dispatch, filters?.startDate, filters?.endDate, filters?.branch]);
 
 
     /**
@@ -400,7 +403,7 @@ export default function Widgets() {
                         clientid: 1,
                         Mode: "SUMMARY",
                         AccountType: "CUSTOMER",
-                        branchcode: 0,
+                        branchcode: filters?.branch ?? 0,
                         IncludeZeroBal: false,
                     })
                 );
@@ -423,7 +426,7 @@ export default function Widgets() {
                         clientid: 1,
                         Mode: "SUMMARY",
                         AccountType: "SUPPLIER",
-                        branchcode: 0,
+                        branchcode: filters?.branch ?? 0,
                         IncludeZeroBal: false,
                     })
                 );
@@ -449,7 +452,7 @@ export default function Widgets() {
         };
 
         fetchAccountBalances();
-    }, [dispatch]);
+    }, [dispatch, filters?.branch]);
 
 
     const salesValue = useMemo(() => {
@@ -496,6 +499,27 @@ export default function Widgets() {
     const payablesValue = useMemo(() => {
         return calculateAccountBalance(supplierAccountBalances);
     }, [supplierAccountBalances]);
+
+    useEffect(() => {
+        if (typeof onKpiComputed === "function") {
+            onKpiComputed({
+                receivables: receivablesValue,
+                payables: payablesValue,
+                sales: salesValue,
+                cashAvailable: cashAvailableValue,
+                stockProfit: incomeStatementValue,
+                collections: collectionsValue,
+            });
+        }
+    }, [
+        onKpiComputed,
+        receivablesValue,
+        payablesValue,
+        salesValue,
+        cashAvailableValue,
+        incomeStatementValue,
+        collectionsValue,
+    ]);
 
 
     const kpis = [
@@ -572,12 +596,6 @@ export default function Widgets() {
 
     return (
         <React.Fragment>
-            <div className="d-flex align-items-center justify-content-between flex-wrap mb-3">
-                <h4 className="card-title mb-0">
-                    KEY METRICS
-                </h4>
-            </div>
-
             <Row className="g-2 mb-2">
                 {kpis.map((item, index) => (
                     <Col
