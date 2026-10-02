@@ -28,7 +28,7 @@ import { resolveBranchName, saveActiveBranch, cleanBranchName } from '../../help
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
 import ImbalanceAlerts from './components/ImbalanceAlerts';
-
+import Section from './Section';
 import FilterActions from './FilterActions';
 
 const DashboardStock = () => {
@@ -147,36 +147,7 @@ const DashboardStock = () => {
                         subtitle={isBranchView ? branchDisplayName : undefined}
                     />
 
-                    <div className="d-flex align-items-center justify-content-between flex-wrap mb-3">
-
-                        <h4 className="card-title mb-0">
-                            KEY METRICS
-                        </h4>
-
-                        <div className="d-flex align-items-center gap-2 flex-wrap">
-                            {isBranchView && branchDisplayName && (
-                                <>
-                                    <span>Branch:</span>
-                                    <strong className="text-primary">{branchDisplayName}</strong>
-                                    <span className="mx-1 text-muted">|</span>
-                                </>
-                            )}
-                            <span>Filtered From:</span>
-                            <strong>{formatDisplay(filters.startDate)}</strong>
-                            <span>to</span>
-                            <strong>{formatDisplay(filters.endDate)}</strong>
-                        </div>
-
-                        <button
-                            type="button"
-                            className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-                            onClick={toggleRightColumn}
-                        >
-                            <i className="ri-filter-fill"></i>
-                            Filter
-                        </button>
-
-                    </div>
+                    <Section rightClickBtn={toggleRightColumn} />
 
                     <Row>
                         <Col xl={12}>
