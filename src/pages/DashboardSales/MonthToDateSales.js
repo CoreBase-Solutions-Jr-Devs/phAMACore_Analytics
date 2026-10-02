@@ -18,21 +18,40 @@ import { getMarketChartsDatas } from "../../slices/thunks";
 import { MonthToDateSalesChart } from "./DashboardAnalyticsCharts";
 import { Link } from "react-router-dom";
 import { createSelector } from "reselect";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 const MonthToDateSales = ({ series, categories, formatAmount }) => {
+  const handleExportExcel = () => {
+    const rows = (categories || []).map((cat, idx) => {
+      const row = { Day: cat };
+      (series || []).forEach((s) => {
+        row[s.name || "Value"] = Number(s.data?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+      });
+      return row;
+    });
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Month_To_Date_Sales_${todayStr}`);
+  };
+
   return (
     <React.Fragment>
       <Row>
         <Col xxl={12}>
-          <Card>
+          <Card id="sales-mtd-card">
             <CardBody className="p-0">
               <Row>
                 <Col xxl={12}>
                   <div className="">
-                    <CardHeader className="border-0 align-items-center d-flex">
+                    <CardHeader className="border-0 align-items-center d-flex justify-content-between flex-wrap gap-2">
   <h4 className="card-title mb-0 flex-grow-1">
     Month To Date Sales Comparative Graph (MTD)
   </h4>
+  <CardExportButtons
+    targetId="sales-mtd-card"
+    title="Month To Date Sales"
+    onExport={handleExportExcel}
+  />
 </CardHeader>
 
 <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2">

@@ -1,18 +1,34 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 import { salesmanRevenue } from "../../common/data/dashboardEcommerce";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 const SalesmanRevenue = ({ data = [], formatAmount  }) => {
   const sorted = [...data].sort((a, b) => b.revenue - a.revenue).slice(0, 10);
 
+  const handleExportExcel = () => {
+    const rows = (data || []).map((item) => ({
+      "Rep / Salesman": item.rep || "",
+      Branch: item.branch || "",
+      "Revenue (KES)": Number(item.revenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+    }));
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Top_Salesman_Revenue_${todayStr}`);
+  };
+
   return (
     <React.Fragment>
-      <Card className="card-height-100">
-        <CardHeader className="align-items-center d-flex">
+      <Card className="card-height-100" id="sales-salesman-revenue-card">
+        <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
           <h4 className="card-title mb-0 flex-grow-1">
             Top Salesman — revenue (KES)
-        
           </h4>
+          <CardExportButtons
+            targetId="sales-salesman-revenue-card"
+            title="Top Salesman Revenue"
+            onExport={handleExportExcel}
+          />
         </CardHeader>
 
         <CardBody>

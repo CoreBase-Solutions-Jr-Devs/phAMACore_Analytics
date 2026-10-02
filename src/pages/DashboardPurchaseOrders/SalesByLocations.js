@@ -1,5 +1,7 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 const getColor = (percent) => {
   if (percent >= 75) return "bg-success";
@@ -22,16 +24,27 @@ const SalesByLocations = ({
     ? [...data].sort((a, b) => b.value - a.value)[0]
     : null;
 
-  console.log("Category data:", data);
-  console.log("Category total:", categoryTotal);
+  const handleExportExcel = () => {
+    const rows = (data || []).map((item) => ({
+      Category: item.name || "",
+      "Spend (KES)": Number(item.value || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+    }));
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Spend_By_Category_${todayStr}`);
+  };
 
   return (
      <React.Fragment>
-        <Card className="card-height-100">
-      <CardHeader className="align-items-center d-flex">
+        <Card className="card-height-100" id="purchases-category-spend-card">
+      <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
         <h4 className="card-title mb-0 flex-grow-1">
           Spend by Category
         </h4>
+        <CardExportButtons
+          targetId="purchases-category-spend-card"
+          title="Spend by Category"
+          onExport={handleExportExcel}
+        />
       </CardHeader>
 
        <CardBody >        {data.length === 0 ? (

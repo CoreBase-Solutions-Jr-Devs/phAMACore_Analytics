@@ -1,5 +1,7 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 const BottomProducts = ({ data = [], }) => {
  
@@ -7,13 +9,26 @@ const BottomProducts = ({ data = [], }) => {
     ? [...data].sort((a, b) => a.qty - b.qty)[0]
     : null;
    
+  const handleExportExcel = () => {
+    const rows = (data || []).map((item) => ({
+      Product: item.name || "",
+      "Units Sold": Number(item.qty || 0).toLocaleString(),
+    }));
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Bottom_Products_Units_Sold_${todayStr}`);
+  };
+
   return (
-    <Card className="card-height-100">
-      <CardHeader className="align-items-center d-flex">
+    <Card className="card-height-100" id="sales-bottom-products-card">
+      <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
         <h4 className="card-title mb-0 flex-grow-1">
         Bottom Products - Units Sold   
-           </h4>
-
+        </h4>
+        <CardExportButtons
+          targetId="sales-bottom-products-card"
+          title="Bottom Products"
+          onExport={handleExportExcel}
+        />
       </CardHeader>
 
       <CardBody>

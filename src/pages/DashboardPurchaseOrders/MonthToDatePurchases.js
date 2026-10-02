@@ -5,50 +5,32 @@ import CountUp from "react-countup";
 import { useSelector, useDispatch } from "react-redux";
 import { getRevenueChartsData } from "../../slices/thunks";
 import { createSelector } from "reselect";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 const MonthToDatePurchases = ({categories, series, formatAmount}) => {
-  // const dispatch = useDispatch();
+  const handleExportExcel = () => {
+    const rows = (categories || []).map((cat, idx) => {
+      const row = { Day: cat };
+      (series || []).forEach((s) => {
+        row[s.name || "Value"] = Number(s.data?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+      });
+      return row;
+    });
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Month_To_Date_Purchases_${todayStr}`);
+  };
 
-  // const [chartData, setchartData] = useState([]);
-
-  // const selectDashboardData = createSelector(
-  //   (state) => state.DashboardEcommerce,
-  //   (revenueData) => revenueData.revenueData
-  // );
-  // // Inside your component
-  // const revenueData = useSelector(selectDashboardData);
-
-
-  // useEffect(() => {
-  //   setchartData(revenueData);
-  // }, [revenueData]);
-
-  // const onChangeChartPeriod = pType => {
-  //   dispatch(getRevenueChartsData(pType));
-  // };
-
-  // useEffect(() => {
-  //   dispatch(getRevenueChartsData("all"));
-  // }, [dispatch]);
   return (
     <React.Fragment>
-      <Card>
-        <CardHeader className="border-0 align-items-center d-flex">
+      <Card id="purchases-mtd-card">
+        <CardHeader className="border-0 align-items-center d-flex justify-content-between flex-wrap gap-2">
           <h4 className="card-title mb-0 flex-grow-1">Month to Date Comparative Purchases Line Graph(MTD) </h4>
-          {/* <div className="d-flex gap-1">
-            <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { onChangeChartPeriod("all"); }}>
-              ALL
-            </button>
-            <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { onChangeChartPeriod("month"); }}>
-              1M
-            </button>
-            <button type="button" className="btn btn-soft-secondary btn-sm" onClick={() => { onChangeChartPeriod("halfyear"); }}>
-              6M
-            </button>
-            <button type="button" className="btn btn-soft-primary btn-sm" onClick={() => { onChangeChartPeriod("year"); }}>
-              1Y
-            </button>
-          </div> */}
+          <CardExportButtons
+            targetId="purchases-mtd-card"
+            title="Month To Date Purchases"
+            onExport={handleExportExcel}
+          />
         </CardHeader>
 
         <CardBody className="p-0 pb-2">

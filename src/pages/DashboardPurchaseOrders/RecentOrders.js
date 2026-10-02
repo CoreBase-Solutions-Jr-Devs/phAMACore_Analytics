@@ -1,5 +1,7 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 const RecentOrders = ({
   overdueSupplierAccounts = [],
@@ -17,14 +19,37 @@ const RecentOrders = ({
     Number(overdue91To120 ?? 0) > 0 ||
     Number(overdue120Plus ?? 0) > 0;
 
-    
+  const handleExportExcel = () => {
+    const rows = [
+      { Category: "Aging Summary", Supplier: "Current (0-30 days)", "Outstanding (KES)": Number(currentReceivables || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }), "Last Invoice": "-", "Last Payment": "-" },
+      { Category: "Aging Summary", Supplier: "31–60 days", "Outstanding (KES)": Number(overdue31To60 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }), "Last Invoice": "-", "Last Payment": "-" },
+      { Category: "Aging Summary", Supplier: "61–90 days", "Outstanding (KES)": Number(overdue61To90 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }), "Last Invoice": "-", "Last Payment": "-" },
+      { Category: "Aging Summary", Supplier: "91–120 days", "Outstanding (KES)": Number(overdue91To120 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }), "Last Invoice": "-", "Last Payment": "-" },
+      { Category: "Aging Summary", Supplier: "120+ days", "Outstanding (KES)": Number(overdue120Plus || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }), "Last Invoice": "-", "Last Payment": "-" },
+      ...(overdueSupplierAccounts || []).map((item) => ({
+        Category: "Overdue Supplier Account",
+        Supplier: `${item.supplier || ""} (${item.cuscode || ""})`,
+        "Outstanding (KES)": Number(item.outstanding || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        "Last Invoice": item.lastInvoice ? new Date(item.lastInvoice).toLocaleDateString("en-GB") : "-",
+        "Last Payment": item.lastPayment ? new Date(item.lastPayment).toLocaleDateString("en-GB") : "-",
+      })),
+    ];
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Supplier_Overdue_Invoices_${todayStr}`);
+  };
+
   return (
     <React.Fragment>
 
-    <Card className="card-height-100">
-     <CardHeader className="card-header align-items-center d-flex">
-                             <h4 className="card-title mb-0 flex-grow-1">
-                              Overdue Invoices</h4>
+    <Card className="card-height-100" id="purchases-overdue-invoices-card">
+     <CardHeader className="card-header align-items-center d-flex justify-content-between flex-wrap gap-2">
+         <h4 className="card-title mb-0 flex-grow-1">
+          Overdue Invoices</h4>
+         <CardExportButtons
+           targetId="purchases-overdue-invoices-card"
+           title="Overdue Invoices"
+           onExport={handleExportExcel}
+         />
       </CardHeader>
 
       <CardBody>

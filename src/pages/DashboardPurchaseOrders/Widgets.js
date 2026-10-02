@@ -3,6 +3,7 @@ import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { exportDashboardReportToExcel, triggerPrint } from "../../helpers/export_helper";
 
 const Widgets = ({
   rightClickBtn,
@@ -18,21 +19,56 @@ const Widgets = ({
    const { branch, dateRange, startDate, endDate } = useSelector(
           (state) => state.PurchaseOrders.filters
         );
-          const formatDisplay = (date) => date || "";
+   const formatDisplay = (date) => date || "";
 
-  //      const branchName =
-  // !branch || branch === "All Branches"
-  //   ? "All Branches"
-  //   : branchMap?.[branch] || "Unknown Branch";
+  const handleExportExcel = () => {
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    const fileName = `Purchases_Dashboard_Analytics_${todayStr}`;
+
+    const metadata = [
+      { label: "Report", value: "Purchase Orders Dashboard Key Metrics" },
+      { label: "Generated Date", value: new Date().toLocaleString("en-GB") },
+      { label: "Date Range Filter", value: `${startDate || ""} to ${endDate || ""}` },
+    ];
+
+    const kpiMetricsRows = [
+      { Metric: "Total Spend", Value: typeof formatAmount === "function" ? formatAmount(totalSpend) : Number(totalSpend || 0).toLocaleString(), Notes: "Tax inclusive" },
+      { Metric: "Active Suppliers", Value: activeSuppliers, Notes: "Suppliers with orders" },
+      { Metric: "Price Alerts", Value: priceAlerts, Notes: "Items with price increase" },
+      { Metric: "Maverick Spend", Value: typeof formatAmount === "function" ? formatAmount(maverickSpend) : Number(maverickSpend || 0).toLocaleString(), Notes: `${maverickSpendPercentage}% of spend` },
+      { Metric: "Avg Lead Time", Value: `${avgLeadTime} days`, Notes: "Order to delivery" },
+    ];
+
+    const sections = [
+      {
+        title: "Key Purchases Metrics",
+        headers: ["Metric", "Value", "Notes"],
+        data: kpiMetricsRows,
+      },
+    ];
+
+    exportDashboardReportToExcel(
+      {
+        title: "Purchase Orders Analytics Report",
+        metadata,
+        sections,
+      },
+      fileName
+    );
+  };
+
+  const handlePrint = () => {
+    triggerPrint();
+  };
+
   return (
     <React.Fragment>
       
-      <div className="d-flex align-items-center justify-content-between flex-wrap mb-1">
+      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
 
   {/* LEFT - TITLE */}
   <h4 className="card-title mb-0">
     KEY METRICS
-    {/* {branchName !== "All Branches" && ` - ${branchName}`} */}
   </h4>
 
   {/* CENTER - DATE RANGE */}
@@ -42,22 +78,43 @@ const Widgets = ({
       {formatDisplay(startDate)}</strong> to <strong>
       {formatDisplay(endDate)}
     </strong>
-    
   </div>
 
-  {/* RIGHT - BUTTON */}
-  <button
-    type="button"
-    className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-    onClick={rightClickBtn}
-  >
-    <i className="ri-filter-fill"></i>
-    Filter
-  </button>
+  {/* RIGHT - BUTTONS */}
+  <div className="d-flex align-items-center gap-2 no-print">
+    <button
+      type="button"
+      className="btn btn-soft-success d-flex align-items-center gap-1"
+      onClick={handleExportExcel}
+      title="Export Key Metrics to Excel"
+    >
+      <i className="ri-file-excel-2-line align-bottom"></i>
+      <span>Export Excel</span>
+    </button>
+
+    <button
+      type="button"
+      className="btn btn-soft-info d-flex align-items-center gap-1"
+      onClick={handlePrint}
+      title="Print Dashboard"
+    >
+      <i className="ri-printer-line align-bottom"></i>
+      <span>Print</span>
+    </button>
+
+    <button
+      type="button"
+      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+      onClick={rightClickBtn}
+    >
+      <i className="ri-filter-fill"></i>
+      Filter
+    </button>
+  </div>
 
 </div>
 
- <Row className="g-2 mb-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
+ <Row className="g-2 mb-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5" id="purchases-kpi-widgets">
       {/* Total Spend */}
       <Col className="d-flex">
         <Card className="card-animate h-80 w-100">

@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { SpendCharts } from './DashboardEcommerceCharts';
 import { getAllData } from "../../slices/thunks";
 import { createSelector } from 'reselect';
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 const getColor = (percent) => {
   if (percent >= 75) return "bg-success";
@@ -18,22 +20,37 @@ const SupplierSpend = ({ supplierData, top2Suppliers, formatAmount, totalSpend }
     Array.isArray(supplierData) &&
     supplierData.length > 0;
 const top2Total =
-  (top2Suppliers[0]?.value || 0) +
-  (top2Suppliers[1]?.value || 0);
+  (top2Suppliers?.[0]?.value || 0) +
+  (top2Suppliers?.[1]?.value || 0);
   const top2Percent =
   totalSpend > 0
     ? ((top2Total / totalSpend) * 100).toFixed(1)
     : 0;
+
+  const handleExportExcel = () => {
+    const rows = (supplierData || []).map((item) => ({
+      Supplier: item.name || "",
+      "Spend (KES)": Number(item.value || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+    }));
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Spend_By_Supplier_${todayStr}`);
+  };
+
     return (
         <React.Fragment>
       
-                <Card className="card-height-100">
+                <Card className="card-height-100" id="purchases-top-suppliers-card">
 
-                    <CardHeader className="card-header align-items-center d-flex">
+                    <CardHeader className="card-header align-items-center d-flex justify-content-between flex-wrap gap-2">
                         <h4 className="card-title mb-0 flex-grow-1">
                          Spend by Supplier
                         </h4>
-                        </CardHeader>
+                        <CardExportButtons
+                          targetId="purchases-top-suppliers-card"
+                          title="Spend by Supplier"
+                          onExport={handleExportExcel}
+                        />
+                    </CardHeader>
                     <div className="card-body p-3">
      
                         {!hasData ? (
