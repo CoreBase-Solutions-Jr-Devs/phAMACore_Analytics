@@ -6,6 +6,8 @@ import {
   getInventoryProfitSummaryUser,
   getCashbookSummary,
 } from "../../helpers/fakebackend_helper";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 // Date formatting utility strictly matching DD/MM/YYYY
 const formatDMY = (date) => {
@@ -184,16 +186,39 @@ const SalesCollection = () => {
     };
   }, [currentMonthIdx, filters.branch]);
 
+  const handleExportExcel = () => {
+    const rows = (categories || []).map((month, idx) => {
+      const rev = chartSeries?.[0]?.data?.[idx] || 0;
+      const col = chartSeries?.[1]?.data?.[idx] || 0;
+      const vol = chartSeries?.[2]?.data?.[idx] || 0;
+      return {
+        Month: month,
+        "Revenue (KES)": Number(rev).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        "Collections (KES)": Number(col).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        "Sales Volume": Number(vol).toLocaleString(),
+      };
+    });
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Sales_vs_Collections_${todayStr}`);
+  };
+
   return (
     <React.Fragment>
-      <Card>
-        <CardHeader className="border-0 align-items-center d-flex">
-          <h4 className="card-title mb-0 flex-grow-1">
+      <Card id="sales-collection-card">
+        <CardHeader className="border-0 align-items-center d-flex justify-content-between flex-wrap gap-2">
+          <h4 className="card-title mb-0">
             Sales vs Collections Performance Trend (YTD)
           </h4>
-          <span className="badge bg-light text-muted">
-            Jan - {monthNames[currentMonthIdx]} YTD
-          </span>
+          <div className="d-flex align-items-center gap-2">
+            <span className="badge bg-light text-muted">
+              Jan - {monthNames[currentMonthIdx]} YTD
+            </span>
+            <CardExportButtons
+              onExport={handleExportExcel}
+              targetId="sales-collection-card"
+              title="Sales vs Collections"
+            />
+          </div>
         </CardHeader>
         <CardBody className="p-0 pb-2">
           <div className="w-100">

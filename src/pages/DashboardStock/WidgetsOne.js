@@ -59,7 +59,7 @@ const WidgetsOne = ({ branchMap = {} }) => {
     return (
         <React.Fragment>
 
-            <Row className="g-2 mb-2">
+            <Row className="g-2 mb-2" id="stock-kpi-widgets">
                 {meta.map((widget) => {
                     const { icon, color } =
                         KPI_ICON_MAP[widget.id] ?? { icon: "activity", color: "primary" };

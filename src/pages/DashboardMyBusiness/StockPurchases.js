@@ -6,6 +6,8 @@ import {
   getAccountBalance,
   getKPITotalStockValueByBranch,
 } from "../../helpers/fakebackend_helper";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
 // Format Date object to DD/MM/YYYY
 const formatDMY = (date) => {
@@ -189,15 +191,36 @@ const StockPurchases = () => {
     };
   }, [currentMonthIdx, filters.branch]);
 
+  const handleExportExcel = () => {
+    const rows = (categories || []).map((month, idx) => {
+      const stock = series?.[0]?.data?.[idx] || 0;
+      const purch = series?.[1]?.data?.[idx] || 0;
+      return {
+        Month: month,
+        "Stock Value (KES)": Number(stock).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        "Purchases (KES)": Number(purch).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      };
+    });
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Stock_vs_Purchases_${todayStr}`);
+  };
+
   return (
-    <Card className="card-height-100">
-      <CardHeader className="border-0 align-items-center d-flex">
-        <h4 className="card-title mb-0 flex-grow-1">
+    <Card className="card-height-100" id="stock-purchases-card">
+      <CardHeader className="border-0 align-items-center d-flex justify-content-between flex-wrap gap-2">
+        <h4 className="card-title mb-0">
           Stock vs Purchases Monthly Trend
         </h4>
-        <span className="badge bg-light text-muted">
-          Jan - {monthNames[currentMonthIdx]} YTD
-        </span>
+        <div className="d-flex align-items-center gap-2">
+          <span className="badge bg-light text-muted">
+            Jan - {monthNames[currentMonthIdx]} YTD
+          </span>
+          <CardExportButtons
+            onExport={handleExportExcel}
+            targetId="stock-purchases-card"
+            title="Stock vs Purchases"
+          />
+        </div>
       </CardHeader>
       <CardBody className="p-0 pb-2">
         <div className="w-100">

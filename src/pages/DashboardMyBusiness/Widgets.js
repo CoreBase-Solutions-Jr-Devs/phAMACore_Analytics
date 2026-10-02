@@ -596,7 +596,7 @@ export default function Widgets({ onKpiComputed }) {
 
     return (
         <React.Fragment>
-            <Row className="g-2 mb-2">
+            <Row className="g-2 mb-2" id="business-kpi-widgets">
                 {kpis.map((item, index) => (
                     <Col
                         xl={2}

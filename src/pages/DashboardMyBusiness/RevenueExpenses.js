@@ -5,6 +5,9 @@ import { RevenueExpensesChart } from "./DashboardMyBusinessCharts";
 import { getInventoryProfitSummaryUser as getInventoryProfitSummaryUserApi } from "../../helpers/fakebackend_helper";
 import { formatCurrency } from "../utils/formatHelper";
 
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
+
 const MONTH_NAMES = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -142,12 +145,28 @@ const RevenueExpenses = () => {
     };
   }, [monthlyRanges, filters.branch]);
 
+  const handleExportExcel = () => {
+    const rows = (trendData.categories || []).map((month, idx) => {
+      const rev = trendData.series?.[0]?.data?.[idx] || 0;
+      const exp = trendData.series?.[1]?.data?.[idx] || 0;
+      const net = rev - exp;
+      return {
+        Month: month,
+        "Revenue (KES)": Number(rev).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        "Expenses (KES)": Number(exp).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        "Net (KES)": Number(net).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      };
+    });
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Revenue_vs_Expenses_${todayStr}`);
+  };
+
   return (
     <Row>
       <Col xxl={12}>
-        <Card>
+        <Card id="revenue-expenses-card">
           <CardBody className="p-0">
-            <CardHeader className="border-0 d-flex justify-content-between align-items-center">
+            <CardHeader className="border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
               <div>
                 <h4 className="card-title mb-0">
                   Revenue vs Expense Monthly Trend
@@ -163,9 +182,16 @@ const RevenueExpenses = () => {
                   </strong>
                 </small>
               </div>
-              <span className="badge bg-light text-primary">
-                YTD {monthlyRanges.currentYear}
-              </span>
+              <div className="d-flex align-items-center gap-2">
+                <span className="badge bg-light text-primary">
+                  YTD {monthlyRanges.currentYear}
+                </span>
+                <CardExportButtons
+                  onExport={handleExportExcel}
+                  targetId="revenue-expenses-card"
+                  title="Revenue vs Expenses"
+                />
+              </div>
             </CardHeader>
             {loading ? (
               <div

@@ -130,10 +130,75 @@ export const exportDashboardReportToExcel = (
 };
 
 /**
- * Native Browser Print Trigger
+ * Native Browser Print Trigger (full page)
  */
 export const triggerPrint = () => {
   if (typeof window !== "undefined") {
+    window.print();
+  }
+};
+
+/**
+ * Print a specific HTML element or card by element ID
+ */
+export const printElement = (elementId, title = "Report") => {
+  if (typeof window === "undefined") return;
+  const elem = document.getElementById(elementId);
+  if (!elem) {
+    window.print();
+    return;
+  }
+
+  try {
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    const styles = Array.from(
+      document.querySelectorAll("link[rel='stylesheet'], style")
+    )
+      .map((s) => s.outerHTML)
+      .join("\n");
+
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${title}</title>
+          ${styles}
+          <style>
+            body { padding: 20px; background: #fff; font-family: sans-serif; }
+            .no-print { display: none !important; }
+            .card { box-shadow: none !important; border: 1px solid #e9ebec !important; }
+            .apexcharts-canvas { margin: 0 auto; }
+          </style>
+        </head>
+        <body>
+          <div class="print-container">
+            ${elem.outerHTML}
+          </div>
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 1000);
+    }, 300);
+  } catch (e) {
+    console.error("Error in printElement, falling back to window.print():", e);
     window.print();
   }
 };
