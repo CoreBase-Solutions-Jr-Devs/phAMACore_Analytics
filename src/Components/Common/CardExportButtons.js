@@ -17,11 +17,11 @@ const CardExportButtons = ({
   };
 
   return (
-    <div className={`d-flex align-items-center gap-1 no-print ${className}`}>
+    <div className={`d-flex align-items-center gap-1 no-print card-export-buttons ${className}`}>
       {onExport && (
         <button
           type="button"
-          className="btn btn-sm btn-soft-success d-flex align-items-center gap-1 py-1 px-2"
+          className="btn btn-sm btn-soft-success btn-export-excel d-flex align-items-center gap-1 py-1 px-2"
           onClick={onExport}
           title={`Export ${title} to Excel`}
         >
@@ -31,7 +31,7 @@ const CardExportButtons = ({
       )}
       <button
         type="button"
-        className="btn btn-sm btn-soft-info d-flex align-items-center gap-1 py-1 px-2"
+        className="btn btn-sm btn-soft-info btn-export-print d-flex align-items-center gap-1 py-1 px-2"
         onClick={handlePrint}
         title={`Print ${title}`}
       >

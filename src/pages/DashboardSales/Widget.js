@@ -92,7 +92,7 @@ const Widget = ({
         <div className="d-flex align-items-center gap-2 no-print">
           <button
             type="button"
-            className="btn btn-soft-success d-flex align-items-center gap-1"
+            className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
             onClick={handleExportExcel}
             title="Export Key Metrics to Excel"
           >
@@ -102,7 +102,7 @@ const Widget = ({
 
           <button
             type="button"
-            className="btn btn-soft-info d-flex align-items-center gap-1"
+            className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
             onClick={handlePrint}
             title="Print Dashboard"
           >
