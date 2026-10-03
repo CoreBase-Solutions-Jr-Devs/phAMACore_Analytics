@@ -25,7 +25,9 @@ import { createSelector } from 'reselect';
 
 const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
     const dispatch = useDispatch();
-
+    const storedUser = JSON.parse(localStorage.getItem("authUser"));
+    const companyName = storedUser?.user?.companyName;
+    // console.log("Company Name:", companyName);
 
     const selectDashboardData = createSelector(
         (state) => state.Layout,
@@ -135,7 +137,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     // letterSpacing: "1px"
                                 }}
                             >
-                                COREBASE SOLUTIONS LTD
+                                {companyName}
+                                {/* AXCESS PHARMACY LTD */}
                             </span>
                         </div>
                         <div className="d-flex align-items-center">

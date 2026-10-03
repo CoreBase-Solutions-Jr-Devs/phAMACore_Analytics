@@ -216,7 +216,7 @@ const CustomTableOne = () => {
 
                 <button
                     type="button"
-                    className="btn btn-sm btn-soft-success d-flex align-items-center gap-1 no-print"
+                    className="btn btn-sm btn-soft-success btn-export-excel d-flex align-items-center gap-1 no-print"
                     onClick={handleExportTable}
                     title="Export this table to Excel"
                 >

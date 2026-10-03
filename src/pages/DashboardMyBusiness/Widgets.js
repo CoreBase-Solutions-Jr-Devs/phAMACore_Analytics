@@ -541,7 +541,7 @@ export default function Widgets({ onKpiComputed }) {
             prefix: "KES",
             suffix: "",
             icon: "shopping-bag",
-            color: "danger",
+            color: "success",
             subtitle: "Supplier balances",
             loading: loadingAccountBalance &&
                 supplierAccountBalances.length === 0,
@@ -553,7 +553,7 @@ export default function Widgets({ onKpiComputed }) {
             prefix: "KES",
             suffix: "",
             icon: "dollar-sign",
-            color: "success",
+            color: "danger",
             subtitle: "Available cash position",
             loading: loadingCashbookSummary,
             decimals: 2,
@@ -570,7 +570,7 @@ export default function Widgets({ onKpiComputed }) {
             decimals: 2,
         },
         {
-            title: "Stock Profit",
+            title: "Profit",
             value: incomeStatementValue,
             prefix: "KES",
             suffix: "",

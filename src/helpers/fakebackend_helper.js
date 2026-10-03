@@ -4,12 +4,16 @@ import {
   PowerBIAPI,
   // LogoutAPI,
   getLoggedinUser,
+  getClientId,
+  setClientId,
 } from "./api_helper";
 import * as url from "./url_helper";
 
 const api = new APIClient();
 // const authApi = new AuthAPI();
 // const powerBIApi = new PowerBIAPI();
+
+export { getClientId, setClientId };
 
 export const getLoggedInUser = () => {
   return getLoggedinUser();

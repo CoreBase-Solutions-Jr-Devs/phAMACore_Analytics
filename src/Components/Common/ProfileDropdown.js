@@ -5,7 +5,8 @@ import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import LogoutModal from './LogoutModal';
 
-import avatar1 from "../../assets/images/users/avatar-1.jpg";
+// import avatar1 from "../../assets/images/users/avatar-1.jpg";
+import defaultUser from "../../assets/images/users/user-dummy-img.jpg";
 
 const ProfileDropdown = () => {
 
@@ -21,23 +22,32 @@ const { user } = useSelector((state) => state.Profile || {});
 
     const [fullName, setFullName] = useState("Admin");
 
-useEffect(() => {
-    const storedUser = localStorage.getItem("authUser");
+    useEffect(() => {
+        const storedUser = localStorage.getItem("authUser");
 
-    let parsedUser = null;
-    try {
-        parsedUser = storedUser ? JSON.parse(storedUser) : null;
-    } catch (e) {
-        parsedUser = null;
-    }
+        let parsedUser = null;
+        try {
+            parsedUser = storedUser ? JSON.parse(storedUser) : null;
+        } catch (e) {
+            parsedUser = null;
+        }
 
-    const name =
-        parsedUser?.fullName ||
-        parsedUser?.email ||
-        "Admin";
+        // 1. User Object
+        const userData = parsedUser?.user || parsedUser;
 
-    setFullName(name);
-}, [user]);
+        // 2. Raw Name String
+        const rawName = userData?.fullusername || userData?.username ||
+            parsedUser?.fullName || userData?.email || "";
+
+        if (rawName) {
+            // 3. Separate using delimiter (underscore, hyphen, dot, or whitespace)
+            const formattedName = rawName.replace(/_/g, " ").trim();
+
+            setFullName(formattedName);
+        } else {
+            setFullName("Admin");
+        }
+    }, [user]);
 
     const navigate = useNavigate();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -66,7 +76,7 @@ useEffect(() => {
             <Dropdown isOpen={isProfileDropdown} toggle={toggleProfileDropdown} className="ms-sm-3 header-item ">
                 <DropdownToggle tag="button" type="button" className="btn btn-body shadow-sm">
                     <span className="d-flex align-items-center">
-                        <img className="rounded-circle header-profile-user" src={avatar1}
+                        <img className="rounded-circle header-profile-user" src={defaultUser}
                             alt="Header Avatar" />
                         <span className="text-start ms-xl-2">
                             <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{fullName}</span>

@@ -10,6 +10,7 @@ import FeatherIcon from "feather-icons-react";
 
 // } from "../../slices/dashboardSales/reducer";
 import { useDispatch, useSelector } from "react-redux";
+import { exportDashboardReportToExcel, triggerPrint } from "../../helpers/export_helper";
 
 const Widget = ({
   totalRevenue = 0,
@@ -34,18 +35,52 @@ const Widget = ({
   );
   const formatDisplay = (date) => date || "";
 
+  const handleExportExcel = () => {
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    const fileName = `Sales_Dashboard_Analytics_${todayStr}`;
 
-  //       const branchName =
-  //   !branch || branch === "All Branches"
-  //     ? "All Branches"
-  //     : branchMap?.[branch] || "Unknown Branch";
+    const metadata = [
+      { label: "Report", value: "Sales Dashboard Key Metrics" },
+      { label: "Generated Date", value: new Date().toLocaleString("en-GB") },
+      { label: "Date Range Filter", value: `${startDate || ""} to ${endDate || ""}` },
+    ];
+
+    const kpiMetricsRows = [
+      { Metric: "Total Revenue", Value: typeof formatAmount === "function" ? formatAmount(totalRevenue) : Number(totalRevenue || 0).toLocaleString(), Notes: "Tax inclusive" },
+      { Metric: "Cash Sales", Value: typeof formatAmount === "function" ? formatAmount(cashSales) : Number(cashSales || 0).toLocaleString(), Notes: `${cashSalesPercentage}% of revenue` },
+      { Metric: "Sales Invoices", Value: typeof formatAmount === "function" ? formatAmount(salesInvoices) : Number(salesInvoices || 0).toLocaleString(), Notes: `${salesInvoicesPercentage}% of revenue` },
+      { Metric: "Cash Invoices", Value: typeof formatAmount === "function" ? formatAmount(cashInvoices) : Number(cashInvoices || 0).toLocaleString(), Notes: `${cashInvoicesPercentage}% of revenue` },
+      { Metric: "Credit Notes", Value: typeof formatAmount === "function" ? formatAmount(creditNotes) : Number(creditNotes || 0).toLocaleString(), Notes: `${creditNotesPercentage}% of revenue` },
+      { Metric: "Overdue Debtors Count", Value: overdueDebtorsCount, Notes: "Accounts with overdue balance" },
+    ];
+
+    const sections = [
+      {
+        title: "Key Sales Metrics",
+        headers: ["Metric", "Value", "Notes"],
+        data: kpiMetricsRows,
+      },
+    ];
+
+    exportDashboardReportToExcel(
+      {
+        title: "Sales Analytics Report",
+        metadata,
+        sections,
+      },
+      fileName
+    );
+  };
+
+  const handlePrint = () => {
+    triggerPrint();
+  };
 
   return (
     <React.Fragment>
-      <div className="d-flex align-items-center justify-content-between flex-wrap mb-1">
+      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
         <h4 className="card-title mb-0">
           KEY METRICS
-          {/* {branchName !== "All Branches" && ` - ${branchName}`}         */}
         </h4>
 
         <div className="d-flex align-items-center gap-2 ">
@@ -54,16 +89,38 @@ const Widget = ({
           <strong>{formatDisplay(endDate)}</strong>
         </div>
 
-        <button
-          type="button"
-          className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-          onClick={rightClickBtn}
-        >
-          <i className="ri-filter-fill"></i>
-          Filter
-        </button>
+        <div className="d-flex align-items-center gap-2 no-print">
+          <button
+            type="button"
+            className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
+            onClick={handleExportExcel}
+            title="Export Key Metrics to Excel"
+          >
+            <i className="ri-file-excel-2-line align-bottom"></i>
+            <span>Export Excel</span>
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
+            onClick={handlePrint}
+            title="Print Dashboard"
+          >
+            <i className="ri-printer-line align-bottom"></i>
+            <span>Print</span>
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+            onClick={rightClickBtn}
+          >
+            <i className="ri-filter-fill"></i>
+            Filter
+          </button>
+        </div>
       </div>
-<Row className="g-2  row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6">
+<Row className="g-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6" id="sales-kpi-widgets">
   <Col className="d-flex">
 <Card className="card-animate w-100 h-80">
             <CardBody className="p-2 d-flex flex-column">
