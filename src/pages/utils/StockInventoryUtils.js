@@ -21,8 +21,8 @@ import { cleanBranchName } from "../../helpers/branch_helper";
 // KPI CARD METADATA
 
 export const KPI_META = [
-    { id: 1, label: "Total SKUs", subtitle: "Across all branches", icon: "ri-medicine-bottle-line text-primary", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 2, label: "Total Stock Value", subtitle: "KES - all branches", icon: "ri-coins-line text-success", decimals: 2, prefix: "KES ", suffix: "m", separator: "," },
+    // { id: 1, label: "Total SKUs", subtitle: "Across all branches", icon: "ri-medicine-bottle-line text-primary", decimals: 0, prefix: "", suffix: "", separator: "," },
+    // { id: 2, label: "Total Stock Value", subtitle: "KES - all branches", icon: "ri-coins-line text-success", decimals: 2, prefix: "KES ", suffix: "m", separator: "," },
     { id: 3, label: "Items below Reorder Level", subtitle: "Need action now", icon: "ri-arrow-down-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 4, label: "Out of Stock Items", subtitle: "SKUs out of stock", icon: "ri-error-warning-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
     { id: 5, label: "Near Expiry (\u2264 90 days)", subtitle: "Products at risk", icon: "ri-time-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
@@ -37,22 +37,22 @@ export const KPI_META = [
 export const getKPIMeta = ({ branchName = "All Branches", isBranchView = false, healthObj = null } = {}) => {
     const cleanName = cleanBranchName(branchName);
     return KPI_META.map((widget) => {
-        if (widget.id === 1) {
-            const stockedCount = healthObj?.stocked_skus;
-            const branchSub = stockedCount !== undefined && stockedCount !== null
-                ? `Branch: ${cleanName} (${stockedCount} stocked)`
-                : `Branch: ${cleanName}`;
-            return {
-                ...widget,
-                subtitle: isBranchView ? branchSub : "Across all branches",
-            };
-        }
-        if (widget.id === 2) {
-            return {
-                ...widget,
-                subtitle: isBranchView ? `KES - ${cleanName}` : "KES - all branches",
-            };
-        }
+        // if (widget.id === 1) {
+        //     const stockedCount = healthObj?.stocked_skus;
+        //     const branchSub = stockedCount !== undefined && stockedCount !== null
+        //         ? `Branch: ${cleanName} (${stockedCount} stocked)`
+        //         : `Branch: ${cleanName}`;
+        //     return {
+        //         ...widget,
+        //         subtitle: isBranchView ? branchSub : "Across all branches",
+        //     };
+        // }
+        // if (widget.id === 2) {
+        //     return {
+        //         ...widget,
+        //         subtitle: isBranchView ? `KES - ${cleanName}` : "KES - all branches",
+        //     };
+        // }
         return widget;
     });
 };
@@ -252,8 +252,8 @@ export const computeKPIs = (
     })();
 
     return { 
-        1: totalSKUs, 
-        2: totalStockValueM, 
+        // 1: totalSKUs, 
+        // 2: totalStockValueM, 
         3: belowReorder, 
         4: outOfStock, 
         5: nearExpiry, 

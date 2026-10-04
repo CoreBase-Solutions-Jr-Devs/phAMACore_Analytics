@@ -9,8 +9,8 @@ import { resolveBranchName, cleanBranchName } from "../../helpers/branch_helper"
 
 
 const KPI_ICON_MAP = {
-    1: { icon: "package", color: "primary" }, // Total SKUs
-    2: { icon: "ksh", color: "success" }, // Total Stock Value
+    // 1: { icon: "package", color: "primary" }, // Total SKUs
+    // 2: { icon: "ksh", color: "success" }, // Total Stock Value
     3: { icon: "alert-triangle", color: "warning" }, // Below Reorder Level
     4: { icon: "x-circle", color: "danger" }, // Out of Stock
     5: { icon: "clock", color: "danger" }, // Near Expiry
@@ -58,58 +58,40 @@ const WidgetsOne = ({ branchMap = {} }) => {
 
     return (
         <React.Fragment>
-
             <Row className="g-2 mb-2" id="stock-kpi-widgets">
                 {meta.map((widget) => {
                     const { icon, color } =
                         KPI_ICON_MAP[widget.id] ?? { icon: "activity", color: "primary" };
 
                     return (
-                        <Col xl={3} lg={4} md={6} sm={6} key={widget.id} className="d-flex">
-                            <Card className="card-animate w-100">
-                                <CardBody className="p-2">
+                        <Col xl={2} lg={4} md={4} sm={6} xs={12} key={widget.id} className="d-flex">
+                            <Card className="card-animate w-100 mb-0">
+                                <CardBody className="p-2 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <p className="font-medium mb-0 text-truncate">{widget.label}</p>
 
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <p className="font-medium mb-0">{widget.label}</p>
-
-                                            <h2 className={`mt-2 ff-secondary fw-semibold text-${color}`}>
-                                                {isLoading ? (
-                                                    <span className="placeholder-glow">
-                                                        <span className="placeholder col-6 rounded" />
-                                                    </span>
-                                                ) : (
-                                                    <CountUp
-                                                        start={0}
-                                                        end={kpis[widget.id] ?? 0}
-                                                        prefix={widget.prefix ?? ""}
-                                                        suffix={widget.suffix ?? ""}
-                                                        separator={widget.separator ?? ","}
-                                                        decimals={widget.decimals ?? 0}
-                                                        duration={4}
-                                                    />
-                                                )}
-                                            </h2>
-
-                                            <p className="text-muted mb-0">
-                                                {widget.subtitle ?? "\u00A0"}
-                                            </p>
-                                        </div>
-
-                                        {/* <div className="avatar-sm flex-shrink-0">
-                                            <span
-                                                className={`avatar-title bg-${color}-subtle rounded-circle fs-2`}
-                                            >
-                                                {icon === "ksh" ? (
-                                                    <span className={`fw-bold fs-5 text-${color} lh-1`} style={{ letterSpacing: "-0.5px", userSelect: "none" }}>
-                                                        KSh
-                                                    </span>
-                                                ) : (
-                                                    <FeatherIcon icon={icon} className={`text-${color}`} />
-                                                )}
-                                            </span>
-                                        </div> */}
+                                        <h2 className={`mt-2 ff-secondary fw-semibold text-${color}`}>
+                                            {isLoading ? (
+                                                <span className="placeholder-glow">
+                                                    <span className="placeholder col-6 rounded" />
+                                                </span>
+                                            ) : (
+                                                <CountUp
+                                                    start={0}
+                                                    end={kpis[widget.id] ?? 0}
+                                                    prefix={widget.prefix ?? ""}
+                                                    suffix={widget.suffix ?? ""}
+                                                    separator={widget.separator ?? ","}
+                                                    decimals={widget.decimals ?? 0}
+                                                    duration={4}
+                                                />
+                                            )}
+                                        </h2>
                                     </div>
+
+                                    <p className="text-muted mb-0 small text-truncate">
+                                        {widget.subtitle ?? "\u00A0"}
+                                    </p>
                                 </CardBody>
                             </Card>
                         </Col>
