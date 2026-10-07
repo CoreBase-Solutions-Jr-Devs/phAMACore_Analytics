@@ -373,7 +373,7 @@ const topDebtors = (kpiOverdueAccounts || [])
 
     if (!acc[name]) {
       acc[name] = {
-        name: rawName,
+        name: name,
         qty: 0,
       };
     }
@@ -390,7 +390,7 @@ const topDebtors = (kpiOverdueAccounts || [])
 
     if (!acc[name]) {
       acc[name] = {
-        name: rawName,
+        name: name,
         qty: 0,
       };
     }
