@@ -8,7 +8,6 @@ import {
     getKPISalesTransactions,
     getKPIOverdueAccounts,
 } from "./thunk";
-import { setGroupBy } from "../dashboardPurchase/reducer";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
@@ -30,7 +29,7 @@ const initialState = {
   error: null,
 
   filters: {
-    branch: null,
+    branch: "",
     dateRange: "Today",
     startDate: new Date().toLocaleDateString("en-GB"),
     endDate: new Date().toLocaleDateString("en-GB"),
@@ -210,33 +209,33 @@ case "Year To Date": {
 
   extraReducers: (builder) => {
     builder
-      .addCase(getSalesTransactions.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // .addCase(getSalesTransactions.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
 
-      .addCase(getSalesTransactions.fulfilled, (state, action) => {
-        state.loading = false;
+      // .addCase(getSalesTransactions.fulfilled, (state, action) => {
+      //   state.loading = false;
 
-        const data = action.payload?.result || action.payload || [];
-        state.sales = data;
+      //   const data = action.payload?.result || action.payload || [];
+      //   state.sales = data;
 
-        const map = {};
+      //   const map = {};
 
-        data.forEach((item) => {
-          const code = item.branch_ID;
-          const name = item.brancch_Name;
+      //   data.forEach((item) => {
+      //     const code = item.branch_ID;
+      //     const name = item.brancch_Name;
 
-          if (code == null) return;
+      //     if (code == null) return;
 
-          map[code] = {
-            branchCode: code,
-            branchName: name,
-          };
-        });
+      //     map[code] = {
+      //       branchCode: code,
+      //       branchName: name,
+      //     };
+      //   });
 
-        state.branches = Object.values(map);
-      })
+      //   state.branches = Object.values(map);
+      // })
 
 .addCase(getKPISalesTransactions.fulfilled, (state, action) => {
    const groupBy = action.meta.arg?.groupBy;
@@ -280,13 +279,13 @@ if (groupBy === "BRANCH_TYPE") {
     action.payload?.result || action.payload || [];
 })
 
-      .addCase(getSalesTransactions.rejected, (state, action) => {
-        state.loading = false;
-        state.error =
-          action.payload?.message ||
-          action.error.message ||
-          "Error loading data";
-      })
+      // .addCase(getSalesTransactions.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error =
+      //     action.payload?.message ||
+      //     action.error.message ||
+      //     "Error loading data";
+      // })
 
       .addCase(getMonthToDateSales.rejected, (state, action) => {
         state.loading = false;

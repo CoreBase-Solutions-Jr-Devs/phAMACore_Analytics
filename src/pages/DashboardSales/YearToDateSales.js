@@ -9,7 +9,10 @@ const YearToDateSales = ({ series, categories, formatAmount }) => {
     const rows = (categories || []).map((cat, idx) => {
       const row = { Period: cat };
       (series || []).forEach((s) => {
-        row[s.name || "Value"] = Number(s.data?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+        row[s.name || "Value"] = Number(s.data?.[idx] || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        );
       });
       return row;
     });
@@ -32,34 +35,34 @@ const YearToDateSales = ({ series, categories, formatAmount }) => {
                 onExport={handleExportExcel}
               />
             </CardHeader>
-<div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2">
-  <div className="d-flex align-items-center gap-2">
-    <span
-      style={{
-        display: "inline-block",
-        width: "25px",
-        borderTop: "3px solid var(--vz-primary)",
-      }}
-    />
-    <span className="text-muted">2026</span>
-  </div>
+            <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2">
+              <div className="d-flex align-items-center gap-2">
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "25px",
+                    borderTop: "3px solid var(--vz-primary)",
+                  }}
+                />
+                <span className="text-muted">2026</span>
+              </div>
 
-  <div className="d-flex align-items-center gap-2">
-    <span
-      style={{
-        display: "inline-block",
-        width: "25px",
-        borderTop: "3px dashed var(--vz-primary)",
-      }}
-    />
-    <span className="text-muted">2025</span>
-  </div>
-</div>
+              <div className="d-flex align-items-center gap-2">
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "25px",
+                    borderTop: "3px dashed var(--vz-primary)",
+                  }}
+                />
+                <span className="text-muted">2025</span>
+              </div>
+            </div>
             <ProgressiveSalesChart
               series={series}
               categories={categories}
               formatAmount={formatAmount}
-dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
+              dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
             />
           </CardBody>
         </Card>

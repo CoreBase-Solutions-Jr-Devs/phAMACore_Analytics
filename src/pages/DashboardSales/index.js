@@ -14,7 +14,6 @@ import TopCustomers from "./TopCustomers";
 import YearToDateSales from "./YearToDateSales";
 import MonthToDateSales from "./MonthToDateSales";
 import FilterActions from "./FilterActions";
-
 import {
   getSalesTransactions,
   getMonthlySales,
@@ -24,10 +23,13 @@ import {
   getKPISalesTransactions,
   getKPIOverdueAccounts,
 } from "../../slices/dashboardSales/thunk";
-
+import {
+  getDateRanges,
+  getPreviousYearDate,
+  getPeriod,
+} from "../../helpers/date_helper";
 import { clearSalesData } from "../../slices/dashboardSales/reducer";
 import useSalesAnalytics from "../../Components/Hooks/useSalesAnalytics";
-// import { groupBy } from "lodash";
 
 const DashboardSales = () => {
   const dispatch = useDispatch();
@@ -39,24 +41,26 @@ const DashboardSales = () => {
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
 
- const {
-  sales = [],
-  monthlySales = [],
-  monthToDateSales = [],
-  lastYearMonthToDateSales = [],
-  lastYearMonthlySales = [],
-  kpiSales = [],
-  kpiOverdueAccounts = [],
-  overdueSummary = [],
-  overdueCustomers = [],
-  overdueCategories = [],
+  const {
+    sales = [],
+    monthlySales = [],
+    monthToDateSales = [],
+    lastYearMonthToDateSales = [],
+    lastYearMonthlySales = [],
+    kpiSales = [],
+    kpiOverdueAccounts = [],
+    overdueSummary = [],
+    overdueCustomers = [],
+    overdueCategories = [],
 
-  salesType = [],
-  salesBranch = [],
-  salesBranch_Type = [],
+    salesType = [],
+    salesBranch = [],
+    salesBranch_Type = [],
 
-  filters,
-} = useSelector((state) => state.powerbi);
+    filters,
+    error,
+    loading,
+  } = useSelector((state) => state.powerbi);
 
   const branchCode = branchId ?? null;
   const isBranchView = !!branchCode;
@@ -94,11 +98,10 @@ const DashboardSales = () => {
     monthToDateChart,
   } = useSalesAnalytics(
     sales,
-    kpiSales,
     kpiOverdueAccounts,
-      salesType,
-  salesBranch,
-  salesBranch_Type,
+    salesType,
+    salesBranch,
+    salesBranch_Type,
     monthlySales,
     monthToDateSales,
     lastYearMonthToDateSales,
@@ -106,10 +109,16 @@ const DashboardSales = () => {
     filters,
   );
 
-  const getPeriod = (dateString) => {
-  const [day, month, year] = dateString.split("/");
-  return `${year}${month}`;
-};
+  const {
+    currentYearStart,
+    currentMonthStart,
+    today,
+    lastYearStart,
+    lastYearMonthStart,
+    lastYearToday,
+  } = getDateRanges();
+
+  const dates = getDateRanges();
 
   useEffect(() => {
     dispatch(
@@ -124,19 +133,8 @@ const DashboardSales = () => {
     dispatch(
       getLastYearMonthlySales({
         clientid: 1,
-
-        startDate: new Date(
-          new Date().getFullYear() - 1,
-          0,
-          1,
-        ).toLocaleDateString("en-GB"),
-
-        endDate: new Date(
-          new Date().getFullYear() - 1,
-          new Date().getMonth(),
-          new Date().getDate(),
-        ).toLocaleDateString("en-GB"),
-
+        startDate: dates.lastYearStart,
+        endDate: dates.lastYearToday,
         branchcode: branchId,
       }),
     );
@@ -144,12 +142,8 @@ const DashboardSales = () => {
     dispatch(
       getMonthlySales({
         clientid: 1,
-        startDate: new Date(new Date().getFullYear(), 0, 1).toLocaleDateString(
-          "en-GB",
-        ),
-
-        endDate: new Date().toLocaleDateString("en-GB"),
-
+        startDate: dates.currentYearStart,
+        endDate: dates.currentYearToday,
         branchcode: branchId,
       }),
     );
@@ -157,14 +151,8 @@ const DashboardSales = () => {
     dispatch(
       getMonthToDateSales({
         clientid: 1,
-        startDate: new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          1,
-        ).toLocaleDateString("en-GB"),
-
-        endDate: new Date().toLocaleDateString("en-GB"),
-
+        startDate: dates.currentYearMonthStart,
+        endDate: dates.currentYearToday,
         branchcode: branchId,
       }),
     );
@@ -172,173 +160,113 @@ const DashboardSales = () => {
     dispatch(
       getLastYearMonthToDateSales({
         clientid: 1,
-        startDate: new Date(
-          new Date().getFullYear() - 1,
-          new Date().getMonth(),
-          1,
-        ).toLocaleDateString("en-GB"),
-
-        endDate: new Date(
-          new Date().getFullYear() - 1,
-          new Date().getMonth(),
-          new Date().getDate(),
-        ).toLocaleDateString("en-GB"),
-
+        startDate: dates.lastYearMonthStart,
+        endDate: dates.lastYearToday,
         branchcode: branchId,
       }),
     );
 
     const params = {
-  clientid: 1,
-  startDate: filters.startDate,
-  endDate: filters.endDate,
-  branchcode: branchId ,
-};
+      clientid: 1,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      branchcode: branchId,
+    };
 
-dispatch(
-  getKPISalesTransactions({
-    ...params,
-    groupBy: "TYPE",
-  }),
-);
+    dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "TYPE",
+      }),
+    );
 
-dispatch(
-  getKPISalesTransactions({
-    ...params,
-    groupBy: "BRANCH",
-  }),
-);
+    dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "BRANCH",
+      }),
+    );
 
-dispatch(
-  getKPISalesTransactions({
-    ...params,
-    groupBy: "BRANCH_TYPE",
-  }),
-);
+    dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "BRANCH_TYPE",
+      }),
+    );
 
     dispatch(
       getKPIOverdueAccounts({
         clientid: 1,
-      mode: "AGING",
-      accountType: "CUSTOMER",
+        mode: "AGING",
+        accountType: "CUSTOMER",
         branchcode: branchId,
-    dateFrom:  filters.startDate,
-  dateTo:  filters.endDate,
-  periodFrom: getPeriod(filters.startDate),
-    periodTo: getPeriod(filters.endDate),
-  includeZeroBal: false,
+        dateFrom: filters.startDate,
+        dateTo: filters.endDate,
+        periodFrom: getPeriod(filters.startDate),
+        periodTo: getPeriod(filters.endDate),
+        includeZeroBal: false,
       }),
     );
   }, [dispatch, branchId]);
-console.log("KPI OVERDUE ACCOUNTS:", kpiOverdueAccounts);
+
   useEffect(() => {
     return () => {
       dispatch(clearSalesData());
     };
   }, [dispatch]);
 
-  const getPreviousYearDate = (dateString) => {
-    const [day, month, year] = dateString.split("/");
-    return `${day}/${month}/${Number(year) - 1}`;
-  };
   const handleApplyFilters = () => {
-    const branchcode = filters.branch ?? null;
-
-    // Always fetch the main sales data
     dispatch(
       getSalesTransactions({
         clientid: 1,
         startDate: filters.startDate,
         endDate: filters.endDate,
-        branchcode,
+        branchcode: branchId,
       }),
     );
 
-   const params = {
-  clientid: 1,
-  startDate: filters.startDate,
-  endDate: filters.endDate,
-  branchcode ,
-};
+    const params = {
+      clientid: 1,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      branchcode: branchId,
+    };
 
-dispatch(
-  getKPISalesTransactions({
-    ...params,
-    groupBy: "TYPE",
-  }),
-);
+    dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "TYPE",
+      }),
+    );
 
-dispatch(
-  getKPISalesTransactions({
-    ...params,
-    groupBy: "BRANCH",
-  }),
-);
+    dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "BRANCH",
+      }),
+    );
 
-dispatch(
-  getKPISalesTransactions({
-    ...params,
-    groupBy: "BRANCH_TYPE",
-  }),
-);
+    dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "BRANCH_TYPE",
+      }),
+    );
 
- dispatch(
+    dispatch(
       getKPIOverdueAccounts({
         clientid: 1,
-      mode: "AGING",
-      accountType: "CUSTOMER",
+        mode: "AGING",
+        accountType: "CUSTOMER",
         branchcode: branchId,
-    dateFrom:  filters.startDate,
-  dateTo:  filters.endDate,
-  periodFrom: getPeriod(filters.startDate),
-    periodTo: getPeriod(filters.endDate),
-  includeZeroBal: "false",
+        dateFrom: filters.startDate,
+        dateTo: filters.endDate,
+        periodFrom: getPeriod(filters.startDate),
+        periodTo: getPeriod(filters.endDate),
+        includeZeroBal: "false",
       }),
     );
 
-    // Year To Date
-    if (filters.dateRange === "Year To Date") {
-      dispatch(
-        getMonthlySales({
-          clientid: 1,
-          startDate: filters.startDate,
-          endDate: filters.endDate,
-          branchcode,
-        }),
-      );
-
-      dispatch(
-        getLastYearMonthlySales({
-          clientid: 1,
-          startDate: getPreviousYearDate(filters.startDate),
-          endDate: getPreviousYearDate(filters.endDate),
-          branchcode,
-        }),
-      );
-    }
-
-    // Month To Date
-    if (filters.dateRange === "Month To Date") {
-      dispatch(
-        getMonthToDateSales({
-          clientid: 1,
-          startDate: filters.startDate,
-          endDate: filters.endDate,
-          branchcode,
-        }),
-      );
-
-      dispatch(
-        getLastYearMonthToDateSales({
-          clientid: 1,
-          startDate: getPreviousYearDate(filters.startDate),
-          endDate: getPreviousYearDate(filters.endDate),
-          branchcode,
-        }),
-      );
-    }
-
-    // Navigate according to selected branch
     if (filters.branch) {
       navigate(`/dashboard-sales/branch/${filters.branch}`);
     } else {
@@ -348,14 +276,6 @@ dispatch(
 
   document.title = "Sales Dashboard | phAMACore Analytics";
 
-  // const branchMap = useMemo(() => {
-  //     if (!filters.branch) return null;
-  //     const map = {};
-  //     sales.forEach((item) => {
-  //       map[item.branch_ID] = item.brancch_Name;
-  //     });
-  //     return map;
-  //   }, [sales]);
   return (
     <div className="page-content">
       <Container fluid>
@@ -364,7 +284,7 @@ dispatch(
           pageTitle="Dashboards"
           subtitle={
             isBranchView
-              ? sales.find((s) => s.branch_ID === Number(branchCode))
+              ? salesBranch.find((s) => s.branch_ID === Number(branchCode))
                   ?.brancch_Name
               : undefined
           }
@@ -379,7 +299,7 @@ dispatch(
             ordersReceived={ordersReceived}
             formatAmount={formatAmount}
             cashInvoicesPercentage={cashInvoicesPercentage}
-salesInvoicesPercentage={salesInvoicesPercentage}
+            salesInvoicesPercentage={salesInvoicesPercentage}
             cashSalesPercentage={cashSalesPercentage}
             overdueDebtorsCount={overdueDebtorsCount}
             creditNotesPercentage={creditNotesPercentage}
@@ -388,9 +308,11 @@ salesInvoicesPercentage={salesInvoicesPercentage}
             cashInvoices={cashInvoices}
             // branchMap={branchMap}
             rightClickBtn={toggleRightColumn}
+            loading={loading}
+            error={error}
           />
         </Row>
-        <Row >
+        <Row>
           <Col xl={6}>
             {isBranchView ? (
               <TopProducts data={topProducts} />
@@ -401,15 +323,21 @@ salesInvoicesPercentage={salesInvoicesPercentage}
                 categories={branchCategories}
                 totalRevenue={totalRevenue}
                 formatAmount={formatAmount}
+                loading={loading}
+                error={error}
               />
             )}
           </Col>
 
           <Col xl={6}>
             {isBranchView ? (
-              <BottomProducts data={bottomProducts} />
+              <BottomProducts
+                data={bottomProducts}
+                error={error}
+                loading={loading}
+              />
             ) : (
-              <TopProducts data={topProducts} />
+              <TopProducts data={topProducts} error={error} loading={loading} />
             )}
           </Col>
         </Row>
@@ -420,6 +348,8 @@ salesInvoicesPercentage={salesInvoicesPercentage}
               sales={sales}
               data={salesmanData}
               formatAmount={formatAmount}
+              error={error}
+              loading={loading}
             />
           </Col>
 
@@ -434,6 +364,8 @@ salesInvoicesPercentage={salesInvoicesPercentage}
               overdue120Plus={overdue120Plus}
               topDebtors={topDebtors}
               formatAmount={formatAmount}
+              error={error}
+              loading={loading}
             />
           </Col>
 
@@ -442,6 +374,8 @@ salesInvoicesPercentage={salesInvoicesPercentage}
               sales={sales}
               data={topCustomersData}
               formatAmount={formatAmount}
+              error={error}
+              loading={loading}
             />
           </Col>
         </Row>
@@ -452,6 +386,8 @@ salesInvoicesPercentage={salesInvoicesPercentage}
               series={monthlyChart.series}
               categories={monthlyChart.categories}
               formatAmount={formatAmount}
+              error={error}
+              loading={loading}
             />
           </Col>
 
@@ -460,6 +396,8 @@ salesInvoicesPercentage={salesInvoicesPercentage}
               series={monthToDateChart.series}
               categories={monthToDateChart.categories}
               formatAmount={formatAmount}
+              error={error}
+              loading={loading}
             />
           </Col>
 

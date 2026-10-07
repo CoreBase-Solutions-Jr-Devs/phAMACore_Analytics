@@ -19,7 +19,7 @@ export const getSalesTransactions = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 // KPI SALES
 export const getKPISalesTransactions = createAsyncThunk(
@@ -31,7 +31,7 @@ export const getKPISalesTransactions = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 export const getKPIOverdueAccounts = createAsyncThunk(
@@ -43,7 +43,7 @@ export const getKPIOverdueAccounts = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 // MONTHLY CHART
 export const getMonthlySales = createAsyncThunk(
@@ -55,7 +55,7 @@ export const getMonthlySales = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // LAST YEAR MONTHLY SALES
@@ -68,8 +68,9 @@ export const getLastYearMonthlySales = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
+
 // MONTH TO DATE
 export const getMonthToDateSales = createAsyncThunk(
   "powerbi/getMonthToDateSales",
@@ -80,7 +81,7 @@ export const getMonthToDateSales = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // LAST YEAR MONTH TO DATE
@@ -93,5 +94,5 @@ export const getLastYearMonthToDateSales = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );

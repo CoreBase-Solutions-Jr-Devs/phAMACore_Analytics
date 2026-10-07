@@ -4,15 +4,16 @@ import { topCustomers } from "../../common/data/dashboardEcommerce";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const TopCustomers = ({ data = [], formatAmount }) => {
-
+const TopCustomers = ({ data = [], loading, error }) => {
   const sorted = [...data].sort((a, b) => b.revenue - a.revenue);
 
   const handleExportExcel = () => {
     const rows = (data || []).map((item) => ({
       Customer: item.name || "",
       Branch: item.branch || "",
-      "Revenue (KES)": Number(item.revenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      "Revenue (KES)": Number(item.revenue || 0).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      }),
     }));
     const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
     exportToExcel(rows, `Top_Customers_Revenue_${todayStr}`);
@@ -33,7 +34,18 @@ const TopCustomers = ({ data = [], formatAmount }) => {
         </CardHeader>
 
         <CardBody>
-          {data.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-5">
+              <div
+                className="spinner-border text-primary mb-3"
+                role="status"
+              ></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-5">
+              <h6 className="text-danger mb-2">{error} </h6>
+            </div>
+          ) : data.length === 0 ? (
             <div className="text-center py-5">
               <p className="text-muted mb-2">
                 No customer revenue data available
@@ -54,15 +66,13 @@ const TopCustomers = ({ data = [], formatAmount }) => {
                 <tbody>
                   {sorted.map((item, i) => (
                     <tr key={i}>
-                      <td >
-                        {item.name}
+                      <td>{item.name}</td>
+
+                      <td className="text-muted font-semibold">
+                        {item.branch}
                       </td>
 
-                      <td className="text-muted font-semibold">{item.branch}</td>
-
-                      <td >
-                        {Number(item.revenue).toLocaleString("en-KE")}
-                      </td>
+                      <td>{Number(item.revenue).toLocaleString("en-KE")}</td>
 
                       {/* <td className="text-end">
                         <span
