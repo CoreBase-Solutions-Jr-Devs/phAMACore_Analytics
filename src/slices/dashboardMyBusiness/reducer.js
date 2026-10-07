@@ -8,6 +8,7 @@ import {
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const today = new Date();
+const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 const yearStart = new Date(today.getFullYear(), 0, 1);
 
 const initialState = {
@@ -29,8 +30,8 @@ const initialState = {
 
   filters: {
     branch: null,
-    dateRange: "Year To Date",
-    startDate: formatDMY(yearStart),
+    dateRange: "Month to Date",
+    startDate: formatDMY(monthStart),
     endDate: formatDMY(today),
     groupBy: "SUMMARY",
   },
@@ -99,6 +100,15 @@ const DashboardMyBusinessSlice = createSlice({
 
           state.filters.startDate = formatDMY(start);
           state.filters.endDate = formatDMY(end);
+          break;
+        }
+
+        case "Month to Date": {
+          const now = new Date();
+          const start = new Date(now.getFullYear(), now.getMonth(), 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(now);
           break;
         }
 
