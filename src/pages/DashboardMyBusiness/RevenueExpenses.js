@@ -41,7 +41,7 @@ const RevenueExpenses = () => {
   const monthlyRanges = useMemo(() => {
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonthIdx = now.getMonth(); // 0 = Jan, 8 = Sep
+    const currentMonthIdx = now.getMonth(); // 0 = Jan, 11 = Dec
 
     const ranges = [];
     for (let i = 0; i <= currentMonthIdx; i++) {
