@@ -185,7 +185,7 @@ const topDebtors = (kpiOverdueAccounts || [])
   const totals = {};
 
   sales.forEach((item) => {
-    const key = normalizeProductName(item.item_Name);
+    const key = (item.item_Name);
 
     if (!totals[key]) {
       totals[key] = {
@@ -366,8 +366,8 @@ const topDebtors = (kpiOverdueAccounts || [])
   }, [monthToDateSales, lastYearMonthToDateSales, filters]);
 
   const topProductsData = sales.reduce((acc, item) => {
-    const rawName = item.item_Name || "UNKNOWN PRODUCT";
-    const name = normalizeProductName(rawName);
+    const name = item.item_Name || "UNKNOWN PRODUCT";
+  
 
     const qty = Number(item.quantity_Sold || 0);
 
@@ -384,8 +384,7 @@ const topDebtors = (kpiOverdueAccounts || [])
   }, {});
 
   const bottomProductsData = sales.reduce((acc, item) => {
-    const rawName = item.item_Name || "UNKNOWN PRODUCT";
-    const name = normalizeProductName(rawName);
+    const name = item.item_Name || "UNKNOWN PRODUCT";
 
     const qty = Number(item.quantity_Sold || 0);
 
