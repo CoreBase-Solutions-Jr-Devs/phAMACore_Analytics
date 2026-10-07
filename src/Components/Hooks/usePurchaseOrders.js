@@ -72,6 +72,26 @@ const usePurchaseOrders = (
   filters = {}
 ) => {
 
+   const formatAmount = (value) => {
+    if (value === null || value === undefined) return "0";
+
+    const abs = Math.abs(value);
+
+    if (abs >= 1_000_000_000) {
+      return (value / 1_000_000_000).toFixed(1) + "B";
+    }
+
+    if (abs >= 1_000_000) {
+      return (value / 1_000_000).toFixed(1) + "M";
+    }
+
+    if (abs >= 1_000) {
+      return (value / 1_000).toFixed(1) + "K";
+    }
+
+    return value % 1 === 0 ? value.toFixed(0) : value.toFixed(2);
+  };
+  
 const totalSpend = Number(
   KPISummary?.[0]?.net_purchases_incl || 0
 );
@@ -570,7 +590,7 @@ const bestPricePerSupplier = bestPriceData
   // RETURN ALL CALCULATED VALUES
   // ============================================================
   return {
-    formatAmount,
+ 
     totalSpend,
     activeSuppliers,
     avgLeadTime,

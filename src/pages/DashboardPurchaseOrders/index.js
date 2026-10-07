@@ -49,39 +49,7 @@ const KPI_GROUP_BYS = [
 ];
 
 const ACTUAL_SPEND_GROUP_BYS = [
-  "SUMMARY",
-  "CATEGORY",
-  "SUPPLIER",
-  "TYPE",
-  "BRANCH",
   "MONTHLY",
-];
-
-const DAILY_SPEND_GROUP_BYS = [
-  "MONTHLY",
-  "SUMMARY",
-  "TYPE",
-  "SUPPLIER",
-  "BRANCH",
-  "CATEGORY",
-];
-
-const LAST_YEAR_ACTUAL_SPEND_GROUP_BYS = [
-  "SUMMARY",
-  "SUPPLIER",
-  "CATEGORY",
-  "TYPE",
-  "MONTHLY",
-  "BRANCH",
-];
-
-const LAST_YEAR_DAILY_SPEND_GROUP_BYS = [
-  "MONTHLY",
-  "CATEGORY",
-  "SUPPLIER",
-  "SUMMARY",
-  "TYPE",
-  "BRANCH",
 ];
 
 const LEAD_TIME_GROUP_BYS = [
@@ -353,16 +321,16 @@ const goodsReceivedParams = {
 dispatch(
   getGoodsReceived({
     ...goodsReceivedParams,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
+      startDate: dates.currentMonthStart,
+      endDate: dates.today,
   })
 );
 
 dispatch(
   getGoodsReceived({
     ...goodsReceivedParams,
-    startDate: getPreviousYearDate(filters.startDate),
-    endDate: getPreviousYearDate(filters.endDate),
+    startDate: dates.lastYearMonthStart,
+    endDate: dates.lastYearToday,
   })
 );
 
@@ -378,17 +346,6 @@ dispatch(
   );
 
   dispatchGroupByRequests(
-    getDailySpend,
-    {
-      clientid: 1,
-      startDate: dates.currentMonthStart,
-      endDate: dates.today,
-      branchcode: branchId ,
-    },
-    DAILY_SPEND_GROUP_BYS
-  );
-
-  dispatchGroupByRequests(
     getLastYearActualSpend,
     {
       clientid: 1,
@@ -396,18 +353,7 @@ dispatch(
       endDate: dates.lastYearToday,
       branchcode: branchId ,
     },
-    LAST_YEAR_ACTUAL_SPEND_GROUP_BYS
-  );
-
-  dispatchGroupByRequests(
-    getLastYearDailySpend,
-    {
-      clientid: 1,
-      startDate: dates.lastYearMonthStart,
-      endDate: dates.lastYearToday,
-      branchcode: branchId ,
-    },
-    LAST_YEAR_DAILY_SPEND_GROUP_BYS
+ACTUAL_SPEND_GROUP_BYS
   );
 
   dispatchGroupByRequests(
