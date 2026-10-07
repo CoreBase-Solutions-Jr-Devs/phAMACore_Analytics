@@ -144,8 +144,6 @@ console.log("KPIBranch in FilterActions:", KPIBranch);
                      setEndDate(end.toLocaleDateString("en-GB"))
                    );
                
-                   // Only switch to Custom when the user
-                   // is actually using a Custom range.
                    if (dateRange === "Custom") {
                      dispatch(setDateRange("Custom"));
                    }

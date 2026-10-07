@@ -12,10 +12,8 @@ import SupplierSpendBottom from "./SupplierSpendBottom";
 import FilterActions from "./FilterActions";
 import SupplierSpend from "./SupplierSpend";
 import RecentOrders from "./RecentOrders";
-
 import BreadCrumb from "../../Components/Common/BreadCrumb";
-import RecentActivity from "./RecentActivity";
-
+// import RecentActivity from "./RecentActivity";
 import {
   getPurchaseOrders,
   getActualSpend,
@@ -32,14 +30,14 @@ import {
 import {
 getKPIOverdueAccounts
 } from "../../slices/dashboardSales/thunk";
-import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
-
+ import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
 import usePurchaseOrders from "../../Components/Hooks/usePurchaseOrders";
 import BestPrices from "./BestPrices";
-
-// --------------------------------------------------
-// GROUP BY CONFIGURATION
-// --------------------------------------------------
+import {
+  getDateRanges,
+  getPreviousYearDate,
+  getPeriod,
+} from "../../helpers/date_helper";
 
 const KPI_GROUP_BYS = [
   "SUMMARY",
@@ -105,9 +103,6 @@ const MAVERICK_SPEND_GROUP_BYS = [
   "OFF_PO_INVOICES",
   "PO_PRICE_VARIANCE",
 ];
-// --------------------------------------------------
-// COMPONENT
-// --------------------------------------------------
 
 const DashboardPurchaseOrders = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
@@ -126,6 +121,7 @@ const DashboardPurchaseOrders = () => {
     setRightColumn(!rightColumn);
   };
 
+
 const {
   PurchaseOrders = [],
 
@@ -139,7 +135,6 @@ const {
   KPIMonthly = [],
   KPIType = [],
 
-  // Maverick Spend
   KPIMaverickSpend = [],
   KPIMaverickSpendSummary = [],
   KPIMaverickSpendSupplier = [],
@@ -153,10 +148,8 @@ const {
   KPIPriceAlertsItems = [],
   KPIPriceAlertsHistory = [],
 
-  // Best Price Per Supplier
   BestPricePerSupplier = [],
 
-  // Lead Time
   KPILeadTime = [],
   KPILeadTimeSummary = [],
   KPILeadTimeSupplier = [],
@@ -164,7 +157,6 @@ const {
   KPILeadTimeMonth = [],
   KPILeadTimeBranch = [],
 
-  // Goods Received
   GoodsReceived = [],
   LastYearGoodsReceived = [],
 
@@ -199,7 +191,8 @@ const {
   LastYearDailySpendBranch = [],
   LastYearDailySpendMonthly = [],
   LastYearDailySpendType = [],
-
+loading,
+  error,
   filters,
 } = useSelector((state) => state.PurchaseOrders);
 
@@ -216,7 +209,6 @@ const {
     branchData,
     actualSpendChart,
     monthToDateChart,
-    // OverdueAccounts,
     bottomSuppliers,
     spendByCategory,
      currentReceivables,
@@ -227,6 +219,7 @@ const {
     overdueSupplierAccounts,
     bestPricePerSupplier,
   } = usePurchaseOrders(
+    
   PurchaseOrders,
 
   KPIPurchases,
@@ -237,7 +230,6 @@ const {
   KPIMonthly,
   KPIType,
 
-  // Maverick Spend
   KPIMaverickSpend,
   KPIMaverickSpendSummary,
   KPIMaverickSpendSupplier,
@@ -245,16 +237,13 @@ const {
   KPIMaverickSpendOffPOInvoices,
   KPIMaverickSpendPOPriceVariance,
 
-  // Price Alerts
   KPIPriceAlerts,
   KPIPriceAlertsSummary,
   KPIPriceAlertsItems,
   KPIPriceAlertsHistory,
 
-  // Best Price Per Supplier
   BestPricePerSupplier,
 
-  // Lead Time
   KPILeadTime,
   KPILeadTimeSummary,
   KPILeadTimeSupplier,
@@ -262,7 +251,6 @@ const {
   KPILeadTimeMonth,
   KPILeadTimeBranch,
 
-  // Goods Received
   GoodsReceived,
   LastYearGoodsReceived,
 
@@ -301,70 +289,17 @@ const {
   kpiOverdueAccounts,
   filters
 );
-  // --------------------------------------------------
-  // DATE HELPERS
-  // --------------------------------------------------
 
-  const getPreviousYearDate = (dateString) => {
-    const [day, month, year] = dateString.split("/");
+  const {
+  currentYearStart,
+  currentMonthStart,
+  today,
+  lastYearStart,
+  lastYearMonthStart,
+  lastYearToday,
+} = getDateRanges();
 
-    return `${day}/${month}/${Number(year) - 1}`;
-  };
-  const getPeriod = (dateString) => {
-  const [day, month, year] = dateString.split("/");
-  return `${year}${month}`;
-};
-const getDateRanges = () => {
-  const today = new Date();
-
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth();
-  const currentDay = today.getDate();
-
-  return {
-    // Current year
-    currentYearStart: new Date(
-      currentYear,
-      0,
-      1
-    ).toLocaleDateString("en-GB"),
-
-    // Current month
-    currentMonthStart: new Date(
-      currentYear,
-      currentMonth,
-      1
-    ).toLocaleDateString("en-GB"),
-
-    // Today
-    today: today.toLocaleDateString("en-GB"),
-
-    // Previous year
-    lastYearStart: new Date(
-      currentYear - 1,
-      0,
-      1
-    ).toLocaleDateString("en-GB"),
-
-    // Same month last year
-    lastYearMonthStart: new Date(
-      currentYear - 1,
-      currentMonth,
-      1
-    ).toLocaleDateString("en-GB"),
-
-    // Same day last year
-    lastYearToday: new Date(
-      currentYear - 1,
-      currentMonth,
-      currentDay
-    ).toLocaleDateString("en-GB"),
-  };
-};
-
-  // --------------------------------------------------
-  // DISPATCH MULTIPLE GROUP BY REQUESTS
-  // --------------------------------------------------
+const dates = getDateRanges();
 
   const dispatchGroupByRequests = (
     thunk,
@@ -381,12 +316,7 @@ const getDateRanges = () => {
     });
   };
 
-  // --------------------------------------------------
-  // INITIAL DATA LOAD
-  // --------------------------------------------------
-
 useEffect(() => {
-  const dates = getDateRanges();
 
   // ----------------------------------------------
   // PURCHASE ORDERS
@@ -435,9 +365,6 @@ dispatch(
     endDate: getPreviousYearDate(filters.endDate),
   })
 );
-  // ----------------------------------------------
-  // ACTUAL SPEND - CURRENT YEAR YTD
-  // ----------------------------------------------
 
   dispatchGroupByRequests(
     getActualSpend,
@@ -450,10 +377,6 @@ dispatch(
     ACTUAL_SPEND_GROUP_BYS
   );
 
-  // ----------------------------------------------
-  // DAILY SPEND - CURRENT MONTH MTD
-  // ----------------------------------------------
-
   dispatchGroupByRequests(
     getDailySpend,
     {
@@ -464,10 +387,6 @@ dispatch(
     },
     DAILY_SPEND_GROUP_BYS
   );
-
-  // ----------------------------------------------
-  // LAST YEAR ACTUAL SPEND - PREVIOUS YEAR YTD
-  // ----------------------------------------------
 
   dispatchGroupByRequests(
     getLastYearActualSpend,
@@ -480,10 +399,6 @@ dispatch(
     LAST_YEAR_ACTUAL_SPEND_GROUP_BYS
   );
 
-  // ----------------------------------------------
-  // LAST YEAR DAILY SPEND - PREVIOUS YEAR MTD
-  // ----------------------------------------------
-
   dispatchGroupByRequests(
     getLastYearDailySpend,
     {
@@ -494,10 +409,6 @@ dispatch(
     },
     LAST_YEAR_DAILY_SPEND_GROUP_BYS
   );
-
-  // ----------------------------------------------
-  // KPI PURCHASES
-  // ----------------------------------------------
 
   dispatchGroupByRequests(
     getKPIPurchases,
@@ -567,25 +478,13 @@ dispatchGroupByRequests(
 
 }, [dispatch, branchId]);
 
-  // --------------------------------------------------
-  // CLEANUP
-  // --------------------------------------------------
-
   useEffect(() => {
     return () => {
       dispatch(clearPurchaseOrdersData());
     };
   }, [dispatch]);
 
-  // --------------------------------------------------
-  // APPLY FILTERS
-  // --------------------------------------------------
-
 const handleApplyFilters = () => {
-  // ----------------------------------------------
-  // PURCHASE ORDERS
-  // ----------------------------------------------
-
   // dispatch(
   //   getPurchaseOrders({
   //     clientid: 1,
@@ -615,9 +514,6 @@ dispatch(
     endDate: getPreviousYearDate(filters.endDate),
   })
 );
-  // ----------------------------------------------
-  // KPI PURCHASES
-  // ----------------------------------------------
 
   dispatchGroupByRequests(
     getKPIPurchases,
@@ -687,35 +583,6 @@ dispatchGroupByRequests(
   })
 );
 
-  // ----------------------------------------------
-  // YEAR TO DATE
-  // ----------------------------------------------
-
-  // if (filters.dateRange === "Year To Date") {
-  //   // Current year YTD
-  //   dispatchGroupByRequests(
-  //     getActualSpend,
-  //     {
-  //       clientid: 1,
-  //       startDate: filters.startDate,
-  //       endDate: filters.endDate,
-  //       branchcode: filters.branch ?? null,
-  //     },
-  //     ACTUAL_SPEND_GROUP_BYS
-  //   );
-
-  //   // Previous year YTD
-  //   dispatchGroupByRequests(
-  //     getLastYearActualSpend,
-  //     {
-  //       clientid: 1,
-  //       startDate: getPreviousYearDate(filters.startDate),
-  //       endDate: getPreviousYearDate(filters.endDate),
-  //       branchcode: filters.branch ?? null,
-  //     },
-  //     LAST_YEAR_ACTUAL_SPEND_GROUP_BYS
-  //   );
-  // }
 dispatchGroupByRequests(
   getKPIMaverickSpend,
   {
@@ -727,40 +594,6 @@ dispatchGroupByRequests(
   },
   MAVERICK_SPEND_GROUP_BYS
 );
-console.log("KPIBranch from Redux:", KPIBranch);
-  // ----------------------------------------------
-  // MONTH TO DATE
-  // ----------------------------------------------
-
-  // if (filters.dateRange === "Month To Date") {
-  //   // Current year MTD
-  //   dispatchGroupByRequests(
-  //     getDailySpend,
-  //     {
-  //       clientid: 1,
-  //       startDate: filters.startDate,
-  //       endDate: filters.endDate,
-  //       branchcode: filters.branch ?? null,
-  //     },
-  //     DAILY_SPEND_GROUP_BYS
-  //   );
-
-  //   // Previous year MTD
-  //   dispatchGroupByRequests(
-  //     getLastYearDailySpend,
-  //     {
-  //       clientid: 1,
-  //       startDate: getPreviousYearDate(filters.startDate),
-  //       endDate: getPreviousYearDate(filters.endDate),
-  //       branchcode: filters.branch ?? null,
-  //     },
-  //     LAST_YEAR_DAILY_SPEND_GROUP_BYS
-  //   );
-  // }
-
-  // ----------------------------------------------
-  // NAVIGATION
-  // ----------------------------------------------
 
   if (filters.branch) {
     navigate(
@@ -771,7 +604,6 @@ console.log("KPIBranch from Redux:", KPIBranch);
   }
 };
 
-
   return (
     <React.Fragment>
       <div className="page-content">
@@ -781,7 +613,7 @@ console.log("KPIBranch from Redux:", KPIBranch);
             pageTitle="Dashboards"
             subtitle={
               isBranchView
-                ? PurchaseOrders.find(
+                ? KPIBranch.find(
                     (item) => item.branch_ID === Number(branchCode),
                   )?.branch_name
                 : undefined
@@ -791,29 +623,33 @@ console.log("KPIBranch from Redux:", KPIBranch);
             <Col>
               <div className="h-100">
                 <Row>
-              <Widget
-  rightClickBtn={toggleRightColumn}
-  formatAmount={formatAmount}
-  totalSpend={totalSpend}
-  activeSuppliers={activeSuppliers}
-  avgLeadTime={avgLeadTime}
-  priceAlerts={priceAlerts}
-  maverickSpend={maverickSpend}
-  maverickSpendPercentage={maverickSpendPercentage}
-/>
+                  <Widget
+                    rightClickBtn={toggleRightColumn}
+                    formatAmount={formatAmount}
+                    totalSpend={totalSpend}
+                    activeSuppliers={activeSuppliers}
+                    avgLeadTime={avgLeadTime}
+                    priceAlerts={priceAlerts}
+                    maverickSpend={maverickSpend}
+                    maverickSpendPercentage={maverickSpendPercentage}
+                    error={error}
+                    loading={loading}
+                  />
                 </Row>
                 <Row>
                   <Col xl={6}>
                     {isBranchView ? (
-                                   <SalesByLocations 
-  data={spendByCategory} 
-  totalSpend={totalSpend} 
-  formatAmount={formatAmount} 
-/>
+                      <SalesByLocations
+                        data={spendByCategory}
+                        totalSpend={totalSpend}
+                        error={error}
+                        loading={loading}
+                      />
                     ) : (
                       <StoreVisits
                         data={branchData}
-                        formatAmount={formatAmount}
+                        error={error}
+                        loading={loading}
                       />
                     )}
                   </Col>
@@ -822,40 +658,46 @@ console.log("KPIBranch from Redux:", KPIBranch);
                     {isBranchView ? (
                       <SupplierSpendBottom
                         supplierData={bottomSuppliers}
-                        formatAmount={formatAmount}
+                        error={error}
+                        loading={loading}
                       />
                     ) : (
-                     <SalesByLocations 
-  data={spendByCategory} 
-  totalSpend={totalSpend} 
-  formatAmount={formatAmount} 
-/>
+                      <SalesByLocations
+                        data={spendByCategory}
+                        totalSpend={totalSpend}
+                        error={error}
+                        loading={loading}
+                      />
                     )}
                   </Col>
                   <Row>
                     <Col xl={4}>
                       <SupplierSpend
                         supplierData={topSuppliers}
-                        formatAmount={formatAmount}
                         top2Suppliers={top2Suppliers}
                         totalSpend={totalSpend}
+                        loading={loading}
+                        error={error}
                       />
-                      </Col>
+                    </Col>
                     <Col xl={4}>
-                      <BestPrices 
-                      bestPricePerSupplier = {bestPricePerSupplier}
+                      <BestPrices
+                        bestPricePerSupplier={bestPricePerSupplier}
+                        error={error}
+                        loading={loading}
                       />
                     </Col>
                     <Col xl={4}>
                       <RecentOrders
-                        // data={PurchaseOrders}
                         formatAmount={formatAmount}
                         overdueSupplierAccounts={overdueSupplierAccounts}
-                         currentReceivables={currentReceivables}
-    overdue31To60={overdue31To60}
-    overdue61To90={overdue61To90}
-    overdue91To120={overdue91To120}
-    overdue120Plus={overdue120Plus}
+                        currentReceivables={currentReceivables}
+                        overdue31To60={overdue31To60}
+                        overdue61To90={overdue61To90}
+                        overdue91To120={overdue91To120}
+                        overdue120Plus={overdue120Plus}
+                        error={error}
+                        loading={loading}
                       />
                     </Col>
                   </Row>

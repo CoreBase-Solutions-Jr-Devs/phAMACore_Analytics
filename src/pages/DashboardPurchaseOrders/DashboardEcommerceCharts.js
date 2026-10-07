@@ -2,75 +2,71 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 
-const RevenueCharts = ({ 
-  dataColors, 
-  series, 
-  categories = [], 
-}) => { 
-  const colors = getChartColorsArray(dataColors); 
- 
-  const options = { 
-    chart: { 
-      height: 370, 
-      type: "line", 
-      toolbar: { 
-        show: false, 
-      }, 
-    }, 
- 
-    stroke: { 
-      curve: "smooth", 
-      width: 3, 
-      dashArray: [0, 6], 
-    }, 
- 
-    dataLabels: { 
-      enabled: false, 
-    }, 
- 
-    colors: [colors[0], colors[0]], 
- 
-    legend: { 
-      show: false, 
-    }, 
- 
-    xaxis: { 
-      categories, 
- 
-      axisTicks: { 
-        show: false, 
-      }, 
- 
-      axisBorder: { 
-        show: false, 
-      }, 
-    }, 
- 
-    yaxis: { 
-      min: 0, 
-      forceNiceScale: true, 
-      tickAmount: 5, 
- 
-      labels: { 
-        formatter: (val) => Number(val).toLocaleString(), 
-      }, 
-    }, 
- 
-    tooltip: { 
-      y: { 
-        formatter: (val) => Number(val).toLocaleString(), 
-      }, 
-    }, 
-  }; 
- 
-  return ( 
-    <ReactApexChart 
-      options={options} 
-      series={series} 
-      type="line" 
-      height={350} 
-    /> 
-  ); 
+const RevenueCharts = ({ dataColors, series, categories = [] }) => {
+  const colors = getChartColorsArray(dataColors);
+
+  const options = {
+    chart: {
+      height: 370,
+      type: "line",
+      toolbar: {
+        show: false,
+      },
+    },
+
+    stroke: {
+      curve: "smooth",
+      width: 3,
+      dashArray: [0, 6],
+    },
+
+    dataLabels: {
+      enabled: false,
+    },
+
+    colors: [colors[0], colors[0]],
+
+    legend: {
+      show: false,
+    },
+
+    xaxis: {
+      categories,
+
+      axisTicks: {
+        show: false,
+      },
+
+      axisBorder: {
+        show: false,
+      },
+    },
+
+    yaxis: {
+      min: 0,
+      forceNiceScale: true,
+      tickAmount: 5,
+
+      labels: {
+        formatter: (val) => Number(val).toLocaleString(),
+      },
+    },
+
+    tooltip: {
+      y: {
+        formatter: (val) => Number(val).toLocaleString(),
+      },
+    },
+  };
+
+  return (
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="line"
+      height={350}
+    />
+  );
 };
 
 const MonthToDateCharts = ({
@@ -81,59 +77,59 @@ const MonthToDateCharts = ({
 }) => {
   const colors = getChartColorsArray(dataColors);
 
- const options = {
-  chart: {
-    height: 370,
-    type: "line",
-    toolbar: {
-      show: false,
+  const options = {
+    chart: {
+      height: 370,
+      type: "line",
+      toolbar: {
+        show: false,
+      },
     },
-  },
 
-  stroke: {
-    curve: "smooth",
-    width: 3,
-    dashArray: [0, 6],
-  },
+    stroke: {
+      curve: "smooth",
+      width: 3,
+      dashArray: [0, 6],
+    },
 
-  dataLabels: {
-    enabled: false,
-  },
+    dataLabels: {
+      enabled: false,
+    },
 
-  colors: [colors[0], colors[0]],
+    colors: [colors[0], colors[0]],
 
-  legend: {
-    show: false,
-  },
-
-  xaxis: {
-    categories,
-
-    axisTicks: {
+    legend: {
       show: false,
     },
 
-    axisBorder: {
-      show: false,
+    xaxis: {
+      categories,
+
+      axisTicks: {
+        show: false,
+      },
+
+      axisBorder: {
+        show: false,
+      },
     },
-  },
 
-  yaxis: {
-    min: 0,
-    forceNiceScale: true,
-    tickAmount: 5,
+    yaxis: {
+      min: 0,
+      forceNiceScale: true,
+      tickAmount: 5,
 
- labels: {
-  formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
-},
-  },
-
-  tooltip: {
-    y: {
-  formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
+      labels: {
+        formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
+      },
     },
-  },
-};
+
+    tooltip: {
+      y: {
+        formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
+      },
+    },
+  };
 
   return (
     <ReactApexChart
@@ -150,9 +146,7 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
   let barchartCountriesColors = [];
 
   try {
-    barchartCountriesColors = dataColors
-      ? getChartColorsArray(dataColors)
-      : [];
+    barchartCountriesColors = dataColors ? getChartColorsArray(dataColors) : [];
   } catch (error) {
     console.warn("Chart colors parsing failed:", error);
     barchartCountriesColors = ["#f06548"];
@@ -180,9 +174,9 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
         borderRadius: 2,
         horizontal: true,
         distributed: true,
-        barHeight: "65%", 
+        barHeight: "65%",
         dataLabels: {
-          position: "right", 
+          position: "right",
         },
       },
     },
@@ -192,7 +186,7 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
     dataLabels: {
       enabled: true,
       textAnchor: "start",
-      offsetX: 15, 
+      offsetX: 15,
       formatter: (val) => formatAmount(val),
 
       style: {
@@ -213,12 +207,12 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
       show: false,
     },
 
-grid: {
-  show: false,
-  padding: {
-    left: 50, // increase if names are still cut off
-  },
-},
+    grid: {
+      show: false,
+      padding: {
+        left: 50, // increase if names are still cut off
+      },
+    },
 
     xaxis: {
       categories: categories || [],
@@ -236,17 +230,17 @@ grid: {
       },
     },
 
- yaxis: {
-  labels: {
-    maxWidth: 250,
-    style: {
-      fontSize: "13px",
-      fontWeight: 600,
-      colors: ["#495057"], // dark gray
-      // fontFamily: "inherit", // optional
+    yaxis: {
+      labels: {
+        maxWidth: 250,
+        style: {
+          fontSize: "13px",
+          fontWeight: 600,
+          colors: ["#495057"], // dark gray
+          // fontFamily: "inherit", // optional
+        },
+      },
     },
-  },
-},
   };
 
   return (
@@ -255,7 +249,7 @@ grid: {
       options={options}
       series={validSeries}
       type="bar"
-height={500}
+      height={500}
       className="apex-charts"
     />
   );
@@ -268,8 +262,7 @@ const StoreVisitsCharts = ({
   formatAmount,
   amounts = [],
 }) => {
-  const chartPieBasicColors =
-    getChartColorsArray(dataColors);
+  const chartPieBasicColors = getChartColorsArray(dataColors);
 
   console.log("Pie categories:", categories);
   console.log("Pie series:", series);
@@ -305,13 +298,14 @@ const StoreVisitsCharts = ({
     },
 
     tooltip: {
-  y: {
-    formatter: (val, { seriesIndex }) => {
-      const amount = amounts[seriesIndex] || 0;
+      y: {
+        formatter: (val, { seriesIndex }) => {
+          const amount = amounts[seriesIndex] || 0;
 
-  return `KES ${Number(amount).toLocaleString("en-KE")}`;    },
-  },
-},
+          return `KES ${Number(amount).toLocaleString("en-KE")}`;
+        },
+      },
+    },
 
     colors: chartPieBasicColors,
   };
