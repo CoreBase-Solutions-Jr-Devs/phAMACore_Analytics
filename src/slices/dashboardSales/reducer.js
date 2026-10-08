@@ -29,7 +29,7 @@ const initialState = {
   error: null,
 
   filters: {
-    branch: "",
+    branchcode: "",
     dateRange: "Today",
     startDate: new Date().toLocaleDateString("en-GB"),
     endDate: new Date().toLocaleDateString("en-GB"),

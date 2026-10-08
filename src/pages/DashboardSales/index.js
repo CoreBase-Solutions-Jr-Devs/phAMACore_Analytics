@@ -315,7 +315,8 @@ const DashboardSales = () => {
         <Row>
           <Col xl={6}>
             {isBranchView ? (
-              <TopProducts data={topProducts} />
+              <TopProducts data={topProducts}   loading={loading}
+                error={error}/>
             ) : (
               <BranchPerformance
                 branchData={branchData}

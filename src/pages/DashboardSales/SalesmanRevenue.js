@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
-import { salesmanRevenue } from "../../common/data/dashboardEcommerce";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 

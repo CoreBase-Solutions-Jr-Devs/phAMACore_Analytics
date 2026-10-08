@@ -3,7 +3,7 @@ import { Card, CardBody, CardHeader } from "reactstrap";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const BottomProducts = ({ data = [] }) => {
+const BottomProducts = ({ data = [], loading, error }) => {
   const bottomProduct = data.length
     ? [...data].sort((a, b) => a.qty - b.qty)[0]
     : null;
