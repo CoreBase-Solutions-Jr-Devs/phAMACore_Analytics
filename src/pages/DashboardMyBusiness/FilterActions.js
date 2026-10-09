@@ -73,6 +73,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
     "This Week",
     "Last Week",
     "This Month",
+    "Month to Date",
     "Last Month",
     "This Year",
     "Year To Date",
