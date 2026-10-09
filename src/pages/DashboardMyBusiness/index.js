@@ -17,6 +17,9 @@ import {
   cleanBranchName,
   getCachedBranchName,
 } from "../../helpers/branch_helper";
+import SalesComposition from "./SalesComposition";
+import VatBreakdown from "./VatBreakdown";
+import ExpenseTargetInputs from "./ExpenseTargets";
 
 export default function DashboardMyBusiness() {
   document.title = "My Business | phAMACore Analytics";
@@ -74,8 +77,11 @@ export default function DashboardMyBusiness() {
 
         <Section rightClickBtn={toggleRightColumn} kpiData={kpiData} />
 
+
         <Widgets onKpiComputed={setKpiData} />
 
+          
+         
         <Row>
           <Col xl={6}>
             <RevenueExpenses />
@@ -84,7 +90,19 @@ export default function DashboardMyBusiness() {
           <Col xl={6}>
             <StockPurchases />
           </Col>
+
         </Row>
+<Row> 
+            <Col xl={4}>
+<SalesComposition />     
+     </Col>
+    <Col xl={4}>
+            <VatBreakdown />
+          </Col>
+<Col xl={4}> 
+<ExpenseTargetInputs />
+        </Col>
+           </Row>
 
         <Row>
           <Col xl={6}>
