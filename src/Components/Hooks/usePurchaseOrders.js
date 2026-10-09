@@ -1,6 +1,7 @@
 import { useMemo } from "react";
+
 const usePurchaseOrders = (
-  PurchaseOrders = [],
+   PurchaseOrders = [],
 
   KPIPurchases = [],
   KPISummary = [],
@@ -10,7 +11,6 @@ const usePurchaseOrders = (
   KPIMonthly = [],
   KPIType = [],
 
-  // Maverick Spend
   KPIMaverickSpend = [],
   KPIMaverickSpendSummary = [],
   KPIMaverickSpendSupplier = [],
@@ -18,16 +18,14 @@ const usePurchaseOrders = (
   KPIMaverickSpendOffPOInvoices = [],
   KPIMaverickSpendPOPriceVariance = [],
 
-  // Price Change Alerts
+
   KPIPriceAlerts = [],
   KPIPriceAlertsSummary = [],
   KPIPriceAlertsItems = [],
   KPIPriceAlertsHistory = [],
 
-  // Best Price Per Supplier
   BestPricePerSupplier = [],
 
-  // Lead Time
   KPILeadTime = [],
   KPILeadTimeSummary = [],
   KPILeadTimeSupplier = [],
@@ -35,11 +33,9 @@ const usePurchaseOrders = (
   KPILeadTimeMonth = [],
   KPILeadTimeBranch = [],
 
-  // Goods Received
   GoodsReceived = [],
   LastYearGoodsReceived = [],
 
-  // Actual Spend
   ActualSpend = [],
   ActualSpendSummary = [],
   ActualSpendCategory = [],
@@ -48,7 +44,6 @@ const usePurchaseOrders = (
   ActualSpendMonthly = [],
   ActualSpendType = [],
 
-  // Daily Spend
   DailySpend = [],
   DailySpendSummary = [],
   DailySpendCategory = [],
@@ -57,7 +52,6 @@ const usePurchaseOrders = (
   DailySpendMonthly = [],
   DailySpendType = [],
 
-  // Last Year Actual Spend
   LastYearActualSpend = [],
   LastYearActualSpendSummary = [],
   LastYearActualSpendCategory = [],
@@ -66,7 +60,6 @@ const usePurchaseOrders = (
   LastYearActualSpendMonthly = [],
   LastYearActualSpendType = [],
 
-  // Last Year Daily Spend
   LastYearDailySpend = [],
   LastYearDailySpendSummary = [],
   LastYearDailySpendCategory = [],
@@ -74,20 +67,12 @@ const usePurchaseOrders = (
   LastYearDailySpendBranch = [],
   LastYearDailySpendMonthly = [],
   LastYearDailySpendType = [],
-
   kpiOverdueAccounts = [],
+
   filters = {}
 ) => {
 
-  // ============================================================
-  // FORMAT AMOUNT
-  // Converts large numbers into K, M, or B format
-  // Example:
-  // 1,500      -> 1.5K
-  // 1,500,000  -> 1.5M
-  // 1,500,000,000 -> 1.5B
-  // ============================================================
-  const formatAmount = (value) => {
+   const formatAmount = (value) => {
     if (value === null || value === undefined) return "0";
 
     const abs = Math.abs(value);
@@ -104,26 +89,9 @@ const usePurchaseOrders = (
       return (value / 1_000).toFixed(1) + "K";
     }
 
-    return value % 1 === 0
-      ? value.toFixed(0)
-      : value.toFixed(2);
+    return value % 1 === 0 ? value.toFixed(0) : value.toFixed(2);
   };
-
-
-  // ============================================================
- // ============================================================
-// TOTAL SPEND & ACTIVE SUPPLIERS
-// Values come directly from the KPI API.
-// No calculations are performed in the frontend.
-// ============================================================
-
-
-
-
-// ============================================================
-// SUMMARY
-// ============================================================
-
+  
 const totalSpend = Number(
   KPISummary?.[0]?.net_purchases_incl || 0
 );
@@ -276,7 +244,7 @@ const spendByCategory = useMemo(() => {
   const grouped = (KPICategory || [])
     .filter(Boolean)
     .reduce((acc, item) => {
-      const name = item?.item_group || "Unknown";
+      const name = item?.item_subgroup || "Unknown";
       const value = Number(item?.net_purchases_incl || 0);
 
       if (!acc[name]) {
@@ -622,7 +590,7 @@ const bestPricePerSupplier = bestPriceData
   // RETURN ALL CALCULATED VALUES
   // ============================================================
   return {
-    formatAmount,
+ 
     totalSpend,
     activeSuppliers,
     avgLeadTime,

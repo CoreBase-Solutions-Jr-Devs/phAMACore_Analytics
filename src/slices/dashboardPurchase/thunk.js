@@ -15,7 +15,6 @@ import {
   getBestPricePerSupplier as getBestPricePerSupplierApi,
 } from "../../helpers/fakebackend_helper";
 
-// GET PURCHASE ORDERS
 export const getPurchaseOrders = createAsyncThunk(
   "powerbi/getPurchaseOrders",
   async (params, { rejectWithValue }) => {
@@ -33,7 +32,6 @@ export const getPurchaseOrders = createAsyncThunk(
   },
 );
 
-// KPI PURCHASES
 export const getKPIPurchases = createAsyncThunk(
   "powerbi/getKPIPurchases",
   async (params, { rejectWithValue }) => {
@@ -47,7 +45,6 @@ export const getKPIPurchases = createAsyncThunk(
   },
 );
 
-// ACTUAL SPEND
 export const getActualSpend = createAsyncThunk(
   "powerbi/getActualSpend",
   async (params, { rejectWithValue }) => {

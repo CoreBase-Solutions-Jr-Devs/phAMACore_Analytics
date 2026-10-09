@@ -3,13 +3,14 @@ import { Card, CardBody, CardHeader } from "reactstrap";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const BestPrices = ({
-  bestPricePerSupplier = [],
-}) => {
+const BestPrices = ({ bestPricePerSupplier = [], loading, error }) => {
   const handleExportExcel = () => {
     const rows = (bestPricePerSupplier || []).map((item) => ({
       Supplier: item.supplierName || "",
-      "Spend (KES)": Number(item.totalSpend || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      "Spend (KES)": Number(item.totalSpend || 0).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
     }));
     const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
     exportToExcel(rows, `Best_Price_Per_Supplier_${todayStr}`);
@@ -30,18 +31,26 @@ const BestPrices = ({
         </CardHeader>
 
         <CardBody>
-          {bestPricePerSupplier.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-5">
+              <div
+                className="spinner-border text-primary mb-3"
+                role="status"
+              ></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-5">
+              <h6 className="text-danger mb-2">{error} </h6>
+            </div>
+          ) : bestPricePerSupplier.length === 0 ? (
             <div className="text-center py-4">
-              <h6 className="text-muted mb-1">
-                No best price data available
-              </h6>
+              <h6 className="text-muted mb-1">No best price data available</h6>
             </div>
           ) : (
-        <div className="table-responsive table-card">
+            <div className="table-responsive table-card">
               <table className="table align-middle table-nowrap mb-0">
                 <thead className="table-light">
                   <tr className="text-muted">
-                
                     <th>Supplier</th>
                     <th>Spend(KES)</th>
                   </tr>
@@ -51,16 +60,11 @@ const BestPrices = ({
                   {bestPricePerSupplier.map((item, index) => (
                     <tr key={index}>
                       <td>
-                        <div className="fw-medium">
-                          {item.supplierName}
-                        </div>
+                        <div className="fw-medium">{item.supplierName}</div>
                       </td>
 
                       <td>
-                      
-                        {Number(
-                          item.totalSpend || 0
-                        ).toLocaleString("en-KE", {
+                        {Number(item.totalSpend || 0).toLocaleString("en-KE", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}

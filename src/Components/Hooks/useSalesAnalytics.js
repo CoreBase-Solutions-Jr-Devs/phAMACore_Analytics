@@ -1,26 +1,17 @@
 import { useMemo } from "react";
 
 const useSalesAnalytics = (
-  sales = [],
-  kpiSales = [],
+ sales = [],
   kpiOverdueAccounts = [],
-    salesType: [],
-  salesBranch: [],
-  salesBranch_Type: [],
+    salesType = [],
+  salesBranch = [],
+  salesBranch_Type = [],
   monthlySales = [],
   monthToDateSales = [],
   lastYearMonthToDateSales = [],
   lastYearMonthlySales = [],
   filters = {}
 ) => {
-  // const branchMap = useMemo(() => {
-  //    if (!filters.branch) return null;
-  //   const map = {};
-  //   sales.forEach((item) => {
-  //     map[item.branch_ID] = item.brancch_Name;
-  //   });
-  //   return map;
-  // }, [sales]);
 
   const formatAmount = (value) => {
     if (value === null || value === undefined) return "0";
@@ -95,9 +86,6 @@ const branchChartSeries = branchData.map((branch) =>
 
 const branchCategories = branchData.map((branch) => branch.name);
 
-console.log("Branch Data:", branchData);
-console.log("Chart Series:", branchChartSeries);
-console.log("Categories:", branchCategories);
   /* -------------------------------------------------------
    * Revenue grouped by Sales Representative.
    * Used in the Salesman Revenue widget.
@@ -190,21 +178,6 @@ const topDebtors = (kpiOverdueAccounts || [])
   }));
 
   /* -------------------------------------------------------
-   * Standardizes product names to prevent duplicates.
-   * Example:
-   * Panadol Tabs
-   * Panadol Tablets
-   * -> Panadol Tab
-   * ------------------------------------------------------*/
-  const normalizeProductName = (name = "") =>
-    name
-      .toLowerCase()
-      .trim()
-      .replace(/\b(tabs?|tablets?)\b/g, "tab")
-      .replace(/\s+/g, " ")
-      .trim();
-
-  /* -------------------------------------------------------
    * Top 5 best-selling products.
    * Products are ranked by quantity sold.
    * ------------------------------------------------------*/
@@ -212,7 +185,7 @@ const topDebtors = (kpiOverdueAccounts || [])
   const totals = {};
 
   sales.forEach((item) => {
-    const key = normalizeProductName(item.item_Name);
+    const key = (item.item_Name);
 
     if (!totals[key]) {
       totals[key] = {
@@ -245,7 +218,6 @@ const topDebtors = (kpiOverdueAccounts || [])
 
     let endDate = currentDate;
 
-    // If YTD is selected, use the selected end date
     if (filters?.dateRange === "Year To Date" && filters?.endDate) {
       const [day, month, year] = filters.endDate.split("/").map(Number);
       endDate = new Date(year, month - 1, day);
@@ -263,7 +235,6 @@ const topDebtors = (kpiOverdueAccounts || [])
 
     const lastYearMap = Object.fromEntries(months.map((m) => [m, 0]));
 
-    // CURRENT YEAR
     (monthlySales || []).forEach((item) => {
       if (!item.transaction_Date) return;
 
@@ -280,7 +251,6 @@ const topDebtors = (kpiOverdueAccounts || [])
       }
     });
 
-    // LAST YEAR
     (lastYearMonthlySales || []).forEach((item) => {
       if (!item.transaction_Date) return;
 
@@ -324,7 +294,6 @@ const topDebtors = (kpiOverdueAccounts || [])
 
     let endDate = now;
 
-    // If MTD is selected, use the selected end date
     if (filters?.dateRange === "Month To Date" && filters?.endDate) {
       const [day, month, year] = filters.endDate.split("/").map(Number);
       endDate = new Date(year, month - 1, day);
@@ -345,7 +314,6 @@ const topDebtors = (kpiOverdueAccounts || [])
       return acc;
     }, {});
 
-    // CURRENT YEAR
     (monthToDateSales || []).forEach((s) => {
       if (!s.transaction_Date) return;
 
@@ -365,7 +333,6 @@ const topDebtors = (kpiOverdueAccounts || [])
       }
     });
 
-    // LAST YEAR
     (lastYearMonthToDateSales || []).forEach((s) => {
       if (!s.transaction_Date) return;
 
@@ -399,14 +366,14 @@ const topDebtors = (kpiOverdueAccounts || [])
   }, [monthToDateSales, lastYearMonthToDateSales, filters]);
 
   const topProductsData = sales.reduce((acc, item) => {
-    const rawName = item.item_Name || "UNKNOWN PRODUCT";
-    const name = normalizeProductName(rawName);
+    const name = item.item_Name || "UNKNOWN PRODUCT";
+  
 
     const qty = Number(item.quantity_Sold || 0);
 
     if (!acc[name]) {
       acc[name] = {
-        name: rawName,
+        name: name,
         qty: 0,
       };
     }
@@ -417,14 +384,13 @@ const topDebtors = (kpiOverdueAccounts || [])
   }, {});
 
   const bottomProductsData = sales.reduce((acc, item) => {
-    const rawName = item.item_Name || "UNKNOWN PRODUCT";
-    const name = normalizeProductName(rawName);
+    const name = item.item_Name || "UNKNOWN PRODUCT";
 
     const qty = Number(item.quantity_Sold || 0);
 
     if (!acc[name]) {
       acc[name] = {
-        name: rawName,
+        name: name,
         qty: 0,
       };
     }
@@ -445,9 +411,6 @@ const topDebtors = (kpiOverdueAccounts || [])
   return {
     formatAmount,
     totalRevenue,
-    // todayRevenue,
-    // yesterdayRevenue,
-    // revenueChange,
     cashSales,
     salesInvoices,
     cashInvoicesPercentage,
@@ -458,7 +421,6 @@ const topDebtors = (kpiOverdueAccounts || [])
     ordersReceived,
     branchData,
     currentReceivables,
-    // overdue1To30,
     overdue31To60,
     overdue61To90,
     overdue91To120,

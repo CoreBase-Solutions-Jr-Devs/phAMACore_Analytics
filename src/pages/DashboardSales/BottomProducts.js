@@ -3,12 +3,11 @@ import { Card, CardBody, CardHeader } from "reactstrap";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const BottomProducts = ({ data = [], }) => {
- 
+const BottomProducts = ({ data = [], loading, error }) => {
   const bottomProduct = data.length
     ? [...data].sort((a, b) => a.qty - b.qty)[0]
     : null;
-   
+
   const handleExportExcel = () => {
     const rows = (data || []).map((item) => ({
       Product: item.name || "",
@@ -22,7 +21,7 @@ const BottomProducts = ({ data = [], }) => {
     <Card className="card-height-100" id="sales-bottom-products-card">
       <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
         <h4 className="card-title mb-0 flex-grow-1">
-        Bottom Products - Units Sold   
+          Bottom Products - Units Sold
         </h4>
         <CardExportButtons
           targetId="sales-bottom-products-card"
@@ -32,16 +31,23 @@ const BottomProducts = ({ data = [], }) => {
       </CardHeader>
 
       <CardBody>
-
-        {data.length === 0 ? (
+        {loading ? (
           <div className="text-center py-5">
-            <h6 className="text-muted mb-2">
-              No product sales data available
-            </h6>
+            <div
+              className="spinner-border text-primary mb-3"
+              role="status"
+            ></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-5">
+            <h6 className="text-danger mb-2">{error} </h6>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="text-center py-5">
+            <h6 className="text-muted mb-2">No product sales data available</h6>
           </div>
         ) : (
           <>
-      
             {data.map((product, index) => {
               const max = data[0]?.qty || 1;
               const percentage = (product.qty / max) * 100;
@@ -50,21 +56,16 @@ const BottomProducts = ({ data = [], }) => {
                 percentage >= 80
                   ? "bg-primary"
                   : percentage >= 60
-                  ? "bg-success"
-                  : percentage >= 40
-                  ? "bg-warning"
-                  : "bg-danger";
+                    ? "bg-success"
+                    : percentage >= 40
+                      ? "bg-warning"
+                      : "bg-danger";
 
               return (
                 <div key={index} className="mb-3">
-
                   <div className="d-flex justify-content-between">
-                    <span className="text-uppercase">
-                      {product.name}
-                    </span>
-                    <span className="text-muted">
-                      {product.qty}
-                    </span>
+                    <span className="text-uppercase">{product.name}</span>
+                    <span className="text-muted">{product.qty}</span>
                   </div>
 
                   <div className="progress mt-2" style={{ height: "20px" }}>
@@ -73,32 +74,30 @@ const BottomProducts = ({ data = [], }) => {
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-
                 </div>
               );
-            })} 
-      
+            })}
+
             <hr className="my-2" />
- 
+
             {bottomProduct && (
-               <div className="d-flex flex-row align-items-center justify-content-center mb-2 gap-3">
+              <div className="d-flex flex-row align-items-center justify-content-center mb-2 gap-3">
                 <p>
-                   Bottom Selling Product:
-                   <strong className="text-uppercase"> {bottomProduct.name}</strong>
+                  Bottom Selling Product:
+                  <strong className="text-uppercase">
+                    {" "}
+                    {bottomProduct.name}
+                  </strong>
                 </p>
 
                 <p>
-               Amount Sold:
-                  <strong>
-                    {bottomProduct.qty} units
-                  </strong>
+                  Amount Sold:
+                  <strong>{bottomProduct.qty} units</strong>
                 </p>
               </div>
             )}
-
           </>
         )}
-
       </CardBody>
     </Card>
   );

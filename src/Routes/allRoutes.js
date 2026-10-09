@@ -3,26 +3,9 @@ import { Navigate } from "react-router-dom";
 
 //Dashboard
 import DashboardSales from "../pages/DashboardSales";
-// import DashboardSalesBranch from "../pages/DashboardSalesBranch";
-// import DashboardPurchaseOrdersBranch from "../pages/DashboardPurchaseOrdersBranch";
 import DashboardStock from "../pages/DashboardStock";
 import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
-import DashboardCrypto from "../pages/DashboardCrypto";
 import DashboardMyBusiness from "../pages/DashboardMyBusiness";
-import DashboardProject from "../pages/DashboardProject";
-import DashboardNFT from "../pages/DashboardNFT";
-import DashboardJob from "../pages/DashboardJob/";
-
-//AuthenticationInner pages
-import BasicSignIn from '../pages/AuthenticationInner/Login/BasicSignIn';
-import CoverSignIn from '../pages/AuthenticationInner/Login/CoverSignIn';
-import BasicSignUp from '../pages/AuthenticationInner/Register/BasicSignUp';
-import CoverSignUp from "../pages/AuthenticationInner/Register/CoverSignUp";
-import BasicPasswReset from '../pages/AuthenticationInner/PasswordReset/BasicPasswReset';
-import Basic404 from '../pages/AuthenticationInner/Errors/Basic404';
-import Cover404 from '../pages/AuthenticationInner/Errors/Cover404';
-import Alt404 from '../pages/AuthenticationInner/Errors/Alt404';
-import Error500 from '../pages/AuthenticationInner/Errors/Error500';
 
 //login
 import Login from "../pages/Authentication/Login";
@@ -71,12 +54,7 @@ const authProtectedRoutes = [
   { path: "/dashboard-stock/branch/:branchId", component: <DashboardStock /> },
   { path: "/dashboard-purchase-orders", component: <DashboardPurchaseOrders /> },
   { path: "/dashboard-purchase-orders/branch/:branchId", component: <DashboardPurchaseOrders /> },
-  { path: "/dashboard-crypto", component: <DashboardCrypto /> },
-  { path: "/dashboard-projects", component: <DashboardProject /> },
-  { path: "/dashboard-nft", component: <DashboardNFT /> },
-  { path: "/dashboard-job", component: <DashboardJob /> },
-
-  
+   
   { path: "/charts-apex-line", component: <LineCharts /> },
   { path: "/charts-apex-area", component: <AreaCharts /> },
   { path: "/charts-apex-column", component: <ColumnCharts /> },
@@ -105,15 +83,6 @@ const publicRoutes = [
   { path: "/reset-password", component: <ResetPassword /> },
   { path: "/register", component: <Register /> },
 
-  { path: "/auth-signin-basic", component: <BasicSignIn /> },
-  { path: "/auth-signin-cover", component: <CoverSignIn /> },
-  { path: "/auth-signup-basic", component: <BasicSignUp /> },
-  { path: "/auth-signup-cover", component: <CoverSignUp /> },
-  { path: "/auth-pass-reset-basic", component: <BasicPasswReset /> },
-  { path: "/auth-404-basic", component: <Basic404 /> },
-  { path: "/auth-404-cover", component: <Cover404 /> },
-  { path: "/auth-404-alt", component: <Alt404 /> },
-  { path: "/auth-500", component: <Error500 /> },
 ];
 
 export { authProtectedRoutes, publicRoutes };

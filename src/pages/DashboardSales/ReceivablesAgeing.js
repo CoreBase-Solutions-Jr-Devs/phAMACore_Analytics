@@ -13,8 +13,9 @@ const ReceivablesAgeing = ({
   overdue61To90,
   overdue91To120,
   overdue120Plus,
+  error,
+  loading,
 }) => {
-
   const hasReceivablesData =
     Number(currentReceivables ?? 0) > 0 ||
     Number(overdue1To30 ?? 0) > 0 ||
@@ -25,15 +26,48 @@ const ReceivablesAgeing = ({
 
   const handleExportExcel = () => {
     const rows = [
-      { Category: "Aging Summary", "Item / Customer": "Current (0-30 days)", "Amount (KES)": Number(currentReceivables || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
-      { Category: "Aging Summary", "Item / Customer": "31–60 days", "Amount (KES)": Number(overdue31To60 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
-      { Category: "Aging Summary", "Item / Customer": "61–90 days", "Amount (KES)": Number(overdue61To90 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
-      { Category: "Aging Summary", "Item / Customer": "91–120 days", "Amount (KES)": Number(overdue91To120 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
-      { Category: "Aging Summary", "Item / Customer": "120+ days", "Amount (KES)": Number(overdue120Plus || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "Current (0-30 days)",
+        "Amount (KES)": Number(currentReceivables || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        ),
+      },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "31–60 days",
+        "Amount (KES)": Number(overdue31To60 || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "61–90 days",
+        "Amount (KES)": Number(overdue61To90 || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "91–120 days",
+        "Amount (KES)": Number(overdue91To120 || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "120+ days",
+        "Amount (KES)": Number(overdue120Plus || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      },
       ...(topDebtors || []).map((d) => ({
         Category: "Top Debtor",
         "Item / Customer": d.name || "",
-        "Amount (KES)": Number(d.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        "Amount (KES)": Number(d.amount || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
       })),
     ];
     const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -55,11 +89,20 @@ const ReceivablesAgeing = ({
         </CardHeader>
 
         <CardBody>
-          {!hasReceivablesData && topDebtors.length === 0 ? (
+          {loading ? (
             <div className="text-center py-5">
-              <p className="text-muted mb-2">
-                No receivables data available
-              </p>
+              <div
+                className="spinner-border text-primary mb-3"
+                role="status"
+              ></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-5">
+              <h6 className="text-danger mb-2">{error} </h6>
+            </div>
+          ) : !hasReceivablesData && topDebtors.length === 0 ? (
+            <div className="text-center py-5">
+              <p className="text-muted mb-2">No receivables data available</p>
             </div>
           ) : (
             <>
@@ -70,7 +113,9 @@ const ReceivablesAgeing = ({
                       <small>Current</small>
                     </p>
                     <h6 className="mb-0 text-success fw-bold">
-                      <small>{Number(currentReceivables).toLocaleString("en-KE")}</small>
+                      <small>
+                        {Number(currentReceivables).toLocaleString("en-KE")}
+                      </small>
                     </h6>
                   </div>
                 </div>
@@ -92,7 +137,9 @@ const ReceivablesAgeing = ({
                       <small>31–60 days</small>
                     </p>
                     <h6 className="mb-0 text-warning fw-bold">
-                      <small>{Number(overdue31To60).toLocaleString("en-KE")}</small>
+                      <small>
+                        {Number(overdue31To60).toLocaleString("en-KE")}
+                      </small>
                     </h6>
                   </div>
                 </div>
@@ -103,7 +150,9 @@ const ReceivablesAgeing = ({
                       <small>61–90 days</small>
                     </p>
                     <h6 className="mb-0 text-danger fw-bold">
-                      <small>{Number(overdue61To90).toLocaleString("en-KE")}</small>
+                      <small>
+                        {Number(overdue61To90).toLocaleString("en-KE")}
+                      </small>
                     </h6>
                   </div>
                 </div>
@@ -114,7 +163,9 @@ const ReceivablesAgeing = ({
                       <small>91–120 days</small>
                     </p>
                     <h6 className="mb-0 text-info fw-bold">
-                      <small>{Number(overdue91To120).toLocaleString("en-KE")}</small>
+                      <small>
+                        {Number(overdue91To120).toLocaleString("en-KE")}
+                      </small>
                     </h6>
                   </div>
                 </div>
@@ -125,7 +176,9 @@ const ReceivablesAgeing = ({
                       <small>120+ days</small>
                     </p>
                     <h6 className="mb-0 text-info fw-bold">
-                      <small>{Number(overdue120Plus).toLocaleString("en-KE")}</small>
+                      <small>
+                        {Number(overdue120Plus).toLocaleString("en-KE")}
+                      </small>
                     </h6>
                   </div>
                 </div>
@@ -139,7 +192,6 @@ const ReceivablesAgeing = ({
                     <h6 className="text-muted mb-1">
                       No debtor data available
                     </h6>
-                   
                   </div>
                 ) : (
                   topDebtors.map((debtor, index) => (
@@ -147,9 +199,7 @@ const ReceivablesAgeing = ({
                       key={index}
                       className="d-flex justify-content-between align-items-center p-2 border-bottom"
                     >
-                      <span className="text-muted">
-                        {debtor.name}
-                      </span>
+                      <span className="text-muted">{debtor.name}</span>
 
                       <span className="badge bg-danger-subtle text-danger">
                         {Number(debtor.amount).toLocaleString("en-KE")}
