@@ -788,7 +788,100 @@ const StockPurchasesCharts = ({
     />
   );
 };
+const SalesCompositionChart = ({
+    dataColors,
+    series = [],
+}) => {
+    const categories = [
+        "Cash Sales",
+        "Insurance Sales",
+        "Debt Collections",
+        "Other Insurance Sales",
+    ];
 
+    // Use explicit colors to verify rendering
+    const chartColors = [
+        "#0ab39c",
+        "#405189",
+        "#f7b84b",
+        "#299cdb",
+    ];
+
+    const chartSeries = categories.map((_, index) =>
+        Number(series[index] || 0)
+    );
+
+    const options = {
+        labels: categories,
+
+        chart: {
+            height: 333,
+            type: "donut",
+        },
+
+        colors: chartColors,
+
+        legend: {
+            position: "bottom",
+            formatter: (seriesName, opts) => {
+                const value =
+                    opts.w.globals.series[opts.seriesIndex];
+
+                return `${seriesName}: KES ${Number(
+                    value || 0
+                ).toLocaleString("en-KE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                })}`;
+            },
+        },
+
+        stroke: {
+            show: true,
+            colors: ["#ffffff"],
+            width: 2,
+        },
+
+        dataLabels: {
+            enabled: true,
+            formatter: (percentage) =>
+                `${Number(percentage || 0).toFixed(1)}%`,
+        },
+
+        tooltip: {
+            y: {
+                formatter: (value) =>
+                    `KES ${Number(value || 0).toLocaleString(
+                        "en-KE",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        }
+                    )}`,
+            },
+        },
+    };
+
+    if (!chartSeries.some((value) => value > 0)) {
+        return (
+            <div
+                className="d-flex justify-content-center align-items-center text-muted"
+                style={{ height: 333 }}
+            >
+                No sales data available
+            </div>
+        );
+    }
+
+    return (
+        <ReactApexChart
+            options={options}
+            series={chartSeries}
+            type="donut"
+            height={333}
+        />
+    );
+};
 const SalesCollectionCharts = ({
   dataColors,
   series,
@@ -936,4 +1029,5 @@ RevenueExpensesChart,
   CountriesCharts,
   UsersByDeviceCharts,
   TopProductsCharts,
+  SalesCompositionChart,
 };
