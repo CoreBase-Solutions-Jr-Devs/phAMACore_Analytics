@@ -143,7 +143,7 @@ const DashboardSales = () => {
       getMonthlySales({
         clientid: 1,
         startDate: dates.currentYearStart,
-        endDate: dates.currentYearToday,
+        endDate: dates.today,
         branchcode: branchId,
       }),
     );
@@ -151,8 +151,8 @@ const DashboardSales = () => {
     dispatch(
       getMonthToDateSales({
         clientid: 1,
-        startDate: dates.currentYearMonthStart,
-        endDate: dates.currentYearToday,
+        startDate: dates.currentMonthStart,
+        endDate: dates.today,
         branchcode: branchId,
       }),
     );
