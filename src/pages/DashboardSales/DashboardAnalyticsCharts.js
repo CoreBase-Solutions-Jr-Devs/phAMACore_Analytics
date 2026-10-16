@@ -430,62 +430,108 @@ const ProgressiveSalesChart = ({
 //     );
 // };
 
+
 const BranchPerformanceChart = ({
   dataColors,
   series = [],
   categories = [],
+  trendData = [],
 }) => {
-  const chartDonutBasicColors =
-    getChartColorsArray(dataColors);
+  const chartColors = getChartColorsArray(dataColors);
+  const barData = series[0]?.data || [];
 
   const options = {
-    labels: categories,
-
     chart: {
       height: 333,
-      type: "donut",
+      type: "line",
+      toolbar: {
+        show: true,
+      },
     },
 
     legend: {
-      position: "bottom",
-      formatter: (seriesName, opts) => {
-        const value = opts.w.globals.series[opts.seriesIndex];
+      show: true,
+      position: "top",
+    },
 
-        return `${seriesName}: ${Number(value || 0).toLocaleString("en-KE")}`;
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "45%",
+        borderRadius: 0,
+        distributed: false,
       },
     },
 
     stroke: {
-      show: false,
+      width: [0, 3],
+      curve: "straight",
     },
 
     dataLabels: {
-      enabled: true,
-      formatter: (val) => `${Number(val || 0).toFixed(1)}%`,
-      dropShadow: {
-        enabled: false,
+      enabled: false,
+    },
+
+    markers: {
+      size: [0, 4],
+    },
+
+    xaxis: {
+      categories,
+      labels: {
+        rotate: -35,
+        trim: true,
+      },
+    },
+
+    yaxis: {
+      title: {
+        text: "Revenue (KES)",
+      },
+      labels: {
+        formatter: (value) =>
+          Number(value || 0).toLocaleString("en-KE"),
       },
     },
 
     tooltip: {
+      shared: true,
+      intersect: false,
       y: {
-        formatter: (val) =>
-          Number(val || 0).toLocaleString("en-KE"),
+        formatter: (value) =>
+          `KES ${Number(value || 0).toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
       },
     },
 
-    colors: chartDonutBasicColors,
+    colors: [chartColors[0], chartColors[1] || "#f1b44c"],
   };
+
+  const mixedSeries = [
+    {
+      name: "Revenue",
+      type: "bar",
+      data: barData,
+    },
+    {
+      name: "Revenue Trend",
+      type: "line",
+      data: trendData.length ? trendData : barData,
+    },
+  ];
 
   return (
     <ReactApexChart
       options={options}
-      series={series}
-      type="donut"
+      series={mixedSeries}
+      type="line"
       height={333}
     />
   );
 };
+
 
 const MonthToDateSalesChart = ({
   dataColors,

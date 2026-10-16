@@ -197,8 +197,7 @@ const ReceivablesAgeing = () => {
             <thead className="text-muted table-light sticky-top">
               <tr>
                 <th>Customer</th>
-                <th>INV No</th>
-                <th>Branch</th>
+                <th>Last Invoiced</th>
                 <th>Last Payment</th>
                 <th>Days Bracket</th>
                 <th>Bal (KES)</th>
