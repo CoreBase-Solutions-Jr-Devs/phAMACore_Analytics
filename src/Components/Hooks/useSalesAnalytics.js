@@ -6,6 +6,11 @@ const useSalesAnalytics = (
     salesType = [],
   salesBranch = [],
   salesBranch_Type = [],
+   salesChannel= [],
+salesComparativeYTD= [],
+salesComparativeMTD= [],
+salesMonthly= [],
+salesDaily= [],
   monthlySales = [],
   monthToDateSales = [],
   lastYearMonthToDateSales = [],
@@ -75,22 +80,16 @@ const useSalesAnalytics = (
       .map((item) => item.invoice_Number),
   ).size;
 
-
-const branchData = salesBranch.map((item) => ({
-  name: (item.branch_name || "UNKNOWN BRANCH")
-    .replace(/^AXCESS PHARMACY\s*-\s*/i, ""),
+ const branchData = salesBranch.map((item) => ({
+  name: item.branch_name || "UNKNOWN BRANCH",
   amount: Number(item.net_sales_incl || 0),
 }));
 
-const branchChartSeries = [
-  {
-    name: "Revenue",
-    data: branchData.map((branch) => branch.amount),
-  },
-];
+const branchChartSeries = branchData.map((branch) =>
+  Number(branch.amount || 0)
+);
 
 const branchCategories = branchData.map((branch) => branch.name);
-
 
   /* -------------------------------------------------------
    * Revenue grouped by Sales Representative.
@@ -216,160 +215,48 @@ const topDebtors = (kpiOverdueAccounts || [])
    * Monthly Revenue Chart
  
    * ------------------------------------------------------*/
-  const monthlyChart = useMemo(() => {
-    const currentDate = new Date();
+const monthlyChart = useMemo(() => {
+   const data = salesComparativeMTD || [];
 
-    const currentYear = currentDate.getFullYear();
-    const lastYear = currentYear - 1;
+  console.log("YTD API Data:", data);
 
-    let endDate = currentDate;
-
-    if (filters?.dateRange === "Year To Date" && filters?.endDate) {
-      const [day, month, year] = filters.endDate.split("/").map(Number);
-      endDate = new Date(year, month - 1, day);
-    }
-
-    const currentMonth = endDate.getMonth() + 1;
-
-    const months = Array.from({ length: currentMonth }, (_, i) =>
-      new Date(2000, i, 1).toLocaleString("en-US", {
-        month: "short",
-      }),
-    );
-
-    const currentYearMap = Object.fromEntries(months.map((m) => [m, 0]));
-
-    const lastYearMap = Object.fromEntries(months.map((m) => [m, 0]));
-
-    (monthlySales || []).forEach((item) => {
-      if (!item.transaction_Date) return;
-
-      const date = new Date(item.transaction_Date);
-
-      if (date.getFullYear() !== currentYear) return;
-
-      const month = date.toLocaleString("en-US", {
-        month: "short",
-      });
-
-      if (currentYearMap[month] !== undefined) {
-        currentYearMap[month] += Number(item.revenue || 0);
-      }
-    });
-
-    (lastYearMonthlySales || []).forEach((item) => {
-      if (!item.transaction_Date) return;
-
-      const date = new Date(item.transaction_Date);
-
-      if (date.getFullYear() !== lastYear) return;
-
-      const month = date.toLocaleString("en-US", {
-        month: "short",
-      });
-
-      if (lastYearMap[month] !== undefined) {
-        lastYearMap[month] += Number(item.revenue || 0);
-      }
-    });
-
-    return {
-      categories: months,
-
-      series: [
-        {
-          name: `${currentYear}`,
-          data: months.map((m) => currentYearMap[m]),
-        },
-        {
-          name: `${lastYear}`,
-          data: months.map((m) => lastYearMap[m]),
-        },
-      ],
-    };
-  }, [monthlySales, lastYearMonthlySales, filters]);
+  return {
+    categories: data.map((item) => item.month_name),
+    series: [
+      {
+        name: String(data[0]?.current_year ?? ""),
+        data: data.map((item) => Number(item.current_year_sales) || 0),
+      },
+      {
+        name: String(data[0]?.prior_year ?? ""),
+        data: data.map((item) => Number(item.prior_year_sales) || 0),
+      },
+    ],
+  };
+}, [salesComparativeMTD]);
 
   /* -------------------------------------------------------
    * Month-to-Date Revenue Chart
    * ------------------------------------------------------*/
-  const monthToDateChart = useMemo(() => {
-    const now = new Date();
+ const monthToDateChart = useMemo(() => {
+  const data = salesComparativeYTD || [];
 
-    const currentYear = now.getFullYear();
-    const lastYear = currentYear - 1;
+  console.log("MTD API Data:", data);
 
-    let endDate = now;
-
-    if (filters?.dateRange === "Month To Date" && filters?.endDate) {
-      const [day, month, year] = filters.endDate.split("/").map(Number);
-      endDate = new Date(year, month - 1, day);
-    }
-
-    const currentMonth = endDate.getMonth();
-    const endDay = endDate.getDate();
-
-    const DAYS = Array.from({ length: endDay }, (_, i) => i + 1);
-
-    const currentYearMap = DAYS.reduce((acc, d) => {
-      acc[d] = 0;
-      return acc;
-    }, {});
-
-    const lastYearMap = DAYS.reduce((acc, d) => {
-      acc[d] = 0;
-      return acc;
-    }, {});
-
-    (monthToDateSales || []).forEach((s) => {
-      if (!s.transaction_Date) return;
-
-      const date = new Date(s.transaction_Date);
-
-      if (
-        date.getFullYear() !== currentYear ||
-        date.getMonth() !== currentMonth
-      ) {
-        return;
-      }
-
-      const day = date.getDate();
-
-      if (currentYearMap[day] !== undefined) {
-        currentYearMap[day] += Number(s.revenue || 0);
-      }
-    });
-
-    (lastYearMonthToDateSales || []).forEach((s) => {
-      if (!s.transaction_Date) return;
-
-      const date = new Date(s.transaction_Date);
-
-      if (date.getFullYear() !== lastYear || date.getMonth() !== currentMonth) {
-        return;
-      }
-
-      const day = date.getDate();
-
-      if (lastYearMap[day] !== undefined) {
-        lastYearMap[day] += Number(s.revenue || 0);
-      }
-    });
-
-    return {
-      categories: DAYS.map(String),
-
-      series: [
-        {
-          name: `${currentYear}`,
-          data: DAYS.map((d) => Number(currentYearMap[d] || 0)),
-        },
-        {
-          name: `${lastYear}`,
-          data: DAYS.map((d) => Number(lastYearMap[d] || 0)),
-        },
-      ],
-    };
-  }, [monthToDateSales, lastYearMonthToDateSales, filters]);
+  return {
+    categories: data.map((item) => item.day_no),
+    series: [
+      {
+        name: String(data[0]?.curr_date?.slice(0, 4) ?? ""),
+        data: data.map((item) => Number(item.current_year_sales) || 0),
+      },
+      {
+        name: String(data[0]?.prior_date?.slice(0, 4) ?? ""),
+        data: data.map((item) => Number(item.prior_year_sales) || 0),
+      },
+    ],
+  };
+}, [salesComparativeYTD]);
 
   const topProductsData = sales.reduce((acc, item) => {
     const name = item.item_Name || "UNKNOWN PRODUCT";

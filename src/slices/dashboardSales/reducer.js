@@ -24,6 +24,11 @@ const initialState = {
   salesSummary: [],
   salesBranch: [],
   salesBranch_Type: [],
+  salesChannel: [],
+salesComparativeYTD: [],
+salesComparativeMTD: [],
+salesMonthly: [],
+salesDaily: [],
 
   loading: false,
   error: null,
@@ -268,6 +273,26 @@ case "Year To Date": {
         case "BRANCH_TYPE":
           state.salesBranch_Type = result;
           break;
+
+            case "CHANNEL":
+      state.salesChannel = result;
+      break;
+
+    case "COMPARATIVE_YTD":
+      state.salesComparativeYTD = result;
+      break;
+
+    case "COMPARATIVE_MTD":
+      state.salesComparativeMTD = result;
+      break;
+
+    case "MONTHLY":
+      state.salesMonthly = result;
+      break;
+
+    case "DAILY":
+      state.salesDaily = result;
+      break;
 
         default:
           break;

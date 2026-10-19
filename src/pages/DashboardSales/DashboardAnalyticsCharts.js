@@ -296,6 +296,7 @@ const ProgressiveSalesChart = ({
       toolbar: {
         show: false,
       },
+      zoom: { enabled: true },
     },
 
     stroke: {
@@ -552,7 +553,7 @@ const MonthToDateSalesChart = ({
     chart: {
       height: 350,
       type: "line",
-      zoom: { enabled: false },
+      zoom: { enabled: true },
       toolbar: { show: false },
     },
 

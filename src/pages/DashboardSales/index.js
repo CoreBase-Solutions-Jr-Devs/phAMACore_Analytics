@@ -16,16 +16,11 @@ import MonthToDateSales from "./MonthToDateSales";
 import FilterActions from "./FilterActions";
 import {
   getSalesTransactions,
-  getMonthlySales,
-  getMonthToDateSales,
-  getLastYearMonthToDateSales,
-  getLastYearMonthlySales,
   getKPISalesTransactions,
   getKPIOverdueAccounts,
 } from "../../slices/dashboardSales/thunk";
 import {
-  getDateRanges,
-  getPreviousYearDate,
+
   getPeriod,
 } from "../../helpers/date_helper";
 import { clearSalesData } from "../../slices/dashboardSales/reducer";
@@ -43,10 +38,7 @@ const DashboardSales = () => {
 
   const {
     sales = [],
-    monthlySales = [],
-    monthToDateSales = [],
-    lastYearMonthToDateSales = [],
-    lastYearMonthlySales = [],
+    
     kpiSales = [],
     kpiOverdueAccounts = [],
     overdueSummary = [],
@@ -56,6 +48,9 @@ const DashboardSales = () => {
     salesType = [],
     salesBranch = [],
     salesBranch_Type = [],
+    salesChannel = [],
+    salesComparativeMTD = [],
+    salesComparativeYTD = [],
 
     filters,
     error,
@@ -102,23 +97,22 @@ const DashboardSales = () => {
     salesType,
     salesBranch,
     salesBranch_Type,
-    monthlySales,
-    monthToDateSales,
-    lastYearMonthToDateSales,
-    lastYearMonthlySales,
+   salesChannel,
+    salesComparativeMTD,
+    salesComparativeYTD,
     filters,
   );
 
-  const {
-    currentYearStart,
-    currentMonthStart,
-    today,
-    lastYearStart,
-    lastYearMonthStart,
-    lastYearToday,
-  } = getDateRanges();
+  // const {
+  //   currentYearStart,
+  //   currentMonthStart,
+  //   today,
+  //   lastYearStart,
+  //   lastYearMonthStart,
+  //   lastYearToday,
+  // } = getDateRanges();
 
-  const dates = getDateRanges();
+  // const dates = getDateRanges();
 
   useEffect(() => {
     dispatch(
@@ -130,41 +124,41 @@ const DashboardSales = () => {
       }),
     );
 
-    dispatch(
-      getLastYearMonthlySales({
-        clientid: 1,
-        startDate: dates.lastYearStart,
-        endDate: dates.lastYearToday,
-        branchcode: branchId,
-      }),
-    );
+    // dispatch(
+    //   getLastYearMonthlySales({
+    //     clientid: 1,
+    //     startDate: dates.lastYearStart,
+    //     endDate: dates.lastYearToday,
+    //     branchcode: branchId,
+    //   }),
+    // );
 
-    dispatch(
-      getMonthlySales({
-        clientid: 1,
-        startDate: dates.currentYearStart,
-        endDate: dates.today,
-        branchcode: branchId,
-      }),
-    );
+    // dispatch(
+    //   getMonthlySales({
+    //     clientid: 1,
+    //     startDate: dates.currentYearStart,
+    //     endDate: dates.today,
+    //     branchcode: branchId,
+    //   }),
+    // );
 
-    dispatch(
-      getMonthToDateSales({
-        clientid: 1,
-        startDate: dates.currentMonthStart,
-        endDate: dates.today,
-        branchcode: branchId,
-      }),
-    );
+    // dispatch(
+    //   getMonthToDateSales({
+    //     clientid: 1,
+    //     startDate: dates.currentMonthStart,
+    //     endDate: dates.today,
+    //     branchcode: branchId,
+    //   }),
+    // );
 
-    dispatch(
-      getLastYearMonthToDateSales({
-        clientid: 1,
-        startDate: dates.lastYearMonthStart,
-        endDate: dates.lastYearToday,
-        branchcode: branchId,
-      }),
-    );
+    // dispatch(
+    //   getLastYearMonthToDateSales({
+    //     clientid: 1,
+    //     startDate: dates.lastYearMonthStart,
+    //     endDate: dates.lastYearToday,
+    //     branchcode: branchId,
+    //   }),
+    // );
 
     const params = {
       clientid: 1,
@@ -191,6 +185,27 @@ const DashboardSales = () => {
       getKPISalesTransactions({
         ...params,
         groupBy: "BRANCH_TYPE",
+      }),
+    );
+
+     dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "CHANNEL",
+      }),
+    );
+
+     dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "COMPARATIVE_MTD",
+      }),
+    );
+
+     dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "COMPARATIVE_YTD",
       }),
     );
 
@@ -253,6 +268,28 @@ const DashboardSales = () => {
       }),
     );
 
+    
+     dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "CHANNEL",
+      }),
+    );
+
+     dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "COMPARATIVE_MTD",
+      }),
+    );
+
+     dispatch(
+      getKPISalesTransactions({
+        ...params,
+        groupBy: "COMPARATIVE_YTD",
+      }),
+    );
+    
     dispatch(
       getKPIOverdueAccounts({
         clientid: 1,
