@@ -289,19 +289,28 @@ const RevenueExpensesChart = ({
   categories = [],
 }) => {
   const colors = getChartColorsArray(dataColors);
+  // A line needs at least three points to read as a trend; shorter ranges
+  // (e.g. Month to Date) are drawn as grouped bars instead.
+  const type = categories.length < 3 ? "bar" : "line";
 
   const options = {
     chart: {
       height: 350,
-      type: "line",
+      type,
       toolbar: { show: false },
       zoom: { enabled: false },
     },
 
     stroke: {
       curve: "smooth",
-      width: 3,
+      width: type === "line" ? 3 : 0,
     },
+
+    plotOptions: {
+      bar: { columnWidth: "45%", borderRadius: 4 },
+    },
+
+    markers: { size: type === "line" ? 4 : 0 },
 
     dataLabels: {
       enabled: false,
@@ -314,7 +323,6 @@ const RevenueExpensesChart = ({
     },
 
     yaxis: {
-      min: 0,
       forceNiceScale: true,
       tickAmount: 5,
       labels: {
@@ -322,6 +330,8 @@ const RevenueExpensesChart = ({
         formatter: (val) => `KES ${formatCompact(val)}`,
       },
     },
+
+    legend: { position: "top", horizontalAlign: "right" },
 
     tooltip: {
       shared: true,
@@ -335,9 +345,10 @@ const RevenueExpensesChart = ({
 
   return (
     <ReactApexChart
+      key={type}
       options={options}
       series={series}
-      type="line"
+      type={type}
       height={350}
     />
   );

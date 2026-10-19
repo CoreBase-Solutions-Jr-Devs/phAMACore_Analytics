@@ -1,61 +1,43 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { exportDashboardReportToExcel, triggerPrint } from "../../helpers/export_helper";
-import { computeKPIs } from "../utils/StockInventoryUtils";
-import { useImbalanceEngine } from "./components/ImbalanceAlerts/useImbalanceEngine";
+import { computeKPIs, getKPIMeta, getExpiryRows, getLookbackDays } from "../utils/StockInventoryUtils";
 import { resolveBranchName, cleanBranchName } from "../../helpers/branch_helper";
 import { formatAmount } from "../../helpers/format_helper";
 
 const Section = ({ rightClickBtn }) => {
   const {
-    dailyClosingStock = [],
-    stockMovements = [],
     batchExpiryNeo = [],
     totalStockValueByBranch = [],
     stockHealth = [],
     slowMovingStock = [],
+    imbalances = [],
     branches = [],
     filters = {},
   } = useSelector((state) => state.StockInventory ?? {});
 
   const { branch, startDate, endDate } = filters;
+  const lookbackDays = getLookbackDays(startDate, endDate);
 
   const isBranchView = Boolean(branch && branch !== "All Branches");
   const branchDisplayName = useMemo(() => {
     if (!isBranchView) return "All Branches";
     return (
-      cleanBranchName(
-        resolveBranchName(branch, branches, stockMovements) || `Branch ${branch}`
-      ) || "All Branches"
+      cleanBranchName(resolveBranchName(branch, branches) || `Branch ${branch}`) || "All Branches"
     );
-  }, [branch, branches, stockMovements, isBranchView]);
-
-  const alerts = useMemo(
-    () => useImbalanceEngine(dailyClosingStock, stockMovements, batchExpiryNeo),
-    [dailyClosingStock, stockMovements, batchExpiryNeo]
-  );
+  }, [branch, branches, isBranchView]);
 
   const kpis = useMemo(
-    () =>
-      computeKPIs(
-        dailyClosingStock,
-        stockMovements,
-        batchExpiryNeo,
-        totalStockValueByBranch,
-        stockHealth,
-        slowMovingStock,
-        alerts
-      ),
-    [
-      dailyClosingStock,
-      stockMovements,
-      batchExpiryNeo,
-      totalStockValueByBranch,
-      stockHealth,
-      slowMovingStock,
-      alerts,
-    ]
+    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances),
+    [batchExpiryNeo, stockHealth, imbalances]
   );
+
+  // Stock figures are live: show when the valuation was taken
+  const stockAsOf = useMemo(() => {
+    const raw = totalStockValueByBranch?.[0]?.as_of_date;
+    const date = raw ? new Date(raw) : null;
+    return date && !isNaN(date.getTime()) ? date.toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" }) : "";
+  }, [totalStockValueByBranch]);
 
   const handleExportExcel = () => {
     const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -69,48 +51,34 @@ const Section = ({ rightClickBtn }) => {
     ];
 
     // 1. KPI Summary
-    const kpiSummaryRows = (kpis || []).map((k) => ({
-      Metric: k.title,
-      Value: typeof k.value === "number" ? formatAmount(k.value) : k.value || 0,
+    const kpiSummaryRows = getKPIMeta({ lookbackDays }).map((k) => ({
+      Metric: k.label,
+      Value: formatAmount(kpis[k.id] ?? 0, 0),
       Status: k.subtitle || "",
     }));
 
-    // 2. Expiry Watch Items (Near Expiry 90 days)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const cutoff = new Date(today);
-    cutoff.setDate(cutoff.getDate() + 90);
-
-    const expiryRows = (batchExpiryNeo || [])
-      .filter((item) => {
-        if (!item.expirydate) return false;
-        const exp = new Date(item.expirydate);
-        return !isNaN(exp.getTime()) && exp >= today && exp <= cutoff;
-      })
-      .map((item) => {
-        const qty = Number(item.qtyBal || 0);
-        const val = Number(item.costValue || 0);
-        return {
-          Product: item.invName || item.itemName || "",
-          Branch: cleanBranchName(item.branchName || item.branch_name || ""),
-          ExpiryDate: new Date(item.expirydate).toLocaleDateString("en-GB"),
-          QtyBalance: qty.toLocaleString(),
-          CostValue: val.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }),
-        };
-      });
+    // 2. Expiry Watch (expired + next 90 days, one row per batch)
+    const expiryRows = getExpiryRows(batchExpiryNeo).map((row) => ({
+      Product: row.product,
+      Batch: row.batch || "-",
+      Branch: row.branch,
+      ExpiryDate: row.expiry.toLocaleDateString("en-GB"),
+      DaysRemaining: row.daysRemaining,
+      QtyBalance: row.qty.toLocaleString(),
+      CostValue: formatAmount(row.value),
+      Action: row.action,
+    }));
 
     // 3. Slow Moving Stock
-    const slowMovingRows = (slowMovingStock || []).slice(0, 30).map((item) => ({
-      ProductCode: item.itemcode || item.itemCode || "",
-      ProductName: item.itemname || item.itemName || "",
-      Branch: cleanBranchName(item.branchname || item.branchName || ""),
-      StockValue: Number(item.stock_value || item.stockValue || 0).toLocaleString(
-        undefined,
-        { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-      ),
+    const slowMovingRows = (slowMovingStock || []).map((item) => ({
+      ProductCode: item.item_code || "",
+      ProductName: item.item_name || "",
+      Category: item.item_group || "-",
+      Branch: cleanBranchName(item.branch_name || ""),
+      Status: item.movement_category || "",
+      CurrentStock: Number(item.current_stock_qty || 0).toLocaleString(),
+      UnitsSold: Number(item.units_sold_window || 0).toLocaleString(),
+      TiedUpCapital: formatAmount(item.tied_up_capital),
     }));
 
     // 4. Branch Stock Breakdown
@@ -132,16 +100,16 @@ const Section = ({ rightClickBtn }) => {
 
     if (expiryRows.length > 0) {
       sections.push({
-        title: "Expiry Watch (90-Day Write-Off Risk)",
-        headers: ["Product", "Branch", "ExpiryDate", "QtyBalance", "CostValue"],
+        title: "Expiry Watch (Expired + 90-Day Write-Off Risk)",
+        headers: ["Product", "Batch", "Branch", "ExpiryDate", "DaysRemaining", "QtyBalance", "CostValue", "Action"],
         data: expiryRows,
       });
     }
 
     if (slowMovingRows.length > 0) {
       sections.push({
-        title: "Slow Moving Stock (30-Day Lookback)",
-        headers: ["ProductCode", "ProductName", "Branch", "StockValue"],
+        title: `Slow Moving Stock (${lookbackDays}-Day Lookback)`,
+        headers: ["ProductCode", "ProductName", "Category", "Branch", "Status", "CurrentStock", "UnitsSold", "TiedUpCapital"],
         data: slowMovingRows,
       });
     }
@@ -188,6 +156,13 @@ const Section = ({ rightClickBtn }) => {
         <strong className="text-dark">{formatDisplay(startDate)}</strong>
         <span>to</span>
         <strong className="text-dark">{formatDisplay(endDate)}</strong>
+        {stockAsOf && (
+          <>
+            <span className="mx-1 text-muted">|</span>
+            <span>Stock as at:</span>
+            <strong className="text-dark">{stockAsOf}</strong>
+          </>
+        )}
       </div>
 
       {/* Right - Action Buttons */}

@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIImbalances, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
 import { saveCachedBranches, cleanBranchName } from "../../helpers/branch_helper";
+import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
+const monthStart = () => new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
 export const initialState = {
   dailyClosingStock: [],
@@ -14,6 +16,9 @@ export const initialState = {
   stockHealth: [],
   criticalStockouts: [],
   slowMovingStock: [],
+  imbalances: [],
+  loadingImbalances: false,
+  errorImbalances: null,
   kpiSalesTransactions: [],
   kpiSalesPeriodDays: 1,
   loadingStock: false,
@@ -38,8 +43,9 @@ export const initialState = {
   errorKPISalesTransactions: null,
   filters: {
     branch: null,
-    dateRange: "Today",
-    startDate: formatDMY(new Date()),
+    // Month to Date by default: a one-day window made the cover and velocity figures meaningless
+    dateRange: DEFAULT_DATE_RANGE,
+    startDate: formatDMY(monthStart()),
     endDate: formatDMY(new Date()),
   },
 };
@@ -116,6 +122,7 @@ const StockInventorySlice = createSlice({
           break;
         }
 
+        case "Month to Date":
         case "This Month": {
           const today = new Date();
           const start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -342,6 +349,25 @@ const StockInventorySlice = createSlice({
           action.payload ||
           action.error?.message ||
           "Failed to fetch slow moving stock!";
+      });
+
+    builder
+      .addCase(fetchKPIImbalances.pending, (state) => {
+        state.loadingImbalances = true;
+        state.errorImbalances = null;
+      })
+      .addCase(fetchKPIImbalances.fulfilled, (state, action) => {
+        state.loadingImbalances = false;
+        state.imbalances = action.payload || [];
+      })
+      .addCase(fetchKPIImbalances.rejected, (state, action) => {
+        state.loadingImbalances = false;
+        state.imbalances = [];
+        state.errorImbalances =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch branch imbalances!";
       });
 
     builder

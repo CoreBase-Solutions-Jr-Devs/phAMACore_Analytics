@@ -12,6 +12,7 @@ import ReceivablesAgeing from "./ReceivablesAgeing";
 import StockMovements from "./StockMovements";
 import SalesCollection from "./SalesCollection";
 import { setBranch } from "../../slices/dashboardMyBusiness/reducer";
+import { fetchMonthlyTrend, fetchSalesByType } from "../../slices/dashboardMyBusiness/thunk";
 import {
   saveActiveBranch,
   cleanBranchName,
@@ -49,6 +50,13 @@ export default function DashboardMyBusiness() {
     }
   }, [dispatch, branchCode]);
 
+  // One shared fetch feeds the three trend cards, and one feeds Sales Composition + VAT
+  useEffect(() => {
+    const range = { startDate: filters.startDate, endDate: filters.endDate, branch: filters.branch ?? null };
+    dispatch(fetchMonthlyTrend(range));
+    dispatch(fetchSalesByType(range));
+  }, [dispatch, filters.startDate, filters.endDate, filters.branch]);
+
   const handleApplyFilters = () => {
     setRightColumn(false);
     if (filters.branch) {
@@ -80,21 +88,22 @@ export default function DashboardMyBusiness() {
           <Col xl={6}>
             <RevenueExpenses />
           </Col>
-
           <Col xl={6}>
             <StockPurchases />
           </Col>
         </Row>
 
         <Row>
-          <Col xl={6}>
+          <Col>
             <ReceivablesAgeing />
           </Col>
-
-          <Col xl={6}>
+        </Row>
+        <Row>
+          <Col>
             <StockMovements />
           </Col>
         </Row>
+
         <Row>
           <Col>
             <SalesCollection />

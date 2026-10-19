@@ -63,7 +63,7 @@ const BarChartThree = ({
             data: chartData.stock,
         },
         {
-            name: "Daily Sales (KES M)",
+            name: "Daily Cost of Sales (KES M)",
             type: "line",
             data: chartData.sales,
         },
@@ -133,7 +133,7 @@ const BarChartThree = ({
             {
                 opposite: true,
                 title: {
-                    text: "Daily Sales (KES M)",
+                    text: "Daily Cost of Sales (KES M)",
                     style: {
                         color: "#0ab39c",
                         fontWeight: 600,
@@ -180,9 +180,13 @@ const BarChartThree = ({
                     if (seriesIndex === 1) {
                         const raw = chartData.rawDailySales?.[dataIndex];
                         const days = chartData.daysCover?.[dataIndex];
-                        const coverInfo = days !== undefined
-                            ? ` [${days > 365 ? ">1 year cover" : `${days} days cover`}]`
+                        const monthly = chartData.monthlyConsumption?.[dataIndex];
+                        const monthlyInfo = monthly !== undefined
+                            ? ` · KES ${Math.round(monthly).toLocaleString()} per 30 days`
                             : "";
+                        const coverInfo = days !== undefined
+                            ? `${monthlyInfo} [${days > 365 ? ">1 year cover" : `${days} days cover`}]`
+                            : monthlyInfo;
 
                         if (raw !== undefined) {
                             let formattedVal = Number(val).toFixed(2);
@@ -205,7 +209,7 @@ const BarChartThree = ({
         grid: {
             borderColor: "rgba(0,0,0,0.08)",
         },
-    }), [height, chartData.categories, chartData.rawStock, chartData.rawDailySales, chartData.daysCover]);
+    }), [height, chartData.categories, chartData.rawStock, chartData.rawDailySales, chartData.monthlyConsumption, chartData.daysCover]);
 
     const isLoading = loadingTotalStockValueByBranch || loadingKPISalesTransactions;
 

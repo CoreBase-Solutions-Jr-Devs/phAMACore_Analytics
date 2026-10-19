@@ -1,216 +1,91 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Card, CardBody, CardHeader, Row, Col, Spinner } from "reactstrap";
+import { Card, CardBody, CardHeader } from "reactstrap";
 import { RevenueExpensesChart } from "./DashboardMyBusinessCharts";
-import { getInventoryProfitSummaryUser as getInventoryProfitSummaryUserApi } from "../../helpers/fakebackend_helper";
 import { formatCurrency } from "../utils/formatHelper";
-
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
-
-const MONTH_NAMES = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
-// DD/MM/YYYY Date Helper
-const formatToDMY = (date) => {
-  const d = String(date.getDate()).padStart(2, "0");
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const y = date.getFullYear();
-  return `${d}/${m}/${y}`;
-};
+import TrendCardBody, { exportStamp, money } from "./TrendCardBody";
 
 const RevenueExpenses = () => {
-  const [loading, setLoading] = useState(false);
-  const [trendData, setTrendData] = useState({
-    categories: [],
-    series: [
-      { name: "Revenue", data: [] },
-      { name: "Expenses", data: [] },
-    ],
-    totalRevenue: 0,
-    totalExpenses: 0,
-  });
-
-  const { filters = {} } = useSelector(
+  const { monthlyTrend = [], loadingMonthlyTrend, errorMonthlyTrend, filters = {} } = useSelector(
     (state) => state.DashboardMyBusiness || {}
   );
 
-  // Compute monthly windows for Year-to-Date
-  const monthlyRanges = useMemo(() => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonthIdx = now.getMonth(); // 0 = Jan, 11 = Dec
+  const trend = useMemo(() => {
+    const round = (value) => Number((value || 0).toFixed(2));
+    const total = (field) => monthlyTrend.reduce((sum, m) => sum + (m[field] || 0), 0);
+    const revenue = total("revenue");
+    const grossProfit = total("grossProfit");
 
-    const ranges = [];
-    for (let i = 0; i <= currentMonthIdx; i++) {
-      const monthStart = new Date(currentYear, i, 1);
-      // If current month, end at current date; otherwise end at last day of the month
-      const monthEnd =
-        i === currentMonthIdx
-          ? now
-          : new Date(currentYear, i + 1, 0);
-
-      ranges.push({
-        label: MONTH_NAMES[i],
-        startDate: formatToDMY(monthStart),
-        endDate: formatToDMY(monthEnd),
-      });
-    }
-
-    return { currentYear, ranges };
-  }, []);
-
-  useEffect(() => {
-    let isSubscribed = true;
-
-    const fetchMonthlyTrend = async () => {
-      setLoading(true);
-      try {
-        const branchFilter = filters.branch ?? 0;
-
-        // Fetch each YTD month in parallel
-        const monthlyPromises = monthlyRanges.ranges.map((item) =>
-          getInventoryProfitSummaryUserApi({
-            clientid: 1,
-            StartDate: item.startDate,
-            EndDate: item.endDate,
-            branchcode: branchFilter,
-            GroupBy: "BRANCH",
-          }).then((res) => ({
-            label: item.label,
-            data: res.data?.result || res.data || res || [],
-          }))
-        );
-
-        const results = await Promise.all(monthlyPromises);
-
-        if (!isSubscribed) return;
-
-        const revData = [];
-        const expData = [];
-        const categories = [];
-
-        let cumRevenue = 0;
-        let cumExpenses = 0;
-
-        results.forEach((monthResult) => {
-          categories.push(monthResult.label);
-
-          const rows = Array.isArray(monthResult.data) ? monthResult.data : [];
-
-          // If branch is specified, filter for that branch; else sum all returned branches
-          const filteredRows =
-            branchFilter && branchFilter !== 0 && branchFilter !== "0"
-              ? rows.filter((r) => String(r.branchCode) === String(branchFilter))
-              : rows;
-
-          const monthRevenue = filteredRows.reduce(
-            (sum, row) => sum + (parseFloat(row.salesValueExcl) || 0),
-            0
-          );
-          const monthExpenses = filteredRows.reduce(
-            (sum, row) => sum + (parseFloat(row.costValue) || 0),
-            0
-          );
-
-          revData.push(Number(monthRevenue.toFixed(2)));
-          expData.push(Number(monthExpenses.toFixed(2)));
-
-          cumRevenue += monthRevenue;
-          cumExpenses += monthExpenses;
-        });
-
-        setTrendData({
-          categories,
-          series: [
-            { name: "Revenue", data: revData },
-            { name: "Expenses", data: expData },
-          ],
-          totalRevenue: cumRevenue,
-          totalExpenses: cumExpenses,
-        });
-      } catch (err) {
-        console.error("Failed to load Revenue vs Expenses trend:", err);
-      } finally {
-        if (isSubscribed) setLoading(false);
-      }
+    return {
+      categories: monthlyTrend.map((m) => m.label),
+      series: [
+        { name: "Revenue (excl. VAT)", data: monthlyTrend.map((m) => round(m.revenue)) },
+        { name: "Cost of Sales", data: monthlyTrend.map((m) => round(m.cost)) },
+        { name: "Gross Profit", data: monthlyTrend.map((m) => round(m.grossProfit)) },
+      ],
+      revenue,
+      cost: total("cost"),
+      grossProfit,
+      margin: revenue ? (grossProfit / revenue) * 100 : 0,
     };
-
-    fetchMonthlyTrend();
-
-    return () => {
-      isSubscribed = false;
-    };
-  }, [monthlyRanges, filters.branch]);
+  }, [monthlyTrend]);
 
   const handleExportExcel = () => {
-    const rows = (trendData.categories || []).map((month, idx) => {
-      const rev = trendData.series?.[0]?.data?.[idx] || 0;
-      const exp = trendData.series?.[1]?.data?.[idx] || 0;
-      const net = rev - exp;
-      return {
-        Month: month,
-        "Revenue (KES)": Number(rev).toLocaleString(undefined, { minimumFractionDigits: 2 }),
-        "Expenses (KES)": Number(exp).toLocaleString(undefined, { minimumFractionDigits: 2 }),
-        "Net (KES)": Number(net).toLocaleString(undefined, { minimumFractionDigits: 2 }),
-      };
-    });
-    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-    exportToExcel(rows, `Revenue_vs_Expenses_${todayStr}`);
+    const rows = monthlyTrend.map((m) => ({
+      Month: m.label,
+      From: m.startDate,
+      To: m.endDate,
+      "Revenue excl. VAT (KES)": money(m.revenue),
+      "Cost of Sales (KES)": money(m.cost),
+      "Gross Profit (KES)": money(m.grossProfit),
+      "Gross Margin %": m.revenue ? ((m.grossProfit / m.revenue) * 100).toFixed(2) : "0.00",
+    }));
+    exportToExcel(rows, `Revenue_vs_Cost_of_Sales_${exportStamp()}`);
   };
 
   return (
-    <Row>
-      <Col xxl={12}>
-        <Card id="revenue-expenses-card">
-          <CardBody className="p-0">
-            <CardHeader className="border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <div>
-                <h4 className="card-title mb-0">
-                  Revenue vs Expense Monthly Trend
-                </h4>
-                <small className="text-muted">
-                  Total Rev:{" "}
-                  <strong className="text-primary me-2">
-                    {formatCurrency(trendData.totalRevenue, "KES", 0)}
-                  </strong>
-                  Total Exp:{" "}
-                  <strong className="text-danger">
-                    {formatCurrency(trendData.totalExpenses, "KES", 0)}
-                  </strong>
-                </small>
-              </div>
-              <div className="d-flex align-items-center gap-2">
-                <span className="badge bg-light text-primary">
-                  YTD {monthlyRanges.currentYear}
-                </span>
-                <CardExportButtons
-                  onExport={handleExportExcel}
-                  targetId="revenue-expenses-card"
-                  title="Revenue vs Expenses"
-                />
-              </div>
-            </CardHeader>
-            {loading ? (
-              <div
-                className="d-flex justify-content-center align-items-center"
-                style={{ height: 350 }}
-              >
-                <Spinner color="primary" />
-              </div>
-            ) : (
-              <RevenueExpensesChart
-                series={trendData.series}
-                categories={trendData.categories}
-                dataColors='["--vz-primary","--vz-danger"]'
-              />
-            )}
-          </CardBody>
-        </Card>
-      </Col>
-    </Row>
+    <Card id="revenue-expenses-card">
+      <CardBody className="p-0">
+        <CardHeader className="border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <h4 className="card-title mb-0">Revenue vs Cost of Sales</h4>
+            <small className="text-muted">
+              Revenue: <strong className="text-primary me-2">{formatCurrency(trend.revenue, "KES", 0)}</strong>
+              Cost of sales: <strong className="text-danger me-2">{formatCurrency(trend.cost, "KES", 0)}</strong>
+              Gross profit:{" "}
+              <strong className="text-success">
+                {formatCurrency(trend.grossProfit, "KES", 0)} ({trend.margin.toFixed(1)}%)
+              </strong>
+            </small>
+          </div>
+          <div className="d-flex align-items-center gap-2">
+            <span className="badge bg-light text-primary">
+              {filters.startDate} - {filters.endDate}
+            </span>
+            <CardExportButtons
+              onExport={handleExportExcel}
+              targetId="revenue-expenses-card"
+              title="Revenue vs Cost of Sales"
+            />
+          </div>
+        </CardHeader>
+        <TrendCardBody loading={loadingMonthlyTrend} error={errorMonthlyTrend} empty={!monthlyTrend.length}>
+          <RevenueExpensesChart
+            series={trend.series}
+            categories={trend.categories}
+            dataColors='["--vz-primary","--vz-danger","--vz-success"]'
+          />
+        </TrendCardBody>
+        <div className="border-top px-3 py-2">
+          <small className="text-muted">
+            Cost of sales is the cost of goods sold, not operating expenses. Rent, salaries and other
+            expenses are not in the system yet, so operating profit cannot be shown.
+          </small>
+        </div>
+      </CardBody>
+    </Card>
   );
 };
 

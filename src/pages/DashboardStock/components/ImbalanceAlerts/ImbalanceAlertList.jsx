@@ -1,6 +1,8 @@
 import React from "react";
-import { ListGroup, Spinner } from "reactstrap";
-import ImbalanceAlertItem from "./ImbalanceAlertItem";
+import { Spinner } from "reactstrap";
+
+const formatCoverDays = (value) =>
+    value === null || value === undefined ? "No sales" : value > 365 ? ">1 yr" : `${value}d`;
 
 const ImbalanceAlertList = ({
     alerts = [],
@@ -15,7 +17,7 @@ const ImbalanceAlertList = ({
                 style={{ minHeight: "180px" }}
             >
                 <Spinner size="sm" color="primary" className="mb-2" />
-                <small className="text-muted">Analyzing inter-branch inventory balances...</small>
+                <small className="text-muted">Loading transfer suggestions...</small>
             </div>
         );
     }
@@ -67,11 +69,68 @@ const ImbalanceAlertList = ({
     }
 
     return (
-        <ListGroup className="list mb-0" flush>
-            {alerts.map((item, i) => (
-                <ImbalanceAlertItem key={item.id || i} data={item} index={i} />
-            ))}
-        </ListGroup>
+        <div className="table-responsive">
+            <table className="table table-sm table-hover table-borderless table-nowrap align-middle mb-0">
+                <thead
+                    className="text-muted table-light"
+                    style={{ position: "sticky", top: 0, zIndex: 1 }}
+                >
+                    <tr>
+                        <th scope="col">Product</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Branch</th>
+                        <th scope="col" className="text-center">Position</th>
+                        <th scope="col" className="text-end">Branch Stock</th>
+                        <th scope="col" className="text-end">Stock Share</th>
+                        <th scope="col" className="text-end">Sales Share</th>
+                        <th scope="col" className="text-end">Suggested Transfer</th>
+                        <th scope="col" className="text-end">Cover (Before → After)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {alerts.map((item, i) => {
+                        const tone = item.deficit ? "danger" : "success";
+                        return (
+                            <tr
+                                key={item.id || i}
+                                data-id={i}
+                                title={item.insight || undefined}
+                            >
+                                <th scope="row" className="fw-medium">
+                                    {item.product}
+                                    {item.itemCode && (
+                                        <small className="text-muted d-block fw-normal">
+                                            {item.itemCode}
+                                        </small>
+                                    )}
+                                </th>
+                                <td className="text-muted">{item.group || "-"}</td>
+                                <td>{item.branch || "-"}</td>
+                                <td className="text-center">
+                                    <span
+                                        className={`badge rounded-pill border border-${tone} text-${tone} bg-${tone}-subtle fs-11 fw-normal px-2 py-1`}
+                                    >
+                                        {item.deficit ? "Needs stock" : "Has surplus"}
+                                    </span>
+                                </td>
+                                <td className="text-end">{(item.stock ?? 0).toLocaleString()}</td>
+                                <td className="text-end">{(item.stockShare ?? 0).toFixed(0)}%</td>
+                                <td className="text-end">{(item.salesShare ?? 0).toFixed(0)}%</td>
+                                <td className="text-end fw-semibold">
+                                    {item.deficit ? "Receive" : "Release"} ~{(item.qty ?? 0).toLocaleString()}
+                                </td>
+                                <td className="text-end text-muted">
+                                    {formatCoverDays(item.coverBefore)} →{" "}
+                                    <span className="text-body fw-medium">
+                                        {formatCoverDays(item.coverAfter)}
+                                    </span>
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        </div>
     );
 };
 

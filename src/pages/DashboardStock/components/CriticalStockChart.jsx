@@ -7,6 +7,25 @@ import { cleanBranchName } from "../../../helpers/branch_helper";
 
 const ITEMS_PER_PAGE = 15;
 
+const ABC_HELP =
+    "ABC class ranks items by sales revenue over the last 90 days, company-wide. " +
+    "Class A items are the top sellers that together make up about 80% of revenue.";
+const ORDER_HELP =
+    "Estimate only: one month of demand plus the minimum level, less stock on hand. " +
+    "It ignores stock on order, pack sizes and supplier minimums.";
+
+const qty = (value) => Math.round(Number(value || 0)).toLocaleString();
+
+export const suggestedOrderQty = (item) =>
+    Math.max(
+        Math.ceil(
+            Number(item.monthly_demand || 0) +
+            Number(item.effective_min_qty ?? item.branch_min_qty ?? 0) -
+            Number(item.current_stock_qty || 0)
+        ),
+        0
+    );
+
 const CriticalStockChart = () => {
     const {
         criticalStockouts = [],
@@ -231,6 +250,48 @@ const CriticalStockChart = () => {
                 height={440}
                 paginationComponent={paginationElement}
             />
+
+            <div className="table-responsive mt-4">
+                <table className="table table-sm table-borderless table-nowrap align-middle mb-0">
+                    <thead className="text-muted table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Branch</th>
+                            <th title={ABC_HELP}>
+                                ABC <i className="ri-information-line align-middle" />
+                            </th>
+                            <th className="text-end">Stock</th>
+                            <th className="text-end">Minimum</th>
+                            <th className="text-end">Monthly Demand</th>
+                            <th className="text-end">Days Cover</th>
+                            <th className="text-end" title={ORDER_HELP}>
+                                Suggested Order (est.) <i className="ri-information-line align-middle" />
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {displayedItems.map((item, idx) => (
+                            <tr key={`${item.item_code}-${item.branch_id}-${idx}`} title={item.action_insight || undefined}>
+                                <td className="fw-medium">
+                                    {item.item_name || "Unknown"}
+                                    <small className="text-muted d-block">{item.item_code}</small>
+                                </td>
+                                <td className="text-muted">{item.item_group || "-"}</td>
+                                <td>{cleanBranchName(item.branch_name || item.branchName) || "-"}</td>
+                                <td>{String(item.abc_class || "-").replace("CLASS_", "")}</td>
+                                <td className={`text-end ${Number(item.current_stock_qty) <= 0 ? "text-danger fw-semibold" : ""}`}>
+                                    {qty(item.current_stock_qty)}
+                                </td>
+                                <td className="text-end">{qty(item.effective_min_qty ?? item.branch_min_qty)}</td>
+                                <td className="text-end">{qty(item.monthly_demand)}</td>
+                                <td className="text-end">{Number(item.days_of_inventory ?? 0).toFixed(1)}</td>
+                                <td className="text-end fw-semibold">{qty(suggestedOrderQty(item))}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

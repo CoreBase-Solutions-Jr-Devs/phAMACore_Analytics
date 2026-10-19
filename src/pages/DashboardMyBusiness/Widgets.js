@@ -9,7 +9,7 @@ import {
     getCashbookSummary,
 } from "../../slices/thunks";
 
-import { getYearToDateApi } from "../utils/dateHelper";
+import { getMonthToDateApi } from "../utils/dateHelper";
 import { formatAmount } from "../../helpers/format_helper";
 
 
@@ -360,9 +360,9 @@ export default function Widgets({ onKpiComputed }) {
      * Fetch the core My Business KPI data.
      */
     useEffect(() => {
-        const ytd = getYearToDateApi();
-        const startDate = filters?.startDate || ytd.startDate;
-        const endDate = filters?.endDate || ytd.endDate;
+        const mtd = getMonthToDateApi();
+        const startDate = filters?.startDate || mtd.startDate;
+        const endDate = filters?.endDate || mtd.endDate;
         const branchCode = filters?.branch ?? null;
 
         // 1. Income Statement KPI (Sales and Stock Profit)
@@ -554,7 +554,7 @@ export default function Widgets({ onKpiComputed }) {
             suffix: "",
             icon: "dollar-sign",
             color: "danger",
-            subtitle: "Available cash position",
+            subtitle: "Cash collected in the period",
             loading: loadingCashbookSummary,
             decimals: 2,
         },
@@ -570,13 +570,13 @@ export default function Widgets({ onKpiComputed }) {
             decimals: 2,
         },
         {
-            title: "Profit",
+            title: "Gross Profit",
             value: incomeStatementValue,
             prefix: "KES",
             suffix: "",
             icon: "package",
             color: "warning",
-            subtitle: "Estimated stock profit",
+            subtitle: "Gross profit (sales less cost of sales)",
             loading: loadingProfitSummary,
             decimals: 2,
         },
