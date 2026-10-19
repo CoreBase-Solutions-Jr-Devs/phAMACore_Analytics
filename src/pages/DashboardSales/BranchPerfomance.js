@@ -41,8 +41,33 @@ const BranchPerformance = ({
             onExport={handleExportExcel}
           />
         </CardHeader>
-       
-<div className="d-flex justify-content-center align-items-center gap-4 flex-wrap mt-2 mb-3">
+          {loading ? (
+            <div className="text-center py-5">
+              <div
+                className="spinner-border text-primary mb-3"
+                role="status"
+              ></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-5">
+              <h6 className="text-danger mb-2">{error} </h6>
+            </div>
+          ) : chartSeries.length === 0 ? (
+            <div className="text-center py-5">
+              <h6 className="text-muted mb-2">
+                No branch performance sales data available
+              </h6>
+            </div>
+          ) : (
+           <div
+  className="branch-chart-container"
+  style={{
+    width: "100%",
+    minWidth: 0,
+    overflow: "hidden",
+    padding: "0 12px 12px",
+  }}>
+    <div className="d-flex justify-content-center align-items-center gap-4 flex-wrap mt-2 mb-3">
   <div className="d-flex align-items-center gap-2">
     <span
       style={{
@@ -71,33 +96,6 @@ const BranchPerformance = ({
     <span className="text-muted">Revenue Trend</span>
   </div>
 </div>
-
-          {loading ? (
-            <div className="text-center py-5">
-              <div
-                className="spinner-border text-primary mb-3"
-                role="status"
-              ></div>
-            </div>
-          ) : error ? (
-            <div className="text-center py-5">
-              <h6 className="text-danger mb-2">{error} </h6>
-            </div>
-          ) : chartSeries.length === 0 ? (
-            <div className="text-center py-5">
-              <h6 className="text-muted mb-2">
-                No branch performance sales data available
-              </h6>
-            </div>
-          ) : (
-           <div
-  className="branch-chart-container"
-  style={{
-    width: "100%",
-    minWidth: 0,
-    overflow: "hidden",
-    padding: "0 12px 12px",
-  }}>
               <BranchPerformanceChart
                 series={chartSeries}
                 categories={categories}
