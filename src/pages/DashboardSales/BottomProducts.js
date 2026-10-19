@@ -19,7 +19,7 @@ const BottomProducts = ({ data = [], loading, error }) => {
 
   return (
     <Card className="card-height-100" id="sales-bottom-products-card">
-      <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
+       <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
         <h4 className="card-title mb-0 flex-grow-1">
           Bottom Products - Units Sold
         </h4>

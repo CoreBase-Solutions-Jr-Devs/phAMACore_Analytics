@@ -442,22 +442,22 @@ const BranchPerformanceChart = ({
 
   const options = {
     chart: {
-      height: 333,
+      height: 350,
       type: "line",
       toolbar: {
-        show: true,
+        show: false,
       },
     },
 
     legend: {
-      show: true,
+      show: false,
       position: "top",
     },
 
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: "45%",
+        columnWidth: "70%",
         borderRadius: 0,
         distributed: false,
       },
@@ -466,23 +466,31 @@ const BranchPerformanceChart = ({
     stroke: {
       width: [0, 3],
       curve: "straight",
+      dashArray: [0, 5],
     },
 
     dataLabels: {
       enabled: false,
     },
 
-    markers: {
-      size: [0, 4],
-    },
+    // markers: {
+    //   size: [0, 4],
+    // },
 
-    xaxis: {
-      categories,
-      labels: {
-        rotate: -35,
-        trim: true,
-      },
+xaxis: {
+  categories,
+  labels: {
+    rotate: -45,
+    rotateAlways: true,
+    trim: false,
+    hideOverlappingLabels: false,
+    minHeight: 100,
+    maxHeight: 160,
+    style: {
+      fontSize: "10px",
     },
+  },
+},
 
     yaxis: {
       title: {
@@ -506,7 +514,7 @@ const BranchPerformanceChart = ({
       },
     },
 
-    colors: [chartColors[0], chartColors[1] || "#f1b44c"],
+    colors: [chartColors[0], chartColors[0] ],
   };
 
   const mixedSeries = [
@@ -527,11 +535,10 @@ const BranchPerformanceChart = ({
       options={options}
       series={mixedSeries}
       type="line"
-      height={333}
+      height={350}
     />
   );
 };
-
 
 const MonthToDateSalesChart = ({
   dataColors,

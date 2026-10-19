@@ -226,23 +226,6 @@ case "Year To Date": {
       const data = action.payload?.result || action.payload || [];
 
       state.sales = data;
-
-      // Build unique branch list
-      const map = {};
-
-      data.forEach((item) => {
-        const code = item.branch_ID;
-        const name = item.brancch_Name;
-
-        if (code == null) return;
-
-        map[code] = {
-          branchCode: code,
-          branchName: name,
-        };
-      });
-
-      state.branches = Object.values(map);
     })
 
     .addCase(getSalesTransactions.rejected, (state, action) => {

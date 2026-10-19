@@ -173,9 +173,9 @@ const Widget = ({
               <div>
                 <p className="font-medium mb-0">Total Revenue</p>
 
-                <h2 className="mt-2 ff-secondary fw-semibold text-success">
+                <h5 className="mt-2 ff-secondary fw-semibold text-success">
                   KES {Number(totalRevenue || 0).toLocaleString("en-KE")}
-                </h2>
+                </h5>
               </div>
               <p className="mb-0 text-muted mt-auto">
                 {/* <i
@@ -205,7 +205,7 @@ const Widget = ({
             <CardBody className="p-2 d-flex flex-column">
               <div>
                 <p className="font-medium  mb-0">Cash Sales</p>
-                <h2 className="mt-2 ff-secondary fw-semibold text-info">
+                <h5 className="mt-2 ff-secondary fw-semibold text-info">
                   <span className="counter-value">
                     {/* <CountUp
                                         start={0}
@@ -216,7 +216,7 @@ const Widget = ({
                                     /> */}
                     KES {Number(cashSales || 0).toLocaleString("en-KE")}
                   </span>
-                </h2>
+                </h5>
               </div>
               <p className="mb-0 text-muted mt-auto">
                 {cashSalesPercentage.toFixed(1)}% of total
@@ -236,7 +236,7 @@ const Widget = ({
             <CardBody className="p-2 d-flex flex-column">
               <div>
                 <p className="font-medium  mb-0">Sales Invoices</p>
-                <h2 className="mt-2 ff-secondary fw-semibold text-danger">
+                <h5 className="mt-2 ff-secondary fw-semibold text-danger">
                   <span className="counter-value">
                     {/* <CountUp
                                         start={0}
@@ -247,7 +247,7 @@ const Widget = ({
                                     /> */}
                     KES {Number(salesInvoices || 0).toLocaleString("en-KE")}
                   </span>
-                </h2>
+                </h5>
               </div>
               <p className="mb-0 text-muted mt-auto">
                 {" "}
@@ -268,7 +268,7 @@ const Widget = ({
             <CardBody className="p-2 d-flex flex-column">
               <div>
                 <p className="font-medium  mb-0">Cash invoices</p>
-                <h2 className="mt-2 ff-secondary fw-semibold text-warning">
+                <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                   <span className="counter-value">
                     {/* <CountUp
                                         start={0}
@@ -278,7 +278,7 @@ const Widget = ({
                                     /> */}
                     KES {Number(cashInvoices || 0).toLocaleString("en-KE")}
                   </span>
-                </h2>
+                </h5>
               </div>
               <p className="mb-0 text-muted mt-auto">
                 {cashInvoicesPercentage.toFixed(1)}% of total
@@ -322,11 +322,11 @@ const Widget = ({
             <CardBody className="p-2 d-flex flex-column">
               <div>
                 <p className="font-medium  mb-0">Credit Notes </p>
-                <h2 className="mt-2 ff-secondary fw-semibold text-info">
+                <h5 className="mt-2 ff-secondary fw-semibold text-info">
                   <span className="counter-value">
                     KES {Number(creditNotes || 0).toLocaleString("en-KE")}
                   </span>
-                </h2>
+                </h5>
               </div>
               <p className="mb-0 text-muted mt-auto">
                 {creditNotesPercentage.toFixed(1)}% of total
@@ -371,11 +371,11 @@ const Widget = ({
             <CardBody className="p-2 d-flex flex-column">
               <div>
                 <p className="font-medium  mb-0">Overdue Accounts</p>
-                <h2 className="mt-2 ff-secondary fw-semibold text-warning">
+                <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                   <span className="counter-value">
                     KES {formatAmount(Number(overdueDebtorsCount || 0))}
                   </span>
-                </h2>
+                </h5>
               </div>
               <p className="mb-0 text-muted mt-auto">At risk</p>
 

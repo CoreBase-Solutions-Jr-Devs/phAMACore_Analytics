@@ -18,7 +18,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const startRef = useRef(null);
   const endRef = useRef(null);
   const {
-    sales,
+    salesBranch,
     // branches,
     loading,
     error,
@@ -28,9 +28,9 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const branches = (() => {
     const map = {};
 
-    (sales || []).forEach((item) => {
-      const code = item.branch_ID;
-      const name = item.brancch_Name;
+    (salesBranch || []).forEach((item) => {
+      const code = item.branch_id;
+      const name = item.branch_name;
 
       if (code == null) return;
 

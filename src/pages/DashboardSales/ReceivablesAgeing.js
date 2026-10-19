@@ -77,7 +77,7 @@ const ReceivablesAgeing = ({
   return (
     <React.Fragment>
       <Card className="card-height-100" id="sales-receivables-ageing-card">
-        <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2 border-0">
+       <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
           <h4 className="card-title mb-0 flex-grow-1">
             Receivables ageing (KES '000)
           </h4>

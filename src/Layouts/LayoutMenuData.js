@@ -109,7 +109,7 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
     },
     {
       id: 'purchase-orders',
-      label: 'Purchase-Orders',
+      label: 'Purchases',
       icon: 'ri-todo-line',
       link: '/#',
       stateVariables: isPurchaseOrders,

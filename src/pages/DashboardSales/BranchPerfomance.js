@@ -30,8 +30,9 @@ const BranchPerformance = ({
   return (
     <React.Fragment>
       <Card className="card-height-100" id="sales-branch-performance-card">
-        <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
-          <h4 className="card-title mb-0 flex-grow-1">
+       <CardBody className="p-0">
+    <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
+                <h4 className="card-title mb-0 1">
             Branch Performance-Revenue by Branch
           </h4>
           <CardExportButtons
@@ -40,7 +41,37 @@ const BranchPerformance = ({
             onExport={handleExportExcel}
           />
         </CardHeader>
-        <CardBody style={{ minHeight: "250px" }}>
+       
+<div className="d-flex justify-content-center align-items-center gap-4 flex-wrap mt-2 mb-3">
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "14px",
+        height: "14px",
+        backgroundColor: "var(--vz-success)",
+        borderRadius: "2px",
+      }}
+    />
+    <span className="text-muted">Revenue</span>
+  </div>
+
+  <div className="d-flex align-items-center gap-2">
+    <svg width="28" height="12" viewBox="0 0 28 12">
+      <line
+        x1="0"
+        y1="6"
+        x2="28"
+        y2="6"
+        stroke="var(--vz-success)"
+        strokeWidth="3"
+        strokeDasharray="3 4"
+      />
+    </svg>
+    <span className="text-muted">Revenue Trend</span>
+  </div>
+</div>
+
           {loading ? (
             <div className="text-center py-5">
               <div
@@ -59,7 +90,14 @@ const BranchPerformance = ({
               </h6>
             </div>
           ) : (
-            <>
+           <div
+  className="branch-chart-container"
+  style={{
+    width: "100%",
+    minWidth: 0,
+    overflow: "hidden",
+    padding: "0 12px 12px",
+  }}>
               <BranchPerformanceChart
                 series={chartSeries}
                 categories={categories}
@@ -73,25 +111,10 @@ const BranchPerformance = ({
           ]'
               />
 
-              <hr className="my-2" />
+             </div>
 
-              {topBranch && (
-                <div className="d-flex flex-row align-items-center justify-content-center mb-2 gap-3">
-                  <p>
-                    Top performing branch:
-                    <strong> {topBranch.name}</strong>
-                  </p>
-
-                  <p>
-                    Revenue:
-                    <strong>
-                      {" "}
-                      KES {formatAmount(Number(topBranch.amount))}
-                    </strong>
-                  </p>
-                </div>
-              )}
-            </>
+             
+           
           )}
         </CardBody>
       </Card>
