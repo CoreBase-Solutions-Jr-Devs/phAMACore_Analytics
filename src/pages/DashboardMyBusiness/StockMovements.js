@@ -5,6 +5,7 @@ import { getKPIStockHealth } from "../../helpers/fakebackend_helper";
 import { formatNumber } from "../utils/formatHelper";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
+import { cleanBranchName } from './../../helpers/branch_helper';
 
 const formatDMY = (date) => {
   const d = String(date.getDate()).padStart(2, "0");
@@ -192,7 +193,7 @@ const StockMovements = () => {
                         )}
                       </td>
                       <td>{formatNumber(item.monthly_demand)}</td>
-                      <td>{item.branch_name || `Branch ${item.branch_id}`}</td>
+                      <td>{cleanBranchName(item.branch_name || `Branch ${item.branch_id}`)}</td>
                       <td>
                         <span
                           className={`badge bg-${badge.color}-subtle text-${badge.color}`}

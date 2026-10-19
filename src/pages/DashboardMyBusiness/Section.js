@@ -34,8 +34,8 @@ const Section = ({ rightClickBtn, kpiData = {} }) => {
       { Metric: "Receivables", Amount: formatAmount(kpiData.receivables || 0), Notes: "Customer balances" },
       { Metric: "Payables", Amount: formatAmount(kpiData.payables || 0), Notes: "Supplier balances" },
       { Metric: "Total Sales", Amount: formatAmount(kpiData.sales || 0), Notes: "Sales revenue" },
-      { Metric: "Cash Available", Amount: formatAmount(kpiData.cashAvailable || 0), Notes: "Total cash collections" },
-      { Metric: "Stock Profit", Amount: formatAmount(kpiData.stockProfit || 0), Notes: "Gross profit" },
+      { Metric: "Cash Available", Amount: formatAmount(kpiData.cashAvailable || 0), Notes: "Cash collected in the period" },
+      { Metric: "Gross Profit", Amount: formatAmount(kpiData.stockProfit || 0), Notes: "Sales less cost of sales" },
       { Metric: "Collections", Amount: formatAmount(kpiData.collections || 0), Notes: "Customer payments received" },
     ];
 

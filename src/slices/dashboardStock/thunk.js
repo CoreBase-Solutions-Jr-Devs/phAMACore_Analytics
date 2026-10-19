@@ -12,6 +12,7 @@ import {
 }
   from "../../helpers/fakebackend_helper";
 import { cleanBranchName } from "../../helpers/branch_helper";
+import { toList, pick, num } from "../../pages/utils/apiRow";
 
 export const fetchDailyClosingStock = createAsyncThunk(
   "stockInventory/fetchDailyClosingStock",
@@ -115,71 +116,71 @@ export const fetchBranches = createAsyncThunk(
     }
 );
 
+const withCleanBranch = (item, fallbackBranch = {}) => {
+  const branchId = pick(item, "branch_id", "branchCode", "bcode") ?? fallbackBranch.branchCode;
+  const rawBranch =
+    pick(item, "branch_name", "branchName") ||
+    fallbackBranch.branchName ||
+    (branchId != null ? `Branch ${branchId}` : "");
+  return {
+    ...item,
+    branch_id: branchId,
+    branch_name: cleanBranchName(rawBranch),
+    total_stock_value: num(
+      pick(item, "total_stock_value", "total_stock_value_avgcost", "stock_value", "closing_value")
+    ),
+  };
+};
+
+const fetchStockValuePerBranch = async ({ clientid, whichcost, IncludeBlocked }, getState) => {
+  let branchList = getState().StockInventory?.branches || [];
+  if (!branchList.length) {
+    try {
+      const branchesRes = await getBranchesApi({ clientid });
+      const rawBranches = toList(branchesRes);
+      branchList = rawBranches.map((b) => ({
+        branchCode: pick(b, "bcode", "branchCode", "branch_ID", "branch_id"),
+        branchName: cleanBranchName(pick(b, "brancH_NAME", "branchName", "branch_name")),
+      })).filter((b) => b.branchCode != null);
+    } catch (e) {
+      branchList = [];
+    }
+  }
+
+  if (!branchList.length) {
+    const fallbackRes = await getKPITotalStockValueByBranchApi({ clientid, whichcost, IncludeBlocked });
+    return toList(fallbackRes).map((item) => withCleanBranch(item));
+  }
+
+  return Promise.all(
+    branchList.map(async (b) => {
+      const empty = { branch_id: b.branchCode, branch_name: cleanBranchName(b.branchName), total_stock_value: 0 };
+      try {
+        const res = await getKPITotalStockValueByBranchApi({ clientid, whichcost, IncludeBlocked, branchcode: b.branchCode });
+        const rows = toList(res);
+        return rows.length > 0 ? withCleanBranch(rows[0], b) : empty;
+      } catch (e) {
+        return empty;
+      }
+    })
+  );
+};
+
 export const fetchKPITotalStockValueByBranch = createAsyncThunk(
   "stockInventory/fetchKPITotalStockValueByBranch",
   async (params = {}, { getState, rejectWithValue }) => {
     try {
-      const {
-        clientid = 1,
-        whichcost = 1,
-        IncludeBlocked = false,
-        branchcode,
-      } = params;
+      // IncludeBlocked defaults to true: it matches the official valuation report
+      // and the figure shown on the My Business dashboard.
+      const { clientid = 1, whichcost = 1, IncludeBlocked = true, branchcode } = params;
+      const base = { clientid, whichcost, IncludeBlocked };
 
       if (branchcode) {
-        const response = await getKPITotalStockValueByBranchApi({
-          clientid,
-          whichcost,
-          IncludeBlocked,
-          branchcode,
-        });
-        const data = response.data ?? response;
-        const list = Array.isArray(data) ? data : [data];
-        return list.map((item) => ({
-          ...item,
-          branch_name: cleanBranchName(item.branch_name || item.branchName),
-        }));
+        const response = await getKPITotalStockValueByBranchApi({ ...base, branchcode });
+        return toList(response).map((item) => withCleanBranch(item, { branchCode: branchcode }));
       }
 
-      // If branchcode is null/undefined, fetch for all branches to build comparison
-      let branchList = getState().StockInventory?.branches || [];
-      if (!branchList.length) {
-        const branchesRes = await getBranchesApi({ clientid });
-        const rawBranches = branchesRes.data?.result || branchesRes.data || [];
-        branchList = rawBranches.map((b) => ({
-          branchCode: b.bcode ?? b.branchCode ?? b.branch_ID,
-          branchName: cleanBranchName(b.brancH_NAME ?? b.branchName ?? b.branch_name),
-        }));
-      }
-
-      const results = await Promise.all(
-        branchList.map(async (b) => {
-          try {
-            const res = await getKPITotalStockValueByBranchApi({ clientid, whichcost, IncludeBlocked, branchcode: b.branchCode});
-            const data = res.data ?? res;
-            if (Array.isArray(data) && data.length > 0) {
-              return {
-                ...data[0],
-                branch_id: b.branchCode,
-                branch_name: cleanBranchName(b.branchName || data[0].branch_name),
-              };
-            }
-            return {
-              branch_id: b.branchCode,
-              branch_name: cleanBranchName(b.branchName),
-              total_stock_value: 0,
-            };
-          } catch (e) {
-            return {
-              branch_id: b.branchCode,
-              branch_name: cleanBranchName(b.branchName),
-              total_stock_value: 0,
-            };
-          }
-        })
-      );
-
-      return results;
+      return await fetchStockValuePerBranch(base, getState);
     } catch (error) {
       return rejectWithValue(error?.response?.data?.message || error?.response?.data ||
         error.message || "Failed to fetch total stock value by branch!"
@@ -192,11 +193,13 @@ export const fetchKPIStockHealth = createAsyncThunk(
   "stockInventory/fetchKPIStockHealth",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const { clientid = 1, branchcode = null } = params;
+      const { clientid = 1, branchcode = null, LookbackDays, AsOfDate } = params;
       const payload = { clientid };
       if (branchcode) {
         payload.branchcode = branchcode;
       }
+      if (LookbackDays) payload.LookbackDays = LookbackDays;
+      if (AsOfDate) payload.AsOfDate = AsOfDate;
 
       const response = await getKPIStockHealthApi(payload);
       const data = response.data ?? response;
@@ -220,7 +223,7 @@ export const fetchKPICriticalStockouts = createAsyncThunk(
         clientid = 1,
         branchcode = null,
         GroupBy = "CRITICAL_STOCKOUTS",
-        TopN = 30,
+        TopN = 0,
         AsOfDate = null,
       } = params;
 
@@ -321,6 +324,30 @@ export const fetchKPISlowMovingStock = createAsyncThunk(
 );
 
 
+// Branch stock vs demand distortion with the API's own transfer recommendation
+export const fetchKPIImbalances = createAsyncThunk(
+  "stockInventory/fetchKPIImbalances",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const { clientid = 1, branchcode = null, TopN = 200, LookbackDays = 30, AsOfDate = null } = params;
+      const payload = { clientid, GroupBy: "IMBALANCES", TopN, LookbackDays };
+      if (branchcode) payload.branchcode = branchcode;
+      if (AsOfDate) payload.AsOfDate = AsOfDate;
+
+      const response = await getKPIStockHealthApi(payload);
+      const data = response.data ?? response;
+      return (Array.isArray(data) ? data : [data]).filter((row) => row && row.item_code);
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error.message ||
+        "Failed to fetch branch imbalances!"
+      );
+    }
+  }
+);
+
 const calculatePeriodDays = (startDate, endDate) => {
   if (!startDate || !endDate) return 1;
   const parse = (str) => {
@@ -331,8 +358,9 @@ const calculatePeriodDays = (startDate, endDate) => {
     }
     return new Date(str);
   };
+  // Inclusive: 01/10 - 11/10 is 11 trading days, not 10
   const diff = parse(endDate) - parse(startDate);
-  const days = Math.round(diff / (1000 * 60 * 60 * 24));
+  const days = Math.round(diff / (1000 * 60 * 60 * 24)) + 1;
   return Math.max(days, 1);
 };
 

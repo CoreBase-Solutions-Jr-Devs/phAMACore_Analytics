@@ -14,13 +14,12 @@ import CustomTableOne from './Tables/Custom/CustomTableOne';
 import {
     fetchBatchExpiryNeo,
     fetchBranches,
-    fetchDailyClosingStock,
     fetchKPICriticalStockouts,
+    fetchKPIImbalances,
     fetchKPISalesTransactions,
     fetchKPISlowMovingStock,
     fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
-    fetchStockMovements
 } from '../../slices/dashboardStock/thunk';
 import { setBranch } from '../../slices/dashboardStock/reducer';
 import { resolveBranchName, saveActiveBranch, cleanBranchName } from '../../helpers/branch_helper';
@@ -33,8 +32,17 @@ import FilterActions from './FilterActions';
 
 import { exportToExcel } from '../../helpers/export_helper';
 import CardExportButtons from '../../Components/Common/CardExportButtons';
-import { useImbalanceEngine } from './components/ImbalanceAlerts/useImbalanceEngine';
 import { transformStockVsSalesVelocity, getPeriodDays } from './Charts/Custom/util/chartTransforms';
+import { suggestedOrderQty } from './components/CriticalStockChart';
+import {
+    buildTransferSuggestions,
+    getExpiryRows,
+    getLookbackDays,
+    CRITICAL_TOP_N,
+    IMBALANCE_TOP_N,
+    SLOW_MOVER_TOP_N,
+} from '../utils/StockInventoryUtils';
+import { addDaysApi } from '../utils/dateHelper';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -53,8 +61,6 @@ const DashboardStock = () => {
     const isBranchView = !!branchCode;
 
     const {
-        stockMovements = [],
-        dailyClosingStock = [],
         batchExpiryNeo = [],
         branches = [],
         criticalStockouts = [],
@@ -62,12 +68,15 @@ const DashboardStock = () => {
         kpiSalesTransactions = [],
         kpiSalesPeriodDays = 1,
         slowMovingStock = [],
+        imbalances = [],
         filters = {},
     } = useSelector((state) => state.StockInventory ?? {});
 
     const branchDisplayName = isBranchView
-        ? cleanBranchName(resolveBranchName(branchCode, branches, stockMovements))
+        ? cleanBranchName(resolveBranchName(branchCode, branches))
         : "";
+
+    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
 
     const [rightColumn, setRightColumn] = useState(false);
 
@@ -90,49 +99,37 @@ const DashboardStock = () => {
         dispatch(fetchBranches({ clientid: 1 }));
     }, [dispatch]);
 
-    // Fetch data when branch or date filters change
+    // Stock position: live figures that only depend on the branch, not on the date filter.
     useEffect(() => {
-        const payload = {
+        const branchcode = branchCode || null;
+
+        dispatch(fetchKPITotalStockValueByBranch({ clientid: 1, whichcost: 1, branchcode }));
+
+        // Expiry is a fixed window around today (expired in the last 12 months up to 90 days
+        // ahead). It used to take the dashboard date range, so a one-day filter returned nothing.
+        dispatch(fetchBatchExpiryNeo({
+            clientid: 1,
+            branchcode,
+            startDate: addDaysApi(-365),
+            endDate: addDaysApi(90),
+        }));
+    }, [dispatch, branchCode]);
+
+    // Movement-based figures: follow the branch and the date filter.
+    // The per-line closing stock and stock movement downloads were dropped: the stock health
+    // endpoint already returns the KPIs and transfer suggestions that were derived from them.
+    useEffect(() => {
+        const health = {
             clientid: 1,
             branchcode: branchCode || null,
-            startDate: filters.startDate,
-            endDate: filters.endDate,
+            LookbackDays: lookbackDays,
+            AsOfDate: filters.endDate,
         };
 
-        dispatch(fetchDailyClosingStock(payload));
-        dispatch(fetchBatchExpiryNeo(payload));
-        dispatch(fetchKPITotalStockValueByBranch({
-            clientid: 1,
-            whichcost: 1,
-            IncludeBlocked: false,
-            branchcode: branchCode || null,
-        }));
-        dispatch(fetchKPIStockHealth({
-            clientid: 1,
-            branchcode: branchCode || null,
-        }));
-        dispatch(fetchKPICriticalStockouts({
-            clientid: 1,
-            branchcode: branchCode || null,
-            GroupBy: "CRITICAL_STOCKOUTS",
-            TopN: 30,
-            AsOfDate: filters.endDate,
-        }));
-        dispatch(fetchKPISlowMovingStock({
-            clientid: 1,
-            branchcode: branchCode || null,
-            GroupBy: "SLOW_MOVERS",
-            TopN: 50,
-            LookbackDays: 30,
-            AsOfDate: filters.endDate,
-        }));
-        // PowerBIStockMovements requires a valid branchcode: use branchCode if available, else default to 1
-        dispatch(fetchStockMovements({
-            clientid: 1,
-            branchcode: branchCode || 1,
-            startDate: filters.startDate,
-            endDate: filters.endDate,
-        }));
+        dispatch(fetchKPIStockHealth(health));
+        dispatch(fetchKPICriticalStockouts({ ...health, GroupBy: "CRITICAL_STOCKOUTS", TopN: CRITICAL_TOP_N }));
+        dispatch(fetchKPISlowMovingStock({ ...health, GroupBy: "SLOW_MOVERS", TopN: SLOW_MOVER_TOP_N }));
+        dispatch(fetchKPIImbalances({ ...health, TopN: IMBALANCE_TOP_N }));
         dispatch(fetchKPISalesTransactions({
             clientid: 1,
             startDate: filters.startDate,
@@ -140,7 +137,7 @@ const DashboardStock = () => {
             GroupBy: "BRANCH",
             branchcode: branchCode || null,
         }));
-    }, [dispatch, branchCode, filters.startDate, filters.endDate]);
+    }, [dispatch, branchCode, filters.startDate, filters.endDate, lookbackDays]);
 
     const periodDays = useMemo(() => {
         if (kpiSalesPeriodDays && kpiSalesPeriodDays > 1) {
@@ -160,7 +157,10 @@ const DashboardStock = () => {
             "Branch": cleanBranchName(item.branch_name || item.branchName || ""),
             "Current Stock": Number(item.current_stock_qty ?? 0).toLocaleString(),
             "Min Reorder Qty": Number(item.effective_min_qty ?? item.branch_min_qty ?? 0).toLocaleString(),
+            "ABC Class": item.abc_class || "-",
+            "Monthly Demand": Number(item.monthly_demand ?? 0).toLocaleString(),
             "Days of Inventory": item.days_of_inventory !== undefined ? Number(item.days_of_inventory) : "-",
+            "Suggested Order Qty (estimate)": suggestedOrderQty(item).toLocaleString(),
             "Risk Status": item.stockout_risk_status || (Number(item.days_of_inventory ?? 0) <= 6 ? "CRITICAL" : "REORDER"),
             "Action Insight": item.action_insight || "-",
         }));
@@ -189,8 +189,8 @@ const DashboardStock = () => {
             "Branch": branch,
             "Stock Value (KES)": (velocityData.rawStock?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
             "Stock Value (M KES)": velocityData.stock?.[idx] ?? 0,
-            "Avg Daily Sales (KES)": (velocityData.rawDailySales?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
-            "Daily Sales (M KES)": velocityData.sales?.[idx] ?? 0,
+            "Avg Daily Cost of Sales (KES)": (velocityData.rawDailySales?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            "Consumption per 30 Days (KES)": (velocityData.monthlyConsumption?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
             "Days of Cover": velocityData.daysCover?.[idx] ?? "-",
         }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -198,36 +198,16 @@ const DashboardStock = () => {
     };
 
     const handleExportExpiryWatch = () => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const cutoff = new Date(today);
-        cutoff.setDate(cutoff.getDate() + 90);
-
-        const rows = (batchExpiryNeo || [])
-            .filter((item) => {
-                if (!item.expirydate) return false;
-                const exp = new Date(item.expirydate);
-                return !isNaN(exp.getTime()) && exp >= today && exp <= cutoff;
-            })
-            .map((item) => {
-                const qty = Number(item.qtyBal || 0);
-                const val = Number(item.costValue || 0);
-                const exp = new Date(item.expirydate);
-                const daysRemaining = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
-                let action = "Prioritise Sales";
-                if (daysRemaining <= 30) action = "Promote now";
-                else if (daysRemaining <= 60) action = "Transfer/Promote";
-
-                return {
-                    "Product": item.invName || item.itemName || "",
-                    "Branch": cleanBranchName(item.branchName || item.branch_name || ""),
-                    "Expiry Date": exp.toLocaleDateString("en-GB"),
-                    "Days Remaining": daysRemaining,
-                    "Qty Balance": qty.toLocaleString(),
-                    "Cost Value (KES)": val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                    "Action Status": action,
-                };
-            });
+        const rows = getExpiryRows(batchExpiryNeo).map((row) => ({
+            "Product": row.product,
+            "Batch": row.batch || "-",
+            "Branch": row.branch,
+            "Expiry Date": row.expiry.toLocaleDateString("en-GB"),
+            "Days Remaining": row.daysRemaining,
+            "Qty Balance": row.qty.toLocaleString(),
+            "Cost Value (KES)": row.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            "Action Status": row.action,
+        }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
         exportToExcel(rows, `Expiry_Watch_Stock_${todayStr}`);
     };
@@ -242,10 +222,12 @@ const DashboardStock = () => {
             return {
                 "Item Name": item.item_name || item.item_Name || "Unknown Item",
                 "Item Code": item.item_code || item.item_Code || "",
+                "Category / Group": item.item_group || "-",
                 "Branch": cleanBranchName(item.branch_name || item.branchName || ""),
                 "Current Stock": item.current_stock_qty !== undefined ? Number(item.current_stock_qty).toLocaleString() : "-",
-                "Units Sold (30 Days)": item.units_sold_window !== undefined ? Number(item.units_sold_window).toLocaleString() : (item.totalQty ?? "-"),
+                [`Units Sold (${lookbackDays} Days)`]: item.units_sold_window !== undefined ? Number(item.units_sold_window).toLocaleString() : (item.totalQty ?? "-"),
                 "Tied Up Capital (KES)": item.tied_up_capital !== undefined ? Number(item.tied_up_capital).toLocaleString(undefined, { minimumFractionDigits: 2 }) : "-",
+                "Days of Inventory": Number(item.days_of_inventory) >= 9999 ? "No sales" : (item.days_of_inventory ?? "-"),
                 "Movement Status": statusLabel,
                 "Action Insight": item.action_insight || "-",
             };
@@ -255,17 +237,22 @@ const DashboardStock = () => {
     };
 
     const handleExportImbalanceAlerts = () => {
-        const alerts = useImbalanceEngine(dailyClosingStock, stockMovements, batchExpiryNeo) || [];
-        const rows = alerts.map((a) => ({
-            "Product": a.product || a.itemCode || "",
-            "Item Code": a.itemCode || "",
-            "Source / From": a.fromBranch || a.from || "",
-            "Destination / To": a.toBranch || a.to || "",
-            "Transfer / Difference Units": a.suggestedTransfer || a.diff || 0,
-            "Urgency Status": a.statusLabel || a.status || "",
+        const rows = buildTransferSuggestions(imbalances, lookbackDays).map((a) => ({
+            "Product": a.product,
+            "Item Code": a.itemCode,
+            "Category / Group": a.group,
+            "Branch": a.branch,
+            "Position": a.deficit ? "Needs stock" : "Has surplus",
+            "Branch Stock": a.stock.toLocaleString(),
+            "Stock Share %": a.stockShare,
+            "Sales Share %": a.salesShare,
+            "Suggested Transfer Units": a.qty.toLocaleString(),
+            "Days Cover Before": a.coverBefore ?? "No sales",
+            "Days Cover After": a.coverAfter ?? "No sales",
+            "Insight": a.insight || "-",
         }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-        exportToExcel(rows, `InterBranch_Imbalance_Alerts_${todayStr}`);
+        exportToExcel(rows, `InterBranch_Transfer_Suggestions_${todayStr}`);
     };
 
     const handleApplyFilters = () => {
@@ -307,7 +294,8 @@ const DashboardStock = () => {
                                                 Critical Stock Levels - MUST-NOT STOCKOUT items
                                             </h4>
                                             <p className="text-muted mb-0 small">
-                                                Class A Revenue Drivers at Risk
+                                                Class A items (top sellers making up about 80% of revenue over 90 days) at risk
+                                                {criticalStockouts.length > 0 && ` · ${criticalStockouts.length.toLocaleString()} items`}
                                             </p>
                                         </div>
                                         <CardExportButtons
@@ -352,8 +340,8 @@ const DashboardStock = () => {
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <h4 className="card-title mb-0">
                                             {isBranchView && branchDisplayName
-                                                ? `Stock VS Sales Velocity - ${branchDisplayName}`
-                                                : "Stock VS Sales Velocity - Branch Coverage Ratio"}
+                                                ? `Stock VS Cost of Sales - ${branchDisplayName}`
+                                                : "Stock VS Cost of Sales - Branch Coverage"}
                                         </h4>
                                         <CardExportButtons
                                             targetId="stock-velocity-card"
@@ -373,7 +361,7 @@ const DashboardStock = () => {
                             <Card id="expiry-watch-card">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                        <h4 className="card-title mb-0">EXPIRY WATCH - WRITE-OFF RISK</h4>
+                                        <h4 className="card-title mb-0">EXPIRY WATCH - EXPIRED &amp; WRITE-OFF RISK</h4>
                                         <CardExportButtons
                                             targetId="expiry-watch-card"
                                             title="Expiry Watch"
@@ -391,11 +379,11 @@ const DashboardStock = () => {
                         </Col>
                     </Row>
                     <Row>
-                        <Col lg={5}>
-                            <Card className="card-height-100" id="slow-moving-stock-card">
+                        <Col xl={12}>
+                            <Card id="slow-moving-stock-card">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                        <h4 className="card-title mb-0">SLOW MOVING STOCK (30 DAYS)</h4>
+                                        <h4 className="card-title mb-0">SLOW MOVING STOCK ({lookbackDays} DAYS)</h4>
                                         <CardExportButtons
                                             targetId="slow-moving-stock-card"
                                             title="Slow Moving Stock"
@@ -404,13 +392,16 @@ const DashboardStock = () => {
                                     </div>
                                 </CardHeader>
                                 <CardBody>
-                                    <p className="text-muted text-truncate mb-3">Low Sales Velocity Items (30 Days)</p>
+                                    <p className="text-muted mb-3 small">
+                                        Dead stock: no sales in {lookbackDays} days. Slow: over 180 days of stock on hand, or under 5% sold.
+                                        {slowMovingStock.length >= SLOW_MOVER_TOP_N && SLOW_MOVER_TOP_N > 0 && ` Top ${SLOW_MOVER_TOP_N} by capital tied up.`}
+                                    </p>
                                     <div id="users">
                                         <Row className="mb-3 align-items-center g-2">
                                             <Col>
                                                 <input
                                                     className="form-control"
-                                                    placeholder="Search by item name or code..."
+                                                    placeholder="Search by item name, code, category, or branch..."
                                                     value={searchTerm}
                                                     onChange={(e) => setSearchTerm(e.target.value)}
                                                 />
@@ -426,7 +417,7 @@ const DashboardStock = () => {
                                             </Col>
                                         </Row>
 
-                                        <SimpleBar style={{ height: "242px" }} className="mx-n3">
+                                        <SimpleBar style={{ maxHeight: "360px" }}>
                                             <SlowMovingStock
                                                 searchTerm={searchTerm}
                                                 sortAscending={sortAscending}
@@ -436,11 +427,13 @@ const DashboardStock = () => {
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col lg={7}>
-                            <Card className="card-height-100" id="imbalance-alerts-card">
+                    </Row>
+                    <Row>
+                        <Col xl={12}>
+                            <Card id="imbalance-alerts-card">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                        <h4 className="card-title mb-0">INTER-BRANCH IMBALANCE ALERTS</h4>
+                                        <h4 className="card-title mb-0">INTER-BRANCH TRANSFER SUGGESTIONS</h4>
                                         <CardExportButtons
                                             targetId="imbalance-alerts-card"
                                             title="Inter-Branch Imbalance Alerts"
@@ -450,13 +443,13 @@ const DashboardStock = () => {
                                 </CardHeader>
 
                                 <CardBody>
-                                    <p className="text-muted text-truncate mb-3">Products where one branch is overstocked while another is critically low.</p>
+                                    <p className="text-muted mb-3 small">Branches holding over 20% more or less of an item's stock than their share of its sales. These are suggestions only; no transfer has been raised.</p>
 
                                     <Row className="mb-3 align-items-center g-2">
                                         <Col>
                                             <input
                                                 className="form-control"
-                                                placeholder="Search by product, branch, or code..."
+                                                placeholder="Search by product, branch, category, or code..."
                                                 value={imbalanceSearchTerm}
                                                 onChange={(e) => setImbalanceSearchTerm(e.target.value)}
                                             />
@@ -473,11 +466,8 @@ const DashboardStock = () => {
                                         </Col>
                                     </Row>
 
-                                    <SimpleBar style={{ height: "242px" }} className="mx-n3 px-3">
+                                    <SimpleBar style={{ maxHeight: "360px" }}>
                                         <ImbalanceAlerts
-                                            stock={dailyClosingStock}
-                                            movements={stockMovements}
-                                            expiry={batchExpiryNeo}
                                             searchTerm={imbalanceSearchTerm}
                                             sortAscending={imbalanceSortAscending}
                                         />
@@ -485,13 +475,13 @@ const DashboardStock = () => {
                                 </CardBody>
                             </Card>
                         </Col>
-                        <FilterActions
-                            onApply={handleApplyFilters}
-                            rightColumn={rightColumn}
-                            hideRightColumn={toggleRightColumn}
-                        />
                     </Row>
                 </Container>
+                <FilterActions
+                    onApply={handleApplyFilters}
+                    rightColumn={rightColumn}
+                    hideRightColumn={toggleRightColumn}
+                />
             </div>
         </React.Fragment>
     );
