@@ -143,11 +143,11 @@ const Widgets = ({
             <CardBody className="p-2 d-flex flex-column">
               <div>
                 <p className=" font-medium mb-0">Total Spend</p>
-                <h2 className="mt-2 ff-secondary fw-semibold text-success">
+                <h5 className="mt-2 ff-secondary fw-semibold text-success">
                   <span className="counter-value">
                     KES {Number(totalSpend || 0).toLocaleString("en-KE")}
                   </span>
-                </h2>
+                </h5>
               </div>
               <p className="text-muted mb-0 mt-auto">Tax inclusive</p>
             </CardBody>
@@ -160,9 +160,9 @@ const Widgets = ({
               <div>
                 <p className=" font-medium mb-0">Active Suppliers</p>
 
-                <h2 className="mt-2 ff-secondary fw-semibold text-info">
+                <h5 className="mt-2 ff-secondary fw-semibold text-info">
                   {Number(activeSuppliers || 0)}
-                </h2>
+                </h5>
               </div>
               <p className="text-muted mb-0 mt-auto">
                 Suppliers with purchases
@@ -177,9 +177,9 @@ const Widgets = ({
               <div>
                 <p className=" font-medium mb-0">Price Alerts</p>
 
-                <h2 className="mt-2 ff-secondary fw-semibold text-danger">
+                <h5 className="mt-2 ff-secondary fw-semibold text-danger">
                   {Number(priceAlerts || 0)}
-                </h2>
+                </h5>
               </div>
               <p className="text-muted mb-0 mt-auto">Recent price changes</p>
             </CardBody>
@@ -192,9 +192,9 @@ const Widgets = ({
               <div>
                 <p className="font-medium mb-0">Maverick Spend</p>
 
-                <h2 className="mt-2 ff-secondary fw-semibold text-warning">
+                <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                   KES {Number(maverickSpend || 0).toLocaleString("en-KE")}
-                </h2>
+                </h5>
               </div>
 
               <p className="text-muted mb-0 mt-auto">
@@ -210,9 +210,9 @@ const Widgets = ({
               <div>
                 <p className="font-medium mb-0">Avg Lead Time</p>
 
-                <h2 className="mt-2 ff-secondary fw-semibold text-success">
+                <h5 className="mt-2 ff-secondary fw-semibold text-success">
                   {Number(avgLeadTime || 0).toFixed(1)} days
-                </h2>
+                </h5>
               </div>
 
               <p className="text-muted mb-0 mt-auto">Delivery time</p>

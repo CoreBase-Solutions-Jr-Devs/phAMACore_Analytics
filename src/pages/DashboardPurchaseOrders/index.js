@@ -69,7 +69,7 @@ const MAVERICK_SPEND_GROUP_BYS = [
   "SUPPLIER",
   "BRANCH",
   "OFF_PO_INVOICES",
-  "PO_PRICE_VARIANCE",
+  // "PO_PRICE_VARIANCE",
 ];
 
 const DashboardPurchaseOrders = () => {
@@ -617,7 +617,7 @@ dispatchGroupByRequests(
                     )}
                   </Col>
                   <Row>
-                    <Col xl={4}>
+                    <Col xl={6}>
                       <SupplierSpend
                         supplierData={topSuppliers}
                         top2Suppliers={top2Suppliers}
@@ -626,14 +626,8 @@ dispatchGroupByRequests(
                         error={error}
                       />
                     </Col>
-                    <Col xl={4}>
-                      <BestPrices
-                        bestPricePerSupplier={bestPricePerSupplier}
-                        error={error}
-                        loading={loading}
-                      />
-                    </Col>
-                    <Col xl={4}>
+                   
+                    <Col xl={6}>
                       <RecentOrders
                         formatAmount={formatAmount}
                         overdueSupplierAccounts={overdueSupplierAccounts}

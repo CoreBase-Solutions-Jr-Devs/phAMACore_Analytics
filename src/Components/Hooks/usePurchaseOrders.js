@@ -93,7 +93,7 @@ const usePurchaseOrders = (
   };
   
 const totalSpend = Number(
-  KPISummary?.[0]?.net_purchases_incl || 0
+  KPISummary?.[0]?.gross_purchases_excl || 0
 );
 
 const activeSuppliers = Number(
@@ -126,9 +126,11 @@ const maverickSpend = Number(
   maverickSpendSummary.maverick_off_po_spend || 0
 );
 
-const maverickSpendPercentage = Number(
-  maverickSpendSummary.maverick_spend_perc || 0
-);
+const maverickSpendPercentage =
+  totalSpend > 0
+    ? (maverickSpend / totalSpend) * 100
+    : 0;
+    
  const leadTimeSummary = KPILeadTimeSummary?.[0] || {};
 
 const avgLeadTime = Number(
@@ -136,7 +138,8 @@ const avgLeadTime = Number(
 );
   const branchData = useMemo(() => {
   const grouped = (KPIBranch || []).reduce((acc, item) => {
-    const group = item?.branch_name || "Unknown";
+const group = (item?.branch_name || "UNKNOWN BRANCH")
+      .replace(/^AXCESS PHARMACY\s*-\s*/i, "");
     const spend = Number(item?.net_purchases_incl || 0);
 
     if (!acc[group]) {

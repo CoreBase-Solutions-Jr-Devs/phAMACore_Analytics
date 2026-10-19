@@ -39,8 +39,9 @@ const StoreVisits = ({ data = {}, error, loading }) => {
   return (
     <React.Fragment>
       <Card className="card-height-100" id="purchases-branch-spend-card">
-        <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
-          <h4 className="card-title mb-0 flex-grow-1">
+       <CardBody className="p-0">
+    <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
+                <h4 className="card-title mb-0 flex-grow-1">
             Branch Performance - Spend by Branch
           </h4>
           <CardExportButtons
@@ -49,8 +50,35 @@ const StoreVisits = ({ data = {}, error, loading }) => {
             onExport={handleExportExcel}
           />
         </CardHeader>
+          <div className="d-flex justify-content-center align-items-center gap-4 flex-wrap mt-2 mb-3">
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "14px",
+        height: "14px",
+        backgroundColor: "var(--vz-purple)",
+        borderRadius: "2px",
+      }}
+    />
+    <span className="text-muted">Revenue</span>
+  </div>
 
-        <CardBody>
+  <div className="d-flex align-items-center gap-2">
+    <svg width="28" height="12" viewBox="0 0 28 12">
+      <line
+        x1="0"
+        y1="6"
+        x2="28"
+        y2="6"
+        stroke="var(--vz-purple)"
+        strokeWidth="3"
+        strokeDasharray="3 4"
+      />
+    </svg>
+    <span className="text-muted">Revenue Trend</span>
+  </div>
+</div>
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary mb-3" role="status">
@@ -68,7 +96,14 @@ const StoreVisits = ({ data = {}, error, loading }) => {
               </h6>
             </div>
           ) : (
-            <>
+                      <div
+  className="branch-chart-container"
+  style={{
+    width: "100%",
+    minWidth: 0,
+    overflow: "hidden",
+    padding: "0 12px 12px",
+  }}>
               <StoreVisitsCharts
                 dataColors='[
                 "--vz-primary",
@@ -86,25 +121,10 @@ const StoreVisits = ({ data = {}, error, loading }) => {
                 series={series}
                 amounts={amounts}
               />
-              <hr className="my-2" />
+           
 
-              {topBranch && (
-                <div className="d-flex flex-row align-items-center justify-content-center mb-2 gap-3">
-                  <p>
-                    Top performing branch:
-                    <strong> {topBranch.name}</strong>
-                  </p>
-
-                  <p>
-                    Spend:
-                    <strong>
-                      {" "}
-                      KES {Number(topBranch.amount).toLocaleString("en-KE")}
-                    </strong>
-                  </p>
-                </div>
-              )}
-            </>
+              
+            </div>
           )}
         </CardBody>
       </Card>

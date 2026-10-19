@@ -789,7 +789,33 @@ const PurchaseOrdersSlice = createSlice({
           action.payload ||
           action.error.message ||
           "Error loading best price per supplier";
-      });
+      })
+
+          // ------------------------------------------
+          // KPI OVERDUE ACCOUNTS
+          // ------------------------------------------
+      
+          .addCase(getKPIOverdueAccounts.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+          })
+      
+          .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
+            state.loading = false;
+            state.error = null;
+      
+            state.kpiOverdueAccounts =
+              action.payload?.result || action.payload || [];
+          })
+      
+          .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
+            state.loading = false;
+            state.error =
+              action.payload?.message ||
+              action.payload ||
+              action.error.message ||
+              "Error loading overdue accounts";
+          });
   },
 });
 

@@ -255,6 +255,7 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
   );
 };
 
+
 const StoreVisitsCharts = ({
   dataColors,
   categories = [],
@@ -262,64 +263,112 @@ const StoreVisitsCharts = ({
   formatAmount,
   amounts = [],
 }) => {
-  const chartPieBasicColors = getChartColorsArray(dataColors);
+  const chartColors = getChartColorsArray(dataColors);
 
-  console.log("Pie categories:", categories);
-  console.log("Pie series:", series);
-  console.log("Pie amounts:", amounts);
+  // Use actual spend amounts for the bars
+  const barData = amounts.length ? amounts : series;
 
   const options = {
-    labels: categories,
-
     chart: {
-      height: 333,
-      type: "donut",
+      height: 350,
+      type: "line",
+      toolbar: {
+        show: false,
+      },
     },
 
     legend: {
-      position: "bottom",
-      formatter: (seriesName, opts) => {
-        const amount = amounts[opts.seriesIndex] || 0;
+      show: false,
+    },
 
-        return `${seriesName}: ${Number(amount).toLocaleString("en-KE")}`;
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "70%",
+        borderRadius: 0,
+        distributed: false,
       },
     },
 
     stroke: {
-      show: false,
+      width: [0, 3],
+      curve: "straight",
+      dashArray: [0, 5],
     },
 
     dataLabels: {
-      enabled: true,
-      formatter: (val) => `${val.toFixed(1)}%`,
-      dropShadow: {
-        enabled: false,
-      },
+      enabled: false,
     },
 
-    tooltip: {
-      y: {
-        formatter: (val, { seriesIndex }) => {
-          const amount = amounts[seriesIndex] || 0;
-
-          return `KES ${Number(amount).toLocaleString("en-KE")}`;
+    xaxis: {
+      categories,
+      labels: {
+        rotate: -45,
+        rotateAlways: true,
+        trim: false,
+        hideOverlappingLabels: false,
+        minHeight: 100,
+        maxHeight: 160,
+        style: {
+          fontSize: "10px",
         },
       },
     },
 
-    colors: chartPieBasicColors,
+    yaxis: {
+      title: {
+        text: "Spend (KES)",
+      },
+      labels: {
+        formatter: (value) =>
+          Number(value || 0).toLocaleString("en-KE"),
+      },
+    },
+
+    tooltip: {
+      shared: false,
+      intersect: true,
+      enabledOnSeries: [0],
+
+      x: {
+        formatter: (value, { dataPointIndex }) =>
+          categories[dataPointIndex] || value,
+      },
+
+      y: {
+        formatter: (value) =>
+          `KES ${Number(value || 0).toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
+      },
+    },
+
+    colors: [chartColors[0], chartColors[0]],
   };
 
+  const mixedSeries = [
+    {
+      name: "Spend",
+      type: "bar",
+      data: barData,
+    },
+    {
+      name: "Spend Trend",
+      type: "line",
+      data: barData,
+    },
+  ];
+
   return (
-    <React.Fragment>
-      <ReactApexChart
-        options={options}
-        series={series}
-        type="donut"
-        height="333"
-      />
-    </React.Fragment>
+    <ReactApexChart
+      options={options}
+      series={mixedSeries}
+      type="line"
+      height={350}
+    />
   );
 };
+
 
 export { RevenueCharts, StoreVisitsCharts, SpendCharts, MonthToDateCharts };

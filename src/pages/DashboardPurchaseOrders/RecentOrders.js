@@ -123,63 +123,63 @@ const RecentOrders = ({
             </div>
           ) : (
             <>
-              <div className="row g-2 mb-3">
-                <div className="col-6 col-md-4 col-sm-6">
-                  <div className="rounded-3 text-center bg-success-subtle p-2">
+           <div className="row row-cols-5 g-1 mb-3 ">
+                <div className="col">
+                  <div className="rounded-3 text-center bg-success-subtle p-1">
                     <p className="text-success fw-semibold mb-1 small">
                       <small>Current</small>
                     </p>
 
-                    <h6 className="mb-0 text-success fw-bold">
-                      {Number(currentReceivables).toLocaleString("en-KE")}
+                    <h6 className="mb-0 text-success fw-bold small">
+                      <small> {Number(currentReceivables).toLocaleString("en-KE")} </small>
                     </h6>
                   </div>
                 </div>
 
-                <div className="col-6 col-md-4 col-sm-6">
-                  <div className="rounded-3 text-center bg-warning-subtle p-2">
+                <div className="col">
+                  <div className="rounded-3 text-center bg-warning-subtle p-1">
                     <p className="text-warning fw-semibold mb-1 small">
                       <small>31–60 days</small>
                     </p>
 
-                    <h6 className="mb-0 text-warning fw-bold">
-                      {Number(overdue31To60).toLocaleString("en-KE")}
+                    <h6 className="mb-0 text-warning fw-bold small">
+                      <small> {Number(overdue31To60).toLocaleString("en-KE")} </small>
                     </h6>
                   </div>
                 </div>
 
-                <div className="col-6 col-md-4 col-sm-6">
-                  <div className="rounded-3 text-center bg-danger-subtle p-2">
+                <div className="col">
+                  <div className="rounded-3 text-center bg-danger-subtle p-1">
                     <p className="text-danger fw-semibold mb-1 small">
                       <small>61–90 days</small>
                     </p>
 
-                    <h6 className="mb-0 text-danger fw-bold">
-                      {Number(overdue61To90).toLocaleString("en-KE")}
+                    <h6 className="mb-0 text-danger fw-bold small">
+                      <small> {Number(overdue61To90).toLocaleString("en-KE")} </small>
                     </h6>
                   </div>
                 </div>
 
-                <div className="col-6 col-md-4 col-sm-6">
-                  <div className="rounded-3 text-center bg-info-subtle p-2">
+                <div className="col">
+                  <div className="rounded-3 text-center bg-info-subtle p-1">
                     <p className="text-info fw-semibold mb-1 small">
                       <small>91–120 days</small>
                     </p>
 
-                    <h6 className="mb-0 text-info fw-bold">
-                      {Number(overdue91To120).toLocaleString("en-KE")}
+                    <h6 className="mb-0 text-info fw-bold small">
+                      <small> {Number(overdue91To120).toLocaleString("en-KE")} </small>
                     </h6>
                   </div>
                 </div>
 
-                <div className="col-6 col-md-4 col-sm-6">
-                  <div className="rounded-3 text-center bg-info-subtle p-2">
+                <div className="col">
+                  <div className="rounded-3 text-center bg-info-subtle p-1">
                     <p className="text-info fw-semibold mb-1 small">
                       <small>120+ days</small>
                     </p>
 
-                    <h6 className="mb-0 text-info fw-bold">
-                      {Number(overdue120Plus).toLocaleString("en-KE")}
+                    <h6 className="mb-0 text-info fw-bold small">
+                      <small> {Number(overdue120Plus).toLocaleString("en-KE")} </small>
                     </h6>
                   </div>
                 </div>
@@ -194,7 +194,7 @@ const RecentOrders = ({
                     </h6>
                   </div>
                 ) : (
-                  <div className="table-responsive table-card">
+                  <div className="table-responsive table-card pt-1">
                     <table className="table table-borderless table-centered table-nowrap mb-0">
                       <thead className="text-muted table-light">
                         <tr>
