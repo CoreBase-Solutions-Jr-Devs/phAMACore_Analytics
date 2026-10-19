@@ -3,13 +3,15 @@ import {
   getInventoryProfitSummaryUser,
   getAccountBalance,
   getCashbookSummary,
+  fetchMonthlyTrend,
+  fetchSalesByType,
 } from "./thunk";
+import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const today = new Date();
 const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-const yearStart = new Date(today.getFullYear(), 0, 1);
 
 const initialState = {
   inventoryProfitSummaryUser: [],
@@ -17,8 +19,15 @@ const initialState = {
   accountBalance: [],
   cashbookSummary: [],
   cashbookSummaryMetrics: [],
+  monthlyTrend: [],
+  stockAsOf: null,
+  salesByType: [],
 
   loading: false,
+  loadingMonthlyTrend: false,
+  loadingSalesByType: false,
+  errorMonthlyTrend: null,
+  errorSalesByType: null,
   loadingProfitSummary: false,
   loadingAccountBalance: false,
   loadingCashbookSummary: false,
@@ -30,7 +39,7 @@ const initialState = {
 
   filters: {
     branch: null,
-    dateRange: "Month to Date",
+    dateRange: DEFAULT_DATE_RANGE,
     startDate: formatDMY(monthStart),
     endDate: formatDMY(today),
     groupBy: "SUMMARY",
@@ -231,6 +240,43 @@ const DashboardMyBusinessSlice = createSlice({
         state.loadingCashbookSummary = false;
         state.error = action.payload || action.error?.message || "Failed to fetch cashbook summary";
         state.errorCashbookSummary = action.payload || action.error?.message || "Failed to fetch cashbook summary";
+      })
+
+      // MONTHLY TREND (requestId guard: a slower, older request must not overwrite a newer one)
+      .addCase(fetchMonthlyTrend.pending, (state, action) => {
+        state.loadingMonthlyTrend = true;
+        state.errorMonthlyTrend = null;
+        state.monthlyTrendRequestId = action.meta.requestId;
+      })
+      .addCase(fetchMonthlyTrend.fulfilled, (state, action) => {
+        if (state.monthlyTrendRequestId !== action.meta.requestId) return;
+        state.loadingMonthlyTrend = false;
+        state.monthlyTrend = action.payload?.months || [];
+        state.stockAsOf = action.payload?.stockAsOf ?? null;
+      })
+      .addCase(fetchMonthlyTrend.rejected, (state, action) => {
+        if (state.monthlyTrendRequestId !== action.meta.requestId) return;
+        state.loadingMonthlyTrend = false;
+        state.monthlyTrend = [];
+        state.errorMonthlyTrend = action.payload || action.error?.message || "Failed to fetch monthly trend";
+      })
+
+      // SALES BY TYPE
+      .addCase(fetchSalesByType.pending, (state, action) => {
+        state.loadingSalesByType = true;
+        state.errorSalesByType = null;
+        state.salesByTypeRequestId = action.meta.requestId;
+      })
+      .addCase(fetchSalesByType.fulfilled, (state, action) => {
+        if (state.salesByTypeRequestId !== action.meta.requestId) return;
+        state.loadingSalesByType = false;
+        state.salesByType = action.payload || [];
+      })
+      .addCase(fetchSalesByType.rejected, (state, action) => {
+        if (state.salesByTypeRequestId !== action.meta.requestId) return;
+        state.loadingSalesByType = false;
+        state.salesByType = [];
+        state.errorSalesByType = action.payload || action.error?.message || "Failed to fetch sales by type";
       });
   },
 });

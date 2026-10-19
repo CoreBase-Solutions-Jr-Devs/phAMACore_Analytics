@@ -1,8 +1,21 @@
 import React, { useMemo } from "react";
-import { ListGroup, ListGroupItem, Spinner } from "reactstrap";
-import { Link } from "react-router-dom";
+import { Spinner } from "reactstrap";
 import { useSelector } from "react-redux";
 import { cleanBranchName } from "../../../helpers/branch_helper";
+import { getLookbackDays } from "../../utils/StockInventoryUtils";
+
+const MAX_ROWS = 100;
+
+const formatDaysCover = (item) => {
+    if (item.daysOfInventory !== null && !isNaN(item.daysOfInventory)) {
+        if (item.daysOfInventory >= 9999) return "No sales";
+        return `${Math.round(item.daysOfInventory).toLocaleString()}d`;
+    }
+    if (item.daysSince !== null) {
+        return `${item.daysSince}d inactive`;
+    }
+    return "-";
+};
 
 const SlowMovingStock = ({
     items,
@@ -13,7 +26,10 @@ const SlowMovingStock = ({
         slowMovingStock = [],
         loadingSlowMovingStock = false,
         errorSlowMovingStock = null,
+        filters = {},
     } = useSelector((state) => state.StockInventory ?? {});
+
+    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
 
     const processed = useMemo(() => {
         // 1. Determine data source: prop items -> Redux slowMovingStock
@@ -29,6 +45,7 @@ const SlowMovingStock = ({
         const normalized = rawList.map((item) => {
             const itemName = item.item_name || item.item_Name || "Unknown Item";
             const itemCode = item.item_code || item.item_Code || "";
+            const itemGroup = item.item_group || "-";
             const category = item.movement_category || item.status || "SLOW_MOVER";
 
             let statusLabel = "Slow";
@@ -52,30 +69,34 @@ const SlowMovingStock = ({
                 ...item,
                 itemName,
                 itemCode,
+                itemGroup,
                 statusLabel,
                 badgeClass,
                 unitsSold: item.units_sold_window !== undefined ? Number(item.units_sold_window) : (item.totalQty ?? 0),
                 currentStock: item.current_stock_qty !== undefined ? Number(item.current_stock_qty) : undefined,
                 tiedUpCapital: item.tied_up_capital !== undefined ? Number(item.tied_up_capital) : undefined,
+                daysOfInventory: item.days_of_inventory !== undefined ? Number(item.days_of_inventory) : null,
                 branchName: cleanBranchName(item.branch_name || item.branchName),
                 daysSince: item.daysSince !== undefined ? item.daysSince : null,
                 actionInsight: item.action_insight,
             };
         });
 
-        // 3. Filter by search term (item name, code, or branch)
+        // 3. Filter by search term (item name, code, category, or branch)
         const term = (searchTerm || "").trim().toLowerCase();
         const filtered = term
             ? normalized.filter((item) => {
                   return (
                       item.itemName.toLowerCase().includes(term) ||
                       item.itemCode.toLowerCase().includes(term) ||
+                      item.itemGroup.toLowerCase().includes(term) ||
                       (item.branchName && item.branchName.toLowerCase().includes(term))
                   );
               })
             : normalized;
 
-        // 4. Sort alphabetically by itemName
+        // 4. Sort alphabetically by itemName (null keeps the API order: most capital tied up first)
+        if (sortAscending === null) return filtered;
         return [...filtered].sort((a, b) => {
             return sortAscending
                 ? a.itemName.localeCompare(b.itemName)
@@ -123,51 +144,74 @@ const SlowMovingStock = ({
     }
 
     return (
-        <ListGroup className="list mb-0" flush>
-            {processed.map((item, idx) => (
-                <ListGroupItem
-                    key={idx}
-                    data-id={idx}
-                    className="px-3 py-2"
-                    title={item.actionInsight || undefined}
-                >
-                    <div className="d-flex align-items-center">
-                        <div className="flex-grow-1 min-w-0 me-2">
-                            <h5 className="fs-13 mb-1 text-truncate">
-                                <Link to="#" className="link name text-body" title={item.itemName}>
-                                    {item.itemName}
-                                </Link>
-                            </h5>
-
-                            <p className="text-muted mb-0 fs-12 text-truncate">
-                                <span>Code: {item.itemCode}</span>
-                                {item.branchName && (
-                                    <span> • <span className="fw-medium text-dark">{item.branchName}</span></span>
-                                )}
-                                <span> • {item.unitsSold} sold (30d)</span>
-                                {item.currentStock !== undefined && (
-                                    <span> • Stock: {item.currentStock.toLocaleString()}</span>
-                                )}
-                                {item.tiedUpCapital !== undefined && item.tiedUpCapital > 0 && (
-                                    <span> • KES {item.tiedUpCapital.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                                )}
-                                {item.daysSince !== null && (
-                                    <span> • {item.daysSince}d inactive</span>
-                                )}
-                            </p>
-                        </div>
-
-                        <div className="flex-shrink-0">
-                            <span
-                                className={`badge rounded-pill border border-${item.badgeClass} text-${item.badgeClass} fs-11 fw-normal px-2 py-1`}
+        <div>
+            <div className="table-responsive">
+                <table className="table table-sm table-hover table-borderless table-nowrap align-middle mb-0">
+                    <thead
+                        className="text-muted table-light"
+                        style={{ position: "sticky", top: 0, zIndex: 1 }}
+                    >
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Branch</th>
+                            <th scope="col" className="text-end">Stock</th>
+                            <th scope="col" className="text-end">Sold ({lookbackDays}d)</th>
+                            <th scope="col" className="text-end">Days Cover</th>
+                            <th scope="col" className="text-end">Tied-Up Capital (KES)</th>
+                            <th scope="col" className="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {processed.slice(0, MAX_ROWS).map((item, idx) => (
+                            <tr
+                                key={`${item.itemCode}-${item.branchName}-${idx}`}
+                                data-id={idx}
+                                title={item.actionInsight || undefined}
                             >
-                                {item.statusLabel}
-                            </span>
-                        </div>
-                    </div>
-                </ListGroupItem>
-            ))}
-        </ListGroup>
+                                <th scope="row" className="fw-medium">
+                                    {item.itemName}
+                                    {item.itemCode && (
+                                        <small className="text-muted d-block fw-normal">
+                                            {item.itemCode}
+                                        </small>
+                                    )}
+                                </th>
+                                <td className="text-muted">{item.itemGroup}</td>
+                                <td>{item.branchName || "-"}</td>
+                                <td className="text-end">
+                                    {item.currentStock !== undefined
+                                        ? item.currentStock.toLocaleString()
+                                        : "-"}
+                                </td>
+                                <td className="text-end">{item.unitsSold.toLocaleString()}</td>
+                                <td className="text-end">{formatDaysCover(item)}</td>
+                                <td className="text-end fw-medium">
+                                    {item.tiedUpCapital !== undefined
+                                        ? item.tiedUpCapital.toLocaleString(undefined, {
+                                              maximumFractionDigits: 0,
+                                          })
+                                        : "-"}
+                                </td>
+                                <td className="text-center">
+                                    <span
+                                        className={`badge rounded-pill border border-${item.badgeClass} text-${item.badgeClass} bg-${item.badgeClass}-subtle fs-11 fw-normal px-2 py-1`}
+                                    >
+                                        {item.statusLabel}
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            {processed.length > MAX_ROWS && (
+                <p className="text-muted fs-12 text-center mt-2 mb-0">
+                    Showing {MAX_ROWS} of {processed.length.toLocaleString()} items. Search to narrow the
+                    list, or export for all of them.
+                </p>
+            )}
+        </div>
     );
 };
 

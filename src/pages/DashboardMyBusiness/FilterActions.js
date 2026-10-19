@@ -15,6 +15,7 @@ import {
   cleanBranchName,
 } from "../../helpers/branch_helper";
 import { getBranches } from "../../helpers/fakebackend_helper";
+import { DEFAULT_DATE_RANGE } from "../utils/dateHelper";
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const dispatch = useDispatch();
@@ -94,7 +95,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
   const handleReset = () => {
     dispatch(setBranch(null));
-    dispatch(setDateRange("Year To Date"));
+    dispatch(setDateRange(DEFAULT_DATE_RANGE));
   };
 
   return (

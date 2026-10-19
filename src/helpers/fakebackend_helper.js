@@ -69,6 +69,8 @@ export const getLastYearMonthToDateSales = (params) =>
 console.log("POWER BI URL:", url.GET_POWERBI_SALES);
 export const getKPIOverdueAccounts = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_KPI_OVERDUE_ACCOUNTS, { params });
+export const getKPIOverdueDebtors = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_KPI_OVERDUE_DEBTORS, { params });
 export const getAccountBalance = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_ACCOUNT_BALANCE, { params });
 export const getPurchaseOrders = (params) =>

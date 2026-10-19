@@ -3,9 +3,7 @@ import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useSelector } from "react-redux";
-import { computeKPIs, getKPIMeta } from "../utils/StockInventoryUtils";
-import { useImbalanceEngine } from "./components/ImbalanceAlerts/useImbalanceEngine";
-import { resolveBranchName, cleanBranchName } from "../../helpers/branch_helper";
+import { computeKPIs, getKPIMeta, getLookbackDays, IMBALANCE_TOP_N } from "../utils/StockInventoryUtils";
 
 
 const KPI_ICON_MAP = {
@@ -19,42 +17,28 @@ const KPI_ICON_MAP = {
     8: { icon: "git-branch", color: "info" }, // Branch Imbalances
 };
 
-const WidgetsOne = ({ branchMap = {} }) => {
+const WidgetsOne = () => {
 
     const {
-        dailyClosingStock = [], stockMovements = [], batchExpiryNeo = [], totalStockValueByBranch = [], stockHealth = [], slowMovingStock = [], branches = [],
-        loadingStock, loadingMovements, loadingTotalStockValueByBranch, loadingStockHealth, loadingSlowMovingStock, errorStock,
+        batchExpiryNeo = [], stockHealth = [], imbalances = [], filters = {},
+        loadingBatchExpiryNeo, loadingStockHealth, loadingImbalances, errorStockHealth,
     } = useSelector((state) => state.StockInventory ?? {});
 
-    const branch = useSelector(
-        (state) => state.StockInventory?.filters?.branch
-    );
-
-    const isBranchView = Boolean(branch && branch !== "All Branches");
-    const branchDisplayName = isBranchView
-        ? cleanBranchName(branchMap?.[branch] || resolveBranchName(branch, branches, stockMovements) || `Branch ${branch}`)
-        : "All Branches";
-
-    const alerts = useMemo(
-        () => useImbalanceEngine(dailyClosingStock, stockMovements, batchExpiryNeo),
-        [dailyClosingStock, stockMovements, batchExpiryNeo]
-    );
+    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
 
     const kpis = useMemo(
-        () => computeKPIs(dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock, alerts),
-        [dailyClosingStock, stockMovements, batchExpiryNeo, totalStockValueByBranch, stockHealth, slowMovingStock, alerts]
+        () => computeKPIs(batchExpiryNeo, stockHealth, imbalances),
+        [batchExpiryNeo, stockHealth, imbalances]
     );
-
-    const healthObj = Array.isArray(stockHealth) && stockHealth.length > 0
-        ? stockHealth[0]
-        : (stockHealth && typeof stockHealth === "object" && !Array.isArray(stockHealth) ? stockHealth : null);
 
     const meta = useMemo(
-        () => getKPIMeta({ branchName: branchDisplayName, isBranchView, healthObj }),
-        [branchDisplayName, isBranchView, healthObj]
+        () => getKPIMeta({ lookbackDays, imbalanceCapped: imbalances.length >= IMBALANCE_TOP_N }),
+        [lookbackDays, imbalances.length]
     );
 
-    const isLoading = loadingStock || loadingMovements || loadingTotalStockValueByBranch || loadingStockHealth || loadingSlowMovingStock;
+    // Each card waits only for the call that feeds it
+    const loadingById = { 5: loadingBatchExpiryNeo, 8: loadingImbalances };
+    const errorStock = errorStockHealth;
 
     return (
         <React.Fragment>
@@ -71,7 +55,7 @@ const WidgetsOne = ({ branchMap = {} }) => {
                                         <p className="font-medium mb-0 text-truncate">{widget.label}</p>
 
                                         <h2 className={`mt-2 ff-secondary fw-semibold text-${color}`}>
-                                            {isLoading ? (
+                                            {(loadingById[widget.id] ?? loadingStockHealth) ? (
                                                 <span className="placeholder-glow">
                                                     <span className="placeholder col-6 rounded" />
                                                 </span>
@@ -83,7 +67,7 @@ const WidgetsOne = ({ branchMap = {} }) => {
                                                     suffix={widget.suffix ?? ""}
                                                     separator={widget.separator ?? ","}
                                                     decimals={widget.decimals ?? 0}
-                                                    duration={4}
+                                                    duration={2}
                                                 />
                                             )}
                                         </h2>

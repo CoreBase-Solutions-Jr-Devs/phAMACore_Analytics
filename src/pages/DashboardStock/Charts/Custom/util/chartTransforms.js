@@ -28,8 +28,9 @@ export function getPeriodDays(startDate, endDate) {
         const [d, m, y] = str.split('/');
         return new Date(`${y}-${m}-${d}`);
     };
+    // Inclusive: 01/10 - 11/10 is 11 trading days, not 10
     const diff = parse(endDate) - parse(startDate);
-    const days = Math.round(diff / (1000 * 60 * 60 * 24));
+    const days = Math.round(diff / (1000 * 60 * 60 * 24)) + 1;
     return Math.max(days, 1);
 }
 
@@ -228,7 +229,9 @@ export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], pe
         const id = row.branch_id != null ? String(row.branch_id) : null;
         const rawName = row.branch_name || row.branchName || "";
         const name = cleanBranchName(rawName).toUpperCase().trim();
-        const salesVal = Number(row.net_sales_incl ?? row.net_sales_excl ?? row.cash_sales_excl ?? 0);
+        // Stock is valued at cost, so it is compared with cost of goods sold (net_cogs).
+        // Dividing by VAT-inclusive selling value understated days of cover by the margin and VAT.
+        const salesVal = Number(row.net_cogs ?? row.net_sales_excl ?? row.net_sales_incl ?? 0);
 
         if (id) salesMap.set(id, salesVal);
         if (name) salesMap.set(name, salesVal);
@@ -279,6 +282,7 @@ export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], pe
             name: entry.name,
             rawStock: entry.rawStock,
             rawDailySales,
+            monthlyConsumption: rawDailySales * 30,
             stockM,
             salesM,
             daysCover,
@@ -300,6 +304,7 @@ export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], pe
         }),
         rawStock: combinedList.map((item) => item.rawStock),
         rawDailySales: combinedList.map((item) => item.rawDailySales),
+        monthlyConsumption: combinedList.map((item) => item.monthlyConsumption),
         daysCover: combinedList.map((item) => item.daysCover),
     };
-}
+}

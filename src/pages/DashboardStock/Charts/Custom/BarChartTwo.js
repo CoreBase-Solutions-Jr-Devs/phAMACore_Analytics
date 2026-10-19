@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import ReactApexChart from "react-apexcharts";
 import { Spinner } from "reactstrap";
 import { cleanBranchName } from "../../../../helpers/branch_helper";
+import { toList, pick, num } from "../../../utils/apiRow";
 
 const BRANCH_COLORS = { MAIN: "#405189", CENTRAL: "#4b9fd4", WESTLANDS: "#0ab39c", "WESTLANDS BRANCH": "#0ab39c", WAREHOUSE: "#299cdb", MOMBASA: "#2a9d8f", "MOMBASA BRANCH": "#2a9d8f", KAKAMEGA: "#e76f51", "KAKAMEGA BRANCH": "#e76f51", WAJIR: "#f4a261", "WAJIR BRANCH": "#f4a261", KAMPALA: "#8e44ad", "KAMPALA BRANCH": "#8e44ad", THIKA: "#f7b84b", "THIKA BRANCH": "#f7b84b", TESTING: "#556ee6", "TEST BRANCH": "#34c38f" };
 
@@ -21,13 +22,14 @@ const BarChartTwo = () => {
     const {
         totalStockValueByBranch = [],
         loadingTotalStockValueByBranch,
-    } = useSelector((state) => state.StockInventory);
+    } = useSelector((state) => state.StockInventory ?? {});
 
     const containerRef = useRef(null);
     const [hoverInfo, setHoverInfo] = useState(null);
 
     const chartData = useMemo(() => {
-        if (!totalStockValueByBranch || !totalStockValueByBranch.length) {
+        const rows = toList(totalStockValueByBranch);
+        if (!rows.length) {
             return {
                 branches: [],
                 values: [],
@@ -35,13 +37,23 @@ const BarChartTwo = () => {
             };
         }
 
-        const sorted = [...totalStockValueByBranch]
+        const sorted = [...rows]
+            .filter(Boolean)
             .map((item) => {
+                const branchId = pick(item, "branch_id", "branchCode", "bcode");
                 const rawBranch =
-                    item.branch_name || item.branchName ||
-                    `Branch ${item.branch_id ?? ""}`;
+                    pick(item, "branch_name", "branchName") ||
+                    `Branch ${branchId ?? ""}`;
                 const branch = cleanBranchName(rawBranch);
-                const rawValue = Number(item.total_stock_value || 0);
+                const rawValue = num(
+                    pick(
+                        item,
+                        "total_stock_value",
+                        "total_stock_value_avgcost",
+                        "stock_value",
+                        "closing_value"
+                    )
+                );
                 return {
                     branch,
                     value: rawValue / 1000000,
@@ -63,7 +75,7 @@ const BarChartTwo = () => {
 
     const axisMax =
         chartData.values.length > 0
-            ? Math.ceil(Math.max(...chartData.values) * 1.3)
+            ? Math.max(Math.ceil(Math.max(...chartData.values) * 1.3), 1)
             : 10;
 
     // All value annotations placed on the far right (x: axisMax)
