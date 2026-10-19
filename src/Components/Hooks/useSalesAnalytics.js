@@ -81,15 +81,20 @@ salesDaily= [],
   ).size;
 
  const branchData = salesBranch.map((item) => ({
-  name: item.branch_name || "UNKNOWN BRANCH",
+   name: (item.branch_name || "UNKNOWN BRANCH")
+    .replace(/^AXCESS PHARMACY\s*-\s*/i, ""),
   amount: Number(item.net_sales_incl || 0),
 }));
 
-const branchChartSeries = branchData.map((branch) =>
-  Number(branch.amount || 0)
-);
+const branchChartSeries = [
+  {
+    name: "Revenue",
+    data: branchData.map((branch) => branch.amount),
+  },
+];
 
 const branchCategories = branchData.map((branch) => branch.name);
+
 
   /* -------------------------------------------------------
    * Revenue grouped by Sales Representative.

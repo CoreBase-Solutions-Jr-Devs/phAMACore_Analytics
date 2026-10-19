@@ -438,7 +438,8 @@ const BranchPerformanceChart = ({
   categories = [],
   trendData = [],
 }) => {
-  const chartColors = getChartColorsArray(dataColors);
+    const chartColors = getChartColorsArray(dataColors);
+
   const barData = series[0]?.data || [];
 
   const options = {
