@@ -455,48 +455,7 @@ salesTargetBranch= [],
   const nonMemberSalesContribution = Number(
     nonMemberCohort.sales_contribution_pct ?? 0,
   );
-// -------------------------------------------------------
-// DEBUG — CUSTOMER MEMBER ANALYSIS SUMMARY
-// -------------------------------------------------------
-console.log("========== CUSTOMER MEMBER ANALYSIS DEBUG ==========");
 
-console.log("Raw Summary Data:", customerMemberAnalysisSummary);
-console.log("First Summary Row:", memberSummary);
-
-console.log("Total Active Members:", totalActiveMembers);
-console.log("New Members Onboarded:", newMembersOnboarded);
-console.log("Returning Members:", returningMembers);
-console.log("New Member Transactions:", newMemberTransactions);
-console.log("New Member Sales:", newMemberSales);
-console.log("New Member ABV:", newMemberABV);
-console.log("Repeat Member Transactions:", repeatMemberTransactions);
-console.log("Repeat Member Sales:", repeatMemberSales);
-console.log("Repeat Member ABV:", repeatMemberABV);
-console.log("Total Store Transactions:", totalStoreTransactions);
-console.log("Total Store Sales:", totalStoreSales);
-console.log("Overall Average Basket Value:", overallAverageBasketValue);
-console.log("Member Transaction Share:", memberTransactionShare);
-console.log("Member Action Insight:", memberActionInsight);
-
-// -------------------------------------------------------
-// DEBUG — CUSTOMER MEMBER ANALYSIS COHORTS
-// -------------------------------------------------------
-console.log("Raw Cohort Data:", customerMemberAnalysisCohort);
-console.log("New Member Cohort:", newMemberCohort);
-console.log("Repeat Member Cohort:", repeatMemberCohort);
-console.log("Non-Member Cohort:", nonMemberCohort);
-
-console.log("New Cohort Member Count:", newCohortMemberCount);
-console.log("New Cohort Transactions:", newCohortTransactions);
-console.log("New Cohort Sales Excl:", newCohortSalesExcl);
-console.log("New Cohort Sales Incl:", newCohortSalesIncl);
-console.log("New Cohort ABV:", newCohortABV);
-console.log("New Cohort Sales Contribution:", newCohortSalesContribution);
-
-console.log("====================================================");
-// -------------------------------------------------------
-// SALES TARGET — BRANCH PERFORMANCE
-// -------------------------------------------------------
 // -------------------------------------------------------
 // SALES TARGET — BRANCH PERFORMANCE
 // -------------------------------------------------------
@@ -529,7 +488,10 @@ const getBranchTarget = (branchID) => {
 
   return {
     branchID,
-    branchName: item?.branchName ?? "",
+     branchName: (item?.branchName ?? "").replace(
+      /^AXCESS PHARMACY\s*-\s*/i,
+      "",
+    ),
     transactionCount: Number(item?.transactionCount ?? 0),
     actualSalesExcl: Number(item?.actualSalesExcl ?? 0),
     actualSalesIncl: Number(item?.actualSalesIncl ?? 0),
@@ -552,7 +514,10 @@ const getMonthlyBranchTarget = (data, branchID) => {
 
   return {
     branchID,
-    branchName: item?.branchName ?? "",
+    branchName: (item?.branchName ?? "").replace(
+      /^AXCESS PHARMACY\s*-\s*/i,
+      "",
+    ),
     actualSalesIncl: Number(item?.actualSalesIncl ?? 0),
     targetSales: Number(item?.targetSales ?? 0),
   };

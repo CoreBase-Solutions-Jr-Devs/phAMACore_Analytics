@@ -228,42 +228,20 @@ const BranchTarget = ({
 
   return (
     <div>
-      {/* <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-        <h5 className="card-title mb-0">BRANCH SALES TARGETS</h5>
+  <div className="d-flex flex-column align-items-start gap-1 mb-2">
+  <h4 className="card-title mb-0">
+    Branch Sales Target Performance
+  </h4>
 
-        <div className="d-flex align-items-center gap-2">
-          <span>Filtered From:</span>
-          <strong>{startDate || "-"}</strong>
-          <span>to</span>
-          <strong>{endDate || "-"}</strong>
-        </div>
-
-        <div className="d-flex align-items-center gap-2">
-          <span>Selected Branch:</span>
-          <strong>{selectedBranchName || "All Branches"}</strong>
-        </div>
-
-        <div className="no-print">
-          <button
-            type="button"
-            className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-            onClick={rightClickBtn}
-          >
-            <i className="ri-filter-fill" />
-            Filter
-          </button>
-        </div>
-      </div> */}
+  <p className="text-muted mb-0 fs-6">
+    Monthly sales inclusive of tax compared with targets
+  </p>
+</div>
 
       <Card className="card-height-100">
         <CardHeader>
-          <h4 className="card-title mb-1">
-            Branch Sales Target Performance
-          </h4>
-          <p className="text-muted mb-0 fs-6">
-            Monthly sales inclusive of tax compared with targets
-          </p>
-        </CardHeader>
+       
+    
 
         <CardBody>
           {loading ? (
@@ -323,6 +301,7 @@ const BranchTarget = ({
             </div>
           )}
         </CardBody>
+            </CardHeader>
       </Card>
     </div>
   );

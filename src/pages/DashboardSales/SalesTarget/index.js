@@ -110,9 +110,19 @@ octoberBranchTargetKisii,
   [], // monthToDateSales
   [], // lastYearMonthToDateSales
   [], // lastYearMonthlySales
-salesTarget,
-salesTargetSummary,
-salesTargetBranch,
+  [], // marginAnalysisBand
+  [], // marginAnalysisDrilldown
+  [], // marginAnalysisSku
+  [], // customerMemberAnalysisSummary
+  [], // customerMemberAnalysisBranch
+  [], // customerMemberAnalysisCohort
+  salesTarget,
+  salesTargetSummary,
+  salesTargetBranch,
+  julySalesTarget,
+  augustSalesTarget,
+  septemberSalesTarget,
+  octoberSalesTarget,
   filters
 );
 const period = getPeriod(filters.startDate);
