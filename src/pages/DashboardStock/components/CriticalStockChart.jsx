@@ -277,7 +277,14 @@ const CriticalStockChart = () => {
                                     {item.item_name || "Unknown"}
                                     <small className="text-muted d-block">{item.item_code}</small>
                                 </td>
-                                <td className="text-muted">{item.item_group || "-"}</td>
+                                <td className="text-muted">
+                                    {item.item_group || "-"}
+                                    <small className="text-muted d-block">
+                                        {item.item_subgroup === "Unassigned" ? "-" :
+                                            item.item_subgroup || "-"
+                                        }
+                                    </small>
+                                </td>
                                 <td>{cleanBranchName(item.branch_name || item.branchName) || "-"}</td>
                                 <td>{String(item.abc_class || "-").replace("CLASS_", "")}</td>
                                 <td className={`text-end ${Number(item.current_stock_qty) <= 0 ? "text-danger fw-semibold" : ""}`}>
