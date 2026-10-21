@@ -5,8 +5,10 @@ import {
   getMonthToDateSales,
   getLastYearMonthToDateSales,
   getLastYearMonthlySales,
-    getKPISalesTransactions,
-    getKPIOverdueAccounts,
+  getKPISalesTransactions,
+  getKPIOverdueAccounts,
+ 
+  getSalesTarget,
 } from "./thunk";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
@@ -25,10 +27,15 @@ const initialState = {
   salesBranch: [],
   salesBranch_Type: [],
   salesChannel: [],
-salesComparativeYTD: [],
-salesComparativeMTD: [],
-salesMonthly: [],
-salesDaily: [],
+  salesComparativeYTD: [],
+  salesComparativeMTD: [],
+  salesMonthly: [],
+  salesDaily: [],
+
+
+
+
+
 
   loading: false,
   error: null,
@@ -38,7 +45,7 @@ salesDaily: [],
     dateRange: "Today",
     startDate: new Date().toLocaleDateString("en-GB"),
     endDate: new Date().toLocaleDateString("en-GB"),
-    groupBy: "SUMMARY",
+   
   },
 };
 
@@ -161,35 +168,26 @@ const powerBISlice = createSlice({
         }
 
         case "Month To Date": {
-  const today = new Date();
+          const today = new Date();
 
-  const start = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    1
-  );
+          const start = new Date(today.getFullYear(), today.getMonth(), 1);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(today);
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(today);
 
-  break;
-}
+          break;
+        }
 
-case "Year To Date": {
-  const today = new Date();
+        case "Year To Date": {
+          const today = new Date();
 
-  const start = new Date(
-    today.getFullYear(),
-    0,
-    1
-  );
+          const start = new Date(today.getFullYear(), 0, 1);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(today);
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(today);
 
-  break;
-}
-
+          break;
+        }
 
         case "Custom":
           state.filters.dateRange = "Custom";
@@ -204,7 +202,7 @@ case "Year To Date": {
     setEndDate: (state, action) => {
       state.filters.endDate = action.payload;
     },
-    
+
     setGroupBy: (state, action) => {
       state.filters.groupBy = action.payload;
     },
@@ -212,232 +210,233 @@ case "Year To Date": {
     clearSalesData: () => initialState,
   },
 
- extraReducers: (builder) => {
-  builder
+  extraReducers: (builder) => {
+    builder
 
-    // ------------------------------------------
-    // SALES TRANSACTIONS
-    // ------------------------------------------
+      // ------------------------------------------
+      // SALES TRANSACTIONS
+      // ------------------------------------------
 
-    .addCase(getSalesTransactions.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
+      .addCase(getSalesTransactions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-    .addCase(getSalesTransactions.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = null;
+      .addCase(getSalesTransactions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-      const data = action.payload?.result || action.payload || [];
+        const data = action.payload?.result || action.payload || [];
 
-      state.sales = data;
-    })
+        state.sales = data;
+      })
 
-    .addCase(getSalesTransactions.rejected, (state, action) => {
-      state.loading = false;
-      state.error =
-        action.payload?.message ||
-        action.payload ||
-        action.error.message ||
-        "Error loading sales transactions";
-    })
+      .addCase(getSalesTransactions.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading sales transactions";
+      })
 
-    // ------------------------------------------
-    // KPI SALES TRANSACTIONS
-    // ------------------------------------------
+      // ------------------------------------------
+      // KPI SALES TRANSACTIONS
+      // ------------------------------------------
 
-    .addCase(getKPISalesTransactions.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
+      .addCase(getKPISalesTransactions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-    .addCase(getKPISalesTransactions.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = null;
+      .addCase(getKPISalesTransactions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-      const groupBy = action.meta.arg?.groupBy;
-      const result = action.payload?.result || action.payload || [];
+        const groupBy = action.meta.arg?.groupBy;
+        const result = action.payload?.result || action.payload || [];
 
-      // Store the latest KPI sales result
-      state.KPISales = result;
+        // Store the latest KPI sales result
+        state.KPISales = result;
 
-      switch (groupBy) {
-        case "TYPE":
-          state.salesType = result;
-          break;
+        switch (groupBy) {
+          case "TYPE":
+            state.salesType = result;
+            break;
 
-        case "BRANCH":
-          state.salesBranch = result;
-          break;
+          case "BRANCH":
+            state.salesBranch = result;
+            break;
 
-        case "BRANCH_TYPE":
-          state.salesBranch_Type = result;
-          break;
+          case "BRANCH_TYPE":
+            state.salesBranch_Type = result;
+            break;
 
-            case "CHANNEL":
-      state.salesChannel = result;
-      break;
+          case "CHANNEL":
+            state.salesChannel = result;
+            break;
 
-    case "COMPARATIVE_YTD":
-      state.salesComparativeYTD = result;
-      break;
+          case "COMPARATIVE_YTD":
+            state.salesComparativeYTD = result;
+            break;
 
-    case "COMPARATIVE_MTD":
-      state.salesComparativeMTD = result;
-      break;
+          case "COMPARATIVE_MTD":
+            state.salesComparativeMTD = result;
+            break;
 
-    case "MONTHLY":
-      state.salesMonthly = result;
-      break;
+          case "MONTHLY":
+            state.salesMonthly = result;
+            break;
 
-    case "DAILY":
-      state.salesDaily = result;
-      break;
+          case "DAILY":
+            state.salesDaily = result;
+            break;
 
-        default:
-          break;
-      }
-    })
+          default:
+            break;
+        }
+      })
 
-    .addCase(getKPISalesTransactions.rejected, (state, action) => {
-      state.loading = false;
-      state.error =
-        action.payload?.message ||
-        action.payload ||
-        action.error.message ||
-        "Error loading KPI sales transactions";
-    })
+      .addCase(getKPISalesTransactions.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading KPI sales transactions";
+      })
 
-    // ------------------------------------------
-    // MONTHLY SALES
-    // ------------------------------------------
+      // ------------------------------------------
+      // MONTHLY SALES
+      // ------------------------------------------
 
-    .addCase(getMonthlySales.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
+      .addCase(getMonthlySales.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-    .addCase(getMonthlySales.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = null;
+      .addCase(getMonthlySales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-      state.monthlySales =
-        action.payload?.result || action.payload || [];
-    })
+        state.monthlySales = action.payload?.result || action.payload || [];
+      })
 
-    .addCase(getMonthlySales.rejected, (state, action) => {
-      state.loading = false;
-      state.error =
-        action.payload?.message ||
-        action.payload ||
-        action.error.message ||
-        "Error loading monthly sales";
-    })
+      .addCase(getMonthlySales.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading monthly sales";
+      })
 
-    // ------------------------------------------
-    // LAST YEAR MONTHLY SALES
-    // ------------------------------------------
+      // ------------------------------------------
+      // LAST YEAR MONTHLY SALES
+      // ------------------------------------------
 
-    .addCase(getLastYearMonthlySales.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
+      .addCase(getLastYearMonthlySales.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-    .addCase(getLastYearMonthlySales.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = null;
+      .addCase(getLastYearMonthlySales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-      state.lastYearMonthlySales =
-        action.payload?.result || action.payload || [];
-    })
+        state.lastYearMonthlySales =
+          action.payload?.result || action.payload || [];
+      })
 
-    .addCase(getLastYearMonthlySales.rejected, (state, action) => {
-      state.loading = false;
-      state.error =
-        action.payload?.message ||
-        action.payload ||
-        action.error.message ||
-        "Error loading last year monthly sales";
-    })
+      .addCase(getLastYearMonthlySales.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading last year monthly sales";
+      })
 
-    // ------------------------------------------
-    // MONTH TO DATE SALES
-    // ------------------------------------------
+      // ------------------------------------------
+      // MONTH TO DATE SALES
+      // ------------------------------------------
 
-    .addCase(getMonthToDateSales.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
+      .addCase(getMonthToDateSales.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-    .addCase(getMonthToDateSales.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = null;
+      .addCase(getMonthToDateSales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-      state.monthToDateSales =
-        action.payload?.result || action.payload || [];
-    })
+        state.monthToDateSales = action.payload?.result || action.payload || [];
+      })
 
-    .addCase(getMonthToDateSales.rejected, (state, action) => {
-      state.loading = false;
-      state.error =
-        action.payload?.message ||
-        action.payload ||
-        action.error.message ||
-        "Error loading month-to-date sales";
-    })
+      .addCase(getMonthToDateSales.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading month-to-date sales";
+      })
 
-    // ------------------------------------------
-    // LAST YEAR MONTH TO DATE SALES
-    // ------------------------------------------
+      // ------------------------------------------
+      // LAST YEAR MONTH TO DATE SALES
+      // ------------------------------------------
 
-    .addCase(getLastYearMonthToDateSales.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
+      .addCase(getLastYearMonthToDateSales.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-    .addCase(getLastYearMonthToDateSales.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = null;
+      .addCase(getLastYearMonthToDateSales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-      state.lastYearMonthToDateSales =
-        action.payload?.result || action.payload || [];
-    })
+        state.lastYearMonthToDateSales =
+          action.payload?.result || action.payload || [];
+      })
 
-    .addCase(getLastYearMonthToDateSales.rejected, (state, action) => {
-      state.loading = false;
-      state.error =
-        action.payload?.message ||
-        action.payload ||
-        action.error.message ||
-        "Error loading last year month-to-date sales";
-    })
+      .addCase(getLastYearMonthToDateSales.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading last year month-to-date sales";
+      })
 
-    // ------------------------------------------
-    // KPI OVERDUE ACCOUNTS
-    // ------------------------------------------
+      // ------------------------------------------
+      // KPI OVERDUE ACCOUNTS
+      // ------------------------------------------
 
-    .addCase(getKPIOverdueAccounts.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
+      .addCase(getKPIOverdueAccounts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-    .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = null;
+      .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-      state.kpiOverdueAccounts =
-        action.payload?.result || action.payload || [];
-    })
+        state.kpiOverdueAccounts =
+          action.payload?.result || action.payload || [];
+      })
 
-    .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
-      state.loading = false;
-      state.error =
-        action.payload?.message ||
-        action.payload ||
-        action.error.message ||
-        "Error loading overdue accounts";
-    });
-},
+      .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading overdue accounts";
+      })
+
+  
+;
+  },
 });
 
 export const {

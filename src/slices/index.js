@@ -10,7 +10,9 @@ import ForgetPasswordReducer from "./auth/forgetpwd/reducer";
 import ChangePasswordReducer from "./auth/changepassword/reducer";
 import ResetPasswordReducer from "./auth/resetpassword/reducer";
 import ProfileReducer from "./auth/profile/reducer";
-
+import CustomerMemberAnalysisReducer from "./dashboardSales/CustomerMemberAnalysis/reducer"
+import MarginAnalysisReducer from "./dashboardSales/MarginAnalysis/reducer"
+import SalesTargetReducer from "./dashboardSales/SalesTarget/reducer"
 //Calendar
 import CalendarReducer from "./calendar/reducer";
 
@@ -43,6 +45,9 @@ const rootReducer = combineReducers({
     StockInventory: StockInventoryReducer,
     DashboardMyBusiness: DashboardMyBusinessReducer,
     MyBusiness: DashboardMyBusinessReducer,
+    salesTarget:SalesTargetReducer,
+    marginAnalysis:MarginAnalysisReducer,
+    customerMemberAnalysis:CustomerMemberAnalysisReducer,
 });
 
 export default rootReducer;
