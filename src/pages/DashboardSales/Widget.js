@@ -373,7 +373,7 @@ const Widget = ({
                 <p className="font-medium  mb-0">Overdue Accounts</p>
                 <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                   <span className="counter-value">
-                    KES {formatAmount(Number(overdueDebtorsCount || 0))}
+                   {formatAmount(Number(overdueDebtorsCount || 0))}
                   </span>
                 </h5>
               </div>
