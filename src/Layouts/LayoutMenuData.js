@@ -88,6 +88,24 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
       subItems: [
         { id: 'dashboard', label: 'Dashboard', link: '/dashboard-sales', parentId: 'sales' },
         { id: 'branchview', label: 'BranchView',  link: `/dashboard-sales/branch/${salesBranch}`, parentId: 'sales' },
+                  {
+    id: "sales-target",
+    label: "Sales Target",
+    link: "/dashboard-sales/Sales-Target",
+    parentId: "sales",
+  },
+          {
+    id: "margin-analysis",
+    label: "Margin Analysis",
+    link: "/dashboard-sales/Margin-Analysis",
+    parentId: "sales",
+  },
+            {
+    id: "Customer-Member-analysis",
+    label: " Member Analysis",
+    link: "/dashboard-sales/Customer-Member-Analysis",
+    parentId: "sales",
+  },
       ],
     },
     {
