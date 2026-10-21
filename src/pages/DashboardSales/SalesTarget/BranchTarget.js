@@ -228,7 +228,7 @@ const BranchTarget = ({
 
   return (
     <div>
-      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+      {/* <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
         <h5 className="card-title mb-0">BRANCH SALES TARGETS</h5>
 
         <div className="d-flex align-items-center gap-2">
@@ -253,7 +253,7 @@ const BranchTarget = ({
             Filter
           </button>
         </div>
-      </div>
+      </div> */}
 
       <Card className="card-height-100">
         <CardHeader>

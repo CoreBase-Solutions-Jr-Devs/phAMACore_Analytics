@@ -121,3 +121,23 @@ export const getGoodsReceived = (params) =>
 export const getBestPricePerSupplier = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_BEST_PRICE, { params });
 
+export const getMarginAnalysis = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_MARGIN_ANALYSIS, { params });
+
+export const getCustomerMemberAnalysis = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_CUSTOMER_MEMBER_ANALYSIS, { params });
+
+export const getSalesTarget = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_SALES_TARGET, { params });
+
+export const getJulySalesTarget = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_SALES_TARGET, { params });
+
+export const getAugustSalesTarget = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_SALES_TARGET, { params });
+
+export const getSeptemberSalesTarget = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_SALES_TARGET, { params });
+
+export const getOctoberSalesTarget = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_SALES_TARGET, { params });
