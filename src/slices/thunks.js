@@ -21,6 +21,10 @@ export * from "./apiKey/thunk";
 // Sales Dashboard
 export * from "./dashboardSales/thunk";
 
+
+export * from "./dashboardSales/CustomerMemberAnalysis/thunk";
+export * from "./dashboardSales/MarginAnalysis/thunk";
+export * from "./dashboardSales/SalesTarget/thunk";
 // Purchases Dashboard
 export * from "./dashboardPurchase/thunk";
 

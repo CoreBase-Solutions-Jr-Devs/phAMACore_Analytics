@@ -85,3 +85,9 @@ export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
 export const POST_EDIT_PROFILE = "/user";
 
 export const POST_LOGOUT = "/Auth/Logout";
+
+export const GET_POWERBI_MARGIN_ANALYSIS = "/api/PowerBI/PowerBIKPIMarginAnalysis";
+
+export const GET_POWERBI_CUSTOMER_MEMBER_ANALYSIS = "/api/PowerBI/PowerBIKPICustomerMemberAnalysis";
+
+export const GET_POWERBI_SALES_TARGET = "/api/PowerBI/PowerBIKPISalesTargets";

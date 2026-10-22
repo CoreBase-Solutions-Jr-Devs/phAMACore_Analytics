@@ -7,6 +7,9 @@ import {
   getLastYearMonthlySales as getLastYearMonthlySalesApi,
   getKPISalesTransactions as getKPISalesTransactionsApi,
   getKPIOverdueAccounts as getKPIOverdueAccountsApi,
+   getMarginAnalysis as getMarginAnalysisApi,
+   getCustomerMemberAnalysis as getCustomerMemberAnalysisApi,
+   getSalesTarget as getSalesTargetApi,
 } from "../../helpers/fakebackend_helper";
 
 // MAIN SALES
@@ -96,3 +99,8 @@ export const getLastYearMonthToDateSales = createAsyncThunk(
     }
   },
 );
+
+
+
+
+

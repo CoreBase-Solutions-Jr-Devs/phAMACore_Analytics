@@ -6,6 +6,9 @@ import DashboardSales from "../pages/DashboardSales";
 import DashboardStock from "../pages/DashboardStock";
 import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
 import DashboardMyBusiness from "../pages/DashboardMyBusiness";
+import MarginAnalysis from "../pages/DashboardSales/MarginAnalysis";
+import CustomerMemberAnalysis from "../pages/DashboardSales/CustomerMemberAnalysis";
+import SalesTarget from "../pages/DashboardSales/SalesTarget";
 
 //login
 import Login from "../pages/Authentication/Login";
@@ -49,6 +52,9 @@ const authProtectedRoutes = [
   { path: "/dashboard/branch/:branchId", component: <DashboardMyBusiness /> },
     // { path: "/index", component: <DashboardMyBusiness /> },
   { path: "/dashboard-sales", component: <DashboardSales /> },
+    { path: "/dashboard-sales/Margin-Analysis", component: <MarginAnalysis /> },
+        { path: "/dashboard-sales/Customer-Member-Analysis", component: <CustomerMemberAnalysis /> },
+         { path: "/dashboard-sales/Sales-Target", component: <SalesTarget /> },
   { path: "/dashboard-sales/branch/:branchId", component: <DashboardSales /> },
   { path: "/dashboard-stock", component: <DashboardStock /> },
   { path: "/dashboard-stock/branch/:branchId", component: <DashboardStock /> },

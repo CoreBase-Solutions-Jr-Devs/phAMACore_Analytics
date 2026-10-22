@@ -41,6 +41,7 @@ const BranchPerformance = ({
             onExport={handleExportExcel}
           />
         </CardHeader>
+      
           {loading ? (
             <div className="text-center py-5">
               <div
@@ -96,6 +97,7 @@ const BranchPerformance = ({
     <span className="text-muted">Revenue Trend</span>
   </div>
 </div>
+
               <BranchPerformanceChart
                 series={chartSeries}
                 categories={categories}
