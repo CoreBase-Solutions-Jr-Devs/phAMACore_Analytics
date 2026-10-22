@@ -9,6 +9,8 @@ import DashboardMyBusiness from "../pages/DashboardMyBusiness";
 import MarginAnalysis from "../pages/DashboardSales/MarginAnalysis";
 import CustomerMemberAnalysis from "../pages/DashboardSales/CustomerMemberAnalysis";
 import SalesTarget from "../pages/DashboardSales/SalesTarget";
+import PerformanceSummary from "../pages/DashboardSales/PerformanceSummary";
+import SalesBreakdown from "../pages/DashboardSales/SalesBreakdown";
 
 //login
 import Login from "../pages/Authentication/Login";
@@ -39,8 +41,8 @@ import ChartsJs from "../pages/Charts/ChartsJs/index";
 import Echarts from "../pages/Charts/ECharts/index";
 
 //Tables
-import BasicTables from '../pages/Tables/BasicTables/BasicTables';
-import ListTables from '../pages/Tables/ListTables/ListTables';
+import BasicTables from "../pages/Tables/BasicTables/BasicTables";
+import ListTables from "../pages/Tables/ListTables/ListTables";
 import ReactTable from "../pages/Tables/ReactTables";
 
 // User Profile
@@ -50,17 +52,34 @@ import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardMyBusiness /> },
   { path: "/dashboard/branch/:branchId", component: <DashboardMyBusiness /> },
-    // { path: "/index", component: <DashboardMyBusiness /> },
+  // { path: "/index", component: <DashboardMyBusiness /> },
   { path: "/dashboard-sales", component: <DashboardSales /> },
-    { path: "/dashboard-sales/Margin-Analysis", component: <MarginAnalysis /> },
-        { path: "/dashboard-sales/Customer-Member-Analysis", component: <CustomerMemberAnalysis /> },
-         { path: "/dashboard-sales/Sales-Target", component: <SalesTarget /> },
+  { path: "/dashboard-sales/Margin-Analysis", component: <MarginAnalysis /> },
+  {
+    path: "/dashboard-sales/Customer-Member-Analysis",
+    component: <CustomerMemberAnalysis />,
+  },
+  { path: "/dashboard-sales/Sales-Target", component: <SalesTarget /> },
+  {
+    path: "/dashboard-sales/Performance-Summary",
+    component: <PerformanceSummary />,
+  },
+  {
+    path: "/dashboard-sales/Sales-Breakdown",
+    component: <SalesBreakdown/>,
+  },
   { path: "/dashboard-sales/branch/:branchId", component: <DashboardSales /> },
   { path: "/dashboard-stock", component: <DashboardStock /> },
   { path: "/dashboard-stock/branch/:branchId", component: <DashboardStock /> },
-  { path: "/dashboard-purchase-orders", component: <DashboardPurchaseOrders /> },
-  { path: "/dashboard-purchase-orders/branch/:branchId", component: <DashboardPurchaseOrders /> },
-   
+  {
+    path: "/dashboard-purchase-orders",
+    component: <DashboardPurchaseOrders />,
+  },
+  {
+    path: "/dashboard-purchase-orders/branch/:branchId",
+    component: <DashboardPurchaseOrders />,
+  },
+
   { path: "/charts-apex-line", component: <LineCharts /> },
   { path: "/charts-apex-area", component: <AreaCharts /> },
   { path: "/charts-apex-column", component: <ColumnCharts /> },
@@ -75,12 +94,10 @@ const authProtectedRoutes = [
   { path: "/tables-react", component: <ReactTable /> },
 
   { path: "/profile", component: <UserProfile /> },
-
- 
 ];
 
 const publicRoutes = [
-    { path: "/", component: <Navigate to="/login" replace /> },
+  { path: "/", component: <Navigate to="/login" replace /> },
 
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login /> },
@@ -88,7 +105,6 @@ const publicRoutes = [
   { path: "/change-password", component: <ChangePassword /> },
   { path: "/reset-password", component: <ResetPassword /> },
   { path: "/register", component: <Register /> },
-
 ];
 
 export { authProtectedRoutes, publicRoutes };
