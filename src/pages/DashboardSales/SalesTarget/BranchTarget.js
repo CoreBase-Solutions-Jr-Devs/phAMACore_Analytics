@@ -233,16 +233,13 @@ const BranchTarget = ({
     Branch Sales Target Performance
   </h4>
 
-  <p className="text-muted mb-0 fs-6">
+  {/* <p className="text-muted mb-0 fs-6">
     Monthly sales inclusive of tax compared with targets
-  </p>
+  </p> */}
 </div>
 
       <Card className="card-height-100">
         <CardHeader>
-       
-    
-
         <CardBody>
           {loading ? (
             <div className="text-center py-5">

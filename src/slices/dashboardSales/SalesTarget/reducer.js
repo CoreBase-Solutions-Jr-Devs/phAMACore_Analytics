@@ -27,7 +27,7 @@ octoberSalesTarget: [],
   error: null,
 
   filters: {
-    branch: "",
+    branchcode: "",
     dateRange: "Today",
     startDate: new Date().toLocaleDateString("en-GB"),
     endDate: new Date().toLocaleDateString("en-GB"),
@@ -204,30 +204,42 @@ extraReducers: (builder) => {
       state.error = null;
     })
 
-    .addCase(getSalesTarget.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = null;
+   .addCase(getSalesTarget.fulfilled, (state, action) => {
+  state.loading = false;
+  state.error = null;
 
-      const groupBy =
-        action.meta.arg?.GroupBy ?? action.meta.arg?.groupBy;
+  const groupBy =
+    action.meta.arg?.GroupBy ?? action.meta.arg?.groupBy;
 
-      const result = action.payload?.result ?? action.payload ?? [];
+  const result = action.payload?.result ?? action.payload ?? [];
 
-      state.salesTarget = result;
+  console.log("========== SALES TARGET REDUCER ==========");
+  console.log("GroupBy:", groupBy);
+  console.log("API Payload:", action.payload);
+  console.log("Processed Result:", result);
 
-      switch (groupBy) {
-        case "SUMMARY":
-          state.salesTargetSummary = result;
-          break;
+  state.salesTarget = result;
 
-        case "BRANCH":
-          state.salesTargetBranch = result;
-          break;
+  switch (groupBy) {
+    case "SUMMARY":
+      state.salesTargetSummary = result;
 
-        default:
-          break;
-      }
-    })
+      console.log("SUMMARY DATA STORED:", state.salesTargetSummary);
+      break;
+
+    case "BRANCH":
+      state.salesTargetBranch = result;
+
+      console.log("BRANCH DATA STORED:", state.salesTargetBranch);
+      break;
+
+    default:
+      console.warn("UNKNOWN GROUPBY:", groupBy);
+      break;
+  }
+
+  console.log("==========================================");
+})
 
     .addCase(getSalesTarget.rejected, (state, action) => {
       state.loading = false;

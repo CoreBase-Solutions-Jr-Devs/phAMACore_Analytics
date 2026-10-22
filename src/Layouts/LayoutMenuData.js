@@ -87,7 +87,13 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
       },
       subItems: [
         { id: 'dashboard', label: 'Dashboard', link: '/dashboard-sales', parentId: 'sales' },
-        { id: 'branchview', label: 'BranchView',  link: `/dashboard-sales/branch/${salesBranch}`, parentId: 'sales' },
+        // { id: 'branchview', label: 'BranchView',  link: `/dashboard-sales/branch/${salesBranch}`, parentId: 'sales' },
+                    {
+    id: "Sales-Breakdown",
+    label: "Sales Breakdown",
+    link: "/dashboard-sales/Sales-Breakdown",
+    parentId: "sales",
+  },
                   {
     id: "sales-target",
     label: "Sales Target",
@@ -104,6 +110,12 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
     id: "Customer-Member-analysis",
     label: " Member Analysis",
     link: "/dashboard-sales/Customer-Member-Analysis",
+    parentId: "sales",
+  },
+              {
+    id: "Performance-Summary",
+    label: "Performance Summary",
+    link: "/dashboard-sales/Performance-Summary",
     parentId: "sales",
   },
       ],

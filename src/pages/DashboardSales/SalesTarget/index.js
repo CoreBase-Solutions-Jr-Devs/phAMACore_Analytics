@@ -3,7 +3,7 @@ import { Container, Row, Col } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import SalesTargetFilterActions from "../../DashboardSales/SalesTarget/FilterActions";
+
 
 // import Bands from "./Bands";
 // import Drilldown from "./Drilldown";
@@ -171,70 +171,70 @@ useEffect(() => {
       };
     }, [dispatch]);
 
-  const handleApplyFilters = () => {
+//   const handleApplyFilters = () => {
    
-   const startYear = 2026;
-const startMonth = 7; // July
+//    const startYear = 2026;
+// const startMonth = 7; // July
 
-const currentDate = new Date();
-const endYear = currentDate.getFullYear();
-const endMonth = currentDate.getMonth() + 1;
+// const currentDate = new Date();
+// const endYear = currentDate.getFullYear();
+// const endMonth = currentDate.getMonth() + 1;
 
-for (
-  let year = startYear, month = startMonth;
-  year < endYear || (year === endYear && month <= endMonth);
-  month++
-) {
-  if (month > 12) {
-    month = 1;
-    year++;
-  }
+// for (
+//   let year = startYear, month = startMonth;
+//   year < endYear || (year === endYear && month <= endMonth);
+//   month++
+// ) {
+//   if (month > 12) {
+//     month = 1;
+//     year++;
+//   }
 
-  // First day of this month
-  const monthStart = new Date(year, month - 1, 1);
+//   // First day of this month
+//   const monthStart = new Date(year, month - 1, 1);
 
-  // Last day of previous months; today for the current month
-  const monthEnd =
-    year === endYear && month === endMonth
-      ? currentDate
-      : new Date(year, month, 0);
+//   // Last day of previous months; today for the current month
+//   const monthEnd =
+//     year === endYear && month === endMonth
+//       ? currentDate
+//       : new Date(year, month, 0);
 
-  const formatDate = (date) =>
-    date.toLocaleDateString("en-GB");
+//   const formatDate = (date) =>
+//     date.toLocaleDateString("en-GB");
 
-  const params = {
-    clientid: 1,
-    startDate: formatDate(monthStart),
-    endDate: formatDate(monthEnd),
-    // branchcode: filters.branch || "",
-    Year: String(year),
-    Month: String(month).padStart(2, "0"),
-  };
+//   const params = {
+//     clientid: 1,
+//     startDate: formatDate(monthStart),
+//     endDate: formatDate(monthEnd),
+//     // branchcode: filters.branch || "",
+//     Year: String(year),
+//     Month: String(month).padStart(2, "0"),
+//   };
 
-  dispatch(
-    getSalesTarget({
-      ...params,
-      groupBy: "SUMMARY",
-    }),
-  );
+//   dispatch(
+//     getSalesTarget({
+//       ...params,
+//       groupBy: "SUMMARY",
+//     }),
+//   );
 
-  dispatch(
-    getSalesTarget({
-      ...params,
-      groupBy: "BRANCH",
-    }),
-  );
-}
+//   dispatch(
+//     getSalesTarget({
+//       ...params,
+//       groupBy: "BRANCH",
+//     }),
+//   );
+// }
     
         
-        //  dispatch(
-        //   getMarginAnalysis({
-        //     ...params,
-        //     groupBy: "SKU",
-        //   }),
-        // );
+//         //  dispatch(
+//         //   getMarginAnalysis({
+//         //     ...params,
+//         //     groupBy: "SKU",
+//         //   }),
+//         // );
     
-  };
+//   };
 const selectedBranchName =
   filters.branch == null || filters.branch === ""
     ? ""
@@ -323,11 +323,11 @@ const selectedBranchName =
 />
           </Col>
 
-             <SalesTargetFilterActions
+             {/* <FilterActions
           onApply={handleApplyFilters}
           rightColumn={rightColumn}
             hideRightColumn={toggleRightColumn}
-        />
+        /> */}
         </Row>
 
      

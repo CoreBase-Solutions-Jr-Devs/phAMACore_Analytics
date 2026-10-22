@@ -30,6 +30,7 @@ const Widget = ({
   creditNotesPercentage = 0,
   lastYearRevenue = 0,
   revenueChange = 0,
+  selectedBranchName,
   branchMap = {},
   rightClickBtn,
 }) => {
@@ -126,14 +127,17 @@ const Widget = ({
       <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
         <h4 className="card-title mb-0">KEY METRICS</h4>
 
-        <div className="d-flex align-items-center gap-2 ">
+        <div className="d-flex align-items-center gap-1 ">
           <span>Filtered From:</span>
           <strong>{formatDisplay(startDate)}</strong> to{" "}
           <strong>{formatDisplay(endDate)}</strong>
         </div>
-
-        <div className="d-flex align-items-center gap-2 no-print">
-          <button
+   <div className="d-flex align-items-center gap-1 ">
+            <span>Selected Branch:</span>
+            <strong>{selectedBranchName}</strong>
+          </div>
+        <div className="d-flex align-items-center gap-1 no-print">
+          {/* <button
             type="button"
             className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
             onClick={handleExportExcel}
@@ -151,7 +155,7 @@ const Widget = ({
           >
             <i className="ri-printer-line align-bottom"></i>
             <span>Print</span>
-          </button>
+          </button> */}
 
           <button
             type="button"
