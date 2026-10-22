@@ -11,6 +11,8 @@
  * }
  */
 
+import { cleanBranchName } from '../../../../../helpers/branch_helper';
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
@@ -26,8 +28,9 @@ export function getPeriodDays(startDate, endDate) {
         const [d, m, y] = str.split('/');
         return new Date(`${y}-${m}-${d}`);
     };
+    // Inclusive: 01/10 - 11/10 is 11 trading days, not 10
     const diff = parse(endDate) - parse(startDate);
-    const days = Math.round(diff / (1000 * 60 * 60 * 24));
+    const days = Math.round(diff / (1000 * 60 * 60 * 24)) + 1;
     return Math.max(days, 1);
 }
 
@@ -130,7 +133,8 @@ export function transformStockValueByBranch(stockRows) {
 
     const branchMap = {};
     stockRows.forEach((row) => {
-        const branch = row.branch_Name || `Branch ${row.branch_id}`;
+        const rawBranch = row.branch_Name || `Branch ${row.branch_id}`;
+        const branch = cleanBranchName(rawBranch);
         if (!branchMap[branch]) branchMap[branch] = 0;
         branchMap[branch] += row.closing_value || 0;
     });
@@ -170,7 +174,8 @@ export function transformBranchCoverageRatio(stockRows, periodDays) {
 
     const branchMap = {};
     stockRows.forEach((row) => {
-        const branch = row.branch_Name || `Branch ${row.branch_id}`;
+        const rawBranch = row.branch_Name || `Branch ${row.branch_id}`;
+        const branch = cleanBranchName(rawBranch);
         if (!branchMap[branch]) branchMap[branch] = { closing_qty: 0, qty_sold: 0 };
         branchMap[branch].closing_qty += row.closing_qty || 0;
         branchMap[branch].qty_sold    += row.qty_sold    || 0;
@@ -188,5 +193,118 @@ export function transformBranchCoverageRatio(stockRows, periodDays) {
         categories: entries.map((e) => e.name),
         data: entries.map((e) => e.daysCover),
         colors: entries.map((e) => getCoverageRatioColor(e.daysCover)),
+    };
+}
+
+// ─── BarChartThree — Stock VS Sales Velocity (Combined Bar & Line) ───────────
+
+/**
+ * Produces chart-ready data for the Stock VS Sales Velocity combined chart.
+ * Combines branch stock value from KPITotalStockValueByBranch and sales velocity
+ * from KPISalesTransactions (GroupBy=BRANCH).
+ *
+ * @param {Array}  stockRows   Array of branch stock objects (from totalStockValueByBranch)
+ * @param {Array}  salesRows   Array of branch sales objects (from kpiSalesTransactions)
+ * @param {number} periodDays  Days in the query period (defaults to 1)
+ * @returns {{ categories: string[], stock: number[], sales: number[], rawStock: number[], rawDailySales: number[], daysCover: number[] }}
+ */
+export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], periodDays = 1) {
+    const validPeriodDays = Math.max(Number(periodDays) || 1, 1);
+
+    if ((!stockRows || !stockRows.length) && (!salesRows || !salesRows.length)) {
+        return {
+            categories: [],
+            stock: [],
+            sales: [],
+            rawStock: [],
+            rawDailySales: [],
+            daysCover: [],
+        };
+    }
+
+    // Build map for sales by branch_id and normalized branch_name
+    const salesMap = new Map();
+    (salesRows || []).forEach((row) => {
+        if (!row) return;
+        const id = row.branch_id != null ? String(row.branch_id) : null;
+        const rawName = row.branch_name || row.branchName || "";
+        const name = cleanBranchName(rawName).toUpperCase().trim();
+        // Stock is valued at cost, so it is compared with cost of goods sold (net_cogs).
+        // Dividing by VAT-inclusive selling value understated days of cover by the margin and VAT.
+        const salesVal = Number(row.net_cogs ?? row.net_sales_excl ?? row.net_sales_incl ?? 0);
+
+        if (id) salesMap.set(id, salesVal);
+        if (name) salesMap.set(name, salesVal);
+    });
+
+    const branchEntries = new Map();
+
+    // Ingest stock rows
+    (stockRows || []).forEach((row) => {
+        if (!row) return;
+        const id = row.branch_id != null ? String(row.branch_id) : `gen_${Math.random()}`;
+        const rawName = row.branch_name || row.branchName || `Branch ${id}`;
+        const name = cleanBranchName(rawName);
+        const rawStock = Number(row.total_stock_value ?? row.closing_value ?? 0);
+
+        branchEntries.set(id, {
+            id,
+            name,
+            rawStock,
+            normName: name.toUpperCase().trim(),
+        });
+    });
+
+    // Also include any branch that made sales but was missing from stock rows
+    (salesRows || []).forEach((row) => {
+        if (!row) return;
+        const id = row.branch_id != null ? String(row.branch_id) : null;
+        const rawName = row.branch_name || row.branchName || (id ? `Branch ${id}` : "Unknown");
+        const name = cleanBranchName(rawName);
+        if (id && !branchEntries.has(id)) {
+            branchEntries.set(id, {
+                id,
+                name,
+                rawStock: 0,
+                normName: name.toUpperCase().trim(),
+            });
+        }
+    });
+
+    const combinedList = Array.from(branchEntries.values()).map((entry) => {
+        const rawSales = salesMap.get(entry.id) ?? salesMap.get(entry.normName) ?? 0;
+        const rawDailySales = rawSales / validPeriodDays;
+        const stockM = entry.rawStock / 1_000_000;
+        const salesM = rawDailySales / 1_000_000;
+        const daysCover = rawDailySales > 0 ? Math.round(entry.rawStock / rawDailySales) : (entry.rawStock > 0 ? 999 : 0);
+
+        return {
+            name: entry.name,
+            rawStock: entry.rawStock,
+            rawDailySales,
+            monthlyConsumption: rawDailySales * 30,
+            stockM,
+            salesM,
+            daysCover,
+        };
+    });
+
+    // Sort descending by stock value (or sales if stock is 0)
+    combinedList.sort((a, b) => b.stockM - a.stockM || b.salesM - a.salesM);
+
+    return {
+        categories: combinedList.map((item) => item.name),
+        stock: combinedList.map((item) => Number(item.stockM.toFixed(2))),
+        sales: combinedList.map((item) => {
+            if (item.salesM <= 0) return 0;
+            if (item.salesM >= 0.01) return Number(item.salesM.toFixed(2));
+            if (item.salesM >= 0.001) return Number(item.salesM.toFixed(3));
+            if (item.salesM >= 0.0001) return Number(item.salesM.toFixed(4));
+            return Number(item.salesM.toFixed(6));
+        }),
+        rawStock: combinedList.map((item) => item.rawStock),
+        rawDailySales: combinedList.map((item) => item.rawDailySales),
+        monthlyConsumption: combinedList.map((item) => item.monthlyConsumption),
+        daysCover: combinedList.map((item) => item.daysCover),
     };
 }

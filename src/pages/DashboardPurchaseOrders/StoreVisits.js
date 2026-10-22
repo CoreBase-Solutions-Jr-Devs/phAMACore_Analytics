@@ -1,41 +1,136 @@
-import React from 'react';
-import { Card, CardHeader, CardBody, Col, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
-import { StoreVisitsCharts } from './DashboardEcommerceCharts';
+import React from "react";
+import { Card, CardHeader, CardBody } from "reactstrap";
+import { StoreVisitsCharts } from "./DashboardEcommerceCharts";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const StoreVisits = ({ data= [] }) => {
-    return (
-        <React.Fragment>
+const StoreVisits = ({ data = {}, error, loading }) => {
+  const categories = data?.categories || [];
+  const series = data?.series || [];
+  const amounts = data?.amounts || [];
+
+  const topBranch =
+    data?.categories?.length && data?.amounts?.length
+      ? data.categories.reduce((top, category, index) => {
+          const amount = Number(data.amounts[index] || 0);
+
+          if (!top || amount > top.amount) {
+            return {
+              name: category,
+              amount,
+            };
+          }
+
+          return top;
+        }, null)
+      : null;
+
+  const handleExportExcel = () => {
+    const rows = (categories || []).map((cat, idx) => ({
+      Branch: cat,
+      "Spend (KES)": Number(amounts?.[idx] || 0).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      }),
+    }));
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Branch_Performance_Spend_${todayStr}`);
+  };
+
+  return (
+    <React.Fragment>
+      <Card className="card-height-100" id="purchases-branch-spend-card">
+       <CardBody className="p-0">
+    <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
+                <h4 className="card-title mb-0 flex-grow-1">
+            Branch Performance - Spend by Branch
+          </h4>
+          <CardExportButtons
+            targetId="purchases-branch-spend-card"
+            title="Branch Spend"
+            onExport={handleExportExcel}
+          />
+        </CardHeader>
+     
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary mb-3" role="status">
+                {/* <span className="visually-hidden">Loading...</span> */}
+              </div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-5">
+              <h6 className="text-danger mb-2">{error} </h6>
+            </div>
+          ) : series.length === 0 ? (
+            <div className="text-center py-5">
+              <h6 className="text-muted mb-2">
+                No branch spend data available
+              </h6>
+            </div>
+          ) : (
+                      <div
+  className="branch-chart-container"
+  style={{
+    width: "100%",
+    minWidth: 0,
+    overflow: "hidden",
+    padding: "0 12px 12px",
+  }}>
+         <div className="d-flex justify-content-center align-items-center gap-4 flex-wrap mt-2 mb-3">
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "14px",
+        height: "14px",
+        backgroundColor: "var(--vz-purple)",
+        borderRadius: "2px",
+      }}
+    />
+    <span className="text-muted">Revenue</span>
+  </div>
+
+  <div className="d-flex align-items-center gap-2">
+    <svg width="28" height="12" viewBox="0 0 28 12">
+      <line
+        x1="0"
+        y1="6"
+        x2="28"
+        y2="6"
+        stroke="var(--vz-purple)"
+        strokeWidth="3"
+        strokeDasharray="3 4"
+      />
+    </svg>
+    <span className="text-muted">Revenue Trend</span>
+  </div>
+</div>
+              <StoreVisitsCharts
+                dataColors='[
+                "--vz-primary",
+                "--vz-success",
+                "--vz-warning",
+                "--vz-danger",
+                "--vz-info",
+                "--vz-secondary",
+                "--vz-dark",
+                "--vz-light",
+                "--vz-purple",
+                "--vz-pink"
+              ]'
+                categories={categories}
+                series={series}
+                amounts={amounts}
+              />
            
-                <Card className="card-height-100">
-                    <CardHeader className="align-items-center d-flex">
-                        <h4 className="card-title mb-0 flex-grow-1">Spend by product category</h4>
-                     
-                    </CardHeader>
-                   <CardBody>
-                            {data.length === 0 ? (
-          <div className="text-center py-5">
-            <h6 className="text-muted mb-2">
-            No product category data available
-            </h6>
-          </div>
-        ) : (
-          <>
-              <div className="text-center py-5">
-            <h6 className="text-muted mb-2">
-            No product category data available
-            </h6>
-          </div>
-                            {/* <StoreVisitsCharts 
-                            dataColors='["--vz-primary", "--vz-success", "--vz-warning", "--vz-danger", "--vz-info"]'
-                            /> */}
-                     
-                       </>
-        )}
-                    </CardBody>
-                </Card>
-           
-        </React.Fragment>
-    );
+
+              
+            </div>
+          )}
+        </CardBody>
+      </Card>
+    </React.Fragment>
+  );
 };
 
 export default StoreVisits;

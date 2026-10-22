@@ -104,3 +104,30 @@ File: Custom Css File
 [data-sidebar-size="lg"] .logo-sm {
     display: none !important;
 }
+
+/* ====================================================
+   Print & Excel Buttons Hover State across All Dashes
+   Ensures text & icons turn #c58c4f on hover against white bg
+   ==================================================== */
+.btn-export-excel,
+.btn-export-print,
+.card-export-buttons .btn,
+button:has(.ri-file-excel-2-line),
+button:has(.ri-printer-line),
+.no-print .btn-soft-success,
+.no-print .btn-soft-info {
+    transition: all 0.2s ease-in-out;
+
+    &:hover,
+    &:focus,
+    &:active {
+        color: #c58c4f !important;
+        border-color: #c58c4f !important;
+        background-color: rgba(197, 140, 79, 0.12) !important;
+
+        i,
+        span {
+            color: #c58c4f !important;
+        }
+    }
+}

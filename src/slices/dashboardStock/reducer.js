@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchDailyClosingStock, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIImbalances, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { saveCachedBranches, cleanBranchName } from "../../helpers/branch_helper";
+import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
+const monthStart = () => new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
 export const initialState = {
   dailyClosingStock: [],
@@ -9,18 +12,40 @@ export const initialState = {
   batchExpiry: [],
   batchExpiryNeo: [],
   branches: [],
+  totalStockValueByBranch: [],
+  stockHealth: [],
+  criticalStockouts: [],
+  slowMovingStock: [],
+  imbalances: [],
+  loadingImbalances: false,
+  errorImbalances: null,
+  kpiSalesTransactions: [],
+  kpiSalesPeriodDays: 1,
   loadingStock: false,
   loadingMovements: false,
   loadingBatchExpiry: false,
   loadingBatchExpiryNeo: false,
+  loadingBranches: false, 
+  loadingTotalStockValueByBranch: false,
+  loadingStockHealth: false,
+  loadingCriticalStockouts: false,
+  loadingSlowMovingStock: false,
+  loadingKPISalesTransactions: false,
+  errorBranches: null,
   errorStock: null,
   errorMovements: null,
   errorBatchExpiry: null,
   errorBatchExpiryNeo: null,
+  errorTotalStockValueByBranch: null,
+  errorStockHealth: null,
+  errorCriticalStockouts: null,
+  errorSlowMovingStock: null,
+  errorKPISalesTransactions: null,
   filters: {
     branch: null,
-    dateRange: "Today",
-    startDate: formatDMY(new Date()),
+    // Month to Date by default: a one-day window made the cover and velocity figures meaningless
+    dateRange: DEFAULT_DATE_RANGE,
+    startDate: formatDMY(monthStart()),
     endDate: formatDMY(new Date()),
   },
 };
@@ -97,6 +122,7 @@ const StockInventorySlice = createSlice({
           break;
         }
 
+        case "Month to Date":
         case "This Month": {
           const today = new Date();
           const start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -170,24 +196,6 @@ const StockInventorySlice = createSlice({
       .addCase(fetchDailyClosingStock.fulfilled, (state, action) => {
         state.loadingStock = false;
         state.dailyClosingStock = action.payload;
-
-        if (!state.branches.length) {
-          const map = {};
-
-          (action.payload || []).forEach((item) => {
-            const code = item.branchID;
-            const name = item.branchName;
-
-            if (code == null) return;
-
-            map[code] = {
-              branchCode: code,
-              branchName: name,
-            };
-          });
-
-          state.branches = Object.values(map);
-        }
       })
 
       .addCase(fetchDailyClosingStock.rejected, (state, action) => {
@@ -248,6 +256,142 @@ const StockInventorySlice = createSlice({
       .addCase(fetchBatchExpiryNeo.rejected, (state, action) => {
         state.loadingBatchExpiryNeo = false;
         state.errorBatchExpiryNeo = action.payload || action.payload?.error || action.error || null;
+      });
+
+    builder.addCase(fetchBranches.pending, (state) => {
+        state.loadingBranches = true;
+        state.errorBranches = null;
+      })
+      .addCase(fetchBranches.fulfilled, (state, action) => {
+        state.loadingBranches = false;
+
+        const branchList = action.payload?.result || action.payload || [];
+        state.branches = branchList.map((branch) => ({
+          branchCode: branch.bcode ?? branch.branchCode ?? branch.branch_ID,
+          branchName: cleanBranchName(branch.brancH_NAME ?? branch.branchName ?? branch.branch_name),
+        }));
+        saveCachedBranches(state.branches);
+      })
+
+      .addCase(fetchBranches.rejected, (state, action) => {
+        state.loadingBranches = false;
+
+        state.errorBranches =
+          action.payload ||
+          action.error?.message ||
+          null;
+      });
+
+    builder
+      .addCase(fetchKPITotalStockValueByBranch.pending, (state) => {
+        state.loadingTotalStockValueByBranch = true;
+        state.errorTotalStockValueByBranch = null;
+      })
+      .addCase(fetchKPITotalStockValueByBranch.fulfilled, (state, action) => {
+        state.loadingTotalStockValueByBranch = false;
+        state.totalStockValueByBranch = action.payload;
+      })
+      .addCase(fetchKPITotalStockValueByBranch.rejected, (state, action) => {
+        state.loadingTotalStockValueByBranch = false;
+        state.errorTotalStockValueByBranch = action.payload?.message || action.payload ||
+          action.error?.message || "Failed to fetch total stock value by branch!";
+      });
+
+    builder
+      .addCase(fetchKPIStockHealth.pending, (state) => {
+        state.loadingStockHealth = true;
+        state.errorStockHealth = null;
+      })
+      .addCase(fetchKPIStockHealth.fulfilled, (state, action) => {
+        state.loadingStockHealth = false;
+        state.stockHealth = action.payload;
+      })
+      .addCase(fetchKPIStockHealth.rejected, (state, action) => {
+        state.loadingStockHealth = false;
+        state.errorStockHealth =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch stock health KPI!";
+      });
+
+    builder
+      .addCase(fetchKPICriticalStockouts.pending, (state) => {
+        state.loadingCriticalStockouts = true;
+        state.errorCriticalStockouts = null;
+      })
+      .addCase(fetchKPICriticalStockouts.fulfilled, (state, action) => {
+        state.loadingCriticalStockouts = false;
+        state.criticalStockouts = action.payload;
+      })
+      .addCase(fetchKPICriticalStockouts.rejected, (state, action) => {
+        state.loadingCriticalStockouts = false;
+        state.errorCriticalStockouts =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch critical stockouts!";
+      });
+
+    builder
+      .addCase(fetchKPISlowMovingStock.pending, (state) => {
+        state.loadingSlowMovingStock = true;
+        state.errorSlowMovingStock = null;
+      })
+      .addCase(fetchKPISlowMovingStock.fulfilled, (state, action) => {
+        state.loadingSlowMovingStock = false;
+        state.slowMovingStock = action.payload;
+      })
+      .addCase(fetchKPISlowMovingStock.rejected, (state, action) => {
+        state.loadingSlowMovingStock = false;
+        state.errorSlowMovingStock =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch slow moving stock!";
+      });
+
+    builder
+      .addCase(fetchKPIImbalances.pending, (state) => {
+        state.loadingImbalances = true;
+        state.errorImbalances = null;
+      })
+      .addCase(fetchKPIImbalances.fulfilled, (state, action) => {
+        state.loadingImbalances = false;
+        state.imbalances = action.payload || [];
+      })
+      .addCase(fetchKPIImbalances.rejected, (state, action) => {
+        state.loadingImbalances = false;
+        state.imbalances = [];
+        state.errorImbalances =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch branch imbalances!";
+      });
+
+    builder
+      .addCase(fetchKPISalesTransactions.pending, (state) => {
+        state.loadingKPISalesTransactions = true;
+        state.errorKPISalesTransactions = null;
+      })
+      .addCase(fetchKPISalesTransactions.fulfilled, (state, action) => {
+        state.loadingKPISalesTransactions = false;
+        if (action.payload && typeof action.payload === "object" && !Array.isArray(action.payload)) {
+          state.kpiSalesTransactions = action.payload.data || [];
+          state.kpiSalesPeriodDays = action.payload.periodDays || 1;
+        } else {
+          state.kpiSalesTransactions = action.payload || [];
+          state.kpiSalesPeriodDays = 1;
+        }
+      })
+      .addCase(fetchKPISalesTransactions.rejected, (state, action) => {
+        state.loadingKPISalesTransactions = false;
+        state.errorKPISalesTransactions =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch sales transactions KPI!";
       });
   },
 });

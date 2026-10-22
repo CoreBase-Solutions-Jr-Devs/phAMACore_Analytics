@@ -2,41 +2,41 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 
-const RevenueCharts = ({
-  dataColors,
-  series,
-  categories,
-  formatAmount,
-}) => {
+const RevenueCharts = ({ dataColors, series, categories = [] }) => {
+  const colors = getChartColorsArray(dataColors);
 
-  var linechartcustomerColors =
-    getChartColorsArray(dataColors);
-
-  var options = {
+  const options = {
     chart: {
       height: 370,
-      type: "bar",
+      type: "line",
       toolbar: {
         show: false,
       },
     },
 
-    plotOptions: {
-      bar: {
-        columnWidth: "50%",
-        borderRadius: 4,
-      },
+    stroke: {
+      curve: "smooth",
+      width: 3,
+      dashArray: [0, 6],
     },
 
     dataLabels: {
       enabled: false,
     },
 
+    colors: [colors[0], colors[0]],
+
+    legend: {
+      show: false,
+    },
+
     xaxis: {
-      categories: categories || [],
+      categories,
+
       axisTicks: {
         show: false,
       },
+
       axisBorder: {
         show: false,
       },
@@ -48,21 +48,23 @@ const RevenueCharts = ({
       tickAmount: 5,
 
       labels: {
-        formatter: (val) => formatAmount(val),
+        formatter: (val) => Number(val).toLocaleString(),
       },
     },
 
-    colors: linechartcustomerColors,
+    tooltip: {
+      y: {
+        formatter: (val) => Number(val).toLocaleString(),
+      },
+    },
   };
 
   return (
     <ReactApexChart
-      dir="ltr"
       options={options}
       series={series}
-      type="bar"
-      height={370}
-      className="apex-charts"
+      type="line"
+      height={350}
     />
   );
 };
@@ -70,38 +72,43 @@ const RevenueCharts = ({
 const MonthToDateCharts = ({
   dataColors,
   series,
-  categories,
+  categories = [],
   formatAmount,
 }) => {
+  const colors = getChartColorsArray(dataColors);
 
-  var linechartcustomerColors =
-    getChartColorsArray(dataColors);
-
-  var options = {
+  const options = {
     chart: {
       height: 370,
-      type: "bar",
+      type: "line",
       toolbar: {
         show: false,
       },
     },
 
-    plotOptions: {
-      bar: {
-        columnWidth: "50%",
-        borderRadius: 4,
-      },
+    stroke: {
+      curve: "smooth",
+      width: 3,
+      dashArray: [0, 6],
     },
 
     dataLabels: {
       enabled: false,
     },
 
+    colors: [colors[0], colors[0]],
+
+    legend: {
+      show: false,
+    },
+
     xaxis: {
-      categories: categories || [],
+      categories,
+
       axisTicks: {
         show: false,
       },
+
       axisBorder: {
         show: false,
       },
@@ -113,21 +120,24 @@ const MonthToDateCharts = ({
       tickAmount: 5,
 
       labels: {
-        formatter: (val) => formatAmount(val),
+        formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
       },
     },
 
-    colors: linechartcustomerColors,
+    tooltip: {
+      y: {
+        formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
+      },
+    },
   };
 
   return (
     <ReactApexChart
-      dir="ltr"
+      // dir="ltr"
       options={options}
       series={series}
-      type="bar"
-      height={370}
-      className="apex-charts"
+      type="line"
+      height={350}
     />
   );
 };
@@ -136,9 +146,7 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
   let barchartCountriesColors = [];
 
   try {
-    barchartCountriesColors = dataColors
-      ? getChartColorsArray(dataColors)
-      : [];
+    barchartCountriesColors = dataColors ? getChartColorsArray(dataColors) : [];
   } catch (error) {
     console.warn("Chart colors parsing failed:", error);
     barchartCountriesColors = ["#f06548"];
@@ -166,9 +174,9 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
         borderRadius: 2,
         horizontal: true,
         distributed: true,
-        barHeight: "65%", 
+        barHeight: "65%",
         dataLabels: {
-          position: "right", 
+          position: "right",
         },
       },
     },
@@ -178,7 +186,7 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
     dataLabels: {
       enabled: true,
       textAnchor: "start",
-      offsetX: 15, 
+      offsetX: 15,
       formatter: (val) => formatAmount(val),
 
       style: {
@@ -199,12 +207,12 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
       show: false,
     },
 
-grid: {
-  show: false,
-  padding: {
-    left: 50, // increase if names are still cut off
-  },
-},
+    grid: {
+      show: false,
+      padding: {
+        left: 50, // increase if names are still cut off
+      },
+    },
 
     xaxis: {
       categories: categories || [],
@@ -222,17 +230,17 @@ grid: {
       },
     },
 
- yaxis: {
-  labels: {
-    maxWidth: 250,
-    style: {
-      fontSize: "13px",
-      fontWeight: 600,
-      colors: ["#495057"], // dark gray
-      // fontFamily: "inherit", // optional
+    yaxis: {
+      labels: {
+        maxWidth: 250,
+        style: {
+          fontSize: "13px",
+          fontWeight: 600,
+          colors: ["#495057"], // dark gray
+          // fontFamily: "inherit", // optional
+        },
+      },
     },
-  },
-},
   };
 
   return (
@@ -241,59 +249,126 @@ grid: {
       options={options}
       series={validSeries}
       type="bar"
-height={500}
+      height={500}
       className="apex-charts"
     />
   );
 };
 
-const StoreVisitsCharts = ({ dataColors }) => {
-  var chartDonutBasicColors = getChartColorsArray(dataColors);
-  const series = [];
-  var options = {
-//    labels: [
-//   "Antibiotics",
-//   "ARVs",
-//   "Antimalarials",
-//   "Chronic Disease",
-//   "OTC/Supp"
-// ],
 
-dataLabels: {
-  enabled: true,
-  formatter: (val) => `${val.toFixed(0)}%`,
-  dropShadow: {
-    enabled: false,
-  },
-},
+const StoreVisitsCharts = ({
+  dataColors,
+  categories = [],
+  series = [],
+  formatAmount,
+  amounts = [],
+}) => {
+  const chartColors = getChartColorsArray(dataColors);
+
+  // Use actual spend amounts for the bars
+  const barData = amounts.length ? amounts : series;
+
+  const options = {
     chart: {
-      height: 333,
-      type: "donut",
-    },
-    legend: {
-      position: "bottom",
-    },
-    stroke: {
-      show: false,
-    },
-    dataLabels: {
-      dropShadow: {
-        enabled: false,
+      height: 350,
+      type: "line",
+      toolbar: {
+        show: false,
       },
     },
-    // colors: chartDonutBasicColors,
+
+    legend: {
+      show: false,
+    },
+
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "70%",
+        borderRadius: 0,
+        distributed: false,
+      },
+    },
+
+    stroke: {
+      width: [0, 3],
+      curve: "straight",
+      dashArray: [0, 5],
+    },
+
+    dataLabels: {
+      enabled: false,
+    },
+
+    xaxis: {
+      categories,
+      labels: {
+        rotate: -45,
+        rotateAlways: true,
+        trim: false,
+        hideOverlappingLabels: false,
+        minHeight: 100,
+        maxHeight: 160,
+        style: {
+          fontSize: "10px",
+        },
+      },
+    },
+
+    yaxis: {
+      title: {
+        text: "Spend (KES)",
+      },
+      labels: {
+        formatter: (value) =>
+          Number(value || 0).toLocaleString("en-KE"),
+      },
+    },
+
+    tooltip: {
+      shared: false,
+      intersect: true,
+      enabledOnSeries: [0],
+
+      x: {
+        formatter: (value, { dataPointIndex }) =>
+          categories[dataPointIndex] || value,
+      },
+
+      y: {
+        formatter: (value) =>
+          `KES ${Number(value || 0).toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
+      },
+    },
+
+    colors: [chartColors[0], chartColors[0]],
   };
+
+  const mixedSeries = [
+    {
+      name: "Spend",
+      type: "bar",
+      data: barData,
+    },
+    {
+      name: "Spend Trend",
+      type: "line",
+      data: barData,
+    },
+  ];
+
   return (
-    <React.Fragment>
-      <ReactApexChart dir="ltr"
-        options={options}
-        series={series}
-        type="donut"
-        height="333"
-        className="apex-charts"
-      />
-    </React.Fragment>
+    <ReactApexChart
+      options={options}
+      series={mixedSeries}
+      type="line"
+      height={350}
+    />
   );
 };
+
 
 export { RevenueCharts, StoreVisitsCharts, SpendCharts, MonthToDateCharts };

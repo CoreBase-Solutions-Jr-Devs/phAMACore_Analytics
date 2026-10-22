@@ -152,7 +152,7 @@ const TableContainer = ({
       </Row>}
 
 
-      <div className={divClass}>
+      <div className={`table-responsive ${divClass || ""}`}>
         <Table hover className={tableClass}>
           <thead className={theadClass}>
             {getHeaderGroups().map((headerGroup) => (

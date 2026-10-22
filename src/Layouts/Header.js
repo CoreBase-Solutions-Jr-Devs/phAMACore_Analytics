@@ -11,7 +11,6 @@ import phamacoreImage from "../assets/images/phamacore.png";
 
 //import Components
 import SearchOption from '../Components/Common/SearchOption';
-import LanguageDropdown from '../Components/Common/LanguageDropdown';
 import WebAppsDropdown from '../Components/Common/WebAppsDropdown';
 import MyCartDropdown from '../Components/Common/MyCartDropdown';
 import FullScreenDropdown from '../Components/Common/FullScreenDropdown';
@@ -25,16 +24,18 @@ import { createSelector } from 'reselect';
 
 const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
     const dispatch = useDispatch();
-
+    const storedUser = JSON.parse(localStorage.getItem("authUser"));
+    const companyName = storedUser?.user?.companyName;
+    // console.log("Company Name:", companyName);
 
     const selectDashboardData = createSelector(
         (state) => state.Layout,
         (state) => ({
-            sidebarVisibilitytype: state.sidebarVisibilitytype})
-      );
+            sidebarVisibilitytype: state.sidebarVisibilitytype
+        })
+    );
     // Inside your component
-    const {sidebarVisibilitytype} = useSelector(selectDashboardData);
-    
+    const { sidebarVisibilitytype } = useSelector(selectDashboardData);
 
     const [search, setSearch] = useState(false);
     const toogleSearch = () => {
@@ -90,8 +91,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     <span className="logo-lg d-flex align-items-center gap-2">
                                         <img src={phamacoreImage} alt="" height="20" />
                                         <span className="logo-text d-flex flex-column lh-1" style={{ color: "#c58c4f" }}>
-                                            <span className="fw-bold fs-4">phAMACore</span>
-                                            <span className="fw-medium ">Analytics</span>
+                                            <span className="fw-bold fs-4">phAMABI</span>
+                                            {/* <span className="fw-medium ">Analytics</span> */}
                                         </span>
                                     </span>
                                 </Link>
@@ -103,8 +104,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     <span className="logo-lg d-flex align-items-center gap-2">
                                         <img src={phamacoreImage} alt="" height="20" />
                                         <span className="logo-text d-flex flex-column lh-1">
-                                            <span className="fw-bold text-white fs-4">phAMACore</span>
-                                            <span className="fw-medium text-white "className=" text-white">Analytics</span>
+                                            <span className="fw-bold text-white fs-4">phAMABI</span>
+                                            {/* <span className="fw-medium text-white "className=" text-white">Analytics</span> */}
                                         </span>
                                     </span>
                                 </Link>
@@ -114,7 +115,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                 onClick={toogleMenuBtn}
                                 type="button"
                                 className="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger text-danger"
-                               style={{ color: "#c58c4f" }}
+                                style={{ color: "#c58c4f" }}
                                 id="topnav-hamburger-icon">
                                 <span className="hamburger-icon">
                                     <span></span>
@@ -126,18 +127,19 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
 
                             {/* <SearchOption /> */}
                         </div>
- <div className="d-none d-md-flex justify-content-center flex-grow-1">
-            <span
-                className="fw-bold"
-                style={{
-                    color: "#c58c4f",
-                    fontSize: "18px",
-                    // letterSpacing: "1px"
-                }}
-            >
-                COREBASE SOLUTIONS LTD
-            </span>
-        </div>
+                        <div className="d-none d-md-flex justify-content-center flex-grow-1">
+                            <span
+                                className="fw-bold"
+                                style={{
+                                    color: "#c58c4f",
+                                    fontSize: "18px",
+                                    // letterSpacing: "1px"
+                                }}
+                            >
+                                {companyName}
+                                {/* AXCESS PHARMACY LTD */}
+                            </span>
+                        </div>
                         <div className="d-flex align-items-center">
                             <Dropdown isOpen={search} toggle={toogleSearch} className="d-md-none topbar-head-dropdown header-item">
                                 <DropdownToggle type="button" tag="button" className="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle">
@@ -157,17 +159,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                 </DropdownMenu>
                             </Dropdown>
 
-                            {/* LanguageDropdown */}
-                            <LanguageDropdown />
-
-                            {/* WebAppsDropdown */}
-                            {/* <WebAppsDropdown /> */}
-
-                            {/* MyCartDropdwon */}
-                            {/* <MyCartDropdown /> */}
-
-                            {/* FullScreenDropdown */}
-                            <FullScreenDropdown />
+                             <FullScreenDropdown />
 
                             {/* Dark/Light Mode set */}
                             <LightDark

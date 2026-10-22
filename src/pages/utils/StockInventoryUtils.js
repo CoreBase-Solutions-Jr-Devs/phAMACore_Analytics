@@ -1,137 +1,141 @@
-// DATE HELPERS
+import { cleanBranchName } from "../../helpers/branch_helper";
+import { getInclusiveDays } from "./dateHelper";
+import { pick, num } from "./apiRow";
 
-const formatToApiDate = (date) => {
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
-};
+// FETCH SIZES (0 = everything). Kept here so they are easy to tune against live data.
+export const CRITICAL_TOP_N = 0;      // Class A items only, so the full list stays small
+export const SLOW_MOVER_TOP_N = 500;  // ranked by capital tied up; the KPI card carries the full count
+export const IMBALANCE_TOP_N = 300;   // ranked by imbalance severity
 
-export const getTodayApi = () => formatToApiDate(new Date());
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-export const getNDaysAgoApi = (n) => {
-    const d = new Date();
-    d.setDate(d.getDate() - n);
-    return formatToApiDate(d);
-};
+/**
+ * Sales-velocity window for the stock health calls. It follows the date filter but never
+ * drops below 30 days: early in the month a Month-to-Date window would be a few days long
+ * and nearly every SKU would be classed as dead stock.
+ */
+export const getLookbackDays = (startDate, endDate) =>
+    Math.min(Math.max(getInclusiveDays(startDate, endDate), 30), 365);
 
 // KPI CARD METADATA
 
 export const KPI_META = [
-    { id: 1, label: "Total SKUs", subtitle: "Across all branches", icon: "ri-medicine-bottle-line text-primary", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 2, label: "Total Stock Value", subtitle: "KES - all branches", icon: "ri-money-dollar-circle-line text-success", decimals: 2, prefix: "KES ", suffix: "m", separator: "," },
-    { id: 3, label: "Items below Reorder Level", subtitle: "Need action now", icon: "ri-arrow-down-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 4, label: "Out of Stock Items", subtitle: "Units out of stock", icon: "ri-error-warning-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 5, label: "Near Expiry (\u2264 90 days)", subtitle: "Products at risk", icon: "ri-time-line text-danger", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 6, label: "Slow Movers (30d)", subtitle: "Below velocity threshold", icon: "ri-hourglass-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 7, label: "Overstocked Items", subtitle: ">120 days cover", icon: "ri-stack-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
-    { id: 8, label: "Branch Imbalances (> 20%)", subtitle: "Transfer candidates", icon: "ri-git-branch-line text-warning", decimals: 0, prefix: "", suffix: "", separator: "," },
+    { id: 3, label: "Items below Reorder Level", subtitle: "Below safety minimum" },
+    { id: 4, label: "Class A Items Out of Stock", subtitle: "Top revenue items at zero stock" },
+    { id: 5, label: "Near Expiry (≤ 90 days)", subtitle: "Products at risk" },
+    { id: 6, label: "Slow Movers & Dead Stock", subtitle: "Low velocity in the window" },
+    { id: 7, label: "Overstocked Items", subtitle: "> Target max cover" },
+    { id: 8, label: "Branch Imbalances (> 20%)", subtitle: "Transfer candidates" },
 ];
 
-// KPI COMPUTATION HELPERS
+export const getKPIMeta = ({ lookbackDays = 30, imbalanceCapped = false } = {}) =>
+    KPI_META.map((widget) => {
+        if (widget.id === 6) return { ...widget, subtitle: `Low or no sales in ${lookbackDays} days` };
+        if (widget.id === 8 && imbalanceCapped) return { ...widget, suffix: "+", subtitle: "Top transfer candidates" };
+        return widget;
+    });
 
-const OVERSTOCK_MULTIPLIER = 2;
-const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
-const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+// EXPIRY
 
-const parseExpiry = (val) => {
-    if (!val || typeof val !== "string" || !val.trim()) return null;
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d;
+export const EXPIRY_BUCKETS = [
+    { id: "expired", label: "Expired", action: "Quarantine / write off", color: "dark" },
+    { id: "0-30", label: "0 - 30 Days (Critical)", action: "Promote now", color: "danger" },
+    { id: "31-60", label: "31 - 60 Days (Warning)", action: "Transfer/Promote", color: "warning" },
+    { id: "61-90", label: "61 - 90 Days (Watch)", action: "Prioritise Sales", color: "info" },
+];
+
+const bucketFor = (days) => {
+    if (days < 0) return EXPIRY_BUCKETS[0];
+    if (days <= 30) return EXPIRY_BUCKETS[1];
+    if (days <= 60) return EXPIRY_BUCKETS[2];
+    return EXPIRY_BUCKETS[3];
 };
 
-// One row per item_code — whichever has the latest snapshot_date
-const latestRowPerItem = (rows) => {
-    const map = new Map();
-    for (const row of rows) {
-        const existing = map.get(row.item_code);
-        if (!existing || new Date(row.snapshot_date) > new Date(existing.snapshot_date))
-            map.set(row.item_code, row);
-    }
-    return Array.from(map.values());
-};
-
-export const computeKPIs = (stockRows = [], movementsRows = [], batchExpiryRows = []) => {
-    if (!stockRows.length) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
-
-    const items = latestRowPerItem(stockRows);
+/**
+ * Batches with stock on hand that have already expired or expire within 90 days.
+ * One row per batch, so the widgets, the table and the exports all reconcile.
+ */
+export const getExpiryRows = (batchRows = []) => {
     const today = new Date();
-    const in90d = new Date(today.getTime() + NINETY_DAYS_MS);
+    today.setHours(0, 0, 0, 0);
 
-    // Total SKUs
-    const totalSKUs = items.length;
+    return (Array.isArray(batchRows) ? batchRows : [])
+        .map((item) => {
+            const expiry = item?.expirydate ? new Date(item.expirydate) : null;
+            if (!expiry || isNaN(expiry.getTime())) return null;
+            expiry.setHours(0, 0, 0, 0);
 
-    // Total Stock Value (millions)
-    const totalStockValueM = items.reduce((sum, r) => sum + (Number(r.closing_value) || 0), 0) / 1_000_000;
+            const qty = num(pick(item, "qtyBal", "closing_qty"));
+            const daysRemaining = Math.round((expiry - today) / MS_PER_DAY);
+            if (qty <= 0 || daysRemaining > 90) return null;
 
-    // Below Reorder Level
-    const belowReorder = items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) < Number(r.reorder_level)).length;
+            const bucket = bucketFor(daysRemaining);
+            return {
+                code: pick(item, "invCode", "item_code") || "",
+                product: pick(item, "invName", "itemName", "item_name") || "",
+                batch: pick(item, "batchNo", "batch_no", "batch", "batchNumber", "lotNo") || "",
+                branch: cleanBranchName(pick(item, "branchName", "branch_name") || ""),
+                expiry,
+                daysRemaining,
+                qty,
+                value: num(pick(item, "costValue")),
+                bucket: bucket.id,
+                action: bucket.action,
+            };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.daysRemaining - b.daysRemaining);
+};
 
-    // Out of Stock
-    const outOfStock = items.filter(r => Number(r.closing_qty) <= 0).length;
+// TRANSFER SUGGESTIONS (PowerBIKPIStockHealth, GroupBy = IMBALANCES)
 
-    // Near Expiry
-    const nearExpiry = batchExpiryRows.reduce((count, item) => {
-        if (!item.expirydate) return count;
+const coverDays = (stock, sales, lookbackDays) =>
+    sales > 0 ? Math.round(Math.max(stock, 0) / (sales / lookbackDays)) : null;
 
-        const expiryDate = new Date(item.expirydate);
-        const daysToExpiry = Math.ceil(
-            (expiryDate - today) / (1000 * 60 * 60 * 24)
-        );
+export const buildTransferSuggestions = (imbalances = [], lookbackDays = 30) =>
+    (Array.isArray(imbalances) ? imbalances : []).map((row, index) => {
+        const deficit = String(row.imbalance_status || "").toUpperCase().includes("DEFICIT");
+        const stock = num(row.branch_stock);
+        const sales = num(row.branch_sales);
+        const qty = Math.abs(num(row.recommended_transfer_qty));
 
-        if (daysToExpiry >= 0 && daysToExpiry <= 90) {
-            return count + 1;
-        }
+        return {
+            id: `${row.item_code}-${row.branch_id}-${index}`,
+            itemCode: row.item_code || "",
+            product: row.item_name || row.item_code || "Unknown item",
+            group: row.item_group || "-",
+            branch: cleanBranchName(row.branch_name || `Branch ${row.branch_id ?? ""}`),
+            deficit,
+            stock,
+            sales,
+            stockShare: num(row.branch_stock_perc),
+            salesShare: num(row.branch_sales_perc),
+            gap: num(row.imbalance_gap_perc),
+            qty,
+            coverBefore: coverDays(stock, sales, lookbackDays),
+            coverAfter: coverDays(deficit ? stock + qty : stock - qty, sales, lookbackDays),
+            insight: [row.action_insight, row.network_context].filter(Boolean).join(" "),
+        };
+    });
 
-        return count;
-    }, 0);
+// KPI COMPUTATION
 
-    // Slow Movers
-    const slowMovers = (() => {
-        const slowItems = new Set();
+export const computeKPIs = (batchExpiryRows = [], stockHealth = [], imbalances = []) => {
+    const health = (Array.isArray(stockHealth) ? stockHealth[0] : stockHealth) || {};
+    const nearExpiry = new Set(
+        getExpiryRows(batchExpiryRows)
+            .filter((row) => row.daysRemaining >= 0)
+            .map((row) => row.code || row.product)
+    );
 
-        movementsRows.forEach((row) => {
-            if (!row.receive_date || !row.movement_date) return;
-
-            const receiveDate = new Date(row.receive_date);
-            const movementDate = new Date(row.movement_date);
-
-            const daysToMove =
-                (movementDate - receiveDate) / (1000 * 60 * 60 * 24);
-
-            if (daysToMove > 30) {
-                slowItems.add(row.item_Code || row.item_code);
-            }
-        });
-
-        return slowItems.size;
-    })();
-
-    // Overstocked
-    const overstocked = items.filter(r => Number(r.reorder_level) > 0 && Number(r.closing_qty) > OVERSTOCK_MULTIPLIER * Number(r.reorder_level)).length;
-
-    // Branch Imbalances (> 20% deviation from per-item network average)
-    const byItem = new Map();
-    for (const row of stockRows) {
-        if (!byItem.has(row.item_code)) byItem.set(row.item_code, []);
-        byItem.get(row.item_code).push(Number(row.closing_qty) || 0);
-    }
-    let branchImbalances = 0;
-    for (const qtys of byItem.values()) {
-        if (qtys.length < 2) continue;
-        const avg = qtys.reduce((a, b) => a + b, 0) / qtys.length;
-        if (avg > 0 && qtys.some(q => Math.abs(q - avg) / avg > 0.2)) branchImbalances++;
-    }
-
-    return { 
-        1: totalSKUs, 
-        2: totalStockValueM, 
-        3: belowReorder, 
-        4: outOfStock, 
-        5: nearExpiry, 
-        6: slowMovers, 
-        7: overstocked, 
-        8: branchImbalances 
+    return {
+        3: num(health.min_breached_skus),
+        // critical_stocked_out_skus is what the summary actually returns; the old
+        // out_of_stock_skus field never existed and fell back to the whole catalogue.
+        4: num(health.critical_stocked_out_skus),
+        5: nearExpiry.size,
+        6: num(health.slow_mover_skus) + num(health.dead_stock_skus),
+        7: num(health.overstocked_skus),
+        8: (imbalances || []).length,
     };
 };

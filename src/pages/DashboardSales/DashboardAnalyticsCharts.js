@@ -293,26 +293,36 @@ const ProgressiveSalesChart = ({
     chart: {
       height: 370,
       type: "line",
-      toolbar: { show: false },
-      // zoom: { enabled: false },
+      toolbar: {
+        show: false,
+      },
+      zoom: { enabled: true },
     },
 
     stroke: {
       curve: "smooth",
       width: 3,
+      dashArray: [0, 6], // 2026 solid, 2025 dashed
     },
 
     dataLabels: {
       enabled: false,
     },
 
-    colors,
+    // Same color for both years
+    colors: [colors[0], colors[0]],
+
+   legend: {
+  show: false,
+},
 
     xaxis: {
       categories,
-         axisTicks: {
+
+      axisTicks: {
         show: false,
       },
+
       axisBorder: {
         show: false,
       },
@@ -322,19 +332,11 @@ const ProgressiveSalesChart = ({
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
-      labels: {
-        formatter: (val) => formatAmount(val),
-      },
-      
-    },
 
-    // grid: {
-    //   yaxis: {
-    //     lines: {
-    //       show: true,
-    //     },
-    //   },
-    // },
+      labels: {
+  formatter: (val) =>
+          Number(val || 0).toLocaleString("en-KE"),      },
+    },
   };
 
   return (
@@ -429,58 +431,113 @@ const ProgressiveSalesChart = ({
 //     );
 // };
 
+
 const BranchPerformanceChart = ({
   dataColors,
   series = [],
   categories = [],
-  formatAmount,
+  trendData = [],
 }) => {
-  const chartDonutBasicColors =
-    getChartColorsArray(dataColors);
+    const chartColors = getChartColorsArray(dataColors);
+
+  const barData = series[0]?.data || [];
 
   const options = {
-    labels: categories,
-
     chart: {
-      height: 333,
-      type: "donut",
+      height: 350,
+      type: "line",
+      toolbar: {
+        show: false,
+      },
     },
 
-   legend: {
-  position: "bottom",
-  formatter: (seriesName, opts) => {
-    const value = opts.w.globals.series[opts.seriesIndex];
-    return `${seriesName}: ${formatAmount(value)}`;
-  },
-},
+    legend: {
+      show: false,
+      position: "top",
+    },
+
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "70%",
+        borderRadius: 0,
+        distributed: false,
+      },
+    },
 
     stroke: {
-      show: false,
+      width: [0, 3],
+      curve: "straight",
+      dashArray: [0, 5],
     },
 
     dataLabels: {
-      enabled: true,
-      formatter: (val) => `${formatAmount(val)}`,
-      dropShadow: {
-        enabled: false,
+      enabled: false,
+    },
+
+    // markers: {
+    //   size: [0, 4],
+    // },
+
+xaxis: {
+  categories,
+  labels: {
+    rotate: -45,
+    rotateAlways: true,
+    trim: false,
+    hideOverlappingLabels: false,
+    minHeight: 100,
+    maxHeight: 160,
+    style: {
+      fontSize: "10px",
+    },
+  },
+},
+
+    yaxis: {
+      title: {
+        text: "Revenue (KES)",
+      },
+      labels: {
+        formatter: (value) =>
+          Number(value || 0).toLocaleString("en-KE"),
       },
     },
 
     tooltip: {
+      shared: true,
+      intersect: false,
       y: {
-        formatter: (val) => `${formatAmount(val)}`,
+        formatter: (value) =>
+          `KES ${Number(value || 0).toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
       },
     },
 
-    colors: chartDonutBasicColors,
+    colors: [chartColors[0], chartColors[0] ],
   };
+
+  const mixedSeries = [
+    {
+      name: "Revenue",
+      type: "bar",
+      data: barData,
+    },
+    {
+      name: "Revenue Trend",
+      type: "line",
+      data: trendData.length ? trendData : barData,
+    },
+  ];
 
   return (
     <ReactApexChart
       options={options}
-      series={series}
-      type="donut"
-      height={333}
+      series={mixedSeries}
+      type="line"
+      height={350}
     />
   );
 };
@@ -497,7 +554,7 @@ const MonthToDateSalesChart = ({
     chart: {
       height: 350,
       type: "line",
-      zoom: { enabled: false },
+      zoom: { enabled: true },
       toolbar: { show: false },
     },
 
@@ -508,9 +565,15 @@ const MonthToDateSalesChart = ({
     stroke: {
       curve: "smooth",
       width: 3,
+      dashArray: [0, 6], // 2026 solid, 2025 dashed
     },
 
-    colors,
+    // Same color for both lines
+    colors: [colors[0], colors[0]],
+
+   legend: {
+  show: false,
+},
 
     xaxis: {
       categories,
@@ -520,8 +583,10 @@ const MonthToDateSalesChart = ({
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
+
       labels: {
-        formatter: (val) => formatAmount(val),
+        formatter: (val) =>
+          Number(val || 0).toLocaleString("en-KE"),
       },
     },
   };

@@ -1,92 +1,215 @@
 import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const ReceivablesAgeing = () => {
+const ReceivablesAgeing = ({
+  kpiOverdueAccounts = [],
+  topDebtors = [],
+  formatAmount,
+  currentReceivables,
+  overdue1To30,
+  overdue31To60,
+  overdue61To90,
+  overdue91To120,
+  overdue120Plus,
+  error,
+  loading,
+}) => {
+  const hasReceivablesData =
+    Number(currentReceivables ?? 0) > 0 ||
+    Number(overdue1To30 ?? 0) > 0 ||
+    Number(overdue31To60 ?? 0) > 0 ||
+    Number(overdue61To90 ?? 0) > 0 ||
+    Number(overdue91To120 ?? 0) > 0 ||
+    Number(overdue120Plus ?? 0) > 0;
+
+  const handleExportExcel = () => {
+    const rows = [
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "Current (0-30 days)",
+        "Amount (KES)": Number(currentReceivables || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        ),
+      },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "31–60 days",
+        "Amount (KES)": Number(overdue31To60 || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "61–90 days",
+        "Amount (KES)": Number(overdue61To90 || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "91–120 days",
+        "Amount (KES)": Number(overdue91To120 || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      },
+      {
+        Category: "Aging Summary",
+        "Item / Customer": "120+ days",
+        "Amount (KES)": Number(overdue120Plus || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      },
+      ...(topDebtors || []).map((d) => ({
+        Category: "Top Debtor",
+        "Item / Customer": d.name || "",
+        "Amount (KES)": Number(d.amount || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }),
+      })),
+    ];
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Receivables_Ageing_Sales_${todayStr}`);
+  };
+
   return (
     <React.Fragment>
-      <Card className="card-height-100 ">
-        <CardHeader className="align-items-center d-flex border-0">
+      <Card className="card-height-100" id="sales-receivables-ageing-card">
+       <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
           <h4 className="card-title mb-0 flex-grow-1">
             Receivables ageing (KES '000)
           </h4>
+          <CardExportButtons
+            targetId="sales-receivables-ageing-card"
+            title="Receivables Ageing"
+            onExport={handleExportExcel}
+          />
         </CardHeader>
 
         <CardBody>
-          <div className="row g-3 mb-2">
-            <div className="col-6 col-md-3 col-sm-6">
-              <div className="rounded-3 p-3 text-center bg-success-subtle">
-                <p className="text-success fw-semibold mb-1 small">
-                  <small>Current</small>
-                </p>
-
-                <h4 className="mb-0 text-success fw-bold">{/* 2,840 */}</h4>
-              </div>
+          {loading ? (
+            <div className="text-center py-5">
+              <div
+                className="spinner-border text-primary mb-3"
+                role="status"
+              ></div>
             </div>
-
-            <div className="col-6 col-md-3 col-sm-6">
-              <div className="rounded-3 p-3 text-center bg-primary-subtle">
-                <p className="text-primary fw-semibold mb-1 small">
-                  <small>1–30 days</small>
-                </p>
-
-                <h4 className="mb-0 text-primary fw-bold">{/* 1,920 */}</h4>
-              </div>
+          ) : error ? (
+            <div className="text-center py-5">
+              <h6 className="text-danger mb-2">{error} </h6>
             </div>
-
-            <div className="col-6 col-md-3 col-sm-6">
-              <div className="rounded-3 p-3 text-center bg-warning-subtle">
-                <p className="text-warning fw-semibold mb-1 small">
-                  <small>31–60 days</small>
-                </p>
-
-                <h4 className="mb-0 text-warning fw-bold">{/* 2,110 */}</h4>
-              </div>
+          ) : !hasReceivablesData && topDebtors.length === 0 ? (
+            <div className="text-center py-5">
+              <p className="text-muted mb-2">No receivables data available</p>
             </div>
+          ) : (
+            <>
+              <div className="row g-2 mb-1">
+                <div className="col-6 col-md-4 col-sm-6">
+                  <div className="rounded-3 text-center bg-success-subtle p-2">
+                    <p className="text-success fw-semibold mb-1 small">
+                      <small>Current</small>
+                    </p>
+                    <h6 className="mb-0 text-success fw-bold">
+                      <small>
+                        {Number(currentReceivables).toLocaleString("en-KE")}
+                      </small>
+                    </h6>
+                  </div>
+                </div>
 
-            <div className="col-6 col-md-3 col-sm-6">
-              <div className="rounded-3 p-3 text-center bg-danger-subtle">
-                <p className="text-danger fw-semibold mb-1 small">
-                  <small>60+ days</small>
-                </p>
+                {/* <div className="col-6 col-md-4 col-sm-6">
+                  <div className="rounded-3 text-center bg-primary-subtle p-2">
+                    <p className="text-primary fw-semibold mb-1 small">
+                      <small>1–30 days</small>
+                    </p>
+                    <h6 className="mb-0 text-primary fw-bold">
+                      {formatAmount(overdue1To30)}
+                    </h6>
+                  </div>
+                </div> */}
 
-                <h4 className="mb-0 text-danger fw-bold">{/* 1,530 */}</h4>
+                <div className="col-6 col-md-4 col-sm-6">
+                  <div className="rounded-3 text-center bg-warning-subtle p-2">
+                    <p className="text-warning fw-semibold mb-1 small">
+                      <small>31–60 days</small>
+                    </p>
+                    <h6 className="mb-0 text-warning fw-bold">
+                      <small>
+                        {Number(overdue31To60).toLocaleString("en-KE")}
+                      </small>
+                    </h6>
+                  </div>
+                </div>
+
+                <div className="col-6 col-md-4 col-sm-6">
+                  <div className="rounded-3 text-center bg-danger-subtle p-2">
+                    <p className="text-danger fw-semibold mb-1 small">
+                      <small>61–90 days</small>
+                    </p>
+                    <h6 className="mb-0 text-danger fw-bold">
+                      <small>
+                        {Number(overdue61To90).toLocaleString("en-KE")}
+                      </small>
+                    </h6>
+                  </div>
+                </div>
+
+                <div className="col-6 col-md-4 col-sm-6">
+                  <div className="rounded-3 text-center bg-info-subtle p-2">
+                    <p className="text-info fw-semibold mb-1 small">
+                      <small>91–120 days</small>
+                    </p>
+                    <h6 className="mb-0 text-info fw-bold">
+                      <small>
+                        {Number(overdue91To120).toLocaleString("en-KE")}
+                      </small>
+                    </h6>
+                  </div>
+                </div>
+
+                <div className="col-6 col-md-4 col-sm-6">
+                  <div className="rounded-3 text-center bg-info-subtle p-2">
+                    <p className="text-info fw-semibold mb-1 small">
+                      <small>120+ days</small>
+                    </p>
+                    <h6 className="mb-0 text-info fw-bold">
+                      <small>
+                        {Number(overdue120Plus).toLocaleString("en-KE")}
+                      </small>
+                    </h6>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div className="mt-4">
-            <h5 className="fw-semibold  mb-3">Top debtors</h5>
+              <div>
+                <h5 className="fw-semibold mb-2">Top debtors</h5>
 
-            {/* <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-                            <span className="text-muted">
-                                Pharma Plus Nrb
-                            </span>
+                {topDebtors.length === 0 ? (
+                  <div className="text-center py-4">
+                    <h6 className="text-muted mb-1">
+                      No debtor data available
+                    </h6>
+                  </div>
+                ) : (
+                  topDebtors.map((debtor, index) => (
+                    <div
+                      key={index}
+                      className="d-flex justify-content-between align-items-center p-2 border-bottom"
+                    >
+                      <span className="text-muted">{debtor.name}</span>
 
-                            <span className="badge bg-danger-subtle text-danger px-3 py-2">
-                                KES 480K
-                            </span>
-                        </div>
-
-                        <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-                            <span className="text-muted">
-                                MedCare Mombasa
-                            </span>
-
-                            <span className="badge bg-warning-subtle text-warning px-3 py-2">
-                                KES 312K
-                            </span>
-                        </div>
-
-                        <div className="d-flex justify-content-between align-items-center py-2">
-                            <span className="text-muted">
-                                Rift Valley Disp.
-                            </span>
-
-                            <span className="badge bg-primary-subtle text-primary px-3 py-2">
-                                KES 267K
-                            </span>
-                        </div> */}
-          </div>
+                      <span className="badge bg-danger-subtle text-danger">
+                        {Number(debtor.amount).toLocaleString("en-KE")}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
+          )}
         </CardBody>
       </Card>
     </React.Fragment>

@@ -2,8 +2,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import {
   loginUserAPI,
-  logoutUserAPI,
-  
 } from "../../../helpers/fakebackend_helper";
 import { setAuthorization } from "../../../helpers/api_helper";
 
@@ -12,14 +10,9 @@ export const loginUser = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await loginUserAPI(data);
+      const authUser = response.data;
 
-      const authUser = response.data.response;
-
-      sessionStorage.setItem(
-        "authUser",
-        JSON.stringify(authUser)
-      );
-
+      localStorage.setItem( "authUser", JSON.stringify(authUser));
       setAuthorization(authUser.token);
 
       return authUser;
@@ -37,34 +30,11 @@ export const loginUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk(
   "login/logoutUser",
-  async (_, { rejectWithValue }) => {
-    try {
-      const authUser = JSON.parse(
-        sessionStorage.getItem("authUser")
-      );
+  async () => {
+    localStorage.removeItem("authUser");
+    setAuthorization(null);
 
-      const token = authUser?.token;
-
-      if (token) {
-        await logoutUserAPI(token);
-      }
-
-      sessionStorage.removeItem("authUser");
-      setAuthorization(null);
-
-      return true;
-
-    } catch (error) {
-      // Even if API fails, clear local session
-      sessionStorage.removeItem("authUser");
-      setAuthorization(null);
-
-      return rejectWithValue(
-        error?.response?.data?.detail ||
-        error.message ||
-        "Logout failed"
-      );
-    }
+    return true;
   }
 );
 

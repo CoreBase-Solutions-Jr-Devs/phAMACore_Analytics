@@ -1,22 +1,51 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getSalesTransactions, getMonthlySales, getMonthToDateSales } from "./thunk";
+import {
+  getSalesTransactions,
+  getMonthlySales,
+  getMonthToDateSales,
+  getLastYearMonthToDateSales,
+  getLastYearMonthlySales,
+  getKPISalesTransactions,
+  getKPIOverdueAccounts,
+ 
+  getSalesTarget,
+} from "./thunk";
 
-  const formatDMY = (date) =>
-  date.toLocaleDateString("en-GB");
-  
+const formatDMY = (date) => date.toLocaleDateString("en-GB");
+
 const initialState = {
   sales: [],
-    monthlySales: [],
+  monthlySales: [],
   monthToDateSales: [],
+  lastYearMonthToDateSales: [],
+  lastYearMonthlySales: [],
   branches: [],
+  kpiSales: [],
+  kpiOverdueAccounts: [],
+
+  salesSummary: [],
+  salesBranch: [],
+  salesBranch_Type: [],
+  salesChannel: [],
+  salesComparativeYTD: [],
+  salesComparativeMTD: [],
+  salesMonthly: [],
+  salesDaily: [],
+
+
+
+
+
+
   loading: false,
   error: null,
 
   filters: {
-    branch: null,
+    branchcode: "",
     dateRange: "Today",
-   startDate: new Date().toLocaleDateString("en-GB"),
-endDate: new Date().toLocaleDateString("en-GB"),
+    startDate: new Date().toLocaleDateString("en-GB"),
+    endDate: new Date().toLocaleDateString("en-GB"),
+   
   },
 };
 
@@ -59,88 +88,110 @@ const powerBISlice = createSlice({
         //   break;
         // }
 
-  case "This Week": {
-  const today = new Date();
+        case "This Week": {
+          const today = new Date();
 
-  const start = new Date(today);
-  start.setDate(today.getDate() - today.getDay());
+          const start = new Date(today);
+          start.setDate(today.getDate() - today.getDay());
 
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
+          const end = new Date(start);
+          end.setDate(start.getDate() + 6);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(end);
-  break;
-}
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
 
-case "Last Week": {
-  const today = new Date();
+        case "Last Week": {
+          const today = new Date();
 
-  const currentWeekStart = new Date(today);
-  currentWeekStart.setDate(today.getDate() - today.getDay());
+          const currentWeekStart = new Date(today);
+          currentWeekStart.setDate(today.getDate() - today.getDay());
 
-  const start = new Date(currentWeekStart);
-  start.setDate(currentWeekStart.getDate() - 7);
+          const start = new Date(currentWeekStart);
+          start.setDate(currentWeekStart.getDate() - 7);
 
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
+          const end = new Date(start);
+          end.setDate(start.getDate() + 6);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(end);
-  break;
-}
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
 
-case "This Month": {
-  const today = new Date();
+        case "This Month": {
+          const today = new Date();
 
-  const start = new Date(today.getFullYear(), today.getMonth(), 1);
+          const start = new Date(today.getFullYear(), today.getMonth(), 1);
 
-  const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+          const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(end);
-  break;
-}
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
 
-case "Last Month": {
-  const today = new Date();
+        case "Last Month": {
+          const today = new Date();
 
-  const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+          const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
 
-  const end = new Date(today.getFullYear(), today.getMonth(), 0);
+          const end = new Date(today.getFullYear(), today.getMonth(), 0);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(end);
-  break;
-}
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
 
-case "This Year": {
-  const today = new Date();
+        case "This Year": {
+          const today = new Date();
 
-  const start = new Date(today.getFullYear(), 0, 1);
+          const start = new Date(today.getFullYear(), 0, 1);
 
-  const end = new Date(today.getFullYear(), 11, 31);
+          const end = new Date(today.getFullYear(), 11, 31);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(end);
-  break;
-}
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
 
-case "Last Year": {
-  const today = new Date();
+        case "Last Year": {
+          const today = new Date();
 
-  const start = new Date(today.getFullYear() - 1, 0, 1);
+          const start = new Date(today.getFullYear() - 1, 0, 1);
 
-  const end = new Date(today.getFullYear() - 1, 11, 31);
+          const end = new Date(today.getFullYear() - 1, 11, 31);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(end);
-  break;
-}
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
 
-case "Custom":
-  state.filters.dateRange = "Custom";
-  break;
+        case "Month To Date": {
+          const today = new Date();
+
+          const start = new Date(today.getFullYear(), today.getMonth(), 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(today);
+
+          break;
+        }
+
+        case "Year To Date": {
+          const today = new Date();
+
+          const start = new Date(today.getFullYear(), 0, 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(today);
+
+          break;
+        }
+
+        case "Custom":
+          state.filters.dateRange = "Custom";
+          break;
       }
     },
 
@@ -151,81 +202,240 @@ case "Custom":
     setEndDate: (state, action) => {
       state.filters.endDate = action.payload;
     },
-    clearSalesData: (state) => {
-  state.sales = [];
-  // state.monthlySales = [];
-  // state.monthToDateSales = [];
-  // state.branches = [];
-  state.loading = false;
-  state.error = null;
 
-  state.filters = {
-    branch: null,
-   dateRange: "Today",
-   startDate: new Date().toLocaleDateString("en-GB"),
-endDate: new Date().toLocaleDateString("en-GB"),
-  };
-},
+    setGroupBy: (state, action) => {
+      state.filters.groupBy = action.payload;
+    },
+
+    clearSalesData: () => initialState,
   },
 
   extraReducers: (builder) => {
     builder
+
+      // ------------------------------------------
+      // SALES TRANSACTIONS
+      // ------------------------------------------
+
       .addCase(getSalesTransactions.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
 
- 
-    .addCase(getSalesTransactions.fulfilled, (state, action) => {
-  state.loading = false;
+      .addCase(getSalesTransactions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-  const data = action.payload?.result || action.payload || [];
-  state.sales = data;
+        const data = action.payload?.result || action.payload || [];
 
-  const map = {};
+        state.sales = data;
+      })
 
-  data.forEach((item) => {
-    const code = item.branch_ID;
-    const name = item.brancch_Name;
-
-    if (code == null) return;
-
-    map[code] = {
-      branchCode: code,
-      branchName: name,
-    };
-  });
-
-  state.branches = Object.values(map);
-})
-
-.addCase(getMonthlySales.fulfilled, (state, action) => {
-  state.monthlySales = action.payload?.result || action.payload || [];
-})
-
-// MONTH TO DATE
-.addCase(getMonthToDateSales.fulfilled, (state, action) => {
-  state.monthToDateSales = action.payload?.result || action.payload || [];
-})
-
-      
-.addCase(getSalesTransactions.rejected, (state, action) => {
+      .addCase(getSalesTransactions.rejected, (state, action) => {
         state.loading = false;
         state.error =
-          action.payload?.message || action.error.message || "Error loading data";
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading sales transactions";
+      })
+
+      // ------------------------------------------
+      // KPI SALES TRANSACTIONS
+      // ------------------------------------------
+
+      .addCase(getKPISalesTransactions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getKPISalesTransactions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        const groupBy = action.meta.arg?.groupBy;
+        const result = action.payload?.result || action.payload || [];
+
+        // Store the latest KPI sales result
+        state.KPISales = result;
+
+        switch (groupBy) {
+          case "TYPE":
+            state.salesType = result;
+            break;
+
+          case "BRANCH":
+            state.salesBranch = result;
+            break;
+
+          case "BRANCH_TYPE":
+            state.salesBranch_Type = result;
+            break;
+
+          case "CHANNEL":
+            state.salesChannel = result;
+            break;
+
+          case "COMPARATIVE_YTD":
+            state.salesComparativeYTD = result;
+            break;
+
+          case "COMPARATIVE_MTD":
+            state.salesComparativeMTD = result;
+            break;
+
+          case "MONTHLY":
+            state.salesMonthly = result;
+            break;
+
+          case "DAILY":
+            state.salesDaily = result;
+            break;
+
+          default:
+            break;
+        }
+      })
+
+      .addCase(getKPISalesTransactions.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading KPI sales transactions";
+      })
+
+      // ------------------------------------------
+      // MONTHLY SALES
+      // ------------------------------------------
+
+      .addCase(getMonthlySales.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getMonthlySales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        state.monthlySales = action.payload?.result || action.payload || [];
+      })
+
+      .addCase(getMonthlySales.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading monthly sales";
+      })
+
+      // ------------------------------------------
+      // LAST YEAR MONTHLY SALES
+      // ------------------------------------------
+
+      .addCase(getLastYearMonthlySales.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getLastYearMonthlySales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        state.lastYearMonthlySales =
+          action.payload?.result || action.payload || [];
+      })
+
+      .addCase(getLastYearMonthlySales.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading last year monthly sales";
+      })
+
+      // ------------------------------------------
+      // MONTH TO DATE SALES
+      // ------------------------------------------
+
+      .addCase(getMonthToDateSales.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getMonthToDateSales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        state.monthToDateSales = action.payload?.result || action.payload || [];
       })
 
       .addCase(getMonthToDateSales.rejected, (state, action) => {
         state.loading = false;
         state.error =
-          action.payload?.message || action.error.message || "Error loading data";
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading month-to-date sales";
       })
 
-         .addCase(getMonthlySales.rejected, (state, action) => {
+      // ------------------------------------------
+      // LAST YEAR MONTH TO DATE SALES
+      // ------------------------------------------
+
+      .addCase(getLastYearMonthToDateSales.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getLastYearMonthToDateSales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        state.lastYearMonthToDateSales =
+          action.payload?.result || action.payload || [];
+      })
+
+      .addCase(getLastYearMonthToDateSales.rejected, (state, action) => {
         state.loading = false;
         state.error =
-          action.payload?.message || action.error.message || "Error loading data";
-      });
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading last year month-to-date sales";
+      })
+
+      // ------------------------------------------
+      // KPI OVERDUE ACCOUNTS
+      // ------------------------------------------
+
+      .addCase(getKPIOverdueAccounts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        state.kpiOverdueAccounts =
+          action.payload?.result || action.payload || [];
+      })
+
+      .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading overdue accounts";
+      })
+
+  
+;
   },
 });
 
@@ -235,7 +445,7 @@ export const {
   setDateRange,
   setStartDate,
   setEndDate,
-    clearSalesData,
+  clearSalesData,
 } = powerBISlice.actions;
 
 export default powerBISlice.reducer;

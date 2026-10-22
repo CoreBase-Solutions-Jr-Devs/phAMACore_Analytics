@@ -43,7 +43,6 @@ const Login = (props) => {
     loading: state.Login.loading,
     errorMsg: state.Login.errorMsg,
   }));
-  // Inside your component
   const { user, error, loading, errorMsg } = useSelector(loginpageData);
 
   const [userLogin, setUserLogin] = useState({});
@@ -60,45 +59,52 @@ const Login = (props) => {
           ? ""
           : user.confirm_password;
       setUserLogin({
-        username: updatedUserData,
+        userName: updatedUserData,
         password: updatedUserPassword,
       });
     }
   }, [user]);
 
   const validation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
     initialValues: {
-      username: userLogin.username || "",
+      userName: userLogin.userName || "",
       password: userLogin.password || "",
+      clientPin: 0,
+      long: "",
+      latt: "",
+      machineCookie: "",
+      ipLocation: "",
     },
     validationSchema: Yup.object({
-      username: Yup.string().required("Please Enter Your Username"),
+      userName: Yup.string().required("Please Enter Your Username"),
       password: Yup.string().required("Please Enter Your Password"),
     }),
 
- onSubmit: async (values) => {
-  const payload = {
-    user: {
-      cusCode: values.username,
-      password: values.password,
+    onSubmit: async (values) => {
+      const payload = {
+          userName: values.userName,
+          password: values.password,
+          clientPin: Number(values.clientPin) || 0,
+          long: values.long || "",
+          latt: values.latt || "",
+          machineCookie: values.machineCookie || "",
+          ipLocation: values.ipLocation || "",
+      };
+
+      try {
+        const authUser = await dispatch(loginUser(payload)).unwrap();
+
+        if (authUser.requirePasswordChange) {
+          navigate("/change-password");
+        } else {
+          navigate("/dashboard");
+        }
+      } catch (error) {
+        console.error(error);
+      }
     },
-  };
-
-  try {
-    const authUser = await dispatch(loginUser(payload)).unwrap();
-
-    if (authUser.requirePasswordChange) {
-      navigate("/change-password");
-    } else {
-      navigate("/dashboard-my-business");
-    }
-  } catch (error) {
-    console.error(error);
-  }
-},
   });
 
   const signIn = (type) => {
@@ -123,28 +129,28 @@ const Login = (props) => {
   document.title = "Login | phAMACore Analytics - Admin Dashboards";
   return (
     <React.Fragment>
- <ParticlesAuth>
-  <div className="auth-page-content py-5">
-    <Container >
-      <Row className="justify-content-center">
-      <Col md={8} lg={6} xl={5}>
-      <Card className="shadow-sm p-2">
-  <CardBody >
-    <div className="text-center ">
-      <Link to="/" className="d-block auth-logo">
-        <img
-          src={phamacoreCloud}
-          alt="phAMACore"
-          style={{ height: "80px" }}
-        />
-      </Link>
+      <ParticlesAuth>
+        <div className="auth-page-content py-5">
+          <Container >
+            <Row className="justify-content-center">
+              <Col md={8} lg={6} xl={5}>
+                <Card className="shadow-sm p-2">
+                  <CardBody>
+                    <div className="text-center ">
+                      <Link to="/" className="d-block auth-logo">
+                        <img
+                          src={phamacoreCloud}
+                          alt="phAMACore"
+                          style={{ height: "80px" }}
+                        />
+                      </Link>
 
-      <h5 className="fw-medium mb-2">Welcome Back!</h5>
+                      <h5 className="fw-medium mb-2">Welcome Back!</h5>
 
-      <p className="text-muted mb-0">
-        Please enter your credentials to sign in!
-      </p>
-    </div>
+                      <p className="text-muted mb-0">
+                        Please enter your credentials to sign in!
+                      </p>
+                    </div>
                     {error && error ? (
                       <Alert color="danger"> {error} </Alert>
                     ) : null}
@@ -158,28 +164,27 @@ const Login = (props) => {
                         action="#"
                       >
                         <div className="mb-3">
-                          <Label htmlFor="username" className="form-label">
+                          <Label htmlFor="userName" className="form-label">
                             Customer ID
                           </Label>
                           <Input
-                            name="username"
+                            name="userName"
+                            id="userName"
                             className="form-control"
                             placeholder="Enter username"
                             type="username"
                             onChange={validation.handleChange}
                             onBlur={validation.handleBlur}
-                            value={validation.values.username || ""}
+                            value={validation.values.userName|| ""}
                             invalid={
-                              validation.touched.username &&
-                              validation.errors.username
-                                ? true
-                                : false
+                              validation.touched.userName &&
+                              Boolean(validation.errors.userName)
                             }
                           />
-                          {validation.touched.username &&
-                          validation.errors.username ? (
+                          {validation.touched.userName &&
+                            validation.errors.userName ? (
                             <FormFeedback type="invalid">
-                              {validation.errors.username}
+                              {validation.errors.userName}
                             </FormFeedback>
                           ) : null}
                         </div>
@@ -210,13 +215,13 @@ const Login = (props) => {
                               onBlur={validation.handleBlur}
                               invalid={
                                 validation.touched.password &&
-                                validation.errors.password
+                                  validation.errors.password
                                   ? true
                                   : false
                               }
                             />
                             {validation.touched.password &&
-                            validation.errors.password ? (
+                              validation.errors.password ? (
                               <FormFeedback type="invalid">
                                 {validation.errors.password}
                               </FormFeedback>

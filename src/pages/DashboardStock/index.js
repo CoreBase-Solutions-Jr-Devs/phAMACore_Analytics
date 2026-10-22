@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
@@ -12,21 +13,70 @@ import CustomTableOne from './Tables/Custom/CustomTableOne';
 
 import {
     fetchBatchExpiryNeo,
-    fetchDailyClosingStock,
-    fetchStockMovements
+    fetchBranches,
+    fetchKPICriticalStockouts,
+    fetchKPIImbalances,
+    fetchKPISalesTransactions,
+    fetchKPISlowMovingStock,
+    fetchKPIStockHealth,
+    fetchKPITotalStockValueByBranch,
 } from '../../slices/dashboardStock/thunk';
+import { setBranch } from '../../slices/dashboardStock/reducer';
+import { resolveBranchName, saveActiveBranch, cleanBranchName } from '../../helpers/branch_helper';
 
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
 import ImbalanceAlerts from './components/ImbalanceAlerts';
-
+import Section from './Section';
 import FilterActions from './FilterActions';
+
+import { exportToExcel } from '../../helpers/export_helper';
+import CardExportButtons from '../../Components/Common/CardExportButtons';
+import { transformStockVsSalesVelocity, getPeriodDays } from './Charts/Custom/util/chartTransforms';
+import { suggestedOrderQty } from './components/CriticalStockChart';
+import {
+    buildTransferSuggestions,
+    getExpiryRows,
+    getLookbackDays,
+    CRITICAL_TOP_N,
+    IMBALANCE_TOP_N,
+    SLOW_MOVER_TOP_N,
+} from '../utils/StockInventoryUtils';
+import { addDaysApi } from '../utils/dateHelper';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortAscending, setSortAscending] = useState(true);
+
+    const [imbalanceSearchTerm, setImbalanceSearchTerm] = useState("");
+    const [imbalanceSortAscending, setImbalanceSortAscending] = useState(true);
+
     const dispatch = useDispatch();
-    const { stockMovements = [] } = useSelector((state) => state.StockInventory);
+    const navigate = useNavigate();
+    const { branchId } = useParams();
+
+    const branchCode = branchId ? Number(branchId) : null;
+    const isBranchView = !!branchCode;
+
+    const {
+        batchExpiryNeo = [],
+        branches = [],
+        criticalStockouts = [],
+        totalStockValueByBranch = [],
+        kpiSalesTransactions = [],
+        kpiSalesPeriodDays = 1,
+        slowMovingStock = [],
+        imbalances = [],
+        filters = {},
+    } = useSelector((state) => state.StockInventory ?? {});
+
+    const branchDisplayName = isBranchView
+        ? cleanBranchName(resolveBranchName(branchCode, branches))
+        : "";
+
+    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
 
     const [rightColumn, setRightColumn] = useState(false);
 
@@ -34,60 +84,199 @@ const DashboardStock = () => {
         setRightColumn(prev => !prev);
     };
 
-    const { filters } = useSelector((state) => state.StockInventory);
     const formatDisplay = (date) => date || "";
 
-    const handleApplyFilters = () => {
-        const payload = {
+    // Sync URL branchId into Redux state and persist active branch when URL changes
+    useEffect(() => {
+        dispatch(setBranch(branchCode));
+        if (branchCode) {
+            saveActiveBranch("stock", branchCode);
+        }
+    }, [dispatch, branchCode]);
+
+    // Fetch branches once on mount
+    useEffect(() => {
+        dispatch(fetchBranches({ clientid: 1 }));
+    }, [dispatch]);
+
+    // Stock position: live figures that only depend on the branch, not on the date filter.
+    useEffect(() => {
+        const branchcode = branchCode || null;
+
+        dispatch(fetchKPITotalStockValueByBranch({ clientid: 1, whichcost: 1, branchcode }));
+
+        // Expiry is a fixed window around today (expired in the last 12 months up to 90 days
+        // ahead). It used to take the dashboard date range, so a one-day filter returned nothing.
+        dispatch(fetchBatchExpiryNeo({
             clientid: 1,
-            branchcode: filters.branch ?? null,
-            startDate: filters.startDate,
-            endDate: filters.endDate,
+            branchcode,
+            startDate: addDaysApi(-365),
+            endDate: addDaysApi(90),
+        }));
+    }, [dispatch, branchCode]);
+
+    // Movement-based figures: follow the branch and the date filter.
+    // The per-line closing stock and stock movement downloads were dropped: the stock health
+    // endpoint already returns the KPIs and transfer suggestions that were derived from them.
+    useEffect(() => {
+        const health = {
+            clientid: 1,
+            branchcode: branchCode || null,
+            LookbackDays: lookbackDays,
+            AsOfDate: filters.endDate,
         };
 
-        dispatch(fetchDailyClosingStock(payload));
-        dispatch(fetchStockMovements(payload));
-        dispatch(fetchBatchExpiryNeo(payload));
+        dispatch(fetchKPIStockHealth(health));
+        dispatch(fetchKPICriticalStockouts({ ...health, GroupBy: "CRITICAL_STOCKOUTS", TopN: CRITICAL_TOP_N }));
+        dispatch(fetchKPISlowMovingStock({ ...health, GroupBy: "SLOW_MOVERS", TopN: SLOW_MOVER_TOP_N }));
+        dispatch(fetchKPIImbalances({ ...health, TopN: IMBALANCE_TOP_N }));
+        dispatch(fetchKPISalesTransactions({
+            clientid: 1,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+            GroupBy: "BRANCH",
+            branchcode: branchCode || null,
+        }));
+    }, [dispatch, branchCode, filters.startDate, filters.endDate, lookbackDays]);
 
-        setRightColumn(false);
+    const periodDays = useMemo(() => {
+        if (kpiSalesPeriodDays && kpiSalesPeriodDays > 1) {
+            return kpiSalesPeriodDays;
+        }
+        if (filters?.startDate && filters?.endDate) {
+            return getPeriodDays(filters.startDate, filters.endDate);
+        }
+        return 1;
+    }, [kpiSalesPeriodDays, filters?.startDate, filters?.endDate]);
+
+    const handleExportCriticalStock = () => {
+        const rows = (criticalStockouts || []).map((item) => ({
+            "Item Name": item.item_name || "Unknown",
+            "Item Code": item.item_code || "",
+            "Category / Group": item.item_group || "-",
+            "Branch": cleanBranchName(item.branch_name || item.branchName || ""),
+            "Current Stock": Number(item.current_stock_qty ?? 0).toLocaleString(),
+            "Min Reorder Qty": Number(item.effective_min_qty ?? item.branch_min_qty ?? 0).toLocaleString(),
+            "ABC Class": item.abc_class || "-",
+            "Monthly Demand": Number(item.monthly_demand ?? 0).toLocaleString(),
+            "Days of Inventory": item.days_of_inventory !== undefined ? Number(item.days_of_inventory) : "-",
+            "Suggested Order Qty (estimate)": suggestedOrderQty(item).toLocaleString(),
+            "Risk Status": item.stockout_risk_status || (Number(item.days_of_inventory ?? 0) <= 6 ? "CRITICAL" : "REORDER"),
+            "Action Insight": item.action_insight || "-",
+        }));
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `Critical_Stock_Levels_${todayStr}`);
     };
 
-    // Load with filters
-    useEffect(() => {
+    const handleExportStockValueByBranch = () => {
+        const rows = (totalStockValueByBranch || []).map((item) => {
+            const rawBranch = item.branch_name || item.branchName || `Branch ${item.branch_id ?? ""}`;
+            const branch = cleanBranchName(rawBranch);
+            const rawVal = Number(item.total_stock_value || 0);
+            return {
+                "Branch": branch,
+                "Stock Value (KES)": rawVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                "Stock Value (M KES)": Number((rawVal / 1000000).toFixed(2)),
+            };
+        });
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `Stock_Value_By_Branch_${todayStr}`);
+    };
+
+    const handleExportStockVelocity = () => {
+        const velocityData = transformStockVsSalesVelocity(totalStockValueByBranch, kpiSalesTransactions, periodDays);
+        const rows = (velocityData.categories || []).map((branch, idx) => ({
+            "Branch": branch,
+            "Stock Value (KES)": (velocityData.rawStock?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            "Stock Value (M KES)": velocityData.stock?.[idx] ?? 0,
+            "Avg Daily Cost of Sales (KES)": (velocityData.rawDailySales?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            "Consumption per 30 Days (KES)": (velocityData.monthlyConsumption?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            "Days of Cover": velocityData.daysCover?.[idx] ?? "-",
+        }));
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `Stock_VS_Sales_Velocity_${todayStr}`);
+    };
+
+    const handleExportExpiryWatch = () => {
+        const rows = getExpiryRows(batchExpiryNeo).map((row) => ({
+            "Product": row.product,
+            "Batch": row.batch || "-",
+            "Branch": row.branch,
+            "Expiry Date": row.expiry.toLocaleDateString("en-GB"),
+            "Days Remaining": row.daysRemaining,
+            "Qty Balance": row.qty.toLocaleString(),
+            "Cost Value (KES)": row.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            "Action Status": row.action,
+        }));
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `Expiry_Watch_Stock_${todayStr}`);
+    };
+
+    const handleExportSlowMovingStock = () => {
+        const rows = (slowMovingStock || []).map((item) => {
+            const category = item.movement_category || item.status || "SLOW_MOVER";
+            let statusLabel = "Slow";
+            if (category === "DEAD_STOCK" || category === "Dead Stock") statusLabel = "Dead Stock";
+            else if (category === "Moderate") statusLabel = "Moderate";
+
+            return {
+                "Item Name": item.item_name || item.item_Name || "Unknown Item",
+                "Item Code": item.item_code || item.item_Code || "",
+                "Category / Group": item.item_group || "-",
+                "Branch": cleanBranchName(item.branch_name || item.branchName || ""),
+                "Current Stock": item.current_stock_qty !== undefined ? Number(item.current_stock_qty).toLocaleString() : "-",
+                [`Units Sold (${lookbackDays} Days)`]: item.units_sold_window !== undefined ? Number(item.units_sold_window).toLocaleString() : (item.totalQty ?? "-"),
+                "Tied Up Capital (KES)": item.tied_up_capital !== undefined ? Number(item.tied_up_capital).toLocaleString(undefined, { minimumFractionDigits: 2 }) : "-",
+                "Days of Inventory": Number(item.days_of_inventory) >= 9999 ? "No sales" : (item.days_of_inventory ?? "-"),
+                "Movement Status": statusLabel,
+                "Action Insight": item.action_insight || "-",
+            };
+        });
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `Slow_Moving_Stock_${todayStr}`);
+    };
+
+    const handleExportImbalanceAlerts = () => {
+        const rows = buildTransferSuggestions(imbalances, lookbackDays).map((a) => ({
+            "Product": a.product,
+            "Item Code": a.itemCode,
+            "Category / Group": a.group,
+            "Branch": a.branch,
+            "Position": a.deficit ? "Needs stock" : "Has surplus",
+            "Branch Stock": a.stock.toLocaleString(),
+            "Stock Share %": a.stockShare,
+            "Sales Share %": a.salesShare,
+            "Suggested Transfer Units": a.qty.toLocaleString(),
+            "Days Cover Before": a.coverBefore ?? "No sales",
+            "Days Cover After": a.coverAfter ?? "No sales",
+            "Insight": a.insight || "-",
+        }));
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `InterBranch_Transfer_Suggestions_${todayStr}`);
+    };
+
+    const handleApplyFilters = () => {
         setRightColumn(false);
-        handleApplyFilters();
-    }, []);
+
+        if (filters.branch) {
+            navigate(`/dashboard-stock/branch/${filters.branch}`);
+        } else {
+            navigate('/dashboard-stock');
+        }
+    };
 
     return (
         <React.Fragment>
             <div className="page-content">
                 <Container fluid>
 
-                    <BreadCrumb title="Inventory/Stock" pageTitle="Dashboards" />
+                    <BreadCrumb
+                        title="Inventory/Stock"
+                        pageTitle="Dashboards"
+                        subtitle={isBranchView ? branchDisplayName : undefined}
+                    />
 
-                    <div className="d-flex align-items-center justify-content-between flex-wrap mb-3">
-
-                        <h4 className="card-title mb-0">
-                            KEY METRICS
-                        </h4>
-
-                        <div className="d-flex align-items-center gap-2">
-                            <span>Filtered From:</span>
-                            <strong>{formatDisplay(filters.startDate)}</strong>
-                            <span>to</span>
-                            <strong>{formatDisplay(filters.endDate)}</strong>
-                        </div>
-
-                        <button
-                            type="button"
-                            className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-                            onClick={toggleRightColumn}
-                        >
-                            <i className="ri-filter-fill"></i>
-                            Filter
-                        </button>
-
-                    </div>
+                    <Section rightClickBtn={toggleRightColumn} />
 
                     <Row>
                         <Col xl={12}>
@@ -97,9 +286,24 @@ const DashboardStock = () => {
 
                     <Row>
                         <Col xl={12}>
-                            <Card>
+                            <Card id="critical-stock-card">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Critical Stock Levels - MUST-NOT STOCKOUT items</h4>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div>
+                                            <h4 className="card-title mb-1">
+                                                Critical Stock Levels - MUST-NOT STOCKOUT items
+                                            </h4>
+                                            <p className="text-muted mb-0 small">
+                                                Class A items (top sellers making up about 80% of revenue over 90 days) at risk
+                                                {criticalStockouts.length > 0 && ` · ${criticalStockouts.length.toLocaleString()} items`}
+                                            </p>
+                                        </div>
+                                        <CardExportButtons
+                                            targetId="critical-stock-card"
+                                            title="Critical Stock Levels"
+                                            onExport={handleExportCriticalStock}
+                                        />
+                                    </div>
                                 </CardHeader>
                                 <CardBody>
                                     <CriticalStockChart />
@@ -109,9 +313,20 @@ const DashboardStock = () => {
                     </Row>
                     <Row className="align-items-stretch">
                         <Col lg={6} className="d-flex">
-                            <Card className="flex-fill">
+                            <Card className="flex-fill" id="stock-value-branch-card">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Stock Value By Branch</h4>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <h4 className="card-title mb-0">
+                                            {isBranchView && branchDisplayName
+                                                ? `Stock Value - ${branchDisplayName}`
+                                                : "Stock Value By Branch"}
+                                        </h4>
+                                        <CardExportButtons
+                                            targetId="stock-value-branch-card"
+                                            title="Stock Value By Branch"
+                                            onExport={handleExportStockValueByBranch}
+                                        />
+                                    </div>
                                 </CardHeader>
                                 <CardBody>
                                     <BarChartTwo />
@@ -120,11 +335,20 @@ const DashboardStock = () => {
                         </Col>
 
                         <Col lg={6} className="d-flex">
-                            <Card className="flex-fill">
+                            <Card className="flex-fill" id="stock-velocity-card">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">
-                                        Stock VS Sales Velocity - Branch Coverage Ratio
-                                    </h4>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <h4 className="card-title mb-0">
+                                            {isBranchView && branchDisplayName
+                                                ? `Stock VS Cost of Sales - ${branchDisplayName}`
+                                                : "Stock VS Cost of Sales - Branch Coverage"}
+                                        </h4>
+                                        <CardExportButtons
+                                            targetId="stock-velocity-card"
+                                            title="Stock VS Sales Velocity"
+                                            onExport={handleExportStockVelocity}
+                                        />
+                                    </div>
                                 </CardHeader>
                                 <CardBody>
                                     <BarChartThree />
@@ -134,9 +358,16 @@ const DashboardStock = () => {
                     </Row>
                     <Row>
                         <Col xl={12}>
-                            <Card>
+                            <Card id="expiry-watch-card">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">EXPIRY WATCH - WRITE-OFF RISK</h4>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <h4 className="card-title mb-0">EXPIRY WATCH - EXPIRED &amp; WRITE-OFF RISK</h4>
+                                        <CardExportButtons
+                                            targetId="expiry-watch-card"
+                                            title="Expiry Watch"
+                                            onExport={handleExportExpiryWatch}
+                                        />
+                                    </div>
                                 </CardHeader>
                                 <div className="card-body p-0 border-top">
                                     <WidgetsTwo />
@@ -148,56 +379,109 @@ const DashboardStock = () => {
                         </Col>
                     </Row>
                     <Row>
-                        <Col lg={5}>
-                            <Card>
+                        <Col xl={12}>
+                            <Card id="slow-moving-stock-card">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">SLOW MOVING STOCK (30 DAYS)</h4>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <h4 className="card-title mb-0">SLOW MOVING STOCK ({lookbackDays} DAYS)</h4>
+                                        <CardExportButtons
+                                            targetId="slow-moving-stock-card"
+                                            title="Slow Moving Stock"
+                                            onExport={handleExportSlowMovingStock}
+                                        />
+                                    </div>
                                 </CardHeader>
                                 <CardBody>
-                                    <p className="text-muted">Use data attributes and other custom attributes as keys</p>
+                                    <p className="text-muted mb-3 small">
+                                        Dead stock: no sales in {lookbackDays} days. Slow: over 180 days of stock on hand, or under 5% sold.
+                                        {slowMovingStock.length >= SLOW_MOVER_TOP_N && SLOW_MOVER_TOP_N > 0 && ` Top ${SLOW_MOVER_TOP_N} by capital tied up.`}
+                                    </p>
                                     <div id="users">
-                                        <Row className="mb-2">
+                                        <Row className="mb-3 align-items-center g-2">
                                             <Col>
-                                                <div>
-                                                    <input className="search form-control" placeholder="Search" />
-                                                </div>
+                                                <input
+                                                    className="form-control"
+                                                    placeholder="Search by item name, code, category, or branch..."
+                                                    value={searchTerm}
+                                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                                />
                                             </Col>
-                                            <Col className="col-auto">
-                                                <button className="btn btn-light sort" data-sort="name">
-                                                    Sort by name
+
+                                            <Col xs="auto">
+                                                <button
+                                                    className="btn btn-outline-secondary"
+                                                    onClick={() => setSortAscending((prev) => !prev)}
+                                                >
+                                                    {sortAscending ? "A–Z ▲" : "Z–A ▼"}
                                                 </button>
                                             </Col>
                                         </Row>
 
-                                        <SimpleBar style={{ height: "242px" }} className="mx-n3">
-                                            <SlowMovingStock movements={stockMovements} />
+                                        <SimpleBar style={{ maxHeight: "360px" }}>
+                                            <SlowMovingStock
+                                                searchTerm={searchTerm}
+                                                sortAscending={sortAscending}
+                                            />
                                         </SimpleBar>
                                     </div>
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col lg={7}>
-                            <Card>
+                    </Row>
+                    <Row>
+                        <Col xl={12}>
+                            <Card id="imbalance-alerts-card">
                                 <CardHeader>
-                                    <h4 className="card-title mb-0">Inter-branch Imbalance Alerts</h4>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <h4 className="card-title mb-0">INTER-BRANCH TRANSFER SUGGESTIONS</h4>
+                                        <CardExportButtons
+                                            targetId="imbalance-alerts-card"
+                                            title="Inter-Branch Imbalance Alerts"
+                                            onExport={handleExportImbalanceAlerts}
+                                        />
+                                    </div>
                                 </CardHeader>
 
                                 <CardBody>
-                                    <p className="text-muted">Products where one branch is overstocked while another is critically low.</p>
+                                    <p className="text-muted mb-3 small">Branches holding over 20% more or less of an item's stock than their share of its sales. These are suggestions only; no transfer has been raised.</p>
 
-                                    <SimpleBar style={{ height: "272px" }} className="mx-n3 px-3">
-                                        <ImbalanceAlerts />
+                                    <Row className="mb-3 align-items-center g-2">
+                                        <Col>
+                                            <input
+                                                className="form-control"
+                                                placeholder="Search by product, branch, category, or code..."
+                                                value={imbalanceSearchTerm}
+                                                onChange={(e) => setImbalanceSearchTerm(e.target.value)}
+                                            />
+                                        </Col>
+
+                                        <Col xs="auto">
+                                            <button
+                                                className="btn btn-outline-secondary"
+                                                onClick={() => setImbalanceSortAscending((prev) => !prev)}
+                                                title={imbalanceSortAscending ? "Sort A–Z" : "Sort Z–A"}
+                                            >
+                                                {imbalanceSortAscending ? "A–Z ▲" : "Z–A ▼"}
+                                            </button>
+                                        </Col>
+                                    </Row>
+
+                                    <SimpleBar style={{ maxHeight: "360px" }}>
+                                        <ImbalanceAlerts
+                                            searchTerm={imbalanceSearchTerm}
+                                            sortAscending={imbalanceSortAscending}
+                                        />
                                     </SimpleBar>
                                 </CardBody>
                             </Card>
                         </Col>
-                        <FilterActions
-                            onApply={handleApplyFilters}
-                            rightColumn={rightColumn}
-                            hideRightColumn={toggleRightColumn}
-                        />
                     </Row>
                 </Container>
+                <FilterActions
+                    onApply={handleApplyFilters}
+                    rightColumn={rightColumn}
+                    hideRightColumn={toggleRightColumn}
+                />
             </div>
         </React.Fragment>
     );

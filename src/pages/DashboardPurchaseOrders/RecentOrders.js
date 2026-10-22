@@ -1,87 +1,287 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
+import { exportToExcel } from "../../helpers/export_helper";
+import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const RecentOrders = ({ data = [], OverdueAccounts = [] }) => {
-  const today = new Date();
-const firstOverdue = OverdueAccounts?.[0];
+const RecentOrders = ({
+  overdueSupplierAccounts = [],
+  currentReceivables = 0,
+  overdue31To60 = 0,
+  overdue61To90 = 0,
+  overdue91To120 = 0,
+  overdue120Plus = 0,
+  loading,
+  error,
+}) => {
+  const hasAgeingData =
+    Number(currentReceivables ?? 0) > 0 ||
+    Number(overdue31To60 ?? 0) > 0 ||
+    Number(overdue61To90 ?? 0) > 0 ||
+    Number(overdue91To120 ?? 0) > 0 ||
+    Number(overdue120Plus ?? 0) > 0;
+
+  const handleExportExcel = () => {
+    const rows = [
+      {
+        Category: "Aging Summary",
+        Supplier: "Current (0-30 days)",
+        "Outstanding (KES)": Number(currentReceivables || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        ),
+        "Last Invoice": "-",
+        "Last Payment": "-",
+      },
+      {
+        Category: "Aging Summary",
+        Supplier: "31–60 days",
+        "Outstanding (KES)": Number(overdue31To60 || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        ),
+        "Last Invoice": "-",
+        "Last Payment": "-",
+      },
+      {
+        Category: "Aging Summary",
+        Supplier: "61–90 days",
+        "Outstanding (KES)": Number(overdue61To90 || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        ),
+        "Last Invoice": "-",
+        "Last Payment": "-",
+      },
+      {
+        Category: "Aging Summary",
+        Supplier: "91–120 days",
+        "Outstanding (KES)": Number(overdue91To120 || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        ),
+        "Last Invoice": "-",
+        "Last Payment": "-",
+      },
+      {
+        Category: "Aging Summary",
+        Supplier: "120+ days",
+        "Outstanding (KES)": Number(overdue120Plus || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        ),
+        "Last Invoice": "-",
+        "Last Payment": "-",
+      },
+      ...(overdueSupplierAccounts || []).map((item) => ({
+        Category: "Overdue Supplier Account",
+        Supplier: `${item.supplier || ""} (${item.cuscode || ""})`,
+        "Outstanding (KES)": Number(item.outstanding || 0).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2 },
+        ),
+        "Last Invoice": item.lastInvoice
+          ? new Date(item.lastInvoice).toLocaleDateString("en-GB")
+          : "-",
+        "Last Payment": item.lastPayment
+          ? new Date(item.lastPayment).toLocaleDateString("en-GB")
+          : "-",
+      })),
+    ];
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+    exportToExcel(rows, `Supplier_Overdue_Invoices_${todayStr}`);
+  };
+
   return (
-    <Card className="card-height-100">
-      <CardHeader className="align-items-center d-flex">
-        <h4 className="card-title mb-0 flex-grow-1">
-          OVERDUE INVOICES 
-        </h4>
-      </CardHeader>
-      <CardBody>
-        <div className="table-responsive table-card">
-          <table className="table table-borderless table-centered table-nowrap mb-0">
-            <thead className="text-muted table-light">
-              <tr>
-                <th>Supplier - Invoice</th>
-                <th>Amount</th>
-                <th>Due date</th>
-                <th>Days overdue</th>
-                <th>Terms</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+    <React.Fragment>
+      <Card className="card-height-100" id="purchases-overdue-invoices-card">
+        <CardHeader className="card-header align-items-center d-flex justify-content-between flex-wrap gap-2">
+          <h4 className="card-title mb-0 flex-grow-1">Overdue Invoices</h4>
+          <CardExportButtons
+            targetId="purchases-overdue-invoices-card"
+            title="Overdue Invoices"
+            onExport={handleExportExcel}
+          />
+        </CardHeader>
 
-            <tbody>
-                {OverdueAccounts.length === 0 ? (
-    <tr>
-      <td colSpan="6" className="text-center py-5">
-        <h6 className="text-muted mb-0">
-          No overdue invoices found
-        </h6>
-      
-      </td>
-    </tr>
-  ) : (
-              OverdueAccounts.map((item, key) => (
-                <tr key={key} className="mb-0">
-                  <td>
-                    <div className="fw-medium">
-                      {item.supplier}
-                      <div className="text-muted fs-12">{item.invoice}</div>
-                    </div>
-                  </td>
+        <CardBody>
+          {loading ? (
+            <div className="text-center py-5">
+              <div
+                className="spinner-border text-primary mb-3"
+                role="status"
+              ></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-5">
+              <h6 className="text-danger mb-2">{error} </h6>
+            </div>
+          ) : !hasAgeingData && overdueSupplierAccounts.length === 0 ? (
+            <div className="text-center py-4">
+              <h6 className="text-muted mb-1">
+                No receivables ageing data available
+              </h6>
+            </div>
+          ) : (
+            <>
+           <div className="row row-cols-5 g-1 mb-3 ">
+                <div className="col">
+                  <div className="rounded-3 text-center bg-success-subtle p-1">
+                    <p className="text-success fw-semibold mb-1 small">
+                      <small>Current</small>
+                    </p>
 
-                  <td className="fw-semibold">{item.amount}</td>
+                    <h6 className="mb-0 text-success fw-bold small">
+                      <small> {Number(currentReceivables).toLocaleString("en-KE")} </small>
+                    </h6>
+                  </div>
+                </div>
 
-                  <td>{item.dueDate}</td>
+                <div className="col">
+                  <div className="rounded-3 text-center bg-warning-subtle p-1">
+                    <p className="text-warning fw-semibold mb-1 small">
+                      <small>31–60 days</small>
+                    </p>
 
-                  <td className="text-danger">{item.daysOverdueLabel}</td>
+                    <h6 className="mb-0 text-warning fw-bold small">
+                      <small> {Number(overdue31To60).toLocaleString("en-KE")} </small>
+                    </h6>
+                  </div>
+                </div>
 
-                  <td></td>
+                <div className="col">
+                  <div className="rounded-3 text-center bg-danger-subtle p-1">
+                    <p className="text-danger fw-semibold mb-1 small">
+                      <small>61–90 days</small>
+                    </p>
 
-                  <td>
-                    <span
-                      className={`badge bg-${item.actionClass}-subtle text-${item.actionClass}`}
-                    >
-                      {/* {item.action} */}
-                    </span>
-                  </td>
-                </tr>
-                ))
-  )}
+                    <h6 className="mb-0 text-danger fw-bold small">
+                      <small> {Number(overdue61To90).toLocaleString("en-KE")} </small>
+                    </h6>
+                  </div>
+                </div>
 
-            </tbody>
-<tfoot>
-  {firstOverdue && (
-    <tr>
-      <td colSpan="6">
-        <div className="text-center ">
-          <p className="mb-1 ">
-            <strong className="text-danger">{firstOverdue.supplier}</strong> will switch to cash on delivery if not delivered by <strong className="text-danger">{firstOverdue.dueDate}</strong>
-          </p>
-        </div>
-      </td>
-    </tr>
-  )}
-</tfoot>
-          </table>
-        </div>
-      </CardBody>
-    </Card>
+                <div className="col">
+                  <div className="rounded-3 text-center bg-info-subtle p-1">
+                    <p className="text-info fw-semibold mb-1 small">
+                      <small>91–120 days</small>
+                    </p>
+
+                    <h6 className="mb-0 text-info fw-bold small">
+                      <small> {Number(overdue91To120).toLocaleString("en-KE")} </small>
+                    </h6>
+                  </div>
+                </div>
+
+                <div className="col">
+                  <div className="rounded-3 text-center bg-info-subtle p-1">
+                    <p className="text-info fw-semibold mb-1 small">
+                      <small>120+ days</small>
+                    </p>
+
+                    <h6 className="mb-0 text-info fw-bold small">
+                      <small> {Number(overdue120Plus).toLocaleString("en-KE")} </small>
+                    </h6>
+                  </div>
+                </div>
+              </div>
+
+              {/* SUPPLIER TABLE */}
+              <div>
+                {overdueSupplierAccounts.length === 0 ? (
+                  <div className="text-center py-4">
+                    <h6 className="text-muted mb-1">
+                      No supplier data available
+                    </h6>
+                  </div>
+                ) : (
+                  <div className="table-responsive table-card pt-1">
+                    <table className="table table-borderless table-centered table-nowrap mb-0">
+                      <thead className="text-muted table-light">
+                        <tr>
+                          <th>Supplier-Invoice</th>
+                          <th>Outstanding(KES)</th>
+                          <th>Last Invoice</th>
+                          {/* <th>Ageing</th> */}
+                          <th>Last Payment</th>
+                          {/* <th>Action</th> */}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {overdueSupplierAccounts.map((item, index) => (
+                          <tr key={index}>
+                            <td>
+                              <div className="fw-medium">{item.supplier}</div>
+
+                              <div className="text-muted">{item.cuscode}</div>
+                            </td>
+
+                            <td>
+                              {Number(item.outstanding).toLocaleString("en-KE")}
+                            </td>
+
+                            <td>
+                              {item.lastInvoice
+                                ? new Date(item.lastInvoice).toLocaleDateString(
+                                    "en-GB",
+                                  )
+                                : "-"}
+                            </td>
+
+                            {/* <td>
+                        <div className="small">
+
+                          <div>
+                            0–30:{" "}
+                            {formatAmount(item.ageing.current)}
+                          </div>
+
+                          <div>
+                            31–60:{" "}
+                            {formatAmount(item.ageing.days31To60)}
+                          </div>
+
+                          <div>
+                            61–90:{" "}
+                            {formatAmount(item.ageing.days61To90)}
+                          </div>
+
+                          <div>
+                            91–120:{" "}
+                            {formatAmount(item.ageing.days91To120)}
+                          </div>
+
+                          <div>
+                            120+:{" "}
+                            {formatAmount(item.ageing.over120)}
+                          </div>
+
+                        </div>
+                      </td> */}
+
+                            <td>
+                              {item.lastPayment
+                                ? new Date(item.lastPayment).toLocaleDateString(
+                                    "en-GB",
+                                  )
+                                : "-"}
+                            </td>
+
+                            {/* <td>
+                        {item.action}
+                      </td> */}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </CardBody>
+      </Card>
+    </React.Fragment>
   );
 };
 

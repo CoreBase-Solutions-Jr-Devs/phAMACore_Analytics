@@ -57,7 +57,7 @@ const {
   forgetPasswordResponse,
 } = useSelector(selectForgotPasswordProperties);
 
-  document.title = "Reset Password | Velzon - React Admin & Dashboard Template";
+  document.title = "Forgot Password | phAMACore Analytics";
   return (
     <ParticlesAuth>
       <div className="auth-page-content py-5">
@@ -78,7 +78,8 @@ const {
                   </div>
 
                   <Alert className="border-0 alert-warning text-center mb-2 mx-2" role="alert">
-Enter your Customer ID to receive your new password                  </Alert>
+                    Enter your Customer ID to receive your password reset link
+                  </Alert>
                   <div className="p-2">
                     {forgetError  ? (
                       <Alert color="danger" style={{ marginTop: "13px" }}>

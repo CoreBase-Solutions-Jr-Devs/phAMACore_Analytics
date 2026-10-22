@@ -41,9 +41,13 @@ const HorizontalLayout = (props) => {
             const items = ul.getElementsByTagName("a");
             let itemsArray = [...items]; // converts NodeList to Array
             removeActivation(itemsArray);
-            let matchingMenuItem = itemsArray.find((x) => {
-                return x.pathname === pathName;
-            });
+          let matchingMenuItem = itemsArray.find((x) => {
+    return (
+        pathName === x.pathname ||
+        pathName.startsWith(x.pathname + "-") ||
+        pathName.startsWith(x.pathname + "/")
+    );
+});
             if (matchingMenuItem) {
                 activateParentDropdown(matchingMenuItem);
             }
