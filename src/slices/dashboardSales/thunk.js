@@ -9,7 +9,7 @@ import {
   getKPIOverdueAccounts as getKPIOverdueAccountsApi,
    getMarginAnalysis as getMarginAnalysisApi,
    getCustomerMemberAnalysis as getCustomerMemberAnalysisApi,
-   getSalesTarget as getSalesTargetApi,
+   getBranches as getBranchesApi,
 } from "../../helpers/fakebackend_helper";
 
 // MAIN SALES
@@ -100,7 +100,17 @@ export const getLastYearMonthToDateSales = createAsyncThunk(
   },
 );
 
-
+export const getBranches = createAsyncThunk(
+  "powerbi/getBranchesSales",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getBranchesApi(params);
+      return response.data || response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
 
 
 

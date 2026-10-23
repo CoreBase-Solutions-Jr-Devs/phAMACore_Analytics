@@ -2,10 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
-
+import {
+  setBranch,
+  setDateRange,
+  setStartDate,
+  setEndDate,
+} from "../../../slices/dashboardSales/MarginAnalysis/reducer";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import MarginFilterActions from "../MarginAnalysis/FilterActions";
-
+import FilterActions from "../../../Components/Common/FilterActions";
 import Bands from "./Bands";
 import Drilldown from "./Drilldown";
 // import MarginSKU from "./MarginSKU";
@@ -170,12 +174,27 @@ const selectedBranchName =
       rightClickBtn={toggleRightColumn}
             />
           </Col>
-
-             <MarginFilterActions
-          onApply={handleApplyFilters}
-          rightColumn={rightColumn}
-            hideRightColumn={toggleRightColumn}
-        />
+<FilterActions
+  branch={filters.branch}
+  dateRange={filters.dateRange}
+  startDate={filters.startDate}
+  endDate={filters.endDate}
+  onBranchChange={(value) =>
+    dispatch(setBranch(value === "" ? null : Number(value)))
+  }
+  onDateRangeChange={(value) =>
+    dispatch(setDateRange(value))
+  }
+  onStartDateChange={(value) =>
+    dispatch(setStartDate(value))
+  }
+  onEndDateChange={(value) =>
+    dispatch(setEndDate(value))
+  }
+  onApply={handleApplyFilters}
+  rightColumn={rightColumn}
+  hideRightColumn={toggleRightColumn}
+/>
         </Row>
 
      

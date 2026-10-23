@@ -13,7 +13,13 @@ import ReceivablesAgeing from "./ReceivablesAgeing";
 import TopCustomers from "./TopCustomers";
 import YearToDateSales from "./YearToDateSales";
 import MonthToDateSales from "./MonthToDateSales";
-import FilterActions from "./FilterActions";
+import FilterActions from "../../Components/Common/FilterActions";
+import {
+  setBranch,
+  setDateRange,
+  setStartDate,
+  setEndDate,
+} from "../../slices/dashboardSales/reducer";
 import {
   getSalesTransactions,
   getKPISalesTransactions,
@@ -57,8 +63,8 @@ const DashboardSales = () => {
     loading,
   } = useSelector((state) => state.powerbi);
 
-  const branchCode = branchId ?? null;
-  const isBranchView = !!branchCode;
+  // const branchCode = branchId ?? null;
+  // const isBranchView = !!branchCode;
 
   const {
     formatAmount,
@@ -120,7 +126,7 @@ const DashboardSales = () => {
         clientid: 1,
         startDate: filters.startDate,
         endDate: filters.endDate,
-        branchcode: branchId,
+        branchcode: filters.branch,
       }),
     );
 
@@ -164,7 +170,7 @@ const DashboardSales = () => {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-      branchcode: branchId,
+      branchcode: filters.branch,
     };
 
     dispatch(
@@ -214,7 +220,7 @@ const DashboardSales = () => {
         clientid: 1,
         mode: "AGING",
         accountType: "CUSTOMER",
-        branchcode: branchId,
+        branchcode: filters.branch,
         dateFrom: filters.startDate,
         dateTo: filters.endDate,
         periodFrom: getPeriod(filters.startDate),
@@ -222,7 +228,7 @@ const DashboardSales = () => {
         includeZeroBal: false,
       }),
     );
-  }, [dispatch, branchId]);
+  }, [dispatch,]);
 
   useEffect(() => {
     return () => {
@@ -236,7 +242,7 @@ const DashboardSales = () => {
         clientid: 1,
         startDate: filters.startDate,
         endDate: filters.endDate,
-        branchcode: branchId,
+        branchcode: filters.branch,
       }),
     );
 
@@ -295,7 +301,7 @@ const DashboardSales = () => {
         clientid: 1,
         mode: "AGING",
         accountType: "CUSTOMER",
-        branchcode: branchId,
+        branchcode: filters.branch,
         dateFrom: filters.startDate,
         dateTo: filters.endDate,
         periodFrom: getPeriod(filters.startDate),
@@ -304,13 +310,15 @@ const DashboardSales = () => {
       }),
     );
 
-    if (filters.branch) {
-      navigate(`/dashboard-sales/branch/${filters.branch}`);
-    } else {
-      navigate("/dashboard-sales");
-    }
+ 
   };
-
+  const selectedBranchName =
+    filters.branch == null || filters.branch === ""
+      ? ""
+      : (salesBranch || []).find(
+          (m) => Number(m.branch_id) === Number(filters.branch),
+        )?.branch_name || "";
+        
   document.title = "Sales Dashboard | phAMACore Analytics";
 
   return (
@@ -319,12 +327,8 @@ const DashboardSales = () => {
         <BreadCrumb
           title="Sales"
           pageTitle="Dashboards"
-          subtitle={
-            isBranchView
-              ? salesBranch.find((s) => s.branch_ID === Number(branchCode))
-                  ?.brancch_Name
-              : undefined
-          }
+          subtitle=
+          {selectedBranchName}
         />
 
         <Row>
@@ -344,6 +348,7 @@ const DashboardSales = () => {
             // revenueChange={revenueChange}
             cashInvoices={cashInvoices}
             // branchMap={branchMap}
+            selectedBranchName={selectedBranchName}
             rightClickBtn={toggleRightColumn}
             loading={loading}
             error={error}
@@ -351,10 +356,7 @@ const DashboardSales = () => {
         </Row>
         <Row>
           <Col xl={6}>
-            {isBranchView ? (
-              <TopProducts data={topProducts}   loading={loading}
-                error={error}/>
-            ) : (
+         
               <BranchPerformance
                 branchData={branchData}
                 chartSeries={branchChartSeries}
@@ -364,35 +366,13 @@ const DashboardSales = () => {
                 loading={loading}
                 error={error}
               />
-            )}
+            
           </Col>
 
           <Col xl={6}>
-            {isBranchView ? (
-              <BottomProducts
-                data={bottomProducts}
-                error={error}
-                loading={loading}
-              />
-            ) : (
-              <TopProducts data={topProducts} error={error} loading={loading} />
-            )}
-          </Col>
-        </Row>
-
-        <Row>
-          <Col xl={4}>
-            <SalesmanRevenue
-              sales={sales}
-              data={salesmanData}
-              formatAmount={formatAmount}
-              error={error}
-              loading={loading}
-            />
-          </Col>
-
-          <Col xl={4}>
-            <ReceivablesAgeing
+          
+              {/* <TopProducts data={topProducts} error={error} loading={loading} /> */}
+                       <ReceivablesAgeing
               kpiOverdueAccounts={kpiOverdueAccounts}
               currentReceivables={currentReceivables}
               // overdue1To30={overdue1To30}
@@ -406,8 +386,24 @@ const DashboardSales = () => {
               loading={loading}
             />
           </Col>
+        </Row>
 
-          <Col xl={4}>
+        <Row>
+          <Col xl={6}>
+            <SalesmanRevenue
+              sales={sales}
+              data={salesmanData}
+              formatAmount={formatAmount}
+              error={error}
+              loading={loading}
+            />
+          </Col>
+
+          {/* <Col xl={4}>
+
+          </Col> */}
+
+          <Col xl={6}>
             <TopCustomers
               sales={sales}
               data={topCustomersData}
@@ -440,6 +436,22 @@ const DashboardSales = () => {
           </Col>
 
           <FilterActions
+                  branch={filters.branch}
+                    dateRange={filters.dateRange}
+                    startDate={filters.startDate}
+                    endDate={filters.endDate}
+                    onBranchChange={(value) =>
+                      dispatch(setBranch(value === "" ? null : Number(value)))
+                    }
+                    onDateRangeChange={(value) =>
+                      dispatch(setDateRange(value))
+                    }
+                    onStartDateChange={(value) =>
+                      dispatch(setStartDate(value))
+                    }
+                    onEndDateChange={(value) =>
+                      dispatch(setEndDate(value))
+                    }
             onApply={handleApplyFilters}
             rightColumn={rightColumn}
             hideRightColumn={toggleRightColumn}

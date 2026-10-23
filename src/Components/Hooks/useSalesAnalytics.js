@@ -21,14 +21,15 @@ const useSalesAnalytics = (
   customerMemberAnalysisSummary = [],
   customerMemberAnalysisBranch = [],
   customerMemberAnalysisCohort = [],
-salesTarget= [],
-salesTargetSummary= [],
-salesTargetBranch= [],
+
   // Monthly Sales Targets
   julySalesTarget = [],
   augustSalesTarget = [],
   septemberSalesTarget = [],
   octoberSalesTarget = [],
+  salesTarget= [],
+salesTargetSummary= [],
+salesTargetBranch= [],
   filters = {},
 ) => {
   const formatAmount = (value) => {
@@ -602,6 +603,16 @@ const augustBranchTargetKisii = getAugustBranchTarget(10);
 const septemberBranchTargetKisii = getSeptemberBranchTarget(10);
 const octoberBranchTargetKisii = getOctoberBranchTarget(10);
 
+const performanceSummary = salesTargetSummary?.[0] ?? {};
+const getChannelData = (channel) =>
+  salesChannel.find((item) => item.sales_channel === channel) || {};
+
+const CASH = getChannelData("CASH");
+const INSURANCE = getChannelData("INSURANCE");
+const OTHER_ACCOUNT = getChannelData("OTHER_ACCOUNT");
+const RETURN = getChannelData("RETURN");
+const TOTAL = getChannelData("TOTAL");
+
   return {
     formatAmount,
     totalRevenue,
@@ -741,6 +752,22 @@ octoberBranchTargetBusia,
 octoberBranchTargetMsaGpo,
 octoberBranchTargetKitale,
 octoberBranchTargetKisii,
+performanceSummary,
+  CASH,
+    INSURANCE,
+    OTHER_ACCOUNT,
+    RETURN,
+    TOTAL,
+// netSales,
+// targetSales,
+// achievementPct,
+// grossProfit,
+// grossMarginPct,
+// averageBasketValue,
+// transactionCount,
+// totalBranches,
+// targetVariance,
+// targetActionInsight,
   };
 };
 

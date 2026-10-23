@@ -73,9 +73,7 @@ const MemberAnalysis = ({
                 className="spinner-border text-primary"
                 role="status"
               />
-              <p className="text-muted mt-2 mb-0">
-                Loading customer cohort analysis...
-              </p>
+             
             </div>
           ) : error ? (
             <div className="text-center py-5">

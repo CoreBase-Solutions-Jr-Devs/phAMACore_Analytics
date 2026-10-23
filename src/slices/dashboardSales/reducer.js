@@ -8,7 +8,7 @@ import {
   getKPISalesTransactions,
   getKPIOverdueAccounts,
  
-  getSalesTarget,
+  getBranches,
 } from "./thunk";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
@@ -433,9 +433,27 @@ const powerBISlice = createSlice({
           action.error.message ||
           "Error loading overdue accounts";
       })
+      
+.addCase(getBranches.pending, (state) => {
+  state.loading = true;
+  state.error = null;
+})
 
-  
-;
+.addCase(getBranches.fulfilled, (state, action) => {
+  state.loading = false;
+  state.error = null;
+
+  state.branches = action.payload?.result || action.payload || [];
+})
+
+.addCase(getBranches.rejected, (state, action) => {
+  state.loading = false;
+  state.error =
+    action.payload?.message ||
+    action.payload ||
+    action.error.message ||
+    "Error loading branches";
+});
   },
 });
 

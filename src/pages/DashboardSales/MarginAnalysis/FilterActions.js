@@ -11,7 +11,7 @@ import {
 import { useRef } from "react";
 import Flatpickr from "react-flatpickr";
 
-const MarginFilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
+const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -226,4 +226,4 @@ const MarginFilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   );
 };
 
-export default MarginFilterActions;
+export default FilterActions;
