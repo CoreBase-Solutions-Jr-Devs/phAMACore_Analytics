@@ -46,6 +46,7 @@ const SlowMovingStock = ({
             const itemName = item.item_name || item.item_Name || "Unknown Item";
             const itemCode = item.item_code || item.item_Code || "";
             const itemGroup = item.item_group || "-";
+            const itemSubGroup = item.item_subgroup || "-";
             const category = item.movement_category || item.status || "SLOW_MOVER";
 
             let statusLabel = "Slow";
@@ -70,6 +71,7 @@ const SlowMovingStock = ({
                 itemName,
                 itemCode,
                 itemGroup,
+                itemSubGroup,
                 statusLabel,
                 badgeClass,
                 unitsSold: item.units_sold_window !== undefined ? Number(item.units_sold_window) : (item.totalQty ?? 0),
@@ -90,6 +92,7 @@ const SlowMovingStock = ({
                       item.itemName.toLowerCase().includes(term) ||
                       item.itemCode.toLowerCase().includes(term) ||
                       item.itemGroup.toLowerCase().includes(term) ||
+                      item.itemSubGroup.toLowerCase().includes(term) ||
                       (item.branchName && item.branchName.toLowerCase().includes(term))
                   );
               })
@@ -145,12 +148,9 @@ const SlowMovingStock = ({
 
     return (
         <div>
-            <div className="table-responsive">
-                <table className="table table-sm table-hover table-borderless table-nowrap align-middle mb-0">
-                    <thead
-                        className="text-muted table-light"
-                        style={{ position: "sticky", top: 0, zIndex: 1 }}
-                    >
+            <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto" }}>
+                <table className="table table-borderless table-centered table-nowrap mb-0">
+                    <thead className="text-muted table-light sticky-top">
                         <tr>
                             <th scope="col">Product</th>
                             <th scope="col">Category</th>
@@ -177,7 +177,14 @@ const SlowMovingStock = ({
                                         </small>
                                     )}
                                 </th>
-                                <td className="text-muted">{item.itemGroup}</td>
+                                <td className="text-muted">
+                                    {item.itemGroup || "-"}
+                                    <small className="text-muted d-block">
+                                        {item.itemSubGroup === "Unassigned" ? "-" :
+                                            item.itemSubGroup || "-"
+                                        }
+                                    </small>
+                                </td>
                                 <td>{item.branchName || "-"}</td>
                                 <td className="text-end">
                                     {item.currentStock !== undefined

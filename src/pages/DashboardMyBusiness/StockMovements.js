@@ -56,7 +56,7 @@ const StockMovements = () => {
           clientid: 1,
           AsOfDate: filters.endDate || todayFormatted,
           GroupBy: "CRITICAL_STOCKOUTS",
-          TopN: 30,
+          TopN: 0,
           branchcode: filters.branch ?? null,
         });
 
@@ -117,9 +117,6 @@ const StockMovements = () => {
           Stock Alerts & Movement Tracking
         </h4>
         <div className="d-flex align-items-center gap-2">
-          <span className="badge bg-danger-subtle text-danger">
-            Top 30 Critical Stockouts
-          </span>
           <CardExportButtons
             onExport={handleExportExcel}
             targetId="stock-movements-card"
@@ -129,10 +126,7 @@ const StockMovements = () => {
       </CardHeader>
 
       <CardBody>
-        <div
-          className="table-responsive table-card"
-          style={{ maxHeight: "380px", overflowY: "auto" }}
-        >
+        <div className="table-responsive table-card" style={{ maxHeight: "380px", overflowY: "auto" }}>
           <table className="table table-borderless table-centered table-nowrap mb-0">
             <thead className="text-muted table-light sticky-top">
               <tr>

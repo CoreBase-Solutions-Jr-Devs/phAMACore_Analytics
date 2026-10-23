@@ -1,5 +1,17 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
+
+const LEGEND_ITEMS = [
+    { color: '#f06548', label: 'Critical Stock' },
+    { color: '#f7b84b', label: 'Reorder Now' },
+    { color: '#0ab39c', label: 'Safe Stock' },
+];
+
+const sameLayout = (a, b) =>
+    a && b &&
+    Math.abs(a.top - b.top) < 0.5 &&
+    Math.abs(a.height - b.height) < 0.5 &&
+    Math.abs(a.right - b.right) < 0.5;
 
 const BarChartOne = ({
     categories = [],
@@ -10,6 +22,21 @@ const BarChartOne = ({
     height = 440,
     paginationComponent = null,
 }) => {
+    // Plot-area geometry read back from ApexCharts, used to pin the
+    // right-hand value labels to the exact centre of each bar row.
+    const [layout, setLayout] = useState(null);
+
+    const captureLayout = useCallback((chartContext) => {
+        const g = chartContext?.w?.globals;
+        if (!g) return;
+        const next = {
+            top: g.translateY,                    // top of plot area
+            height: g.gridHeight,                 // height of plot area
+            right: g.translateX + g.gridWidth,    // right edge of plot area (x)
+        };
+        setLayout((prev) => (sameLayout(prev, next) ? prev : next));
+    }, []);
+
     const resolvedCategories = categories || [];
     const resolvedData = data || [];
 
@@ -34,30 +61,10 @@ const BarChartOne = ({
             return '#0ab39c';
         });
 
-    const maxVal = resolvedData.length > 0 ? Math.max(...resolvedData) : 0;
+    const maxVal = Math.max(...resolvedData);
     const axisMax = Math.max(reorderLine * 1.5, Math.ceil(maxVal * 1.3), 15);
 
-    const pointAnnotations = resolvedData.map((val, i) => ({
-        x: axisMax,
-        y: resolvedCategories[i],
-        marker: { size: 0 },
-        label: {
-            text: `${parseFloat(val).toFixed(1)}d`,
-            textAnchor: 'end',
-            offsetX: -4,
-            offsetY: 5,
-            borderWidth: 0,
-            style: {
-                background: 'transparent',
-                color: resolvedColors[i] || '#f06548',
-                fontSize: '12px',
-                fontWeight: 700,
-                padding: { top: 0, bottom: 0, left: 0, right: 0 },
-            },
-        },
-    }));
-
-    const series = [{ name: "Days of Cover", data: resolvedData }];
+    const series = [{ name: 'Days of Cover', data: resolvedData }];
 
     const dynamicHeight = Math.min(
         Math.max(260, resolvedCategories.length * 30),
@@ -70,6 +77,10 @@ const BarChartOne = ({
             height: dynamicHeight,
             toolbar: { show: false },
             animations: { enabled: true },
+            events: {
+                mounted: captureLayout,
+                updated: captureLayout,
+            },
         },
         plotOptions: {
             bar: {
@@ -99,7 +110,6 @@ const BarChartOne = ({
                     },
                 },
             ],
-            points: pointAnnotations,
         },
         xaxis: {
             min: 0,
@@ -148,31 +158,47 @@ const BarChartOne = ({
         },
     };
 
-    const legendItems = [
-        {
-            color: "#f06548",
-            label: "Critical Stock",
-        },
-        {
-            color: "#f7b84b",
-            label: "Reorder Now",
-        },
-        {
-            color: "#0ab39c",
-            label: "Safe Stock",
-        },
-    ];
+    const rowHeight = layout ? layout.height / resolvedCategories.length : 0;
 
     return (
         <div className="critical-stock-chart-wrapper">
-            <ReactApexChart
-                dir="ltr"
-                className="apex-charts"
-                options={options}
-                series={series}
-                type="bar"
-                height={dynamicHeight}
-            />
+            <div style={{ position: 'relative' }}>
+                <ReactApexChart
+                    dir="ltr"
+                    className="apex-charts"
+                    options={options}
+                    series={series}
+                    type="bar"
+                    height={dynamicHeight}
+                />
+
+                {/* Right-hand "days of cover" values, centred on each bar row */}
+                {layout && (
+                    <div
+                        aria-hidden="true"
+                        style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+                    >
+                        {resolvedData.map((val, i) => (
+                            <span
+                                key={`${resolvedCategories[i]}-${i}`}
+                                style={{
+                                    position: 'absolute',
+                                    top: layout.top + rowHeight * (i + 0.5),
+                                    left: layout.right - 4,
+                                    transform: 'translate(-100%, -50%)',
+                                    lineHeight: 1,
+                                    whiteSpace: 'nowrap',
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    color: resolvedColors[i] || '#f06548',
+                                }}
+                            >
+                                {`${parseFloat(val).toFixed(1)}d`}
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className="px-2 pt-3 mt-2 border-top">
                 <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -182,18 +208,11 @@ const BarChartOne = ({
                         </div>
 
                         <div className="d-flex flex-wrap gap-3 small">
-                            {legendItems.map(({ color, label }) => (
-                                <span
-                                    key={label}
-                                    className="d-flex align-items-center"
-                                >
+                            {LEGEND_ITEMS.map(({ color, label }) => (
+                                <span key={label} className="d-flex align-items-center">
                                     <span
                                         className="me-2 rounded-circle"
-                                        style={{
-                                            width: 10,
-                                            height: 10,
-                                            backgroundColor: color,
-                                        }}
+                                        style={{ width: 10, height: 10, backgroundColor: color }}
                                     />
                                     {label}
                                 </span>

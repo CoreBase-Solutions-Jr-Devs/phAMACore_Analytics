@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Card, CardBody, CardHeader } from "reactstrap";
+import { Offcanvas, OffcanvasHeader, OffcanvasBody } from "reactstrap";
 import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -7,8 +7,9 @@ import { setBranch, setDateRange, setStartDate, setEndDate } from "../../slices/
 import { getCachedBranchesMap, cleanBranchName } from "../../helpers/branch_helper";
 import { DEFAULT_DATE_RANGE } from "../utils/dateHelper";
 
-const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
+const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Last Week", "This Week", "Month to Date", "Last Month", "This Year", "Last Year", "Custom"];
 
+const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
     const dispatch = useDispatch();
 
     const {
@@ -30,21 +31,16 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
         }));
     }, [reduxBranches]);
 
-    const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Last Week", "This Week", "Month to Date", "Last Month", "This Year", "Last Year", "Custom"];
+    const isCustom = dateRange === "Custom";
 
     const handleDateChange = (type, selectedDates) => {
         if (!selectedDates?.length) return;
 
         const formatted = selectedDates[0].toLocaleDateString("en-GB");
-
         dispatch(setDateRange("Custom"));
 
-        if (type === "startDate") {
-            dispatch(setStartDate(formatted));
-        }
-        if (type === "endDate") {
-            dispatch(setEndDate(formatted));
-        }
+        if (type === "startDate") dispatch(setStartDate(formatted));
+        if (type === "endDate") dispatch(setEndDate(formatted));
     };
 
     const handleReset = () => {
@@ -52,131 +48,90 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
         dispatch(setDateRange(DEFAULT_DATE_RANGE));
     };
 
+    const pickerProps = {
+        className: `form-control ${isCustom ? "" : "bg-light text-primary"}`,
+        options: { dateFormat: "d/m/Y", allowInput: isCustom, clickOpens: isCustom },
+        readOnly: !isCustom,
+    };
+
     return (
-        <div
-            className={ rightColumn
-                ? "layout-rightside-col d-block"
-                : "layout-rightside-col d-none"
-            }
+        <Offcanvas
+            isOpen={rightColumn}
+            toggle={hideRightColumn}
+            direction="end"
+            style={{ width: 360 }}
         >
-            <div className="overlay" onClick={hideRightColumn} />
+            <OffcanvasHeader toggle={hideRightColumn} className="border-bottom">
+                Filter Actions
+            </OffcanvasHeader>
 
-            <div className="layout-rightside h-100">
-                <Card className="h-100 card-animate">
+            <OffcanvasBody>
+                <div className="row mb-3 align-items-center">
+                    <label className="col-4 col-form-label">Branch</label>
+                    <div className="col-8">
+                        <select
+                            className="form-select"
+                            value={branch ?? ""}
+                            onChange={(e) => dispatch(setBranch(e.target.value === "" ? null : Number(e.target.value)))}
+                        >
+                            <option value="">All Branches</option>
+                            {branches.map((b) => (
+                                <option key={b.branchCode} value={b.branchCode}>
+                                    {b.branchName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
 
-                    <CardHeader className="py-2">
-                        <h5 className="mb-0">Filter Actions</h5>
-                    </CardHeader>
+                <div className="row mb-3 align-items-center">
+                    <label className="col-4 col-form-label">Date Range</label>
+                    <div className="col-8">
+                        <select
+                            className="form-select"
+                            value={dateRange}
+                            onChange={(e) => dispatch(setDateRange(e.target.value))}
+                        >
+                            {dateOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
 
-                    <CardBody>
+                <div className="row mb-3 align-items-center">
+                    <label className="col-4 col-form-label">Start Date</label>
+                    <div className="col-8">
+                        <Flatpickr
+                            {...pickerProps}
+                            value={startDate}
+                            onChange={(dates) => handleDateChange("startDate", dates)}
+                        />
+                    </div>
+                </div>
 
-                        <div className="row mb-3 align-items-center">
-                            <label className="col-4 col-form-label">Branch</label>
-                            <div className="col-8">
-                                <select
-                                    className="form-select"
-                                    value={branch ?? ""}
-                                    onChange={(e) => dispatch(setBranch(e.target.value === ""
-                                                ? null
-                                                : Number(e.target.value)
-                                            ))}
-                                >
-                                    <option value="">
-                                        All Branches
-                                    </option>
+                <div className="row mb-3 align-items-center">
+                    <label className="col-4 col-form-label">End Date</label>
+                    <div className="col-8">
+                        <Flatpickr
+                            {...pickerProps}
+                            value={endDate}
+                            onChange={(dates) => handleDateChange("endDate", dates)}
+                        />
+                    </div>
+                </div>
 
-                                    {branches.map((b) => (
-                                        <option
-                                            key={b.branchCode}
-                                            value={b.branchCode}
-                                        >
-                                            {b.branchName}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
+                <hr className="mb-2 mt-3" />
 
-                        <div className="row mb-3 align-items-center">
-                            <label className="col-4 col-form-label">Date Range</label>
-                            <div className="col-8">
-                                <select
-                                    className="form-select"
-                                    value={dateRange}
-                                    onChange={(e) =>dispatch(setDateRange(e.target.value))}
-                                >
-                                    {dateOptions.map((option) => (
-                                        <option
-                                            key={option}
-                                            value={option}
-                                        >
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="row mb-3 align-items-center">
-                            <label className="col-4 col-form-label">Start Date</label>
-                            <div className="col-8">
-                                <Flatpickr
-                                    className={`form-control ${dateRange !== "Custom"
-                                            ? "bg-light text-primary"
-                                            : ""
-                                        }`}
-                                    options={{
-                                        dateFormat: "d/m/Y",
-                                        allowInput: dateRange === "Custom",
-                                        clickOpens: dateRange === "Custom",
-                                    }}
-                                    value={startDate}
-                                    onChange={(dates) => handleDateChange("startDate", dates)}
-                                    readOnly={dateRange !== "Custom"}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="row mb-3 align-items-center">
-                            <label className="col-4 col-form-label">End Date</label>
-                            <div className="col-8">
-                                <Flatpickr
-                                    className={`form-control ${dateRange !== "Custom"
-                                            ? "bg-light text-primary"
-                                            : ""
-                                        }`}
-                                    options={{
-                                        dateFormat: "d/m/Y",
-                                        allowInput:dateRange ==="Custom",
-                                        clickOpens:dateRange ==="Custom",
-                                    }}
-                                    value={endDate}
-                                    onChange={(dates) => handleDateChange("endDate",dates)
-                                    }
-                                    readOnly={dateRange !== "Custom"}
-                                />
-                            </div>
-                        </div>
-
-                        <hr className="mb-2 mt-3" />
-
-                        <div className="d-flex justify-content-end gap-2">
-                            <button className="btn btn-success" onClick={onApply}>
-                                Select
-                            </button>
-
-                            <button className="btn btn-warning" onClick={handleReset}>
-                                Reset
-                            </button>
-
-                            <button className="btn btn-danger" onClick={hideRightColumn}>
-                                Close
-                            </button>
-                        </div>
-                    </CardBody>
-                </Card>
-            </div>
-        </div>
+                <div className="d-flex justify-content-end gap-2">
+                    <button className="btn btn-success" onClick={onApply}>Select</button>
+                    <button className="btn btn-warning" onClick={handleReset}>Reset</button>
+                    <button className="btn btn-danger" onClick={hideRightColumn}>Close</button>
+                </div>
+            </OffcanvasBody>
+        </Offcanvas>
     );
 };
 
