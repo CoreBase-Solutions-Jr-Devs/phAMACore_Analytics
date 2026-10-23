@@ -15,7 +15,7 @@ const initialState = {
 salesTarget: [],
 salesTargetSummary: [],
 salesTargetBranch: [],
-
+salesTargetMONTHLY_PIVOT: [],
 julySalesTarget: [],
 augustSalesTarget: [],
 septemberSalesTarget: [],
@@ -213,11 +213,6 @@ extraReducers: (builder) => {
 
   const result = action.payload?.result ?? action.payload ?? [];
 
-  console.log("========== SALES TARGET REDUCER ==========");
-  console.log("GroupBy:", groupBy);
-  console.log("API Payload:", action.payload);
-  console.log("Processed Result:", result);
-
   state.salesTarget = result;
 
   switch (groupBy) {
@@ -230,15 +225,15 @@ extraReducers: (builder) => {
     case "BRANCH":
       state.salesTargetBranch = result;
 
-      console.log("BRANCH DATA STORED:", state.salesTargetBranch);
+       case "MONTHLY_PIVOT":
+      state.salesTargetMONTHLY_PIVOT = result;
+
       break;
 
     default:
-      console.warn("UNKNOWN GROUPBY:", groupBy);
+     
       break;
   }
-
-  console.log("==========================================");
 })
 
     .addCase(getSalesTarget.rejected, (state, action) => {

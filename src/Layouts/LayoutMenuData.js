@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { getActiveBranch } from '../helpers/branch_helper';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { getActiveBranch } from "../helpers/branch_helper";
 
 const Navdata = () => {
   const history = useNavigate();
   const branch = "default-branch";
-const filters = { branch: "default-branch" };
+  const filters = { branch: "default-branch" };
 
-const salesBranch = useSelector(
-  (state) => state.powerbi?.filters?.branch
-);
+  const salesBranch = useSelector((state) => state.powerbi?.filters?.branch);
 
-const purchaseBranch = useSelector(
-  (state) => state.PurchaseOrders?.filters?.branch
-);
+  const purchaseBranch = useSelector(
+    (state) => state.PurchaseOrders?.filters?.branch,
+  );
 
-const stockBranch = useSelector((state) => state.StockInventory?.filters?.branch);
+  const stockBranch = useSelector(
+    (state) => state.StockInventory?.filters?.branch,
+  );
 
-// const activeSalesBranch = salesBranch || getActiveBranch('sales');
-const activeStockBranch = stockBranch || getActiveBranch('stock');
-// const activePurchaseBranch = purchaseBranch || getActiveBranch('purchase');
+  // const activeSalesBranch = salesBranch || getActiveBranch('sales');
+  const activeStockBranch = stockBranch || getActiveBranch("stock");
+  // const activePurchaseBranch = purchaseBranch || getActiveBranch('purchase');
 
   // States
   const [isDashboard, setIsDashboard] = useState(false);
@@ -28,20 +28,20 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
   const [isStock, setIsStock] = useState(false);
   const [isPurchaseOrders, setIsPurchaseOrders] = useState(false);
   const [isMyBusiness, setIsMyBusiness] = useState(false);
-  const [iscurrentState, setIscurrentState] = useState('Dashboard');
+  const [iscurrentState, setIscurrentState] = useState("Dashboard");
 
   // Fixed DOM manipulation safety checks
   function updateIconSidebar(e) {
-    if (e && e.target && e.target.getAttribute('subitems')) {
-      const ul = document.getElementById('two-column-menu');
+    if (e && e.target && e.target.getAttribute("subitems")) {
+      const ul = document.getElementById("two-column-menu");
       if (ul) {
-        const iconItems = ul.querySelectorAll('.nav-icon.active');
+        const iconItems = ul.querySelectorAll(".nav-icon.active");
         let activeIconItems = [...iconItems];
         activeIconItems.forEach((item) => {
-          item.classList.remove('active');
-          var id = item.getAttribute('subitems');
+          item.classList.remove("active");
+          var id = item.getAttribute("subitems");
           if (document.getElementById(id)) {
-            document.getElementById(id).classList.remove('show');
+            document.getElementById(id).classList.remove("show");
           }
         });
       }
@@ -50,114 +50,143 @@ const activeStockBranch = stockBranch || getActiveBranch('stock');
 
   // Sync state visibility safely
   useEffect(() => {
-    document.body.classList.remove('twocolumn-panel');
-    
-    if (iscurrentState !== 'Sales') setIsSales(false);
-    if (iscurrentState !== 'Dashboard') setIsDashboard(false);
-    if (iscurrentState !== 'Purchase-Orders') setIsPurchaseOrders(false);
-    if (iscurrentState !== 'Stock') setIsStock(false);
-    if (iscurrentState !== 'MyBusiness') setIsMyBusiness(false); // Fixed bug here
+    document.body.classList.remove("twocolumn-panel");
+
+    if (iscurrentState !== "Sales") setIsSales(false);
+    if (iscurrentState !== "Dashboard") setIsDashboard(false);
+    if (iscurrentState !== "Purchase-Orders") setIsPurchaseOrders(false);
+    if (iscurrentState !== "Stock") setIsStock(false);
+    if (iscurrentState !== "MyBusiness") setIsMyBusiness(false); // Fixed bug here
   }, [iscurrentState]);
 
   const menuItems = [
     {
-      id: 'my business',
-      label: 'My Business',
-      icon: 'ri-home-4-line',
-      link: '/dashboard',
+      id: "my business",
+      label: "My Business",
+      icon: "ri-home-4-line",
+      link: "/dashboard",
       stateVariables: isMyBusiness,
       click: function (e) {
         e.preventDefault();
         setIsMyBusiness(!isMyBusiness); // Fixed bug here
-        setIscurrentState('MyBusiness');
+        setIscurrentState("MyBusiness");
         updateIconSidebar(e);
       },
     },
     {
-      id: 'sales',
-      label: 'Sales',
-      icon: 'ri-bar-chart-fill',
-      link: '/#',
+      id: "sales",
+      label: "Sales",
+      icon: "ri-bar-chart-fill",
+      link: "/#",
       stateVariables: isSales,
       click: function (e) {
         e.preventDefault();
         setIsSales(!isSales);
-        setIscurrentState('Sales');
+        setIscurrentState("Sales");
         updateIconSidebar(e);
       },
       subItems: [
-        { id: 'dashboard', label: 'Dashboard', link: '/dashboard-sales', parentId: 'sales' },
+        {
+          id: "dashboard",
+          label: "Dashboard",
+          link: "/dashboard-sales",
+          parentId: "sales",
+        },
         // { id: 'branchview', label: 'BranchView',  link: `/dashboard-sales/branch/${salesBranch}`, parentId: 'sales' },
-                    {
-    id: "Sales-Breakdown",
-    label: "Sales Breakdown",
-    link: "/dashboard-sales/Sales-Breakdown",
-    parentId: "sales",
-  },
-                  {
-    id: "sales-target",
-    label: "Sales Target",
-    link: "/dashboard-sales/Sales-Target",
-    parentId: "sales",
-  },
-          {
-    id: "margin-analysis",
-    label: "Margin Analysis",
-    link: "/dashboard-sales/Margin-Analysis",
-    parentId: "sales",
-  },
-            {
-    id: "Customer-Member-analysis",
-    label: " Member Analysis",
-    link: "/dashboard-sales/Customer-Member-Analysis",
-    parentId: "sales",
-  },
-              {
-    id: "Performance-Summary",
-    label: "Performance Summary",
-    link: "/dashboard-sales/Performance-Summary",
-    parentId: "sales",
-  },
+        {
+          id: "Sales-Breakdown",
+          label: "Sales Breakdown",
+          link: "/dashboard-sales/Sales-Breakdown",
+          parentId: "sales",
+        },
+        {
+          id: "sales-target",
+          label: "Sales Target",
+          link: "/dashboard-sales/Sales-Target",
+          parentId: "sales",
+        },
+        {
+          id: "margin-analysis",
+          label: "Margin Analysis",
+          link: "/dashboard-sales/Margin-Analysis",
+          parentId: "sales",
+        },
+        {
+          id: "Customer-Member-analysis",
+          label: " Customer Analysis",
+          link: "/dashboard-sales/Customer-Member-Analysis",
+          parentId: "sales",
+        },
+        {
+          id: "Performance-Summary",
+          label: "Performance Summary",
+          link: "/dashboard-sales/Performance-Summary",
+          parentId: "sales",
+        },
+        {
+          id: "Category-Performance",
+          label: "Category Performance",
+          link: "/dashboard-sales/Category-Performance",
+          parentId: "sales",
+        },
       ],
     },
     {
-      id: 'stock',
-      label: 'Inventory / Stock',
-      icon: 'ri-box-3-line',
-      link: '/#',
+      id: "stock",
+      label: "Inventory / Stock",
+      icon: "ri-box-3-line",
+      link: "/#",
       stateVariables: isStock,
       click: function (e) {
         e.preventDefault();
         setIsStock(!isStock);
-        setIscurrentState('Stock');
+        setIscurrentState("Stock");
         updateIconSidebar(e);
       },
       subItems: [
-        { id: 'dashboard-stock', label: 'Dashboard', link: '/dashboard-stock', parentId: 'stock' },
-        { id: 'branchview-stock', label: 'BranchView',  link: `/dashboard-stock/branch/${activeStockBranch}` ,  parentId: 'stock' },
+        {
+          id: "dashboard-stock",
+          label: "Dashboard",
+          link: "/dashboard-stock",
+          parentId: "stock",
+        },
+        {
+          id: "branchview-stock",
+          label: "BranchView",
+          link: `/dashboard-stock/branch/${activeStockBranch}`,
+          parentId: "stock",
+        },
       ],
     },
     {
-      id: 'purchase-orders',
-      label: 'Purchases',
-      icon: 'ri-todo-line',
-      link: '/#',
+      id: "purchase-orders",
+      label: "Purchases",
+      icon: "ri-todo-line",
+      link: "/#",
       stateVariables: isPurchaseOrders,
       click: function (e) {
         e.preventDefault();
         setIsPurchaseOrders(!isPurchaseOrders);
-        setIscurrentState('Purchase-Orders');
+        setIscurrentState("Purchase-Orders");
         updateIconSidebar(e);
       },
       subItems: [
-        { id: 'dashboard-purchase-orders', label: 'Dashboard', link: '/dashboard-purchase-orders', parentId: 'purchase-orders' },
-        { id: 'branchview-purchase-orders', label: 'BranchView', link: `/dashboard-purchase-orders/branch/${purchaseBranch}`,
-   parentId: 'purchase-orders' },
+        {
+          id: "dashboard-purchase-orders",
+          label: "Dashboard",
+          link: "/dashboard-purchase-orders",
+          parentId: "purchase-orders",
+        },
+        {
+          id: "branchview-purchase-orders",
+          label: "BranchView",
+          link: `/dashboard-purchase-orders/branch/${purchaseBranch}`,
+          parentId: "purchase-orders",
+        },
       ],
     },
   ];
 
- 
   return <React.Fragment>{menuItems}</React.Fragment>;
 };
 

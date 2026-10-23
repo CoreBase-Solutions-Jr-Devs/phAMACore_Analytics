@@ -613,6 +613,8 @@ const OTHER_ACCOUNT = getChannelData("OTHER_ACCOUNT");
 const RETURN = getChannelData("RETURN");
 const TOTAL = getChannelData("TOTAL");
 
+const categoryPerformance = sales ?? [0];
+
   return {
     formatAmount,
     totalRevenue,
@@ -758,6 +760,7 @@ performanceSummary,
     OTHER_ACCOUNT,
     RETURN,
     TOTAL,
+    categoryPerformance,
 // netSales,
 // targetSales,
 // achievementPct,

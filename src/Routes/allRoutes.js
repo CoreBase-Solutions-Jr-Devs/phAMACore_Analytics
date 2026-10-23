@@ -48,6 +48,7 @@ import ReactTable from "../pages/Tables/ReactTables";
 // User Profile
 import UserProfile from "../pages/Authentication/user-profile";
 import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
+import CategoryPerformance from "../pages/DashboardSales/CategoryPerformance";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardMyBusiness /> },
@@ -67,6 +68,10 @@ const authProtectedRoutes = [
   {
     path: "/dashboard-sales/Sales-Breakdown",
     component: <SalesBreakdown/>,
+  },
+    {
+    path: "/dashboard-sales/Category-Performance",
+    component: <CategoryPerformance/>,
   },
   { path: "/dashboard-sales/branch/:branchId", component: <DashboardSales /> },
   { path: "/dashboard-stock", component: <DashboardStock /> },
