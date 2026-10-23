@@ -126,10 +126,7 @@ const StockMovements = () => {
       </CardHeader>
 
       <CardBody>
-        <div
-          className="table-responsive table-card"
-          style={{ maxHeight: "380px", overflowY: "auto" }}
-        >
+        <div className="table-responsive table-card" style={{ maxHeight: "380px", overflowY: "auto" }}>
           <table className="table table-borderless table-centered table-nowrap mb-0">
             <thead className="text-muted table-light sticky-top">
               <tr>

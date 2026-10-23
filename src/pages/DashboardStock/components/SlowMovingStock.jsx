@@ -148,12 +148,9 @@ const SlowMovingStock = ({
 
     return (
         <div>
-            <div className="table-responsive">
-                <table className="table table-sm table-hover table-borderless table-nowrap align-middle mb-0">
-                    <thead
-                        className="text-muted table-light"
-                        style={{ position: "sticky", top: 0, zIndex: 1 }}
-                    >
+            <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto" }}>
+                <table className="table table-borderless table-centered table-nowrap mb-0">
+                    <thead className="text-muted table-light sticky-top">
                         <tr>
                             <th scope="col">Product</th>
                             <th scope="col">Category</th>
