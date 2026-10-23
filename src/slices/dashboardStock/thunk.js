@@ -276,7 +276,7 @@ export const fetchKPISlowMovingStock = createAsyncThunk(
         clientid = 1,
         branchcode = null,
         GroupBy = "SLOW_MOVERS",
-        TopN = 50,
+        TopN = 0,
         LookbackDays = 30,
         AsOfDate = null,
       } = params;
@@ -329,7 +329,7 @@ export const fetchKPIImbalances = createAsyncThunk(
   "stockInventory/fetchKPIImbalances",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const { clientid = 1, branchcode = null, TopN = 200, LookbackDays = 30, AsOfDate = null } = params;
+      const { clientid = 1, branchcode = null, TopN = 0, LookbackDays = 30, AsOfDate = null } = params;
       const payload = { clientid, GroupBy: "IMBALANCES", TopN, LookbackDays };
       if (branchcode) payload.branchcode = branchcode;
       if (AsOfDate) payload.AsOfDate = AsOfDate;

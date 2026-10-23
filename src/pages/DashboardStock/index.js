@@ -416,13 +416,10 @@ const DashboardStock = () => {
                                                 </button>
                                             </Col>
                                         </Row>
-
-                                        <SimpleBar style={{ maxHeight: "360px" }}>
-                                            <SlowMovingStock
-                                                searchTerm={searchTerm}
-                                                sortAscending={sortAscending}
-                                            />
-                                        </SimpleBar>
+                                        <SlowMovingStock
+                                            searchTerm={searchTerm}
+                                            sortAscending={sortAscending}
+                                        />
                                     </div>
                                 </CardBody>
                             </Card>
@@ -465,13 +462,10 @@ const DashboardStock = () => {
                                             </button>
                                         </Col>
                                     </Row>
-
-                                    <SimpleBar style={{ maxHeight: "360px" }}>
-                                        <ImbalanceAlerts
-                                            searchTerm={imbalanceSearchTerm}
-                                            sortAscending={imbalanceSortAscending}
-                                        />
-                                    </SimpleBar>
+                                    <ImbalanceAlerts
+                                        searchTerm={imbalanceSearchTerm}
+                                        sortAscending={imbalanceSortAscending}
+                                    />
                                 </CardBody>
                             </Card>
                         </Col>
