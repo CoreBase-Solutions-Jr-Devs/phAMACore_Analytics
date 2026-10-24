@@ -1,26 +1,21 @@
 import React, { useMemo } from "react";
 import { Spinner } from "reactstrap";
 import { useSelector } from "react-redux";
-import { cleanBranchName } from "../../../helpers/branch_helper";
-import { getLookbackDays } from "../../utils/StockInventoryUtils";
+import {
+    buildSlowMovingRows,
+    formatSlowDaysCover,
+    getLookbackDays,
+    sortSlowMovingRows,
+} from "../../utils/StockInventoryUtils";
 
 const MAX_ROWS = 100;
-
-const formatDaysCover = (item) => {
-    if (item.daysOfInventory !== null && !isNaN(item.daysOfInventory)) {
-        if (item.daysOfInventory >= 9999) return "No sales";
-        return `${Math.round(item.daysOfInventory).toLocaleString()}d`;
-    }
-    if (item.daysSince !== null) {
-        return `${item.daysSince}d inactive`;
-    }
-    return "-";
-};
 
 const SlowMovingStock = ({
     items,
     searchTerm = "",
-    sortAscending = true,
+    sortField = "tiedUpCapital",
+    sortDesc = true,
+    onSort,
 }) => {
     const {
         slowMovingStock = [],
@@ -33,79 +28,42 @@ const SlowMovingStock = ({
 
     const processed = useMemo(() => {
         // 1. Determine data source: prop items -> Redux slowMovingStock
-        let rawList = [];
-
-        if (Array.isArray(items) && items.length > 0) {
-            rawList = items;
-        } else if (Array.isArray(slowMovingStock) && slowMovingStock.length > 0) {
-            rawList = slowMovingStock;
-        }
+        const rawList = Array.isArray(items) && items.length > 0 ? items : slowMovingStock;
 
         // 2. Normalize items to uniform shape
-        const normalized = rawList.map((item) => {
-            const itemName = item.item_name || item.item_Name || "Unknown Item";
-            const itemCode = item.item_code || item.item_Code || "";
-            const itemGroup = item.item_group || "-";
-            const itemSubGroup = item.item_subgroup || "-";
-            const category = item.movement_category || item.status || "SLOW_MOVER";
-
-            let statusLabel = "Slow";
-            let badgeClass = "warning";
-
-            if (category === "DEAD_STOCK" || category === "Dead Stock") {
-                statusLabel = "Dead Stock";
-                badgeClass = "danger";
-            } else if (category === "SLOW_MOVER" || category === "Slow Mover" || category === "Slow") {
-                statusLabel = "Slow";
-                badgeClass = "warning";
-            } else if (category === "Moderate") {
-                statusLabel = "Moderate";
-                badgeClass = "info";
-            } else {
-                statusLabel = category;
-                badgeClass = "secondary";
-            }
-
-            return {
-                ...item,
-                itemName,
-                itemCode,
-                itemGroup,
-                itemSubGroup,
-                statusLabel,
-                badgeClass,
-                unitsSold: item.units_sold_window !== undefined ? Number(item.units_sold_window) : (item.totalQty ?? 0),
-                currentStock: item.current_stock_qty !== undefined ? Number(item.current_stock_qty) : undefined,
-                tiedUpCapital: item.tied_up_capital !== undefined ? Number(item.tied_up_capital) : undefined,
-                daysOfInventory: item.days_of_inventory !== undefined ? Number(item.days_of_inventory) : null,
-                branchName: cleanBranchName(item.branch_name || item.branchName),
-                daysSince: item.daysSince !== undefined ? item.daysSince : null,
-                actionInsight: item.action_insight,
-            };
-        });
+        const normalized = buildSlowMovingRows(rawList);
 
         // 3. Filter by search term (item name, code, category, or branch)
         const term = (searchTerm || "").trim().toLowerCase();
         const filtered = term
-            ? normalized.filter((item) => {
-                  return (
-                      item.itemName.toLowerCase().includes(term) ||
-                      item.itemCode.toLowerCase().includes(term) ||
-                      item.itemGroup.toLowerCase().includes(term) ||
-                      item.itemSubGroup.toLowerCase().includes(term) ||
-                      (item.branchName && item.branchName.toLowerCase().includes(term))
-                  );
-              })
+            ? normalized.filter((item) =>
+                  [item.name, item.itemCode, item.group, item.subGroup, item.branch].some((field) =>
+                      String(field || "").toLowerCase().includes(term)
+                  )
+              )
             : normalized;
 
-        // 4. Sort alphabetically by itemName (null keeps the API order: most capital tied up first)
-        if (sortAscending === null) return filtered;
-        return [...filtered].sort((a, b) => {
-            return sortAscending
-                ? a.itemName.localeCompare(b.itemName)
-                : b.itemName.localeCompare(a.itemName);
-        });
-    }, [items, slowMovingStock, searchTerm, sortAscending]);
+        // 4. Sort by the selected column (default: most capital tied up first)
+        return sortSlowMovingRows(filtered, sortField, sortDesc);
+    }, [items, slowMovingStock, searchTerm, sortField, sortDesc]);
+
+    const renderSortIcon = (field) => {
+        if (sortField !== field) return null;
+        return <i className={`ms-1 text-primary ${sortDesc ? "ri-arrow-down-line" : "ri-arrow-up-line"}`}></i>;
+    };
+
+    const renderSortableHeader = (field, label, className = "") => (
+        <th
+            scope="col"
+            className={className}
+            role={onSort ? "button" : undefined}
+            onClick={onSort ? () => onSort(field) : undefined}
+            style={onSort ? { cursor: "pointer", userSelect: "none" } : undefined}
+        >
+            {label}
+            {renderSortIcon(field)}
+        </th>
+    );
 
     if (loadingSlowMovingStock && (!processed || processed.length === 0)) {
         return (
@@ -152,63 +110,54 @@ const SlowMovingStock = ({
                 <table className="table table-borderless table-centered table-nowrap mb-0">
                     <thead className="text-muted table-light sticky-top">
                         <tr>
-                            <th scope="col">Product</th>
-                            <th scope="col">Category</th>
+                            {renderSortableHeader("name", "Product")}
                             <th scope="col">Branch</th>
-                            <th scope="col" className="text-end">Stock</th>
-                            <th scope="col" className="text-end">Sold ({lookbackDays}d)</th>
-                            <th scope="col" className="text-end">Days Cover</th>
-                            <th scope="col" className="text-end">Tied-Up Capital (KES)</th>
+                            {renderSortableHeader("stockQty", "Stock Qty", "text-end")}
+                            <th scope="col" className="text-end">Sold ({lookbackDays}D)</th>
+                            {renderSortableHeader("daysCover", "Days Cover", "text-end")}
+                            {renderSortableHeader("tiedUpCapital", "Tied-Up Capital", "text-end")}
                             <th scope="col" className="text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {processed.slice(0, MAX_ROWS).map((item, idx) => (
-                            <tr
-                                key={`${item.itemCode}-${item.branchName}-${idx}`}
-                                data-id={idx}
-                                title={item.actionInsight || undefined}
-                            >
-                                <th scope="row" className="fw-medium">
-                                    {item.itemName}
-                                    {item.itemCode && (
+                        {processed.slice(0, MAX_ROWS).map((item, idx) => {
+                            const tone = item.isDead ? "danger" : "warning";
+                            return (
+                                <tr
+                                    key={item.id}
+                                    data-id={idx}
+                                    title={item.actionInsight || `${item.name} (${item.itemCode})`}
+                                >
+                                    <th scope="row" className="fw-medium">
+                                        {item.name}
                                         <small className="text-muted d-block fw-normal">
-                                            {item.itemCode}
+                                            {[item.itemCode, item.category].filter(Boolean).join(" · ")}
                                         </small>
-                                    )}
-                                </th>
-                                <td className="text-muted">
-                                    {item.itemGroup || "-"}
-                                    <small className="text-muted d-block">
-                                        {item.itemSubGroup === "Unassigned" ? "-" :
-                                            item.itemSubGroup || "-"
-                                        }
-                                    </small>
-                                </td>
-                                <td>{item.branchName || "-"}</td>
-                                <td className="text-end">
-                                    {item.currentStock !== undefined
-                                        ? item.currentStock.toLocaleString()
-                                        : "-"}
-                                </td>
-                                <td className="text-end">{item.unitsSold.toLocaleString()}</td>
-                                <td className="text-end">{formatDaysCover(item)}</td>
-                                <td className="text-end fw-medium">
-                                    {item.tiedUpCapital !== undefined
-                                        ? item.tiedUpCapital.toLocaleString(undefined, {
-                                              maximumFractionDigits: 0,
-                                          })
-                                        : "-"}
-                                </td>
-                                <td className="text-center">
-                                    <span
-                                        className={`badge rounded-pill border border-${item.badgeClass} text-${item.badgeClass} bg-${item.badgeClass}-subtle fs-11 fw-normal px-2 py-1`}
-                                    >
-                                        {item.statusLabel}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
+                                    </th>
+                                    <td>{item.branch || "-"}</td>
+                                    <td className="text-end fw-semibold">{item.stockQty.toLocaleString()}</td>
+                                    <td className="text-end text-muted">{item.unitsSold.toLocaleString()}</td>
+                                    <td className="text-end text-muted">{formatSlowDaysCover(item.daysCover)}</td>
+                                    <td className="text-end fw-semibold">
+                                        <span
+                                            title={`Unit Avg Cost: KES ${item.unitAvgCost.toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,
+                                            })}`}
+                                        >
+                                            KES {item.tiedUpCapital.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        </span>
+                                    </td>
+                                    <td className="text-center">
+                                        <span
+                                            className={`badge rounded-pill border border-${tone} text-${tone} bg-${tone}-subtle fs-11 fw-normal px-2 py-1`}
+                                        >
+                                            {item.statusLabel}
+                                        </span>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

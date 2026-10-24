@@ -36,6 +36,11 @@ import { transformStockVsSalesVelocity, getPeriodDays } from './Charts/Custom/ut
 import { suggestedOrderQty } from './components/CriticalStockChart';
 import {
     buildTransferSuggestions,
+    buildSlowMovingRows,
+    sortSlowMovingRows,
+    formatSlowDaysCover,
+    filterTransferSuggestions,
+    IMBALANCE_STATUS_FILTERS,
     getExpiryRows,
     getLookbackDays,
     CRITICAL_TOP_N,
@@ -48,10 +53,27 @@ const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortAscending, setSortAscending] = useState(true);
+    // Slow moving stock: sort by column, most capital tied up first by default
+    const [sortField, setSortField] = useState("tiedUpCapital");
+    const [sortDesc, setSortDesc] = useState(true);
 
     const [imbalanceSearchTerm, setImbalanceSearchTerm] = useState("");
-    const [imbalanceSortAscending, setImbalanceSortAscending] = useState(true);
+    // Transfer suggestions: keep the API severity ranking, filter by Deficit / Surplus
+    const [imbalanceStatusFilter, setImbalanceStatusFilter] = useState("ALL");
+
+    const handleSlowMovingSort = (field) => {
+        if (sortField === field) {
+            setSortDesc((prev) => !prev);
+        } else {
+            setSortField(field);
+            setSortDesc(field !== "name");
+        }
+    };
+
+    const renderSlowSortIcon = (field) =>
+        sortField === field ? (
+            <i className={`ms-1 ${sortDesc ? "ri-arrow-down-line" : "ri-arrow-up-line"}`}></i>
+        ) : null;
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -213,43 +235,47 @@ const DashboardStock = () => {
     };
 
     const handleExportSlowMovingStock = () => {
-        const rows = (slowMovingStock || []).map((item) => {
-            const category = item.movement_category || item.status || "SLOW_MOVER";
-            let statusLabel = "Slow";
-            if (category === "DEAD_STOCK" || category === "Dead Stock") statusLabel = "Dead Stock";
-            else if (category === "Moderate") statusLabel = "Moderate";
-
-            return {
-                "Item Name": item.item_name || item.item_Name || "Unknown Item",
-                "Item Code": item.item_code || item.item_Code || "",
-                "Category / Group": item.item_group || "-",
-                "Branch": cleanBranchName(item.branch_name || item.branchName || ""),
-                "Current Stock": item.current_stock_qty !== undefined ? Number(item.current_stock_qty).toLocaleString() : "-",
-                [`Units Sold (${lookbackDays} Days)`]: item.units_sold_window !== undefined ? Number(item.units_sold_window).toLocaleString() : (item.totalQty ?? "-"),
-                "Tied Up Capital (KES)": item.tied_up_capital !== undefined ? Number(item.tied_up_capital).toLocaleString(undefined, { minimumFractionDigits: 2 }) : "-",
-                "Days of Inventory": Number(item.days_of_inventory) >= 9999 ? "No sales" : (item.days_of_inventory ?? "-"),
-                "Movement Status": statusLabel,
-                "Action Insight": item.action_insight || "-",
-            };
-        });
+        const rows = sortSlowMovingRows(buildSlowMovingRows(slowMovingStock), sortField, sortDesc).map((item) => ({
+            "Item Name": item.name,
+            "Item Code": item.itemCode,
+            "Category": item.category,
+            "Branch": item.branch,
+            "Stock Qty": item.stockQty.toLocaleString(),
+            [`Sold (${lookbackDays}D)`]: item.unitsSold.toLocaleString(),
+            "Days Cover": formatSlowDaysCover(item.daysCover),
+            "Unit Avg Cost (KES)": item.unitAvgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            "Tied-Up Capital (KES)": item.tiedUpCapital.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            "Status": item.statusLabel,
+            "Action Insight": item.actionInsight || "-",
+        }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
         exportToExcel(rows, `Slow_Moving_Stock_${todayStr}`);
     };
 
+    const imbalanceCounts = useMemo(() => {
+        const list = buildTransferSuggestions(imbalances, lookbackDays);
+        const deficit = list.filter((item) => item.deficit).length;
+        return { deficit, surplus: list.length - deficit };
+    }, [imbalances, lookbackDays]);
+
     const handleExportImbalanceAlerts = () => {
-        const rows = buildTransferSuggestions(imbalances, lookbackDays).map((a) => ({
+        const suggestions = filterTransferSuggestions(buildTransferSuggestions(imbalances, lookbackDays), imbalanceStatusFilter);
+        const rows = suggestions.map((a) => ({
             "Product": a.product,
             "Item Code": a.itemCode,
-            "Category / Group": a.group,
+            "Category": a.group,
             "Branch": a.branch,
-            "Position": a.deficit ? "Needs stock" : "Has surplus",
+            "Status": a.deficit ? "Deficit" : "Surplus",
+            "Imbalance Gap %": Number(a.gap.toFixed(1)),
             "Branch Stock": a.stock.toLocaleString(),
-            "Stock Share %": a.stockShare,
-            "Sales Share %": a.salesShare,
-            "Suggested Transfer Units": a.qty.toLocaleString(),
-            "Days Cover Before": a.coverBefore ?? "No sales",
-            "Days Cover After": a.coverAfter ?? "No sales",
-            "Insight": a.insight || "-",
+            "Company Stock": a.companyStock.toLocaleString(),
+            "Stock Share %": Number(a.stockShare.toFixed(1)),
+            "Branch Sales": a.sales.toLocaleString(),
+            "Company Sales": a.companySales.toLocaleString(),
+            "Sales Share %": Number(a.salesShare.toFixed(1)),
+            "Rec. Transfer Units": a.qty.toLocaleString(),
+            "Network Counterpart": a.networkContext,
+            "Action": a.actionInsight,
         }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
         exportToExcel(rows, `InterBranch_Transfer_Suggestions_${todayStr}`);
@@ -409,16 +435,28 @@ const DashboardStock = () => {
 
                                             <Col xs="auto">
                                                 <button
-                                                    className="btn btn-outline-secondary"
-                                                    onClick={() => setSortAscending((prev) => !prev)}
+                                                    type="button"
+                                                    className={`btn ${sortField === "name" ? "btn-primary" : "btn-outline-secondary"}`}
+                                                    onClick={() => handleSlowMovingSort("name")}
                                                 >
-                                                    {sortAscending ? "A–Z ▲" : "Z–A ▼"}
+                                                    Sort by Name{renderSlowSortIcon("name")}
+                                                </button>
+                                            </Col>
+                                            <Col xs="auto">
+                                                <button
+                                                    type="button"
+                                                    className={`btn ${sortField === "tiedUpCapital" ? "btn-primary" : "btn-outline-secondary"}`}
+                                                    onClick={() => handleSlowMovingSort("tiedUpCapital")}
+                                                >
+                                                    Sort by Capital{renderSlowSortIcon("tiedUpCapital")}
                                                 </button>
                                             </Col>
                                         </Row>
                                         <SlowMovingStock
                                             searchTerm={searchTerm}
-                                            sortAscending={sortAscending}
+                                            sortField={sortField}
+                                            sortDesc={sortDesc}
+                                            onSort={handleSlowMovingSort}
                                         />
                                     </div>
                                 </CardBody>
@@ -453,18 +491,28 @@ const DashboardStock = () => {
                                         </Col>
 
                                         <Col xs="auto">
-                                            <button
-                                                className="btn btn-outline-secondary"
-                                                onClick={() => setImbalanceSortAscending((prev) => !prev)}
-                                                title={imbalanceSortAscending ? "Sort A–Z" : "Sort Z–A"}
-                                            >
-                                                {imbalanceSortAscending ? "A–Z ▲" : "Z–A ▼"}
-                                            </button>
+                                            <div className="btn-group" role="group" aria-label="Filter by imbalance status">
+                                                {IMBALANCE_STATUS_FILTERS.map((tab) => (
+                                                    <button
+                                                        key={tab.key}
+                                                        type="button"
+                                                        className={`btn ${imbalanceStatusFilter === tab.key ? "btn-primary" : "btn-outline-secondary"}`}
+                                                        onClick={() => setImbalanceStatusFilter(tab.key)}
+                                                    >
+                                                        {tab.label}
+                                                        {tab.key !== "ALL" && (
+                                                            <span className="badge bg-light text-body ms-1">
+                                                                {tab.key === "DEFICIT" ? imbalanceCounts.deficit : imbalanceCounts.surplus}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </Col>
                                     </Row>
                                     <ImbalanceAlerts
                                         searchTerm={imbalanceSearchTerm}
-                                        sortAscending={imbalanceSortAscending}
+                                        statusFilter={imbalanceStatusFilter}
                                     />
                                 </CardBody>
                             </Card>

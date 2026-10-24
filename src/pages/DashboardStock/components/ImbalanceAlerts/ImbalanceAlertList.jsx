@@ -1,12 +1,12 @@
 import React from "react";
 import { Spinner } from "reactstrap";
 
-const formatCoverDays = (value) =>
-    value === null || value === undefined ? "No sales" : value > 365 ? ">1 yr" : `${value}d`;
+const formatGap = (gap = 0) => `${gap > 0 ? "+" : ""}${Number(gap).toFixed(1)}%`;
 
 const ImbalanceAlertList = ({
     alerts = [],
     searchTerm = "",
+    statusFilter = "ALL",
     isLoading = false,
     error = null,
 }) => {
@@ -35,7 +35,7 @@ const ImbalanceAlertList = ({
     }
 
     if (!alerts?.length) {
-        if (searchTerm) {
+        if (searchTerm || statusFilter !== "ALL") {
             return (
                 <div
                     className="d-flex flex-column align-items-center justify-content-center py-4 text-center text-muted"
@@ -44,7 +44,9 @@ const ImbalanceAlertList = ({
                     <i className="ri-search-line display-6 mb-2"></i>
                     <div className="fw-medium text-dark fs-13">No matching imbalance alerts</div>
                     <small className="text-muted">
-                        No alerts match "{searchTerm}". Try adjusting your search query.
+                        {searchTerm
+                            ? `No alerts match "${searchTerm}". Try adjusting your search query.`
+                            : "No inter-branch imbalances match your filter."}
                     </small>
                 </div>
             );
@@ -74,53 +76,78 @@ const ImbalanceAlertList = ({
                 <thead className="text-muted table-light sticky-top">
                     <tr>
                         <th scope="col">Product</th>
-                        <th scope="col">Category</th>
                         <th scope="col">Branch</th>
-                        <th scope="col" className="text-center">Position</th>
+                        <th scope="col" className="text-center">Status &amp; Gap</th>
                         <th scope="col" className="text-end">Branch Stock</th>
-                        <th scope="col" className="text-end">Stock Share</th>
-                        <th scope="col" className="text-end">Sales Share</th>
-                        <th scope="col" className="text-end">Suggested Transfer</th>
-                        <th scope="col" className="text-end">Cover (Before → After)</th>
+                        <th scope="col" className="text-end">Branch Sales</th>
+                        <th scope="col" className="text-center">Rec. Transfer</th>
+                        <th scope="col">Network Counterpart &amp; Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {alerts.map((item, i) => {
                         const tone = item.deficit ? "danger" : "success";
                         return (
-                            <tr
-                                key={item.id || i}
-                                data-id={i}
-                                title={item.insight || undefined}
-                            >
-                                <th scope="row" className="fw-medium">
+                            <tr key={item.id || i} data-id={i}>
+                                <th
+                                    scope="row"
+                                    className="fw-medium"
+                                    title={`${item.product} (${item.itemCode})\nCategory: ${item.group}\n${item.actionInsight}`}
+                                >
                                     {item.product}
-                                    {item.itemCode && (
-                                        <small className="text-muted d-block fw-normal">
-                                            {item.itemCode}
-                                        </small>
-                                    )}
+                                    <small className="text-muted d-block fw-normal">
+                                        {[item.itemCode, item.group].filter((v) => v && v !== "-").join(" · ")}
+                                    </small>
                                 </th>
-                                <td className="text-muted">{item.group || "-"}</td>
-                                <td>{item.branch || "-"}</td>
-                                <td className="text-center">
+                                <td>
+                                    <span className="badge bg-light text-body fs-12 fw-medium">{item.branch || "-"}</span>
+                                </td>
+                                <td
+                                    className="text-center"
+                                    title={`Stock share (${item.stockShare.toFixed(1)}%) vs Sales share (${item.salesShare.toFixed(1)}%) = ${formatGap(item.gap)} gap`}
+                                >
                                     <span
                                         className={`badge rounded-pill border border-${tone} text-${tone} bg-${tone}-subtle fs-11 fw-normal px-2 py-1`}
                                     >
-                                        {item.deficit ? "Needs stock" : "Has surplus"}
+                                        {item.deficit ? "Deficit" : "Surplus"}
+                                    </span>
+                                    <small className={`d-block fw-semibold text-${tone}`}>{formatGap(item.gap)} gap</small>
+                                </td>
+                                <td
+                                    className="text-end"
+                                    title={`Branch Stock: ${item.stock.toLocaleString()} units of ${item.companyStock.toLocaleString()} company total (${item.stockShare.toFixed(1)}%)`}
+                                >
+                                    <span className="fw-semibold">{item.stock.toLocaleString()} u</span>
+                                    <small className="text-muted d-block">
+                                        {item.stockShare.toFixed(1)}% of {item.companyStock.toLocaleString()}
+                                    </small>
+                                </td>
+                                <td
+                                    className="text-end"
+                                    title={`Branch Sales: ${item.sales.toLocaleString()} units of ${item.companySales.toLocaleString()} company total (${item.salesShare.toFixed(1)}%)`}
+                                >
+                                    <span className="fw-semibold">{item.sales.toLocaleString()} u</span>
+                                    <small className="text-muted d-block">
+                                        {item.salesShare.toFixed(1)}% of {item.companySales.toLocaleString()}
+                                    </small>
+                                </td>
+                                <td className="text-center">
+                                    <span
+                                        className="badge bg-primary-subtle text-primary fs-12 fw-semibold px-2 py-1"
+                                        title={item.actionInsight}
+                                    >
+                                        <i className="ri-arrow-left-right-line me-1 align-middle"></i>
+                                        {item.qty.toLocaleString()} u
                                     </span>
                                 </td>
-                                <td className="text-end">{(item.stock ?? 0).toLocaleString()}</td>
-                                <td className="text-end">{(item.stockShare ?? 0).toFixed(0)}%</td>
-                                <td className="text-end">{(item.salesShare ?? 0).toFixed(0)}%</td>
-                                <td className="text-end fw-semibold">
-                                    {item.deficit ? "Receive" : "Release"} ~{(item.qty ?? 0).toLocaleString()}
-                                </td>
-                                <td className="text-end text-muted">
-                                    {formatCoverDays(item.coverBefore)} →{" "}
-                                    <span className="text-body fw-medium">
-                                        {formatCoverDays(item.coverAfter)}
-                                    </span>
+                                <td title={`${item.networkContext}\n\nAction: ${item.actionInsight}`}>
+                                    <div className="text-truncate fs-12 fw-medium" style={{ maxWidth: "320px" }}>
+                                        {item.networkContext}
+                                    </div>
+                                    <small className="text-muted d-block text-truncate" style={{ maxWidth: "320px" }}>
+                                        <i className="ri-information-line text-primary me-1 align-middle"></i>
+                                        {item.actionInsight}
+                                    </small>
                                 </td>
                             </tr>
                         );

@@ -87,6 +87,53 @@ export const getExpiryRows = (batchRows = []) => {
         .sort((a, b) => a.daysRemaining - b.daysRemaining);
 };
 
+// SLOW MOVING STOCK (PowerBIKPIStockHealth, GroupBy = SLOW_MOVERS)
+
+/**
+ * Normalises the slow mover rows into the shape shown in the table and the export.
+ * Status is binary: Dead Stock (flagged as dead or nothing sold in the window) or Slow Mover.
+ */
+export const buildSlowMovingRows = (slowMovingStock = []) =>
+    (Array.isArray(slowMovingStock) ? slowMovingStock : []).map((row, index) => {
+        const unitsSold = num(row.units_sold_window ?? row.totalQty);
+        const category = String(row.movement_category || row.status || "").toUpperCase();
+        const isDead = category.includes("DEAD") || unitsSold === 0;
+        const itemCode = String(row.item_code || row.item_Code || "");
+        const subGroup = row.item_subgroup && row.item_subgroup !== "Unassigned" ? row.item_subgroup : "";
+
+        return {
+            id: `${itemCode || index}-${row.branch_id ?? row.branch_code ?? index}-${index}`,
+            itemCode,
+            name: String(row.item_name || row.item_Name || row.item_code || "Unknown Item"),
+            category: String(subGroup || row.item_group || "General"),
+            group: String(row.item_group || ""),
+            subGroup: String(subGroup),
+            branch: cleanBranchName(row.branch_name || row.branchName || (row.branch_id ? `Branch ${row.branch_id}` : "All Branches")),
+            stockQty: num(row.current_stock_qty),
+            unitsSold,
+            daysCover: Math.round(num(row.days_of_inventory)),
+            unitAvgCost: num(row.unit_avg_cost),
+            tiedUpCapital: num(row.tied_up_capital),
+            isDead,
+            statusLabel: isDead ? "Dead Stock" : "Slow Mover",
+            actionInsight: String(row.action_insight || ""),
+        };
+    });
+
+/** Sorts slow mover rows by name (alphabetical) or by one of the numeric columns. */
+export const sortSlowMovingRows = (rows = [], sortField = "tiedUpCapital", sortDesc = true) =>
+    [...rows].sort((a, b) => {
+        if (sortField === "name") {
+            return sortDesc ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
+        }
+        const av = a[sortField] ?? 0;
+        const bv = b[sortField] ?? 0;
+        return sortDesc ? bv - av : av - bv;
+    });
+
+export const formatSlowDaysCover = (days) =>
+    days >= 999 ? "999+ days" : `${Number(days || 0).toLocaleString()} days`;
+
 // TRANSFER SUGGESTIONS (PowerBIKPIStockHealth, GroupBy = IMBALANCES)
 
 const coverDays = (stock, sales, lookbackDays) =>
@@ -115,8 +162,31 @@ export const buildTransferSuggestions = (imbalances = [], lookbackDays = 30) =>
             coverBefore: coverDays(stock, sales, lookbackDays),
             coverAfter: coverDays(deficit ? stock + qty : stock - qty, sales, lookbackDays),
             insight: [row.action_insight, row.network_context].filter(Boolean).join(" "),
+            rankPos: num(row.rank_pos) || index + 1,
+            companyStock: num(row.company_stock),
+            companySales: num(row.company_sales),
+            actionInsight: row.action_insight || (deficit ? "Urgent transfer required from surplus branch" : "Transfer excess stock to deficit branches"),
+            networkContext: row.network_context || "—",
         };
     });
+
+// KPI COMPUTATION
+
+export const IMBALANCE_STATUS_FILTERS = [
+    { key: "ALL", label: "All" },
+    { key: "DEFICIT", label: "Deficit" },
+    { key: "SURPLUS", label: "Surplus" },
+];
+
+/** Keeps the API's severity ranking (rank_pos) and applies the Deficit / Surplus filter. */
+export const filterTransferSuggestions = (suggestions = [], statusFilter = "ALL") =>
+    suggestions
+        .filter((item) => {
+            if (statusFilter === "DEFICIT") return item.deficit;
+            if (statusFilter === "SURPLUS") return !item.deficit;
+            return true;
+        })
+        .sort((a, b) => a.rankPos - b.rankPos);
 
 // KPI COMPUTATION
 
