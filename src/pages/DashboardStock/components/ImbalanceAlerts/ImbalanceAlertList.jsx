@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Spinner } from "reactstrap";
 
 const formatGap = (gap = 0) => `${gap > 0 ? "+" : ""}${Number(gap).toFixed(1)}%`;
@@ -10,6 +10,26 @@ const ImbalanceAlertList = ({
     isLoading = false,
     error = null,
 }) => {
+    const [hoverInfo, setHoverInfo] = useState(null);
+
+    const handleCellHover = (e, info) => {
+        setHoverInfo({
+            ...info,
+            x: e.clientX,
+            y: e.clientY,
+        });
+    };
+
+    const handleMouseMove = (e) => {
+        if (hoverInfo) {
+            setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setHoverInfo(null);
+    };
+
     if (isLoading && (!alerts || alerts.length === 0)) {
         return (
             <div
@@ -71,89 +91,270 @@ const ImbalanceAlertList = ({
     }
 
     return (
-        <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto" }}>
-            <table className="table table-borderless table-centered table-nowrap mb-0">
-                <thead className="text-muted table-light sticky-top">
-                    <tr>
-                        <th scope="col">Product</th>
-                        <th scope="col">Branch</th>
-                        <th scope="col" className="text-center">Status &amp; Gap</th>
-                        <th scope="col" className="text-end">Branch Stock</th>
-                        <th scope="col" className="text-end">Branch Sales</th>
-                        <th scope="col" className="text-center">Rec. Transfer</th>
-                        <th scope="col">Network Counterpart &amp; Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {alerts.map((item, i) => {
-                        const tone = item.deficit ? "danger" : "success";
-                        return (
-                            <tr key={item.id || i} data-id={i}>
-                                <th
-                                    scope="row"
-                                    className="fw-medium"
-                                    title={`${item.product} (${item.itemCode})\nCategory: ${item.group}\n${item.actionInsight}`}
-                                >
-                                    {item.product}
-                                    <small className="text-muted d-block fw-normal">
-                                        {[item.itemCode, item.group].filter((v) => v && v !== "-").join(" · ")}
-                                    </small>
-                                </th>
-                                <td>
-                                    <span className="badge bg-light text-body fs-12 fw-medium">{item.branch || "-"}</span>
-                                </td>
-                                <td
-                                    className="text-center"
-                                    title={`Stock share (${item.stockShare.toFixed(1)}%) vs Sales share (${item.salesShare.toFixed(1)}%) = ${formatGap(item.gap)} gap`}
-                                >
-                                    <span
-                                        className={`badge rounded-pill border border-${tone} text-${tone} bg-${tone}-subtle fs-11 fw-normal px-2 py-1`}
+        <div style={{ position: "relative" }}>
+            <div
+                className="table-responsive"
+                style={{ maxHeight: "400px", overflowY: "auto" }}
+                onMouseLeave={handleMouseLeave}
+            >
+                <table className="table table-borderless table-centered mb-0 w-100">
+                    <thead className="text-muted table-light sticky-top">
+                        <tr>
+                            <th scope="col" className="text-nowrap">Product</th>
+                            <th scope="col" className="text-nowrap">Branch</th>
+                            <th scope="col" className="text-center text-nowrap">Status &amp; Gap</th>
+                            <th scope="col" className="text-end text-nowrap">Branch Stock</th>
+                            <th scope="col" className="text-end text-nowrap">Branch Sales</th>
+                            <th scope="col" className="text-center text-nowrap">Rec. Transfer</th>
+                            <th scope="col" style={{ width: "100%", minWidth: "280px" }}>Network Counterpart &amp; Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {alerts.map((item, i) => {
+                            const tone = item.deficit ? "danger" : "success";
+                            const toneColor = item.deficit ? "#f06548" : "#0ab39c";
+
+                            return (
+                                <tr key={item.id || i} data-id={i}>
+                                    <th
+                                        scope="row"
+                                        className="fw-medium text-nowrap"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: item.product,
+                                                badgeColor: toneColor,
+                                                mainValue: item.itemCode ? `SKU: ${item.itemCode}` : item.product,
+                                                mainColor: "#299cdb",
+                                                subText: `Category: ${item.group || "General"} · Branch: ${item.branch}`,
+                                                extraText: item.actionInsight || undefined,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
                                     >
-                                        {item.deficit ? "Deficit" : "Surplus"}
-                                    </span>
-                                    <small className={`d-block fw-semibold text-${tone}`}>{formatGap(item.gap)} gap</small>
-                                </td>
-                                <td
-                                    className="text-end"
-                                    title={`Branch Stock: ${item.stock.toLocaleString()} units of ${item.companyStock.toLocaleString()} company total (${item.stockShare.toFixed(1)}%)`}
-                                >
-                                    <span className="fw-semibold">{item.stock.toLocaleString()} u</span>
-                                    <small className="text-muted d-block">
-                                        {item.stockShare.toFixed(1)}% of {item.companyStock.toLocaleString()}
-                                    </small>
-                                </td>
-                                <td
-                                    className="text-end"
-                                    title={`Branch Sales: ${item.sales.toLocaleString()} units of ${item.companySales.toLocaleString()} company total (${item.salesShare.toFixed(1)}%)`}
-                                >
-                                    <span className="fw-semibold">{item.sales.toLocaleString()} u</span>
-                                    <small className="text-muted d-block">
-                                        {item.salesShare.toFixed(1)}% of {item.companySales.toLocaleString()}
-                                    </small>
-                                </td>
-                                <td className="text-center">
-                                    <span
-                                        className="badge bg-primary-subtle text-primary fs-12 fw-semibold px-2 py-1"
-                                        title={item.actionInsight}
+                                        {item.product}
+                                        <small className="text-muted d-block fw-normal">
+                                            {[item.itemCode, item.group].filter((v) => v && v !== "-").join(" · ")}
+                                        </small>
+                                    </th>
+                                    <td
+                                        className="text-nowrap"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: item.branch,
+                                                badgeColor: "#405189",
+                                                mainValue: `${item.stock.toLocaleString()} units in stock`,
+                                                mainColor: "#00e396",
+                                                subText: `Sales in window: ${item.sales.toLocaleString()} units`,
+                                                extraText: `Imbalance Status: ${item.deficit ? "Deficit (Needs stock)" : "Surplus (Excess stock)"}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
                                     >
-                                        <i className="ri-arrow-left-right-line me-1 align-middle"></i>
-                                        {item.qty.toLocaleString()} u
-                                    </span>
-                                </td>
-                                <td title={`${item.networkContext}\n\nAction: ${item.actionInsight}`}>
-                                    <div className="text-truncate fs-12 fw-medium" style={{ maxWidth: "320px" }}>
-                                        {item.networkContext}
-                                    </div>
-                                    <small className="text-muted d-block text-truncate" style={{ maxWidth: "320px" }}>
-                                        <i className="ri-information-line text-primary me-1 align-middle"></i>
-                                        {item.actionInsight}
-                                    </small>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                                        <span className="badge bg-light text-body fs-12 fw-medium">{item.branch || "-"}</span>
+                                    </td>
+                                    <td
+                                        className="text-center text-nowrap"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: `${item.deficit ? "Deficit" : "Surplus"} Alert`,
+                                                badgeColor: toneColor,
+                                                mainValue: `${formatGap(item.gap)} Imbalance Gap`,
+                                                mainColor: toneColor,
+                                                subText: `Stock share (${item.stockShare.toFixed(1)}%) vs Sales share (${item.salesShare.toFixed(1)}%)`,
+                                                extraText: `Recommended Transfer: ${item.qty.toLocaleString()} units`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <span
+                                            className={`badge rounded-pill border border-${tone} text-${tone} bg-${tone}-subtle fs-11 fw-normal px-2 py-1`}
+                                        >
+                                            {item.deficit ? "Deficit" : "Surplus"}
+                                        </span>
+                                        <small className={`d-block fw-semibold text-${tone}`}>{formatGap(item.gap)} gap</small>
+                                    </td>
+                                    <td
+                                        className="text-end text-nowrap"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: `${item.branch} Stock`,
+                                                badgeColor: "#299cdb",
+                                                mainValue: `${item.stock.toLocaleString()} units`,
+                                                mainColor: "#00e396",
+                                                subText: `${item.stockShare.toFixed(1)}% of total company stock (${item.companyStock.toLocaleString()} units)`,
+                                                extraText: `Product: ${item.product}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <span className="fw-semibold">{item.stock.toLocaleString()} u</span>
+                                        <small className="text-muted d-block">
+                                            {item.stockShare.toFixed(1)}% of {item.companyStock.toLocaleString()}
+                                        </small>
+                                    </td>
+                                    <td
+                                        className="text-end text-nowrap"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: `${item.branch} Sales`,
+                                                badgeColor: "#0ab39c",
+                                                mainValue: `${item.sales.toLocaleString()} units sold`,
+                                                mainColor: "#00e396",
+                                                subText: `${item.salesShare.toFixed(1)}% of total company sales (${item.companySales.toLocaleString()} units)`,
+                                                extraText: `Disparity Gap: ${formatGap(item.gap)}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <span className="fw-semibold">{item.sales.toLocaleString()} u</span>
+                                        <small className="text-muted d-block">
+                                            {item.salesShare.toFixed(1)}% of {item.companySales.toLocaleString()}
+                                        </small>
+                                    </td>
+                                    <td
+                                        className="text-center text-nowrap"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: "Recommended Inter-Branch Transfer",
+                                                badgeColor: "#405189",
+                                                mainValue: `${item.deficit ? "Receive" : "Transfer Out"} ${item.qty.toLocaleString()} units`,
+                                                mainColor: "#00e396",
+                                                subText: item.actionInsight,
+                                                extraText: `Network Context: ${item.networkContext}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <span className="badge bg-primary-subtle text-primary fs-12 fw-semibold px-2 py-1">
+                                            <i className="ri-arrow-left-right-line me-1 align-middle"></i>
+                                            {item.qty.toLocaleString()} u
+                                        </span>
+                                    </td>
+                                    <td
+                                        style={{ minWidth: "280px", whiteSpace: "normal" }}
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: "Network Counterpart & Action",
+                                                badgeColor: "#f7b84b",
+                                                mainValue: item.networkContext,
+                                                mainColor: "#f7b84b",
+                                                subText: `Recommended Action: ${item.actionInsight}`,
+                                                extraText: `Suggested Transfer: ${item.qty.toLocaleString()} units (${item.deficit ? "Deficit" : "Surplus"})`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <div className="fs-12 fw-medium text-dark" style={{ lineHeight: "1.35" }}>
+                                            {item.networkContext}
+                                        </div>
+                                        <div className="text-muted d-block mt-1 fs-11" style={{ lineHeight: "1.35" }}>
+                                            <i className="ri-information-line text-primary me-1 align-middle"></i>
+                                            {item.actionInsight}
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Custom Floating Hover Tooltip matching Stock Value By Branch (BarChartTwo) */}
+            {hoverInfo && (
+                <div
+                    style={{
+                        position: "fixed",
+                        left: `${hoverInfo.x}px`,
+                        top: `${hoverInfo.y}px`,
+                        transform:
+                            hoverInfo.x > (typeof window !== "undefined" && window.innerWidth ? window.innerWidth - 340 : 600)
+                                ? hoverInfo.y < 100
+                                    ? "translate(-100%, 15px)"
+                                    : "translate(-100%, -120%)"
+                                : hoverInfo.y < 100
+                                ? "translate(15px, 15px)"
+                                : "translate(15px, -120%)",
+                        pointerEvents: "none",
+                        zIndex: 99999,
+                        backgroundColor: "rgba(33, 37, 41, 0.95)",
+                        color: "#fff",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
+                        fontSize: "12px",
+                        lineHeight: "1.4",
+                        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.25)",
+                        whiteSpace: "nowrap",
+                        transition: "opacity 0.1s ease",
+                    }}
+                >
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            fontWeight: 600,
+                            marginBottom: "3px",
+                        }}
+                    >
+                        <span
+                            style={{
+                                width: "9px",
+                                height: "9px",
+                                borderRadius: "50%",
+                                backgroundColor: hoverInfo.badgeColor || "#00e396",
+                                display: "inline-block",
+                            }}
+                        />
+                        <span>{hoverInfo.title}</span>
+                    </div>
+                    {hoverInfo.mainValue && (
+                        <div
+                            style={{
+                                color: hoverInfo.mainColor || "#00e396",
+                                fontWeight: 700,
+                                fontSize: "13px",
+                            }}
+                        >
+                            {hoverInfo.mainValue}
+                        </div>
+                    )}
+                    {hoverInfo.subText && (
+                        <div
+                            style={{
+                                fontSize: "11px",
+                                color: "#adb5bd",
+                                marginTop: "2px",
+                                whiteSpace: "normal",
+                                maxWidth: "340px",
+                            }}
+                        >
+                            {hoverInfo.subText}
+                        </div>
+                    )}
+                    {hoverInfo.extraText && (
+                        <div
+                            style={{
+                                fontSize: "11px",
+                                color: "#e9ecef",
+                                marginTop: "4px",
+                                borderTop: "1px solid rgba(255,255,255,0.12)",
+                                paddingTop: "4px",
+                                whiteSpace: "normal",
+                                maxWidth: "340px",
+                            }}
+                        >
+                            {hoverInfo.extraText}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Spinner } from "reactstrap";
 import { useSelector } from "react-redux";
 import {
@@ -17,6 +17,8 @@ const SlowMovingStock = ({
     sortDesc = true,
     onSort,
 }) => {
+    const [hoverInfo, setHoverInfo] = useState(null);
+
     const {
         slowMovingStock = [],
         loadingSlowMovingStock = false,
@@ -25,6 +27,24 @@ const SlowMovingStock = ({
     } = useSelector((state) => state.StockInventory ?? {});
 
     const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
+
+    const handleCellHover = (e, info) => {
+        setHoverInfo({
+            ...info,
+            x: e.clientX,
+            y: e.clientY,
+        });
+    };
+
+    const handleMouseMove = (e) => {
+        if (hoverInfo) {
+            setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setHoverInfo(null);
+    };
 
     const processed = useMemo(() => {
         // 1. Determine data source: prop items -> Redux slowMovingStock
@@ -105,9 +125,13 @@ const SlowMovingStock = ({
     }
 
     return (
-        <div>
-            <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto" }}>
-                <table className="table table-borderless table-centered table-nowrap mb-0">
+        <div style={{ position: "relative" }}>
+            <div
+                className="table-responsive"
+                style={{ maxHeight: "400px", overflowY: "auto" }}
+                onMouseLeave={handleMouseLeave}
+            >
+                <table className="table table-borderless table-centered table-nowrap mb-0 w-100">
                     <thead className="text-muted table-light sticky-top">
                         <tr>
                             {renderSortableHeader("name", "Product")}
@@ -122,33 +146,138 @@ const SlowMovingStock = ({
                     <tbody>
                         {processed.slice(0, MAX_ROWS).map((item, idx) => {
                             const tone = item.isDead ? "danger" : "warning";
+                            const toneColor = item.isDead ? "#f06548" : "#f7b84b";
+
                             return (
-                                <tr
-                                    key={item.id}
-                                    data-id={idx}
-                                    title={item.actionInsight || `${item.name} (${item.itemCode})`}
-                                >
-                                    <th scope="row" className="fw-medium">
+                                <tr key={item.id} data-id={idx}>
+                                    <th
+                                        scope="row"
+                                        className="fw-medium"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: item.name,
+                                                badgeColor: toneColor,
+                                                mainValue: item.itemCode ? `SKU: ${item.itemCode}` : item.name,
+                                                mainColor: "#299cdb",
+                                                subText: `Category: ${item.category} · Branch: ${item.branch}`,
+                                                extraText: item.actionInsight || undefined,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
                                         {item.name}
                                         <small className="text-muted d-block fw-normal">
                                             {[item.itemCode, item.category].filter(Boolean).join(" · ")}
                                         </small>
                                     </th>
-                                    <td>{item.branch || "-"}</td>
-                                    <td className="text-end fw-semibold">{item.stockQty.toLocaleString()}</td>
-                                    <td className="text-end text-muted">{item.unitsSold.toLocaleString()}</td>
-                                    <td className="text-end text-muted">{formatSlowDaysCover(item.daysCover)}</td>
-                                    <td className="text-end fw-semibold">
-                                        <span
-                                            title={`Unit Avg Cost: KES ${item.unitAvgCost.toLocaleString(undefined, {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2,
-                                            })}`}
-                                        >
+                                    <td
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: item.branch || "Branch Location",
+                                                badgeColor: "#405189",
+                                                mainValue: `${item.stockQty.toLocaleString()} units on hand`,
+                                                mainColor: "#00e396",
+                                                subText: `${item.unitsSold.toLocaleString()} units sold in ${lookbackDays} days`,
+                                                extraText: `Movement status: ${item.statusLabel}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {item.branch || "-"}
+                                    </td>
+                                    <td
+                                        className="text-end fw-semibold"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: "Current Stock On Hand",
+                                                badgeColor: "#299cdb",
+                                                mainValue: `${item.stockQty.toLocaleString()} units`,
+                                                mainColor: "#299cdb",
+                                                subText: `Sold in window: ${item.unitsSold.toLocaleString()} units`,
+                                                extraText: `Days of Inventory Cover: ${formatSlowDaysCover(item.daysCover)}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {item.stockQty.toLocaleString()}
+                                    </td>
+                                    <td
+                                        className="text-end text-muted"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: `Units Sold (${lookbackDays} Days)`,
+                                                badgeColor: "#0ab39c",
+                                                mainValue: `${item.unitsSold.toLocaleString()} units sold`,
+                                                mainColor: "#0ab39c",
+                                                subText: `Current stock: ${item.stockQty.toLocaleString()} units`,
+                                                extraText: item.unitsSold === 0 ? "Zero movement in the selected lookback period" : undefined,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {item.unitsSold.toLocaleString()}
+                                    </td>
+                                    <td
+                                        className="text-end text-muted"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: "Days of Inventory Cover",
+                                                badgeColor: toneColor,
+                                                mainValue: formatSlowDaysCover(item.daysCover),
+                                                mainColor: toneColor,
+                                                subText: `Stock: ${item.stockQty.toLocaleString()} · Sold: ${item.unitsSold.toLocaleString()}`,
+                                                extraText: item.daysCover >= 999 ? "Extremely high cover / zero sales recorded" : undefined,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {formatSlowDaysCover(item.daysCover)}
+                                    </td>
+                                    <td
+                                        className="text-end fw-semibold"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: "Tied-Up Capital Valuation",
+                                                badgeColor: "#00e396",
+                                                mainValue: `KES ${item.tiedUpCapital.toLocaleString(undefined, {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                })}`,
+                                                mainColor: "#00e396",
+                                                subText: `Unit Avg Cost: KES ${item.unitAvgCost.toLocaleString(undefined, {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                })}`,
+                                                extraText: `Holding ${item.stockQty.toLocaleString()} units at ${item.branch}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <span>
                                             KES {item.tiedUpCapital.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                         </span>
                                     </td>
-                                    <td className="text-center">
+                                    <td
+                                        className="text-center"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: item.statusLabel,
+                                                badgeColor: toneColor,
+                                                mainValue: item.statusLabel,
+                                                mainColor: toneColor,
+                                                subText: item.actionInsight || (item.isDead ? "No sales in lookback period" : "High days of inventory cover"),
+                                                extraText: `Tied-up Capital: KES ${item.tiedUpCapital.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
                                         <span
                                             className={`badge rounded-pill border border-${tone} text-${tone} bg-${tone}-subtle fs-11 fw-normal px-2 py-1`}
                                         >
@@ -161,6 +290,97 @@ const SlowMovingStock = ({
                     </tbody>
                 </table>
             </div>
+
+            {/* Custom Floating Hover Tooltip matching Stock Value By Branch (BarChartTwo) */}
+            {hoverInfo && (
+                <div
+                    style={{
+                        position: "fixed",
+                        left: `${hoverInfo.x}px`,
+                        top: `${hoverInfo.y}px`,
+                        transform:
+                            hoverInfo.x > (typeof window !== "undefined" && window.innerWidth ? window.innerWidth - 340 : 600)
+                                ? hoverInfo.y < 100
+                                    ? "translate(-100%, 15px)"
+                                    : "translate(-100%, -120%)"
+                                : hoverInfo.y < 100
+                                ? "translate(15px, 15px)"
+                                : "translate(15px, -120%)",
+                        pointerEvents: "none",
+                        zIndex: 99999,
+                        backgroundColor: "rgba(33, 37, 41, 0.95)",
+                        color: "#fff",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
+                        fontSize: "12px",
+                        lineHeight: "1.4",
+                        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.25)",
+                        whiteSpace: "nowrap",
+                        transition: "opacity 0.1s ease",
+                    }}
+                >
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            fontWeight: 600,
+                            marginBottom: "3px",
+                        }}
+                    >
+                        <span
+                            style={{
+                                width: "9px",
+                                height: "9px",
+                                borderRadius: "50%",
+                                backgroundColor: hoverInfo.badgeColor || "#00e396",
+                                display: "inline-block",
+                            }}
+                        />
+                        <span>{hoverInfo.title}</span>
+                    </div>
+                    {hoverInfo.mainValue && (
+                        <div
+                            style={{
+                                color: hoverInfo.mainColor || "#00e396",
+                                fontWeight: 700,
+                                fontSize: "13px",
+                            }}
+                        >
+                            {hoverInfo.mainValue}
+                        </div>
+                    )}
+                    {hoverInfo.subText && (
+                        <div
+                            style={{
+                                fontSize: "11px",
+                                color: "#adb5bd",
+                                marginTop: "2px",
+                                whiteSpace: "normal",
+                                maxWidth: "340px",
+                            }}
+                        >
+                            {hoverInfo.subText}
+                        </div>
+                    )}
+                    {hoverInfo.extraText && (
+                        <div
+                            style={{
+                                fontSize: "11px",
+                                color: "#e9ecef",
+                                marginTop: "4px",
+                                borderTop: "1px solid rgba(255,255,255,0.12)",
+                                paddingTop: "4px",
+                                whiteSpace: "normal",
+                                maxWidth: "340px",
+                            }}
+                        >
+                            {hoverInfo.extraText}
+                        </div>
+                    )}
+                </div>
+            )}
+
             {processed.length > MAX_ROWS && (
                 <p className="text-muted fs-12 text-center mt-2 mb-0">
                     Showing {MAX_ROWS} of {processed.length.toLocaleString()} items. Search to narrow the
