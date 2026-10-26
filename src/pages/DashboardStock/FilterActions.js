@@ -49,9 +49,9 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
     };
 
     const handleReset = () => {
+        saveActiveBranch("stock", 0);
         dispatch(resetFilters());
-        saveActiveBranch("stock", null);
-        navigate("/dashboard-stock");
+        navigate("/dashboard-stock?branch=0", { replace: true });
     };
 
     const startPickerOptions = useMemo(
@@ -93,10 +93,10 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
                     <div className="col-8">
                         <select
                             className="form-select"
-                            value={branch ?? ""}
-                            onChange={(e) => dispatch(setBranch(e.target.value === "" ? null : Number(e.target.value)))}
+                            value={branch ?? 0}
+                            onChange={(e) => dispatch(setBranch(e.target.value === "" ? 0 : Number(e.target.value)))}
                         >
-                            <option value="">All Branches</option>
+                            <option value={0}>All Branches</option>
                             {branches.map((b) => (
                                 <option key={b.branchCode} value={b.branchCode}>
                                     {b.branchName}

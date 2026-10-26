@@ -20,7 +20,7 @@ const Section = ({ rightClickBtn }) => {
   const { branch, startDate, endDate } = appliedFilters || filters;
   const lookbackDays = getLookbackDays(startDate, endDate);
 
-  const isBranchView = Boolean(branch && branch !== "All Branches");
+  const isBranchView = Boolean(branch && branch !== "All Branches" && Number(branch) > 0);
   const branchDisplayName = useMemo(() => {
     if (!isBranchView) return "All Branches";
     return (
