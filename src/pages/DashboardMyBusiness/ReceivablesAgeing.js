@@ -51,10 +51,9 @@ const ReceivablesAgeing = () => {
   const [error, setError] = useState(null);
   const [sort, setSort] = useState({ key: "balance", desc: true });
 
-  const { filters = {}, appliedFilters } = useSelector(
-    (state) => state.DashboardMyBusiness || state.MyBusiness || {}
+  const appliedFilters = useSelector(
+    (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
   );
-  const activeFilters = appliedFilters || filters;
 
   useEffect(() => {
     let isMounted = true;
@@ -68,8 +67,8 @@ const ReceivablesAgeing = () => {
       const [overdueRes, agingRes] = await Promise.allSettled([
         getKPIOverdueDebtors({
           clientid: 1,
-          AsOfDate: activeFilters.endDate,
-          branchcode: activeFilters.branch ?? 0,
+          AsOfDate: appliedFilters.endDate,
+          branchcode: appliedFilters.branch ?? 0,
           OverdueOnly: false,
           GroupBy: "CUSTOMER",
         }),
@@ -78,8 +77,8 @@ const ReceivablesAgeing = () => {
           Mode: "AGING",
           AccountType: "CUSTOMER",
           IncludeZeroBal: false,
-          DateTo: activeFilters.endDate,
-          branchcode: activeFilters.branch ?? 0,
+          DateTo: appliedFilters.endDate,
+          branchcode: appliedFilters.branch ?? 0,
         }),
       ]);
       if (!isMounted) return;
@@ -134,7 +133,7 @@ const ReceivablesAgeing = () => {
     return () => {
       isMounted = false;
     };
-  }, [activeFilters.branch, activeFilters.endDate]);
+  }, [appliedFilters.branch, appliedFilters.endDate]);
 
   const sorted = useMemo(() => {
     const direction = sort.desc ? -1 : 1;
@@ -197,7 +196,7 @@ const ReceivablesAgeing = () => {
         </div>
         <div className="d-flex align-items-center gap-2">
           <span className="badge bg-light text-muted">
-            {byTerms ? "Aged against payment terms" : "Aged by balance age"} · as at {activeFilters.endDate}
+            {byTerms ? "Aged against payment terms" : "Aged by balance age"} · as at {appliedFilters.endDate}
           </span>
           <CardExportButtons
             onExport={handleExportExcel}

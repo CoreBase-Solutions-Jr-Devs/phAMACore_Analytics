@@ -38,10 +38,9 @@ const StockMovements = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { filters = {}, appliedFilters } = useSelector(
-    (state) => state.DashboardMyBusiness || state.MyBusiness || {}
+  const appliedFilters = useSelector(
+    (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
   );
-  const activeFilters = appliedFilters || filters;
 
   useEffect(() => {
     let isMounted = true;
@@ -55,10 +54,10 @@ const StockMovements = () => {
 
         const response = await getKPIStockHealth({
           clientid: 1,
-          AsOfDate: activeFilters.endDate || todayFormatted,
+          AsOfDate: appliedFilters.endDate || todayFormatted,
           GroupBy: "CRITICAL_STOCKOUTS",
           TopN: 0,
-          branchcode: activeFilters.branch ?? null,
+          branchcode: appliedFilters.branch ?? null,
         });
 
         let data = response?.data ?? response;
@@ -95,7 +94,7 @@ const StockMovements = () => {
     return () => {
       isMounted = false;
     };
-  }, [activeFilters.branch, activeFilters.endDate]);
+  }, [appliedFilters.branch, appliedFilters.endDate]);
 
   const handleExportExcel = () => {
     const rows = (stockAlerts || []).map((item) => ({

@@ -7,10 +7,9 @@ import CardExportButtons from "../../Components/Common/CardExportButtons";
 import TrendCardBody, { exportStamp, money } from "./TrendCardBody";
 
 const StockPurchases = () => {
-  const { monthlyTrend = [], loadingMonthlyTrend, errorMonthlyTrend, filters = {}, appliedFilters } = useSelector(
+  const { monthlyTrend = [], loadingMonthlyTrend, errorMonthlyTrend, appliedFilters = {} } = useSelector(
     (state) => state.DashboardMyBusiness || state.MyBusiness || {}
   );
-  const activeFilters = appliedFilters || filters;
 
   // null (not 0) where a figure does not exist, so the chart leaves a gap instead of a false zero
   const series = useMemo(() => {
@@ -40,7 +39,7 @@ const StockPurchases = () => {
         <h4 className="card-title mb-0">Purchases, Cost of Sales &amp; Stock</h4>
         <div className="d-flex align-items-center gap-2">
           <span className="badge bg-light text-muted">
-            {activeFilters.startDate} - {activeFilters.endDate}
+            {appliedFilters.startDate} - {appliedFilters.endDate}
           </span>
           <CardExportButtons
             onExport={handleExportExcel}

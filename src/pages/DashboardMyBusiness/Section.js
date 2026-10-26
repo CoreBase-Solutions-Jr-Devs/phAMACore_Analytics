@@ -5,13 +5,11 @@ import { getCachedBranchName } from "../../helpers/branch_helper";
 import { formatAmount } from "../../helpers/format_helper";
 
 const Section = ({ rightClickBtn, kpiData = {} }) => {
-  const { filters = {}, appliedFilters } = useSelector(
-    (state) =>
-      state.DashboardMyBusiness ||
-      state.MyBusiness || { filters: {} }
+  const appliedFilters = useSelector(
+    (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
   );
 
-  const { branch, startDate, endDate } = appliedFilters || filters;
+  const { branch, startDate, endDate } = appliedFilters;
 
   const isBranchView = Boolean(branch && branch !== "All Branches");
   const branchDisplayName = useMemo(() => {

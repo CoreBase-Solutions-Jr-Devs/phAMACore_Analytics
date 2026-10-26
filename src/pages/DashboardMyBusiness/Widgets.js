@@ -12,6 +12,7 @@ import {
 import { getMonthToDateApi } from "../utils/dateHelper";
 import { formatAmount } from "../../helpers/format_helper";
 
+const formatKpiAmount = (val) => formatAmount(val, 2);
 
 /**
  * Calculate profit from the Inventory Profit Summary response.
@@ -326,7 +327,7 @@ const calculateAccountBalance = (data) => {
 };
 
 
-export default function Widgets({ onKpiComputed }) {
+function Widgets({ onKpiComputed }) {
     const dispatch = useDispatch();
 
     /*
@@ -340,11 +341,9 @@ export default function Widgets({ onKpiComputed }) {
 
     const {
         inventoryProfitSummaryUser = [],
-        accountBalance = [],
         cashbookSummary = [],
         cashbookSummaryMetrics = [],
-        filters,
-        appliedFilters,
+        appliedFilters = {},
 
         loadingProfitSummary = false,
         loadingAccountBalance = false,
@@ -356,17 +355,15 @@ export default function Widgets({ onKpiComputed }) {
             {}
     );
 
-    const activeFilters = appliedFilters || filters;
-
 
     /**
      * Fetch the core My Business KPI data.
      */
     useEffect(() => {
         const mtd = getMonthToDateApi();
-        const startDate = activeFilters?.startDate || mtd.startDate;
-        const endDate = activeFilters?.endDate || mtd.endDate;
-        const branchCode = activeFilters?.branch ?? null;
+        const startDate = appliedFilters?.startDate || mtd.startDate;
+        const endDate = appliedFilters?.endDate || mtd.endDate;
+        const branchCode = appliedFilters?.branch ?? null;
 
         // 1. Income Statement KPI (Sales and Stock Profit)
         dispatch(
@@ -389,7 +386,7 @@ export default function Widgets({ onKpiComputed }) {
                 branchcode: branchCode,
             })
         );
-    }, [dispatch, activeFilters?.startDate, activeFilters?.endDate, activeFilters?.branch]);
+    }, [dispatch, appliedFilters?.startDate, appliedFilters?.endDate, appliedFilters?.branch]);
 
 
     /**
@@ -406,7 +403,7 @@ export default function Widgets({ onKpiComputed }) {
                         clientid: 1,
                         Mode: "SUMMARY",
                         AccountType: "CUSTOMER",
-                        branchcode: activeFilters?.branch ?? 0,
+                        branchcode: appliedFilters?.branch ?? 0,
                         IncludeZeroBal: false,
                     })
                 );
@@ -429,7 +426,7 @@ export default function Widgets({ onKpiComputed }) {
                         clientid: 1,
                         Mode: "SUMMARY",
                         AccountType: "SUPPLIER",
-                        branchcode: activeFilters?.branch ?? 0,
+                        branchcode: appliedFilters?.branch ?? 0,
                         IncludeZeroBal: false,
                     })
                 );
@@ -455,7 +452,7 @@ export default function Widgets({ onKpiComputed }) {
         };
 
         fetchAccountBalances();
-    }, [dispatch, activeFilters?.branch]);
+    }, [dispatch, appliedFilters?.branch]);
 
 
     const salesValue = useMemo(() => {
@@ -647,14 +644,7 @@ export default function Widgets({ onKpiComputed }) {
                                                             : 2
                                                     }
                                                     duration={2}
-                                                    formattingFn={(val) =>
-                                                        formatAmount(
-                                                            val,
-                                                            item.decimals !== undefined
-                                                                ? item.decimals
-                                                                : 2
-                                                        )
-                                                    }
+                                                    formattingFn={formatKpiAmount}
                                                 />
                                             )}
                                         </span>
@@ -685,3 +675,5 @@ export default function Widgets({ onKpiComputed }) {
         </React.Fragment>
     );
 }
+
+export default React.memo(Widgets);
