@@ -88,19 +88,18 @@ export const fetchBatchExpiryNeo = createAsyncThunk(
   "stockInventory/fetchBatchExpireDetailsNeo",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const { clientid = 1, branchcode, startDate, endDate } = params;
-      const payload = { clientid };
-      if (startDate) payload.startDate = startDate;
-      if (endDate) payload.endDate = endDate;
-      if (
+      const { clientid = 1, branchcode = 0, startDate, endDate } = params;
+      const parsedBranch =
         branchcode !== undefined &&
         branchcode !== null &&
         branchcode !== "" &&
         !Number.isNaN(Number(branchcode)) &&
         Number(branchcode) > 0
-      ) {
-        payload.branchcode = Number(branchcode);
-      }
+          ? Number(branchcode)
+          : 0;
+      const payload = { clientid, branchcode: parsedBranch };
+      if (startDate) payload.startDate = startDate;
+      if (endDate) payload.endDate = endDate;
 
       const response = await getBatchExpiryNeoApi(payload);
       return toList(response);
@@ -186,12 +185,12 @@ export const fetchKPITotalStockValueByBranch = createAsyncThunk(
     try {
       // IncludeBlocked defaults to true: it matches the official valuation report
       // and the figure shown on the My Business dashboard.
-      const { clientid = 1, whichcost = 1, IncludeBlocked = true, branchcode } = params;
+      const { clientid = 1, whichcost = 1, IncludeBlocked = true, branchcode = 0 } = params;
       const base = { clientid, whichcost, IncludeBlocked };
 
-      if (branchcode) {
-        const response = await getKPITotalStockValueByBranchApi({ ...base, branchcode });
-        return toList(response).map((item) => withCleanBranch(item, { branchCode: branchcode }));
+      if (branchcode && Number(branchcode) > 0) {
+        const response = await getKPITotalStockValueByBranchApi({ ...base, branchcode: Number(branchcode) });
+        return toList(response).map((item) => withCleanBranch(item, { branchCode: Number(branchcode) }));
       }
 
       return await fetchStockValuePerBranch(base, getState);
@@ -207,11 +206,11 @@ export const fetchKPIStockHealth = createAsyncThunk(
   "stockInventory/fetchKPIStockHealth",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const { clientid = 1, branchcode = null, LookbackDays, AsOfDate } = params;
-      const payload = { clientid };
-      if (branchcode) {
-        payload.branchcode = branchcode;
-      }
+      const { clientid = 1, branchcode = 0, LookbackDays, AsOfDate } = params;
+      const payload = {
+        clientid,
+        branchcode: branchcode && Number(branchcode) > 0 ? Number(branchcode) : 0,
+      };
       if (LookbackDays) payload.LookbackDays = LookbackDays;
       if (AsOfDate) payload.AsOfDate = AsOfDate;
 
@@ -235,7 +234,7 @@ export const fetchKPICriticalStockouts = createAsyncThunk(
     try {
       const {
         clientid = 1,
-        branchcode = null,
+        branchcode = 0,
         GroupBy = "CRITICAL_STOCKOUTS",
         TopN = 0,
         AsOfDate = null,
@@ -243,13 +242,10 @@ export const fetchKPICriticalStockouts = createAsyncThunk(
 
       const payload = {
         clientid,
+        branchcode: branchcode && Number(branchcode) > 0 ? Number(branchcode) : 0,
         GroupBy,
         TopN,
       };
-
-      if (branchcode) {
-        payload.branchcode = branchcode;
-      }
 
       if (AsOfDate) {
         // Date format DD/MM/YYYY
@@ -288,7 +284,7 @@ export const fetchKPISlowMovingStock = createAsyncThunk(
     try {
       const {
         clientid = 1,
-        branchcode = null,
+        branchcode = 0,
         GroupBy = "SLOW_MOVERS",
         TopN = 0,
         LookbackDays = 30,
@@ -297,14 +293,11 @@ export const fetchKPISlowMovingStock = createAsyncThunk(
 
       const payload = {
         clientid,
+        branchcode: branchcode && Number(branchcode) > 0 ? Number(branchcode) : 0,
         GroupBy,
         TopN,
         LookbackDays,
       };
-
-      if (branchcode) {
-        payload.branchcode = branchcode;
-      }
 
       if (AsOfDate) {
         // Date format DD/MM/YYYY
@@ -343,9 +336,14 @@ export const fetchKPIImbalances = createAsyncThunk(
   "stockInventory/fetchKPIImbalances",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const { clientid = 1, branchcode = null, TopN = 0, LookbackDays = 30, AsOfDate = null } = params;
-      const payload = { clientid, GroupBy: "IMBALANCES", TopN, LookbackDays };
-      if (branchcode) payload.branchcode = branchcode;
+      const { clientid = 1, branchcode = 0, TopN = 0, LookbackDays = 30, AsOfDate = null } = params;
+      const payload = {
+        clientid,
+        branchcode: branchcode && Number(branchcode) > 0 ? Number(branchcode) : 0,
+        GroupBy: "IMBALANCES",
+        TopN,
+        LookbackDays,
+      };
       if (AsOfDate) payload.AsOfDate = AsOfDate;
 
       const response = await getKPIStockHealthApi(payload);
@@ -387,12 +385,13 @@ export const fetchKPISalesTransactions = createAsyncThunk(
         startDate,
         endDate,
         GroupBy = "BRANCH",
-        branchcode = null,
+        branchcode = 0,
       } = params;
 
       const payload = {
         clientid,
         GroupBy,
+        branchcode: branchcode && Number(branchcode) > 0 ? Number(branchcode) : 0,
       };
 
       if (startDate) {
@@ -400,9 +399,6 @@ export const fetchKPISalesTransactions = createAsyncThunk(
       }
       if (endDate) {
         payload.EndDate = endDate;
-      }
-      if (branchcode) {
-        payload.branchcode = branchcode;
       }
 
       const periodDays = calculatePeriodDays(startDate, endDate);

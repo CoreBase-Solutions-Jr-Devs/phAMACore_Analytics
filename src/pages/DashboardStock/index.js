@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
 import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
@@ -21,8 +21,8 @@ import {
     fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
 } from '../../slices/dashboardStock/thunk';
-import { setBranch, applyFilters } from '../../slices/dashboardStock/reducer';
-import { resolveBranchName, saveActiveBranch, cleanBranchName } from '../../helpers/branch_helper';
+import { setBranch, applyFilters, syncDraftFilters } from '../../slices/dashboardStock/reducer';
+import { resolveBranchName, saveActiveBranch, getActiveBranch, cleanBranchName } from '../../helpers/branch_helper';
 
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
@@ -87,8 +87,15 @@ const DashboardStock = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { branchId } = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const urlBranchCode = branchId ? Number(branchId) : null;
+    const queryBranchParam = searchParams.get("branch");
+    const urlBranchCode = useMemo(() => {
+        const raw = branchId ?? queryBranchParam;
+        if (raw === null || raw === undefined || raw === "") return null;
+        const parsed = Number(raw);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+    }, [branchId, queryBranchParam]);
 
     const {
         batchExpiryNeo = [],
@@ -105,8 +112,8 @@ const DashboardStock = () => {
 
     const activeFilters = appliedFilters || filters;
 
-    const branchCode = activeFilters.branch ? Number(activeFilters.branch) : null;
-    const isBranchView = !!branchCode;
+    const branchCode = activeFilters.branch && Number(activeFilters.branch) > 0 ? Number(activeFilters.branch) : 0;
+    const isBranchView = branchCode > 0;
 
     const branchDisplayName = isBranchView
         ? cleanBranchName(resolveBranchName(branchCode, branches))
@@ -117,19 +124,36 @@ const DashboardStock = () => {
     const [rightColumn, setRightColumn] = useState(false);
 
     const toggleRightColumn = () => {
-        setRightColumn(prev => !prev);
+        setRightColumn((prev) => {
+            if (prev) {
+                dispatch(syncDraftFilters());
+            }
+            return !prev;
+        });
     };
 
     const formatDisplay = (date) => date || "";
 
-    // Sync URL branchId into Redux state and persist active branch when URL changes
+    // Sync URL branch query param / legacy path param, Redux state, and localStorage persistence
     useEffect(() => {
-        dispatch(setBranch(urlBranchCode));
-        dispatch(applyFilters());
-        if (urlBranchCode) {
-            saveActiveBranch("stock", urlBranchCode);
+        if (branchId !== undefined) {
+            const code = urlBranchCode ?? 0;
+            saveActiveBranch("stock", code);
+            dispatch(applyFilters({ branch: code }));
+            navigate(`/dashboard-stock?branch=${code}`, { replace: true });
+            return;
         }
-    }, [dispatch, urlBranchCode]);
+
+        if (urlBranchCode !== null) {
+            saveActiveBranch("stock", urlBranchCode);
+            dispatch(applyFilters({ branch: urlBranchCode }));
+            return;
+        }
+
+        const persistedBranch = getActiveBranch("stock") ?? 0;
+        dispatch(applyFilters({ branch: persistedBranch }));
+        setSearchParams({ branch: String(persistedBranch) }, { replace: true });
+    }, [dispatch, navigate, branchId, urlBranchCode, setSearchParams]);
 
     // Fetch branches once on mount
     useEffect(() => {
@@ -138,7 +162,7 @@ const DashboardStock = () => {
 
     // Stock position: live figures that depend on the branch.
     useEffect(() => {
-        const branchcode = branchCode || null;
+        const branchcode = branchCode || 0;
 
         dispatch(fetchKPITotalStockValueByBranch({ clientid: 1, whichcost: 1, branchcode }));
     }, [dispatch, branchCode]);
@@ -146,7 +170,7 @@ const DashboardStock = () => {
     // Batch expiry: 12-month lookback up to 90 days ahead of the filtered end date (or today),
     // filtered by the selected branch.
     useEffect(() => {
-        const branchcode = branchCode || null;
+        const branchcode = branchCode || 0;
         const asOf = parseApiDate(activeFilters.endDate) || new Date();
 
         dispatch(fetchBatchExpiryNeo({
@@ -161,9 +185,10 @@ const DashboardStock = () => {
     // The per-line closing stock and stock movement downloads were dropped: the stock health
     // endpoint already returns the KPIs and transfer suggestions that were derived from them.
     useEffect(() => {
+        const branchcode = branchCode || 0;
         const health = {
             clientid: 1,
-            branchcode: branchCode || null,
+            branchcode,
             LookbackDays: lookbackDays,
             AsOfDate: activeFilters.endDate,
         };
@@ -177,7 +202,7 @@ const DashboardStock = () => {
             startDate: activeFilters.startDate,
             endDate: activeFilters.endDate,
             GroupBy: "BRANCH",
-            branchcode: branchCode || null,
+            branchcode,
         }));
     }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate, lookbackDays]);
 
@@ -323,15 +348,11 @@ const DashboardStock = () => {
     };
 
     const handleApplyFilters = () => {
-        dispatch(applyFilters());
+        const nextBranch = filters.branch && Number(filters.branch) > 0 ? Number(filters.branch) : 0;
+        saveActiveBranch("stock", nextBranch);
+        dispatch(applyFilters({ branch: nextBranch }));
         setRightColumn(false);
-
-        if (filters.branch) {
-            saveActiveBranch("stock", filters.branch);
-            navigate(`/dashboard-stock/branch/${filters.branch}`);
-        } else {
-            navigate('/dashboard-stock');
-        }
+        setSearchParams({ branch: String(nextBranch) }, { replace: true });
     };
 
     return (

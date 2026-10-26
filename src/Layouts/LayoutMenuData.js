@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getActiveBranch } from "../helpers/branch_helper";
 
 const Navdata = () => {
   const history = useNavigate();
@@ -14,12 +13,7 @@ const Navdata = () => {
     (state) => state.PurchaseOrders?.filters?.branch,
   );
 
-  const stockBranch = useSelector(
-    (state) => state.StockInventory?.filters?.branch,
-  );
-
   // const activeSalesBranch = salesBranch || getActiveBranch('sales');
-  const activeStockBranch = stockBranch || getActiveBranch("stock");
   // const activePurchaseBranch = purchaseBranch || getActiveBranch('purchase');
 
   // States
@@ -148,12 +142,6 @@ const Navdata = () => {
           id: "dashboard-stock",
           label: "Dashboard",
           link: "/dashboard-stock",
-          parentId: "stock",
-        },
-        {
-          id: "branchview-stock",
-          label: "BranchView",
-          link: `/dashboard-stock/branch/${activeStockBranch}`,
           parentId: "stock",
         },
       ],
