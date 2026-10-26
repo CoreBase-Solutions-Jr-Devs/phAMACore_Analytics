@@ -18,9 +18,12 @@ const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL" }) => {
         loadingImbalances = false,
         errorImbalances = null,
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
 
-    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
+    const activeFilters = appliedFilters || filters;
+
+    const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
 
     const alerts = useMemo(() => {
         const term = searchTerm.trim().toLowerCase();

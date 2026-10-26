@@ -344,6 +344,7 @@ export default function Widgets({ onKpiComputed }) {
         cashbookSummary = [],
         cashbookSummaryMetrics = [],
         filters,
+        appliedFilters,
 
         loadingProfitSummary = false,
         loadingAccountBalance = false,
@@ -355,15 +356,17 @@ export default function Widgets({ onKpiComputed }) {
             {}
     );
 
+    const activeFilters = appliedFilters || filters;
+
 
     /**
      * Fetch the core My Business KPI data.
      */
     useEffect(() => {
         const mtd = getMonthToDateApi();
-        const startDate = filters?.startDate || mtd.startDate;
-        const endDate = filters?.endDate || mtd.endDate;
-        const branchCode = filters?.branch ?? null;
+        const startDate = activeFilters?.startDate || mtd.startDate;
+        const endDate = activeFilters?.endDate || mtd.endDate;
+        const branchCode = activeFilters?.branch ?? null;
 
         // 1. Income Statement KPI (Sales and Stock Profit)
         dispatch(
@@ -386,7 +389,7 @@ export default function Widgets({ onKpiComputed }) {
                 branchcode: branchCode,
             })
         );
-    }, [dispatch, filters?.startDate, filters?.endDate, filters?.branch]);
+    }, [dispatch, activeFilters?.startDate, activeFilters?.endDate, activeFilters?.branch]);
 
 
     /**
@@ -403,7 +406,7 @@ export default function Widgets({ onKpiComputed }) {
                         clientid: 1,
                         Mode: "SUMMARY",
                         AccountType: "CUSTOMER",
-                        branchcode: filters?.branch ?? 0,
+                        branchcode: activeFilters?.branch ?? 0,
                         IncludeZeroBal: false,
                     })
                 );
@@ -426,7 +429,7 @@ export default function Widgets({ onKpiComputed }) {
                         clientid: 1,
                         Mode: "SUMMARY",
                         AccountType: "SUPPLIER",
-                        branchcode: filters?.branch ?? 0,
+                        branchcode: activeFilters?.branch ?? 0,
                         IncludeZeroBal: false,
                     })
                 );
@@ -452,7 +455,7 @@ export default function Widgets({ onKpiComputed }) {
         };
 
         fetchAccountBalances();
-    }, [dispatch, filters?.branch]);
+    }, [dispatch, activeFilters?.branch]);
 
 
     const salesValue = useMemo(() => {

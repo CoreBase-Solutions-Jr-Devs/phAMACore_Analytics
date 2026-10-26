@@ -229,13 +229,16 @@ const CustomTableOne = () => {
         errorBatchExpiryNeo,
         branches = [],
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory);
+
+    const activeFilters = appliedFilters || filters;
 
     const { expiredTableRows, writeOffRiskTableRows } = useMemo(() => {
         const allRows = getExpiryRows(batchExpiryNeo, {
-            branchCode: filters.branch,
+            branchCode: activeFilters.branch,
             branches,
-            asOfDate: filters.endDate,
+            asOfDate: activeFilters.endDate,
         });
         const expired = [];
         const writeOffRisk = [];
@@ -253,7 +256,7 @@ const CustomTableOne = () => {
             expiredTableRows: expired,
             writeOffRiskTableRows: writeOffRisk,
         };
-    }, [batchExpiryNeo, filters.branch, branches, filters.endDate]);
+    }, [batchExpiryNeo, activeFilters.branch, branches, activeFilters.endDate]);
 
     if (errorBatchExpiryNeo) {
         return (

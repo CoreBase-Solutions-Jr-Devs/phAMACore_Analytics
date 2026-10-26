@@ -1,26 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Offcanvas, OffcanvasHeader, OffcanvasBody } from "reactstrap";
 import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import {
   setBranch,
   setDateRange,
   setStartDate,
   setEndDate,
+  resetFilters,
 } from "../../slices/dashboardMyBusiness/reducer";
 import {
   getCachedBranchesMap,
   saveCachedBranches,
   cleanBranchName,
+  saveActiveBranch,
 } from "../../helpers/branch_helper";
 import { getBranches } from "../../helpers/fakebackend_helper";
-import { DEFAULT_DATE_RANGE } from "../utils/dateHelper";
 
-const dateOptions = ["Today","Yesterday","Last 7 Days","This Week","Last Week","This Month","Month to Date","Last Month","This Year","Year To Date","Custom"];
+const dateOptions = ["Today","Yesterday","Last 7 Days","This Week","Last Week","This Month","Month to Date","Last Month","This Year","Year To Date","Last Year","Custom"];
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const {
     filters: { branch, dateRange, startDate, endDate },
@@ -66,24 +69,46 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
   const isCustom = dateRange === "Custom";
 
-  const handleDateChange = (type, selectedDates) => {
-    if (!selectedDates?.length) return;
-    const formatted = selectedDates[0].toLocaleDateString("en-GB");
-    dispatch(setDateRange("Custom"));
+  const handleDateChangeRef = useRef(null);
+  handleDateChangeRef.current = (type, selectedDates) => {
+    const selected = selectedDates?.[0];
+    if (!(selected instanceof Date) || isNaN(selected.getTime())) return;
+
+    const formatted = selected.toLocaleDateString("en-GB");
+    if (dateRange !== "Custom") {
+      dispatch(setDateRange("Custom"));
+    }
     if (type === "startDate") dispatch(setStartDate(formatted));
     if (type === "endDate") dispatch(setEndDate(formatted));
   };
 
   const handleReset = () => {
-    dispatch(setBranch(null));
-    dispatch(setDateRange(DEFAULT_DATE_RANGE));
+    dispatch(resetFilters());
+    saveActiveBranch("mybusiness", null);
+    navigate("/dashboard");
   };
 
-  const pickerProps = {
-    className: `form-control ${isCustom ? "" : "bg-light text-primary"}`,
-    options: { dateFormat: "d/m/Y", allowInput: isCustom, clickOpens: isCustom },
-    readOnly: !isCustom,
-  };
+  const startPickerOptions = useMemo(
+    () => ({
+      dateFormat: "d/m/Y",
+      allowInput: isCustom,
+      clickOpens: isCustom,
+      onChange: [(dates) => handleDateChangeRef.current("startDate", dates)],
+    }),
+    [isCustom]
+  );
+
+  const endPickerOptions = useMemo(
+    () => ({
+      dateFormat: "d/m/Y",
+      allowInput: isCustom,
+      clickOpens: isCustom,
+      onChange: [(dates) => handleDateChangeRef.current("endDate", dates)],
+    }),
+    [isCustom]
+  );
+
+  const pickerClassName = `form-control ${isCustom ? "" : "bg-light text-primary"}`;
 
   return (
     <Offcanvas
@@ -138,9 +163,10 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
           <label className="col-4 col-form-label">Start Date</label>
           <div className="col-8">
             <Flatpickr
-              {...pickerProps}
+              className={pickerClassName}
+              options={startPickerOptions}
+              readOnly={!isCustom}
               value={startDate}
-              onChange={(dates) => handleDateChange("startDate", dates)}
             />
           </div>
         </div>
@@ -149,9 +175,10 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
           <label className="col-4 col-form-label">End Date</label>
           <div className="col-8">
             <Flatpickr
-              {...pickerProps}
+              className={pickerClassName}
+              options={endPickerOptions}
+              readOnly={!isCustom}
               value={endDate}
-              onChange={(dates) => handleDateChange("endDate", dates)}
             />
           </div>
         </div>

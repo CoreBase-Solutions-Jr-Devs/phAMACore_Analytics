@@ -1,12 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { Offcanvas, OffcanvasHeader, OffcanvasBody } from "reactstrap";
 import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { setBranch, setDateRange, setStartDate, setEndDate } from "../../slices/dashboardStock/reducer";
+import { setBranch, setDateRange, setStartDate, setEndDate, resetFilters } from "../../slices/dashboardStock/reducer";
 import { getCachedBranchesMap, cleanBranchName, saveActiveBranch } from "../../helpers/branch_helper";
-import { DEFAULT_DATE_RANGE } from "../utils/dateHelper";
 
 const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Last Week", "This Week", "Month to Date", "Last Month", "This Year", "Last Year", "Custom"];
 
@@ -35,28 +34,47 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
 
     const isCustom = dateRange === "Custom";
 
-    const handleDateChange = (type, selectedDates) => {
-        if (!selectedDates?.length) return;
+    const handleDateChangeRef = useRef(null);
+    handleDateChangeRef.current = (type, selectedDates) => {
+        const selected = selectedDates?.[0];
+        if (!(selected instanceof Date) || isNaN(selected.getTime())) return;
 
-        const formatted = selectedDates[0].toLocaleDateString("en-GB");
-        dispatch(setDateRange("Custom"));
+        const formatted = selected.toLocaleDateString("en-GB");
+        if (dateRange !== "Custom") {
+            dispatch(setDateRange("Custom"));
+        }
 
         if (type === "startDate") dispatch(setStartDate(formatted));
         if (type === "endDate") dispatch(setEndDate(formatted));
     };
 
     const handleReset = () => {
-        dispatch(setBranch(null));
-        dispatch(setDateRange(DEFAULT_DATE_RANGE));
+        dispatch(resetFilters());
         saveActiveBranch("stock", null);
         navigate("/dashboard-stock");
     };
 
-    const pickerProps = {
-        className: `form-control ${isCustom ? "" : "bg-light text-primary"}`,
-        options: { dateFormat: "d/m/Y", allowInput: isCustom, clickOpens: isCustom },
-        readOnly: !isCustom,
-    };
+    const startPickerOptions = useMemo(
+        () => ({
+            dateFormat: "d/m/Y",
+            allowInput: isCustom,
+            clickOpens: isCustom,
+            onChange: [(dates) => handleDateChangeRef.current("startDate", dates)],
+        }),
+        [isCustom]
+    );
+
+    const endPickerOptions = useMemo(
+        () => ({
+            dateFormat: "d/m/Y",
+            allowInput: isCustom,
+            clickOpens: isCustom,
+            onChange: [(dates) => handleDateChangeRef.current("endDate", dates)],
+        }),
+        [isCustom]
+    );
+
+    const pickerClassName = `form-control ${isCustom ? "" : "bg-light text-primary"}`;
 
     return (
         <Offcanvas
@@ -109,9 +127,10 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
                     <label className="col-4 col-form-label">Start Date</label>
                     <div className="col-8">
                         <Flatpickr
-                            {...pickerProps}
+                            className={pickerClassName}
+                            options={startPickerOptions}
+                            readOnly={!isCustom}
                             value={startDate}
-                            onChange={(dates) => handleDateChange("startDate", dates)}
                         />
                     </div>
                 </div>
@@ -120,9 +139,10 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
                     <label className="col-4 col-form-label">End Date</label>
                     <div className="col-8">
                         <Flatpickr
-                            {...pickerProps}
+                            className={pickerClassName}
+                            options={endPickerOptions}
+                            readOnly={!isCustom}
                             value={endDate}
-                            onChange={(dates) => handleDateChange("endDate", dates)}
                         />
                     </div>
                 </div>

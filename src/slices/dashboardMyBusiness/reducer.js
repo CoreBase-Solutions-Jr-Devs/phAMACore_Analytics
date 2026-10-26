@@ -10,8 +10,17 @@ import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
-const today = new Date();
-const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+const defaultFilters = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  return {
+    branch: null,
+    dateRange: DEFAULT_DATE_RANGE,
+    startDate: formatDMY(start),
+    endDate: formatDMY(now),
+    groupBy: "SUMMARY",
+  };
+};
 
 const initialState = {
   inventoryProfitSummaryUser: [],
@@ -37,13 +46,8 @@ const initialState = {
   errorAccountBalance: null,
   errorCashbookSummary: null,
 
-  filters: {
-    branch: null,
-    dateRange: DEFAULT_DATE_RANGE,
-    startDate: formatDMY(monthStart),
-    endDate: formatDMY(today),
-    groupBy: "SUMMARY",
-  },
+  filters: defaultFilters(),
+  appliedFilters: defaultFilters(),
 };
 
 const DashboardMyBusinessSlice = createSlice({
@@ -151,6 +155,16 @@ const DashboardMyBusinessSlice = createSlice({
           break;
         }
 
+        case "Last Year": {
+          const now = new Date();
+          const start = new Date(now.getFullYear() - 1, 0, 1);
+          const end = new Date(now.getFullYear() - 1, 11, 31);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
+          break;
+        }
+
         default:
           break;
       }
@@ -166,6 +180,16 @@ const DashboardMyBusinessSlice = createSlice({
 
     setGroupBy: (state, action) => {
       state.filters.groupBy = action.payload;
+    },
+
+    applyFilters: (state) => {
+      state.appliedFilters = { ...state.filters };
+    },
+
+    resetFilters: (state) => {
+      const defaults = defaultFilters();
+      state.filters = { ...defaults };
+      state.appliedFilters = { ...defaults };
     },
 
     clearMyBusinessData: () => initialState,
@@ -287,6 +311,8 @@ export const {
   setStartDate,
   setEndDate,
   setGroupBy,
+  applyFilters,
+  resetFilters,
   clearMyBusinessData,
 } = DashboardMyBusinessSlice.actions;
 

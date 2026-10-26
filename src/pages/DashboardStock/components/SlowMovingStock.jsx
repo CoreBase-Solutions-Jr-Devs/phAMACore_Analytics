@@ -24,9 +24,11 @@ const SlowMovingStock = ({
         loadingSlowMovingStock = false,
         errorSlowMovingStock = null,
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
 
-    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
+    const activeFilters = appliedFilters || filters;
+    const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
 
     const handleCellHover = (e, info) => {
         setHoverInfo({

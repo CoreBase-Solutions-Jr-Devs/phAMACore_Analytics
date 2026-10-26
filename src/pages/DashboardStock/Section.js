@@ -14,9 +14,10 @@ const Section = ({ rightClickBtn }) => {
     imbalances = [],
     branches = [],
     filters = {},
+    appliedFilters,
   } = useSelector((state) => state.StockInventory ?? {});
 
-  const { branch, startDate, endDate } = filters;
+  const { branch, startDate, endDate } = appliedFilters || filters;
   const lookbackDays = getLookbackDays(startDate, endDate);
 
   const isBranchView = Boolean(branch && branch !== "All Branches");

@@ -18,14 +18,17 @@ const WidgetsTwo = () => {
         batchExpiryNeo = [],
         branches = [],
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
+
+    const activeFilters = appliedFilters || filters;
 
     // Batches (not products) per bucket, so the cards add up to the table below
     const widgetData = useMemo(() => {
         const rows = getExpiryRows(batchExpiryNeo, {
-            branchCode: filters.branch,
+            branchCode: activeFilters.branch,
             branches,
-            asOfDate: filters.endDate,
+            asOfDate: activeFilters.endDate,
         });
         return EXPIRY_BUCKETS.map((bucket) => {
             const inBucket = rows.filter((row) => row.bucket === bucket.id);
@@ -35,7 +38,7 @@ const WidgetsTwo = () => {
                 value: inBucket.reduce((sum, row) => sum + row.value, 0),
             };
         });
-    }, [batchExpiryNeo, filters.branch, branches, filters.endDate]);
+    }, [batchExpiryNeo, activeFilters.branch, branches, activeFilters.endDate]);
 
     return (
         <Row className="g-2 mb-2">

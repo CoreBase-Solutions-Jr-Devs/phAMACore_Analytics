@@ -11,7 +11,7 @@ import StockPurchases from "./StockPurchases";
 import ReceivablesAgeing from "./ReceivablesAgeing";
 import StockMovements from "./StockMovements";
 import SalesCollection from "./SalesCollection";
-import { setBranch } from "../../slices/dashboardMyBusiness/reducer";
+import { setBranch, applyFilters } from "../../slices/dashboardMyBusiness/reducer";
 import { fetchMonthlyTrend, fetchSalesByType } from "../../slices/dashboardMyBusiness/thunk";
 import {
   saveActiveBranch,
@@ -36,28 +36,36 @@ export default function DashboardMyBusiness() {
     setRightColumn((prev) => !prev);
   };
 
-  const { filters = {} } = useSelector(
+  const { filters = {}, appliedFilters } = useSelector(
     (state) =>
       state.DashboardMyBusiness ||
       state.MyBusiness || { filters: {} }
   );
 
+  const activeFilters = appliedFilters || filters;
+
   // Sync URL branchId into Redux state when URL changes
   useEffect(() => {
     if (branchCode) {
       dispatch(setBranch(branchCode));
+      dispatch(applyFilters());
       saveActiveBranch("mybusiness", branchCode);
     }
   }, [dispatch, branchCode]);
 
   // One shared fetch feeds the three trend cards, and one feeds Sales Composition + VAT
   useEffect(() => {
-    const range = { startDate: filters.startDate, endDate: filters.endDate, branch: filters.branch ?? null };
+    const range = {
+      startDate: activeFilters.startDate,
+      endDate: activeFilters.endDate,
+      branch: activeFilters.branch ?? null,
+    };
     dispatch(fetchMonthlyTrend(range));
     dispatch(fetchSalesByType(range));
-  }, [dispatch, filters.startDate, filters.endDate, filters.branch]);
+  }, [dispatch, activeFilters.startDate, activeFilters.endDate, activeFilters.branch]);
 
   const handleApplyFilters = () => {
+    dispatch(applyFilters());
     setRightColumn(false);
     if (filters.branch) {
       saveActiveBranch("mybusiness", filters.branch);

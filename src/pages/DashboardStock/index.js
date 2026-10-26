@@ -21,7 +21,7 @@ import {
     fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
 } from '../../slices/dashboardStock/thunk';
-import { setBranch } from '../../slices/dashboardStock/reducer';
+import { setBranch, applyFilters } from '../../slices/dashboardStock/reducer';
 import { resolveBranchName, saveActiveBranch, cleanBranchName } from '../../helpers/branch_helper';
 
 import CriticalStockChart from './components/CriticalStockChart';
@@ -98,16 +98,19 @@ const DashboardStock = () => {
         slowMovingStock = [],
         imbalances = [],
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
 
-    const branchCode = filters.branch ? Number(filters.branch) : null;
+    const activeFilters = appliedFilters || filters;
+
+    const branchCode = activeFilters.branch ? Number(activeFilters.branch) : null;
     const isBranchView = !!branchCode;
 
     const branchDisplayName = isBranchView
         ? cleanBranchName(resolveBranchName(branchCode, branches))
         : "";
 
-    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
+    const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
 
     const [rightColumn, setRightColumn] = useState(false);
 
@@ -120,6 +123,7 @@ const DashboardStock = () => {
     // Sync URL branchId into Redux state and persist active branch when URL changes
     useEffect(() => {
         dispatch(setBranch(urlBranchCode));
+        dispatch(applyFilters());
         if (urlBranchCode) {
             saveActiveBranch("stock", urlBranchCode);
         }
@@ -141,7 +145,7 @@ const DashboardStock = () => {
     // filtered by the selected branch.
     useEffect(() => {
         const branchcode = branchCode || null;
-        const asOf = parseApiDate(filters.endDate) || new Date();
+        const asOf = parseApiDate(activeFilters.endDate) || new Date();
 
         dispatch(fetchBatchExpiryNeo({
             clientid: 1,
@@ -149,7 +153,7 @@ const DashboardStock = () => {
             startDate: addDaysApi(-365, asOf),
             endDate: addDaysApi(90, asOf),
         }));
-    }, [dispatch, branchCode, filters.endDate]);
+    }, [dispatch, branchCode, activeFilters.endDate]);
 
     // Movement-based figures: follow the branch and the date filter.
     // The per-line closing stock and stock movement downloads were dropped: the stock health
@@ -159,7 +163,7 @@ const DashboardStock = () => {
             clientid: 1,
             branchcode: branchCode || null,
             LookbackDays: lookbackDays,
-            AsOfDate: filters.endDate,
+            AsOfDate: activeFilters.endDate,
         };
 
         dispatch(fetchKPIStockHealth(health));
@@ -168,22 +172,22 @@ const DashboardStock = () => {
         dispatch(fetchKPIImbalances({ ...health, TopN: IMBALANCE_TOP_N }));
         dispatch(fetchKPISalesTransactions({
             clientid: 1,
-            startDate: filters.startDate,
-            endDate: filters.endDate,
+            startDate: activeFilters.startDate,
+            endDate: activeFilters.endDate,
             GroupBy: "BRANCH",
             branchcode: branchCode || null,
         }));
-    }, [dispatch, branchCode, filters.startDate, filters.endDate, lookbackDays]);
+    }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate, lookbackDays]);
 
     const periodDays = useMemo(() => {
         if (kpiSalesPeriodDays && kpiSalesPeriodDays > 1) {
             return kpiSalesPeriodDays;
         }
-        if (filters?.startDate && filters?.endDate) {
-            return getPeriodDays(filters.startDate, filters.endDate);
+        if (activeFilters?.startDate && activeFilters?.endDate) {
+            return getPeriodDays(activeFilters.startDate, activeFilters.endDate);
         }
         return 1;
-    }, [kpiSalesPeriodDays, filters?.startDate, filters?.endDate]);
+    }, [kpiSalesPeriodDays, activeFilters?.startDate, activeFilters?.endDate]);
 
     const handleExportCriticalStock = () => {
         const rows = (criticalStockouts || []).map((item) => ({
@@ -237,7 +241,7 @@ const DashboardStock = () => {
         const rows = getExpiryRows(batchExpiryNeo, {
             branchCode,
             branches,
-            asOfDate: filters.endDate,
+            asOfDate: activeFilters.endDate,
         }).map((row) => ({
             "Product": row.product,
             "Batch": row.batch || "-",
@@ -300,9 +304,11 @@ const DashboardStock = () => {
     };
 
     const handleApplyFilters = () => {
+        dispatch(applyFilters());
         setRightColumn(false);
 
         if (filters.branch) {
+            saveActiveBranch("stock", filters.branch);
             navigate(`/dashboard-stock/branch/${filters.branch}`);
         } else {
             navigate('/dashboard-stock');

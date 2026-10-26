@@ -51,9 +51,10 @@ const ReceivablesAgeing = () => {
   const [error, setError] = useState(null);
   const [sort, setSort] = useState({ key: "balance", desc: true });
 
-  const { filters = {} } = useSelector(
+  const { filters = {}, appliedFilters } = useSelector(
     (state) => state.DashboardMyBusiness || state.MyBusiness || {}
   );
+  const activeFilters = appliedFilters || filters;
 
   useEffect(() => {
     let isMounted = true;
@@ -67,8 +68,8 @@ const ReceivablesAgeing = () => {
       const [overdueRes, agingRes] = await Promise.allSettled([
         getKPIOverdueDebtors({
           clientid: 1,
-          AsOfDate: filters.endDate,
-          branchcode: filters.branch ?? 0,
+          AsOfDate: activeFilters.endDate,
+          branchcode: activeFilters.branch ?? 0,
           OverdueOnly: false,
           GroupBy: "CUSTOMER",
         }),
@@ -77,8 +78,8 @@ const ReceivablesAgeing = () => {
           Mode: "AGING",
           AccountType: "CUSTOMER",
           IncludeZeroBal: false,
-          DateTo: filters.endDate,
-          branchcode: filters.branch ?? 0,
+          DateTo: activeFilters.endDate,
+          branchcode: activeFilters.branch ?? 0,
         }),
       ]);
       if (!isMounted) return;
@@ -133,7 +134,7 @@ const ReceivablesAgeing = () => {
     return () => {
       isMounted = false;
     };
-  }, [filters.branch, filters.endDate]);
+  }, [activeFilters.branch, activeFilters.endDate]);
 
   const sorted = useMemo(() => {
     const direction = sort.desc ? -1 : 1;
@@ -196,7 +197,7 @@ const ReceivablesAgeing = () => {
         </div>
         <div className="d-flex align-items-center gap-2">
           <span className="badge bg-light text-muted">
-            {byTerms ? "Aged against payment terms" : "Aged by balance age"} · as at {filters.endDate}
+            {byTerms ? "Aged against payment terms" : "Aged by balance age"} · as at {activeFilters.endDate}
           </span>
           <CardExportButtons
             onExport={handleExportExcel}
