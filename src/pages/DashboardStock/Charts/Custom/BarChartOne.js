@@ -18,7 +18,7 @@ const BarChartOne = ({
     data = [],
     colors = [],
     metadata = [],
-    reorderLine = 14,
+    reorderLine = 7,
     height = 440,
     paginationComponent = null,
 }) => {
@@ -62,7 +62,7 @@ const BarChartOne = ({
         });
 
     const maxVal = Math.max(...resolvedData);
-    const axisMax = Math.max(reorderLine * 1.5, Math.ceil(maxVal * 1.3), 15);
+    const axisMax = Math.max(reorderLine * 3, Math.ceil(maxVal * 1.3), 15);
 
     const series = [{ name: 'Days of Cover', data: resolvedData }];
 

@@ -246,7 +246,7 @@ const CriticalStockChart = () => {
                 data={chartData.data}
                 colors={chartData.colors}
                 metadata={chartData.metadata}
-                reorderLine={14}
+                reorderLine={7}
                 height={440}
                 paginationComponent={paginationElement}
             />
