@@ -106,7 +106,7 @@ const ImbalanceAlertList = ({
                             <th scope="col" className="text-center text-nowrap">Status &amp; Gap</th>
                             <th scope="col" className="text-end text-nowrap">Branch Stock</th>
                             <th scope="col" className="text-end text-nowrap">Branch Sales</th>
-                            <th scope="col" className="text-center text-nowrap">Rec. Transfer</th>
+                            <th scope="col" className="text-center text-nowrap">Required Transfer</th>
                             <th scope="col" style={{ width: "100%", minWidth: "280px" }}>Network Counterpart &amp; Action</th>
                         </tr>
                     </thead>
@@ -164,7 +164,7 @@ const ImbalanceAlertList = ({
                                                 mainValue: `${formatGap(item.gap)} Imbalance Gap`,
                                                 mainColor: toneColor,
                                                 subText: `Stock share (${item.stockShare.toFixed(1)}%) vs Sales share (${item.salesShare.toFixed(1)}%)`,
-                                                extraText: `Recommended Transfer: ${item.qty.toLocaleString()} units`,
+                                                extraText: `Required Transfer: ${item.qty.toLocaleString()} units`,
                                             })
                                         }
                                         onMouseMove={handleMouseMove}
@@ -221,7 +221,7 @@ const ImbalanceAlertList = ({
                                         className="text-center text-nowrap"
                                         onMouseEnter={(e) =>
                                             handleCellHover(e, {
-                                                title: "Recommended Inter-Branch Transfer",
+                                                title: "Required Inter-Branch Transfer",
                                                 badgeColor: "#405189",
                                                 mainValue: `${item.deficit ? "Receive" : "Transfer Out"} ${item.qty.toLocaleString()} units`,
                                                 mainColor: "#00e396",

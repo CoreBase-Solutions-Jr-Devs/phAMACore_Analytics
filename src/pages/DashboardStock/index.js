@@ -314,7 +314,7 @@ const DashboardStock = () => {
             "Branch Sales": a.sales.toLocaleString(),
             "Company Sales": a.companySales.toLocaleString(),
             "Sales Share %": Number(a.salesShare.toFixed(1)),
-            "Rec. Transfer Units": a.qty.toLocaleString(),
+            "Required Transfer Units": a.qty.toLocaleString(),
             "Network Counterpart": a.networkContext,
             "Action": a.actionInsight,
         }));
