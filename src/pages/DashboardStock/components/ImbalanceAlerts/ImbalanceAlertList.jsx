@@ -7,6 +7,7 @@ const ImbalanceAlertList = ({
     alerts = [],
     searchTerm = "",
     statusFilter = "ALL",
+    branchFilter = "",
     isLoading = false,
     error = null,
 }) => {
@@ -55,7 +56,7 @@ const ImbalanceAlertList = ({
     }
 
     if (!alerts?.length) {
-        if (searchTerm || statusFilter !== "ALL") {
+        if (searchTerm || statusFilter !== "ALL" || (branchFilter && branchFilter !== "ALL")) {
             return (
                 <div
                     className="d-flex flex-column align-items-center justify-content-center py-4 text-center text-muted"

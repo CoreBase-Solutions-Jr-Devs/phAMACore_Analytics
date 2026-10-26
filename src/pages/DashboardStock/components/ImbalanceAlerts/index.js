@@ -11,8 +11,8 @@ const MAX_ROWS = 100;
 
 // Transfer suggestions come straight from PowerBIKPIStockHealth (GroupBy = IMBALANCES),
 // replacing the old client-side engine that needed every closing-stock line in the browser.
-// Rows keep the API's severity ranking; the Deficit / Surplus filter narrows the list.
-const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL" }) => {
+// Rows keep the API's severity ranking; the Deficit / Surplus and Branch filters narrow the list.
+const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL", branchFilter = "" }) => {
     const {
         imbalances = [],
         loadingImbalances = false,
@@ -34,8 +34,8 @@ const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL" }) => {
                     String(field).toLowerCase().includes(term)
                 )
         );
-        return filterTransferSuggestions(list, statusFilter);
-    }, [imbalances, lookbackDays, searchTerm, statusFilter]);
+        return filterTransferSuggestions(list, statusFilter, branchFilter);
+    }, [imbalances, lookbackDays, searchTerm, statusFilter, branchFilter]);
 
     return (
         <>
@@ -43,6 +43,7 @@ const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL" }) => {
                 alerts={alerts.slice(0, MAX_ROWS)}
                 searchTerm={searchTerm}
                 statusFilter={statusFilter}
+                branchFilter={branchFilter}
                 isLoading={loadingImbalances}
                 error={errorImbalances}
             />

@@ -40,6 +40,7 @@ import {
     sortSlowMovingRows,
     formatSlowDaysCover,
     filterTransferSuggestions,
+    getImbalanceBranches,
     IMBALANCE_STATUS_FILTERS,
     getExpiryRows,
     getLookbackDays,
@@ -58,8 +59,9 @@ const DashboardStock = () => {
     const [sortDesc, setSortDesc] = useState(true);
 
     const [imbalanceSearchTerm, setImbalanceSearchTerm] = useState("");
-    // Transfer suggestions: keep the API severity ranking, filter by Deficit / Surplus
+    // Transfer suggestions: keep the API severity ranking, filter by Deficit / Surplus and Branch
     const [imbalanceStatusFilter, setImbalanceStatusFilter] = useState("ALL");
+    const [imbalanceBranchFilter, setImbalanceBranchFilter] = useState("");
 
     const handleSlowMovingSort = (field) => {
         if (sortField === field) {
@@ -274,14 +276,31 @@ const DashboardStock = () => {
         exportToExcel(rows, `Slow_Moving_Stock_${todayStr}`);
     };
 
+    const imbalanceBranches = useMemo(
+        () => getImbalanceBranches(imbalances),
+        [imbalances]
+    );
+
+    useEffect(() => {
+        if (imbalanceBranchFilter && !imbalanceBranches.includes(imbalanceBranchFilter)) {
+            setImbalanceBranchFilter("");
+        }
+    }, [imbalanceBranches, imbalanceBranchFilter]);
+
     const imbalanceCounts = useMemo(() => {
-        const list = buildTransferSuggestions(imbalances, lookbackDays);
+        const list = buildTransferSuggestions(imbalances, lookbackDays).filter(
+            (item) => !imbalanceBranchFilter || item.branch === imbalanceBranchFilter
+        );
         const deficit = list.filter((item) => item.deficit).length;
         return { deficit, surplus: list.length - deficit };
-    }, [imbalances, lookbackDays]);
+    }, [imbalances, lookbackDays, imbalanceBranchFilter]);
 
     const handleExportImbalanceAlerts = () => {
-        const suggestions = filterTransferSuggestions(buildTransferSuggestions(imbalances, lookbackDays), imbalanceStatusFilter);
+        const suggestions = filterTransferSuggestions(
+            buildTransferSuggestions(imbalances, lookbackDays),
+            imbalanceStatusFilter,
+            imbalanceBranchFilter
+        );
         const rows = suggestions.map((a) => ({
             "Product": a.product,
             "Item Code": a.itemCode,
@@ -502,7 +521,36 @@ const DashboardStock = () => {
                                 </CardHeader>
 
                                 <CardBody>
-                                    <p className="text-muted mb-3 small">Branches holding over 20% more or less of an item's stock than their share of its sales. These are suggestions only; no transfer has been raised.</p>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                        <p className="text-muted mb-0 small">
+                                            Branches holding over 20% more or less of an item's stock than their share of its sales. These are suggestions only; no transfer has been raised.
+                                        </p>
+
+                                        <div className="d-flex align-items-center gap-2 ms-auto">
+                                            <label
+                                                htmlFor="imbalance-branch-filter"
+                                                className="text-muted small mb-0 text-nowrap fw-medium"
+                                            >
+                                                <i className="ri-filter-3-line me-1 align-middle"></i>
+                                                Branch:
+                                            </label>
+                                            <select
+                                                id="imbalance-branch-filter"
+                                                className="form-select form-select-sm"
+                                                style={{ minWidth: "180px", width: "auto" }}
+                                                value={imbalanceBranchFilter}
+                                                onChange={(e) => setImbalanceBranchFilter(e.target.value)}
+                                                aria-label="Filter imbalances by branch"
+                                            >
+                                                <option value="">All Branches</option>
+                                                {imbalanceBranches.map((branchName) => (
+                                                    <option key={branchName} value={branchName}>
+                                                        {branchName}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
 
                                     <Row className="mb-3 align-items-center g-2">
                                         <Col>
@@ -537,6 +585,7 @@ const DashboardStock = () => {
                                     <ImbalanceAlerts
                                         searchTerm={imbalanceSearchTerm}
                                         statusFilter={imbalanceStatusFilter}
+                                        branchFilter={imbalanceBranchFilter}
                                     />
                                 </CardBody>
                             </Card>

@@ -179,7 +179,7 @@ export const buildTransferSuggestions = (imbalances = [], lookbackDays = 30) =>
             itemCode: row.item_code || "",
             product: row.item_name || row.item_code || "Unknown item",
             group: row.item_group || "-",
-            branch: cleanBranchName(row.branch_name || `Branch ${row.branch_id ?? ""}`),
+            branch: cleanBranchName(row.branch_name || row.branchName || `Branch ${row.branch_id ?? ""}`),
             deficit,
             stock,
             sales,
@@ -206,10 +206,26 @@ export const IMBALANCE_STATUS_FILTERS = [
     { key: "SURPLUS", label: "Surplus" },
 ];
 
-/** Keeps the API's severity ranking (rank_pos) and applies the Deficit / Surplus filter. */
-export const filterTransferSuggestions = (suggestions = [], statusFilter = "ALL") =>
+/** Extracts sorted unique branch names from the StockHealth imbalances payload. */
+export const getImbalanceBranches = (imbalances = []) => {
+    const branches = new Set();
+    (Array.isArray(imbalances) ? imbalances : []).forEach((row) => {
+        if (!row) return;
+        const name = cleanBranchName(
+            row.branch_name || row.branchName || (row.branch_id != null ? `Branch ${row.branch_id}` : "")
+        );
+        if (name && name !== "-") {
+            branches.add(name);
+        }
+    });
+    return Array.from(branches).sort((a, b) => a.localeCompare(b));
+};
+
+/** Keeps the API's severity ranking (rank_pos) and applies the Deficit / Surplus and Branch filters. */
+export const filterTransferSuggestions = (suggestions = [], statusFilter = "ALL", branchFilter = "") =>
     suggestions
         .filter((item) => {
+            if (branchFilter && branchFilter !== "ALL" && item.branch !== branchFilter) return false;
             if (statusFilter === "DEFICIT") return item.deficit;
             if (statusFilter === "SURPLUS") return !item.deficit;
             return true;
