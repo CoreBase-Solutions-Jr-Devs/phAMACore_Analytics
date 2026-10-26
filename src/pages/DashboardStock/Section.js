@@ -27,9 +27,14 @@ const Section = ({ rightClickBtn }) => {
     );
   }, [branch, branches, isBranchView]);
 
+  const expiryOptions = useMemo(
+    () => ({ branchCode: branch, branches, asOfDate: endDate }),
+    [branch, branches, endDate]
+  );
+
   const kpis = useMemo(
-    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances),
-    [batchExpiryNeo, stockHealth, imbalances]
+    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances, expiryOptions),
+    [batchExpiryNeo, stockHealth, imbalances, expiryOptions]
   );
 
   // Stock figures are live: show when the valuation was taken
@@ -58,7 +63,7 @@ const Section = ({ rightClickBtn }) => {
     }));
 
     // 2. Expiry Watch (separated into Expired and Write-Off Risk)
-    const allExpiryRows = getExpiryRows(batchExpiryNeo);
+    const allExpiryRows = getExpiryRows(batchExpiryNeo, expiryOptions);
     const expiredRows = allExpiryRows
       .filter((row) => row.daysRemaining < 0)
       .map((row) => ({

@@ -1,5 +1,5 @@
-import { cleanBranchName } from "../../helpers/branch_helper";
-import { getInclusiveDays } from "./dateHelper";
+import { cleanBranchName, resolveBranchName } from "../../helpers/branch_helper";
+import { getInclusiveDays, parseApiDate } from "./dateHelper";
 import { pick, num } from "./apiRow";
 
 // FETCH SIZES (0 = everything). Kept here so they are easy to tune against live data.
@@ -22,7 +22,7 @@ export const getLookbackDays = (startDate, endDate) =>
 export const KPI_META = [
     { id: 3, label: "Items below Reorder Level", subtitle: "Below safety minimum" },
     { id: 4, label: "Class A Items Out of Stock", subtitle: "Top revenue items at zero stock" },
-    { id: 5, label: "Near Expiry (≤ 90 days)", subtitle: "Products at risk" },
+    { id: 5, label: "Near Expiry (≤ 90 days)", subtitle: "Batches nearing expiry" },
     { id: 6, label: "Slow Movers & Dead Stock", subtitle: "Low velocity in the window" },
     { id: 7, label: "Overstocked Items", subtitle: "> Target max cover" },
     { id: 8, label: "Branch Imbalances (> 20%)", subtitle: "Transfer candidates" },
@@ -55,9 +55,21 @@ const bucketFor = (days) => {
  * Batches with stock on hand that have already expired or expire within 90 days.
  * One row per batch, so the widgets, the table and the exports all reconcile.
  */
-export const getExpiryRows = (batchRows = []) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+export const getExpiryRows = (batchRows = [], options = {}) => {
+    const { branchCode = null, branches = [], asOfDate = null } = options;
+    const referenceDate = parseApiDate(asOfDate) || new Date();
+    referenceDate.setHours(0, 0, 0, 0);
+
+    const activeBranchCode =
+        branchCode !== undefined && branchCode !== null &&
+        branchCode !== "" && branchCode !== "All Branches" &&
+        !Number.isNaN(Number(branchCode)) && Number(branchCode) > 0
+            ? Number(branchCode)
+            : null;
+
+    const targetBranchName = activeBranchCode
+        ? cleanBranchName(resolveBranchName(activeBranchCode, branches)).toLowerCase()
+        : "";
 
     return (Array.isArray(batchRows) ? batchRows : [])
         .map((item) => {
@@ -65,16 +77,32 @@ export const getExpiryRows = (batchRows = []) => {
             if (!expiry || isNaN(expiry.getTime())) return null;
             expiry.setHours(0, 0, 0, 0);
 
+            const branch = cleanBranchName(pick(item, "branchName", "branch_name") || "");
+            const rowBranchId = pick(item, "branchID", "branch_id", "branchCode", "bcode");
+
+            if (activeBranchCode) {
+                if (rowBranchId !== undefined && rowBranchId !== null && String(rowBranchId) !== "") {
+                    if (Number(rowBranchId) !== activeBranchCode) return null;
+                } else if (
+                    targetBranchName &&
+                    !targetBranchName.startsWith("branch ") &&
+                    branch &&
+                    branch.toLowerCase() !== targetBranchName
+                ) {
+                    return null;
+                }
+            }
+
             const qty = num(pick(item, "qtyBal", "closing_qty"));
-            const daysRemaining = Math.round((expiry - today) / MS_PER_DAY);
+            const daysRemaining = Math.floor((expiry.getTime() - referenceDate.getTime()) / MS_PER_DAY);
             if (qty <= 0 || daysRemaining > 90) return null;
 
             const bucket = bucketFor(daysRemaining);
             return {
                 code: pick(item, "invCode", "item_code") || "",
                 product: pick(item, "invName", "itemName", "item_name") || "",
-                batch: pick(item, "batchNo", "batch_no", "batch", "batchNumber", "lotNo") || "",
-                branch: cleanBranchName(pick(item, "branchName", "branch_name") || ""),
+                batch: pick(item, "batchNo", "batch_no", "batch", "batchNumber", "lotNo", "stockInNo") || "",
+                branch,
                 expiry,
                 daysRemaining,
                 qty,
@@ -190,20 +218,17 @@ export const filterTransferSuggestions = (suggestions = [], statusFilter = "ALL"
 
 // KPI COMPUTATION
 
-export const computeKPIs = (batchExpiryRows = [], stockHealth = [], imbalances = []) => {
+export const computeKPIs = (batchExpiryRows = [], stockHealth = [], imbalances = [], expiryOptions = {}) => {
     const health = (Array.isArray(stockHealth) ? stockHealth[0] : stockHealth) || {};
-    const nearExpiry = new Set(
-        getExpiryRows(batchExpiryRows)
-            .filter((row) => row.daysRemaining >= 0)
-            .map((row) => row.code || row.product)
-    );
+    const nearExpiry = getExpiryRows(batchExpiryRows, expiryOptions)
+        .filter((row) => row.daysRemaining >= 0).length;
 
     return {
         3: num(health.min_breached_skus),
         // critical_stocked_out_skus is what the summary actually returns; the old
         // out_of_stock_skus field never existed and fell back to the whole catalogue.
         4: num(health.critical_stocked_out_skus),
-        5: nearExpiry.size,
+        5: nearExpiry,
         6: num(health.slow_mover_skus) + num(health.dead_stock_skus),
         7: num(health.overstocked_skus),
         8: (imbalances || []).length,

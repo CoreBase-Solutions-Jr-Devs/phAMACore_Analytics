@@ -47,7 +47,7 @@ import {
     IMBALANCE_TOP_N,
     SLOW_MOVER_TOP_N,
 } from '../utils/StockInventoryUtils';
-import { addDaysApi } from '../utils/dateHelper';
+import { addDaysApi, parseApiDate } from '../utils/dateHelper';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -86,8 +86,7 @@ const DashboardStock = () => {
     const navigate = useNavigate();
     const { branchId } = useParams();
 
-    const branchCode = branchId ? Number(branchId) : null;
-    const isBranchView = !!branchCode;
+    const urlBranchCode = branchId ? Number(branchId) : null;
 
     const {
         batchExpiryNeo = [],
@@ -100,6 +99,9 @@ const DashboardStock = () => {
         imbalances = [],
         filters = {},
     } = useSelector((state) => state.StockInventory ?? {});
+
+    const branchCode = filters.branch ? Number(filters.branch) : null;
+    const isBranchView = !!branchCode;
 
     const branchDisplayName = isBranchView
         ? cleanBranchName(resolveBranchName(branchCode, branches))
@@ -117,32 +119,37 @@ const DashboardStock = () => {
 
     // Sync URL branchId into Redux state and persist active branch when URL changes
     useEffect(() => {
-        dispatch(setBranch(branchCode));
-        if (branchCode) {
-            saveActiveBranch("stock", branchCode);
+        dispatch(setBranch(urlBranchCode));
+        if (urlBranchCode) {
+            saveActiveBranch("stock", urlBranchCode);
         }
-    }, [dispatch, branchCode]);
+    }, [dispatch, urlBranchCode]);
 
     // Fetch branches once on mount
     useEffect(() => {
         dispatch(fetchBranches({ clientid: 1 }));
     }, [dispatch]);
 
-    // Stock position: live figures that only depend on the branch, not on the date filter.
+    // Stock position: live figures that depend on the branch.
     useEffect(() => {
         const branchcode = branchCode || null;
 
         dispatch(fetchKPITotalStockValueByBranch({ clientid: 1, whichcost: 1, branchcode }));
+    }, [dispatch, branchCode]);
 
-        // Expiry is a fixed window around today (expired in the last 12 months up to 90 days
-        // ahead). It used to take the dashboard date range, so a one-day filter returned nothing.
+    // Batch expiry: 12-month lookback up to 90 days ahead of the filtered end date (or today),
+    // filtered by the selected branch.
+    useEffect(() => {
+        const branchcode = branchCode || null;
+        const asOf = parseApiDate(filters.endDate) || new Date();
+
         dispatch(fetchBatchExpiryNeo({
             clientid: 1,
             branchcode,
-            startDate: addDaysApi(-365),
-            endDate: addDaysApi(90),
+            startDate: addDaysApi(-365, asOf),
+            endDate: addDaysApi(90, asOf),
         }));
-    }, [dispatch, branchCode]);
+    }, [dispatch, branchCode, filters.endDate]);
 
     // Movement-based figures: follow the branch and the date filter.
     // The per-line closing stock and stock movement downloads were dropped: the stock health
@@ -227,7 +234,11 @@ const DashboardStock = () => {
     };
 
     const handleExportExpiryWatch = () => {
-        const rows = getExpiryRows(batchExpiryNeo).map((row) => ({
+        const rows = getExpiryRows(batchExpiryNeo, {
+            branchCode,
+            branches,
+            asOfDate: filters.endDate,
+        }).map((row) => ({
             "Product": row.product,
             "Batch": row.batch || "-",
             "Branch": row.branch,
