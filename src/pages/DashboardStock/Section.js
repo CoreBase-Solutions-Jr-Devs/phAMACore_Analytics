@@ -57,17 +57,33 @@ const Section = ({ rightClickBtn }) => {
       Status: k.subtitle || "",
     }));
 
-    // 2. Expiry Watch (expired + next 90 days, one row per batch)
-    const expiryRows = getExpiryRows(batchExpiryNeo).map((row) => ({
-      Product: row.product,
-      Batch: row.batch || "-",
-      Branch: row.branch,
-      ExpiryDate: row.expiry.toLocaleDateString("en-GB"),
-      DaysRemaining: row.daysRemaining,
-      QtyBalance: row.qty.toLocaleString(),
-      CostValue: formatAmount(row.value),
-      Action: row.action,
-    }));
+    // 2. Expiry Watch (separated into Expired and Write-Off Risk)
+    const allExpiryRows = getExpiryRows(batchExpiryNeo);
+    const expiredRows = allExpiryRows
+      .filter((row) => row.daysRemaining < 0)
+      .map((row) => ({
+        Product: row.product,
+        Batch: row.batch || "-",
+        Branch: row.branch,
+        ExpiryDate: row.expiry.toLocaleDateString("en-GB"),
+        DaysExpired: Math.abs(row.daysRemaining),
+        QtyBalance: row.qty.toLocaleString(),
+        CostValue: formatAmount(row.value),
+        Action: row.action,
+      }));
+
+    const writeOffRiskRows = allExpiryRows
+      .filter((row) => row.daysRemaining >= 0)
+      .map((row) => ({
+        Product: row.product,
+        Batch: row.batch || "-",
+        Branch: row.branch,
+        ExpiryDate: row.expiry.toLocaleDateString("en-GB"),
+        DaysRemaining: row.daysRemaining,
+        QtyBalance: row.qty.toLocaleString(),
+        CostValue: formatAmount(row.value),
+        Action: row.action,
+      }));
 
     // 3. Slow Moving Stock
     const slowMovingRows = (slowMovingStock || []).map((item) => ({
@@ -98,11 +114,19 @@ const Section = ({ rightClickBtn }) => {
       },
     ];
 
-    if (expiryRows.length > 0) {
+    if (expiredRows.length > 0) {
       sections.push({
-        title: "Expiry Watch (Expired + 90-Day Write-Off Risk)",
+        title: "Expired Products",
+        headers: ["Product", "Batch", "Branch", "ExpiryDate", "DaysExpired", "QtyBalance", "CostValue", "Action"],
+        data: expiredRows,
+      });
+    }
+
+    if (writeOffRiskRows.length > 0) {
+      sections.push({
+        title: "Write-Off Risk Products (0 - 90 Days)",
         headers: ["Product", "Batch", "Branch", "ExpiryDate", "DaysRemaining", "QtyBalance", "CostValue", "Action"],
-        data: expiryRows,
+        data: writeOffRiskRows,
       });
     }
 

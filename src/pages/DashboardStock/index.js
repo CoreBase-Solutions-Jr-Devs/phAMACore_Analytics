@@ -75,6 +75,13 @@ const DashboardStock = () => {
             <i className={`ms-1 ${sortDesc ? "ri-arrow-down-line" : "ri-arrow-up-line"}`}></i>
         ) : null;
 
+    const getImbalanceTabBtnClass = (key) => {
+        const isActive = imbalanceStatusFilter === key;
+        if (key === "DEFICIT") return isActive ? "btn-danger" : "btn-outline-danger";
+        if (key === "SURPLUS") return isActive ? "btn-success" : "btn-outline-success";
+        return isActive ? "btn-caramel" : "btn-outline-caramel";
+    };
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { branchId } = useParams();
@@ -436,7 +443,7 @@ const DashboardStock = () => {
                                             <Col xs="auto">
                                                 <button
                                                     type="button"
-                                                    className={`btn ${sortField === "name" ? "btn-primary" : "btn-outline-secondary"}`}
+                                                    className={`btn ${sortField === "name" ? "btn-caramel" : "btn-outline-caramel"}`}
                                                     onClick={() => handleSlowMovingSort("name")}
                                                 >
                                                     Sort by Name{renderSlowSortIcon("name")}
@@ -445,7 +452,7 @@ const DashboardStock = () => {
                                             <Col xs="auto">
                                                 <button
                                                     type="button"
-                                                    className={`btn ${sortField === "tiedUpCapital" ? "btn-primary" : "btn-outline-secondary"}`}
+                                                    className={`btn ${sortField === "tiedUpCapital" ? "btn-caramel" : "btn-outline-caramel"}`}
                                                     onClick={() => handleSlowMovingSort("tiedUpCapital")}
                                                 >
                                                     Sort by Capital{renderSlowSortIcon("tiedUpCapital")}
@@ -496,7 +503,7 @@ const DashboardStock = () => {
                                                     <button
                                                         key={tab.key}
                                                         type="button"
-                                                        className={`btn ${imbalanceStatusFilter === tab.key ? "btn-primary" : "btn-outline-secondary"}`}
+                                                        className={`btn ${getImbalanceTabBtnClass(tab.key)}`}
                                                         onClick={() => setImbalanceStatusFilter(tab.key)}
                                                     >
                                                         {tab.label}
