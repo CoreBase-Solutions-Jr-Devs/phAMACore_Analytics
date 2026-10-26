@@ -12,6 +12,7 @@ import {
 } from "../../../slices/dashboardSales/reducer";
 // import Customer from "./Customer";
 import Breakdown from "./Breakdown";
+import Performance from "./Performance";
 import useSalesAnalytics from "../../../Components/Hooks/useSalesAnalytics";
 import { getKPISalesTransactions } from "../../../slices/dashboardSales/thunk";
 import { clearSalesData } from "../../../slices/dashboardSales/reducer";
@@ -27,6 +28,7 @@ const SalesBreakdown = () => {
   const {
     // salesTargetSummary = [],
     // salesTargetBranch = [],
+    performanceSummary,
     salesBranch = [],
     salesChannel = [],
     filters,
@@ -127,7 +129,7 @@ const SalesBreakdown = () => {
         endDate: filters.endDate,
         branchcode: filters.branch,
         groupBy: "CHANNEL",
-        IncludeCollections: 1,
+        // IncludeCollections: 1,
       }),
     );
   }, [dispatch]);
@@ -146,14 +148,13 @@ const SalesBreakdown = () => {
         endDate: filters.endDate,
         branchcode: filters.branch,
         groupBy: "CHANNEL",
-                IncludeCollections: 1,
-
+        // IncludeCollections: 1,
       }),
     );
   };
   const selectedBranchName =
     filters.branch == null || filters.branch === ""
-      ? ""
+      ? "All Branches"
       : (salesBranch || []).find(
           (m) => Number(m.branchID) === Number(filters.branch),
         )?.branchName || "";
@@ -168,7 +169,22 @@ const SalesBreakdown = () => {
           pageTitle="Dashboards"
           subtitle={selectedBranchName}
         />
-
+        <Row>
+          <Col xl={12}>
+            <Performance
+              CASH={CASH}
+              INSURANCE={INSURANCE}
+              OTHER_ACCOUNT={OTHER_ACCOUNT}
+              RETURN={RETURN}
+              TOTAL={TOTAL}
+              performanceSummary={performanceSummary}
+              selectedBranchName={selectedBranchName}
+              loading={loading}
+              error={error}
+              rightClickBtn={toggleRightColumn}
+            />
+          </Col>
+        </Row>
         <Row>
           <Col xl={12}>
             <Breakdown
@@ -177,10 +193,6 @@ const SalesBreakdown = () => {
               OTHER_ACCOUNT={OTHER_ACCOUNT}
               RETURN={RETURN}
               TOTAL={TOTAL}
-              selectedBranchName={selectedBranchName}
-              loading={loading}
-              error={error}
-              rightClickBtn={toggleRightColumn}
             />
           </Col>
           <FilterActions

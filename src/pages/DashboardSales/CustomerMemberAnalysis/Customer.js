@@ -72,6 +72,25 @@ const Customer = ({
             </button>
           </div>
         </div>
+                {loading ? (
+  <div className="text-center py-5">
+    <div
+      className="spinner-border text-primary"
+      role="status"
+      aria-label="Loading performance metrics"
+    >
+     
+    </div>
+
+   
+  </div>
+) : error ? (
+  <div className="text-center py-5">
+    <p className="text-danger mb-0">
+      {error}
+    </p>
+  </div>
+) : (
         <Row
           className="g-2 row-cols-1 row-cols-sm-2 row-cols-lg-3"
           id="margin-band-widgets"
@@ -124,7 +143,7 @@ const Customer = ({
             <Card className="card-animate w-100 h-80">
               <CardBody className="p-2 d-flex flex-column">
                 <div>
-                  <p className="font-medium mb-0">Returning Customers</p>
+                  <p className="font-medium mb-0">Returning Members</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-danger">
                     {Number(returningMembers || 0)}
@@ -141,6 +160,7 @@ const Customer = ({
             </Card>
           </Col>
         </Row>
+          )}
       </React.Fragment>
     </div>
   );

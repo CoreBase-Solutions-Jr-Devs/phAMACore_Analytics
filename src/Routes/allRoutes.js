@@ -8,7 +8,7 @@ import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
 import DashboardMyBusiness from "../pages/DashboardMyBusiness";
 import MarginAnalysis from "../pages/DashboardSales/MarginAnalysis";
 import CustomerMemberAnalysis from "../pages/DashboardSales/CustomerMemberAnalysis";
-import SalesTarget from "../pages/DashboardSales/SalesTarget";
+// import SalesTarget from "../pages/DashboardSales/SalesTarget";
 import PerformanceSummary from "../pages/DashboardSales/PerformanceSummary";
 import SalesBreakdown from "../pages/DashboardSales/SalesBreakdown";
 
@@ -60,7 +60,7 @@ const authProtectedRoutes = [
     path: "/dashboard-sales/Customer-Member-Analysis",
     component: <CustomerMemberAnalysis />,
   },
-  { path: "/dashboard-sales/Sales-Target", component: <SalesTarget /> },
+  // { path: "/dashboard-sales/Sales-Target", component: <SalesTarget /> },
   {
     path: "/dashboard-sales/Performance-Summary",
     component: <PerformanceSummary />,

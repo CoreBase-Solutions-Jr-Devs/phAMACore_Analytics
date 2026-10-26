@@ -81,6 +81,7 @@ const {
   [], // salesComparativeMTD
   [], // salesMonthly
   [], // salesDaily
+    [], //  salesSubgroup 
   [], // monthlySales
   [], // monthToDateSales
   [], // lastYearMonthToDateSales
@@ -178,7 +179,7 @@ const {
   };
   const selectedBranchName =
   filters.branch == null || filters.branch === ""
-    ? ""
+    ? "All Branches"
     : (customerMemberAnalysisBranch || []).find(
         (m) => Number(m.branch_id) === Number(filters.branch),
       )?.branch_name || "Unknown Branch";

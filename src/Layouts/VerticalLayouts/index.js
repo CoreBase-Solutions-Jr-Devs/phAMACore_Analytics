@@ -196,7 +196,9 @@ const VerticalLayout = (props) => {
               <li className="nav-item">
                 <Link
                   onClick={item.click}
-                  className="nav-link menu-link"
+                  className={`nav-link menu-link ${
+                    item.subItems && item.stateVariables ? "menu-expanded" : ""
+                  }`}
                   to={item.link ? item.link : "/#"}
                   data-bs-toggle="collapse"
                   aria-expanded={item.stateVariables}
@@ -222,46 +224,51 @@ const VerticalLayout = (props) => {
                     {item.subItems &&
                       (item.subItems || []).map((subItem, key) => (
                         <React.Fragment key={key}>
- {!subItem.isChildItem ? (
-  <li className="nav-item">
-    <Link
-      to={
-        subItem.disabled
-          ? "/#"
-          : subItem.link
-            ? subItem.link
-            : "/#"
-      }
-      onClick={(e) => {
-        if (subItem.disabled) {
-          e.preventDefault();
-        }
-      }}
-      className={`nav-link d-flex align-items-center gap-2 ${
-        subItem.disabled ? "disabled" : ""
-      }`}
-      style={{
-        pointerEvents: subItem.disabled ? "none" : "auto",
-        opacity: subItem.disabled ? 0.4 : 1,
-      }}
-    >
-      {subItem.icon && <i className={subItem.icon}></i>}
+                          {!subItem.isChildItem ? (
+                            <li className="nav-item">
+                              <Link
+                                to={
+                                  subItem.disabled
+                                    ? "/#"
+                                    : subItem.link
+                                      ? subItem.link
+                                      : "/#"
+                                }
+                                onClick={(e) => {
+                                  if (subItem.disabled) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                                className={`nav-link d-flex align-items-center gap-2 ${
+                                  subItem.disabled ? "disabled" : ""
+                                }`}
+                                style={{
+                                  pointerEvents: subItem.disabled
+                                    ? "none"
+                                    : "auto",
+                                  opacity: subItem.disabled ? 0.4 : 1,
+                                }}
+                              >
+                                {subItem.icon && (
+                                  <i className={subItem.icon}></i>
+                                )}
 
-      <span>{props.t(subItem.label)}</span>
+                                <span>{props.t(subItem.label)}</span>
 
-      {subItem.badgeName ? (
-        <span
-          className={
-            "badge badge-pill bg-" + subItem.badgeColor
-          }
-          data-key="t-new"
-        >
-          {subItem.badgeName}
-        </span>
-      ) : null}
-    </Link>
-  </li>
-)  : (
+                                {subItem.badgeName ? (
+                                  <span
+                                    className={
+                                      "badge badge-pill bg-" +
+                                      subItem.badgeColor
+                                    }
+                                    data-key="t-new"
+                                  >
+                                    {subItem.badgeName}
+                                  </span>
+                                ) : null}
+                              </Link>
+                            </li>
+                          ) : (
                             <li className="nav-item">
                               <Link
                                 onClick={subItem.click}
@@ -365,7 +372,9 @@ const VerticalLayout = (props) => {
             ) : (
               <li className="nav-item">
                 <Link
-                  className="nav-link menu-link"
+                  className={`nav-link menu-link ${
+                    item.subItems && item.stateVariables ? "menu-expanded" : ""
+                  }`}
                   to={item.link ? item.link : "/#"}
                 >
                   <i className={item.icon}></i>{" "}

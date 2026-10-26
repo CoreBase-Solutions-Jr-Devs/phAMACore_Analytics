@@ -99,12 +99,12 @@ const Navdata = () => {
           link: "/dashboard-sales/Sales-Breakdown",
           parentId: "sales",
         },
-        {
-          id: "sales-target",
-          label: "Sales Target",
-          link: "/dashboard-sales/Sales-Target",
-          parentId: "sales",
-        },
+        // {
+        //   id: "sales-target",
+        //   label: "Sales Target",
+        //   link: "/dashboard-sales/Sales-Target",
+        //   parentId: "sales",
+        // },
         {
           id: "margin-analysis",
           label: "Margin Analysis",

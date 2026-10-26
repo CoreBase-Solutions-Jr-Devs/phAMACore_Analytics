@@ -141,3 +141,6 @@ export const getSeptemberSalesTarget = (params) =>
 
 export const getOctoberSalesTarget = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_SALES_TARGET, { params });
+
+export const getInventoryProfitSummary = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_INVENTORY_PROFIT_SUMMARY, { params });

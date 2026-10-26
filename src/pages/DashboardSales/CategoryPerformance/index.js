@@ -13,8 +13,9 @@ import {
 // import Customer from "./Customer";
 import Products from "./Products";
 import useSalesAnalytics from "../../../Components/Hooks/useSalesAnalytics";
-import { getSalesTransactions } from "../../../slices/dashboardSales/thunk";
+import { getKPISalesTransactions } from "../../../slices/dashboardSales/thunk";
 import { clearSalesData } from "../../../slices/dashboardSales/reducer";
+import Category from "./Category"
 
 const CategoryPerformance = () => {
   const dispatch = useDispatch();
@@ -26,9 +27,9 @@ const CategoryPerformance = () => {
   const {
     // salesTargetSummary = [],
     // salesTargetBranch = [],
-    // salesBranch = [],
+    salesBranch = [],
     // salesChannel = [],
-    sales = [],
+    salesSubgroup = [],
     filters,
     loading,
     error,
@@ -85,7 +86,7 @@ const CategoryPerformance = () => {
     // TOTAL,
     categoryPerformance,
   } = useSalesAnalytics(
-     sales,
+    //  sales,
     [], // kpiOverdueAccounts
     [], // salesType
     [], // salesBranch
@@ -95,6 +96,7 @@ const CategoryPerformance = () => {
     [], // salesComparativeMTD
     [], // salesMonthly
     [], // salesDaily
+    salesSubgroup,
     [], // monthlySales
     [], // monthToDateSales
     [], // lastYearMonthToDateSales
@@ -122,12 +124,12 @@ const CategoryPerformance = () => {
 
   useEffect(() => {
     dispatch(
-      getSalesTransactions({
+      getKPISalesTransactions({
         clientid: 1,
         startDate: filters.startDate,
         endDate: filters.endDate,
         branchcode: filters.branch,
-        // groupBy: "CHANNEL",
+        groupBy: "SUBGROUP",
         // IncludeCollections: 1,
       }),
     );
@@ -141,23 +143,23 @@ const CategoryPerformance = () => {
 
   const handleApplyFilters = () => {
     dispatch(
-      getSalesTransactions({
+      getKPISalesTransactions({
         clientid: 1,
         startDate: filters.startDate,
         endDate: filters.endDate,
         branchcode: filters.branch,
-        // groupBy: "CHANNEL",
-        //         IncludeCollections: 1,
+        groupBy: "SUBGROUP",
+                IncludeCollections: 1,
 
       }),
     );
   };
   const selectedBranchName =
     filters.branch == null || filters.branch === ""
-      ? ""
-      : (sales || []).find(
-          (m) => Number(m.branch_ID) === Number(filters.branch),
-        )?.brancch_Name || "";
+      ? "All Branches"
+      : (salesBranch || []).find(
+          (m) => Number(m.branch_id) === Number(filters.branch),
+        )?.branch_name || "";
 
   document.title = "Category Performance| phAMACore Analytics";
 
@@ -167,10 +169,18 @@ const CategoryPerformance = () => {
         <BreadCrumb
           title="Category Performance"
           pageTitle="Dashboards"
-          subtitle=
-          {selectedBranchName}
+          subtitle= {selectedBranchName}
+         
         />
-
+<Row>
+  <Col xl={12}>
+  <Category
+                categoryPerformance={categoryPerformance}
+              rightClickBtn={toggleRightColumn}
+selectedBranchName ={selectedBranchName}
+  />
+  </Col>
+</Row>
         <Row>
           <Col xl={12}>
             <Products

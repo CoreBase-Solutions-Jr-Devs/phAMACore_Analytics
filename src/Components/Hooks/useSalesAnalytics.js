@@ -11,6 +11,7 @@ const useSalesAnalytics = (
   salesComparativeMTD = [],
   salesMonthly = [],
   salesDaily = [],
+  salesSubgroup = [],
   monthlySales = [],
   monthToDateSales = [],
   lastYearMonthToDateSales = [],
@@ -30,6 +31,7 @@ const useSalesAnalytics = (
   salesTarget= [],
 salesTargetSummary= [],
 salesTargetBranch= [],
+salesTargetMONTHLY_PIVOT= [],
   filters = {},
 ) => {
   const formatAmount = (value) => {
@@ -94,22 +96,32 @@ salesTargetBranch= [],
       .map((item) => item.invoice_Number),
   ).size;
 
-  const branchData = salesBranch.map((item) => ({
-    name: (item.branch_name || "UNKNOWN BRANCH").replace(
-      /^AXCESS PHARMACY\s*-\s*/i,
-      "",
-    ),
-    amount: Number(item.net_sales_incl || 0),
-  }));
+ const branchData = useMemo(
+  () =>
+    (Array.isArray(salesBranch) ? salesBranch : []).map((item) => ({
+      name: (item.branch_name || "UNKNOWN BRANCH").replace(
+        /^AXCESS PHARMACY\s*-\s*/i,
+        "",
+      ),
+      amount: Number(item.net_sales_incl ?? 0),
+    })),
+  [salesBranch],
+);
 
-  const branchChartSeries = [
+const branchChartSeries = useMemo(
+  () => [
     {
       name: "Revenue",
       data: branchData.map((branch) => branch.amount),
     },
-  ];
+  ],
+  [branchData],
+);
 
-  const branchCategories = branchData.map((branch) => branch.name);
+const branchCategories = useMemo(
+  () => branchData.map((branch) => branch.name),
+  [branchData],
+);
 
   /* -------------------------------------------------------
    * Revenue grouped by Sales Representative.
@@ -457,153 +469,10 @@ salesTargetBranch= [],
     nonMemberCohort.sales_contribution_pct ?? 0,
   );
 
-// -------------------------------------------------------
-// SALES TARGET — BRANCH PERFORMANCE
-// -------------------------------------------------------
-
-const branchTargets = Array.isArray(salesTargetBranch)
-  ? salesTargetBranch
-  : [];
-
-const julyTargets = Array.isArray(julySalesTarget)
-  ? julySalesTarget
-  : [];
-
-const augustTargets = Array.isArray(augustSalesTarget)
-  ? augustSalesTarget
-  : [];
-
-const septemberTargets = Array.isArray(septemberSalesTarget)
-  ? septemberSalesTarget
-  : [];
-
-const octoberTargets = Array.isArray(octoberSalesTarget)
-  ? octoberSalesTarget
-  : [];
-
-// General branch target lookup
-const getBranchTarget = (branchID) => {
-  const item = branchTargets.find(
-    (item) => Number(item.branchID) === branchID
-  );
-
-  return {
-    branchID,
-     branchName: (item?.branchName ?? "").replace(
-      /^AXCESS PHARMACY\s*-\s*/i,
-      "",
-    ),
-    transactionCount: Number(item?.transactionCount ?? 0),
-    actualSalesExcl: Number(item?.actualSalesExcl ?? 0),
-    actualSalesIncl: Number(item?.actualSalesIncl ?? 0),
-    totalCOGS: Number(item?.totalCOGS ?? 0),
-    grossProfit: Number(item?.grossProfit ?? 0),
-    grossMarginPct: Number(item?.grossMarginPct ?? 0),
-    avgBasketValue: Number(item?.avgBasketValue ?? 0),
-    targetSales: Number(item?.targetSales ?? 0),
-    gapToTarget: Number(item?.gapToTarget ?? 0),
-    achievementPct: Number(item?.achievementPct ?? 0),
-    actionInsight: item?.action_insight ?? "",
-  };
-};
-
-// Monthly branch target lookup
-const getMonthlyBranchTarget = (data, branchID) => {
-  const item = data.find(
-    (item) => Number(item.branchID) === branchID
-  );
-
-  return {
-    branchID,
-    branchName: (item?.branchName ?? "").replace(
-      /^AXCESS PHARMACY\s*-\s*/i,
-      "",
-    ),
-    actualSalesIncl: Number(item?.actualSalesIncl ?? 0),
-    targetSales: Number(item?.targetSales ?? 0),
-  };
-};
-
-// JULY
-const getJulyBranchTarget = (branchID) =>
-  getMonthlyBranchTarget(julyTargets, branchID);
-
-// AUGUST
-const getAugustBranchTarget = (branchID) =>
-  getMonthlyBranchTarget(augustTargets, branchID);
-
-// SEPTEMBER
-const getSeptemberBranchTarget = (branchID) =>
-  getMonthlyBranchTarget(septemberTargets, branchID);
-
-// OCTOBER
-const getOctoberBranchTarget = (branchID) =>
-  getMonthlyBranchTarget(octoberTargets, branchID);
-
-// Individual permanent branches
-const branchTargetSyokimau = getBranchTarget(1);
-const branchTargetTassia = getBranchTarget(2);
-const branchTargetMachakos = getBranchTarget(3);
-const branchTargetMtwapa = getBranchTarget(4);
-const branchTargetKasarani = getBranchTarget(5);
-const branchTargetEldoret = getBranchTarget(6);
-const branchTargetBusia = getBranchTarget(7);
-const branchTargetMsaGpo = getBranchTarget(8);
-const branchTargetKitale = getBranchTarget(9);
-const branchTargetKisii = getBranchTarget(10);
-
-// Monthly targets for each branch
-const julyBranchTargetSyokimau = getJulyBranchTarget(1);
-const augustBranchTargetSyokimau = getAugustBranchTarget(1);
-const septemberBranchTargetSyokimau = getSeptemberBranchTarget(1);
-const octoberBranchTargetSyokimau = getOctoberBranchTarget(1);
-
-const julyBranchTargetTassia = getJulyBranchTarget(2);
-const augustBranchTargetTassia = getAugustBranchTarget(2);
-const septemberBranchTargetTassia = getSeptemberBranchTarget(2);
-const octoberBranchTargetTassia = getOctoberBranchTarget(2);
-
-const julyBranchTargetMachakos = getJulyBranchTarget(3);
-const augustBranchTargetMachakos = getAugustBranchTarget(3);
-const septemberBranchTargetMachakos = getSeptemberBranchTarget(3);
-const octoberBranchTargetMachakos = getOctoberBranchTarget(3);
-
-const julyBranchTargetMtwapa = getJulyBranchTarget(4);
-const augustBranchTargetMtwapa = getAugustBranchTarget(4);
-const septemberBranchTargetMtwapa = getSeptemberBranchTarget(4);
-const octoberBranchTargetMtwapa = getOctoberBranchTarget(4);
-
-const julyBranchTargetKasarani = getJulyBranchTarget(5);
-const augustBranchTargetKasarani = getAugustBranchTarget(5);
-const septemberBranchTargetKasarani = getSeptemberBranchTarget(5);
-const octoberBranchTargetKasarani = getOctoberBranchTarget(5);
-
-const julyBranchTargetEldoret = getJulyBranchTarget(6);
-const augustBranchTargetEldoret = getAugustBranchTarget(6);
-const septemberBranchTargetEldoret = getSeptemberBranchTarget(6);
-const octoberBranchTargetEldoret = getOctoberBranchTarget(6);
-
-const julyBranchTargetBusia = getJulyBranchTarget(7);
-const augustBranchTargetBusia = getAugustBranchTarget(7);
-const septemberBranchTargetBusia = getSeptemberBranchTarget(7);
-const octoberBranchTargetBusia = getOctoberBranchTarget(7);
-
-const julyBranchTargetMsaGpo = getJulyBranchTarget(8);
-const augustBranchTargetMsaGpo = getAugustBranchTarget(8);
-const septemberBranchTargetMsaGpo = getSeptemberBranchTarget(8);
-const octoberBranchTargetMsaGpo = getOctoberBranchTarget(8);
-
-const julyBranchTargetKitale = getJulyBranchTarget(9);
-const augustBranchTargetKitale = getAugustBranchTarget(9);
-const septemberBranchTargetKitale = getSeptemberBranchTarget(9);
-const octoberBranchTargetKitale = getOctoberBranchTarget(9);
-
-const julyBranchTargetKisii = getJulyBranchTarget(10);
-const augustBranchTargetKisii = getAugustBranchTarget(10);
-const septemberBranchTargetKisii = getSeptemberBranchTarget(10);
-const octoberBranchTargetKisii = getOctoberBranchTarget(10);
-
 const performanceSummary = salesTargetSummary?.[0] ?? {};
+const performanceSummaryMONTHLY =
+  salesTargetMONTHLY_PIVOT ?? [];
+
 const getChannelData = (channel) =>
   salesChannel.find((item) => item.sales_channel === channel) || {};
 
@@ -613,8 +482,28 @@ const OTHER_ACCOUNT = getChannelData("OTHER_ACCOUNT");
 const RETURN = getChannelData("RETURN");
 const TOTAL = getChannelData("TOTAL");
 
-const categoryPerformance = sales ?? [0];
+const categoryPerformance = (Array.isArray(salesSubgroup) ? salesSubgroup : [])
+  .reduce(
+    (totals, item) => ({
+      total_sales_incl:
+        totals.total_sales_incl + Number(item.total_sales_incl ?? 0),
 
+      gross_profit:
+        totals.gross_profit + Number(item.gross_profit ?? 0),
+
+      total_units_sold:
+        totals.total_units_sold + Number(item.total_units_sold ?? 0),
+
+      active_items_count:
+        totals.active_items_count + Number(item.active_items_count ?? 0),
+    }),
+    {
+      total_sales_incl: 0,
+      gross_profit: 0,
+      total_units_sold: 0,
+      active_items_count: 0,
+    },
+  );
   return {
     formatAmount,
     totalRevenue,
@@ -635,6 +524,7 @@ const categoryPerformance = sales ?? [0];
     topDebtors,
     creditNotes,
     overdueDebtorsCount,
+    branchData,
     branchChartSeries,
     branchCategories,
     salesmanData,
@@ -643,6 +533,7 @@ const categoryPerformance = sales ?? [0];
     bottomProducts,
     monthlyChart,
     monthToDateChart,
+    marginDrilldown,
     marginDrilldown25,
     marginDrilldown25To30,
     marginDrilldown30To45,
@@ -685,76 +576,8 @@ const categoryPerformance = sales ?? [0];
     nonMemberSalesIncl,
     nonMemberABV,
     nonMemberSalesContribution,
-      branchTargetSyokimau,
-  branchTargetTassia,
-  branchTargetMachakos,
-  branchTargetMtwapa,
-  branchTargetKasarani,
-  branchTargetEldoret,
-  branchTargetBusia,
-  branchTargetMsaGpo,
-  branchTargetKitale,
-  branchTargetKisii,
-  // Monthly sales target arrays
-julySalesTarget,
-augustSalesTarget,
-septemberSalesTarget,
-octoberSalesTarget,
-
-// Monthly lookup functions
-getJulyBranchTarget,
-getAugustBranchTarget,
-getSeptemberBranchTarget,
-getOctoberBranchTarget,
-
-// July
-julyBranchTargetSyokimau,
-julyBranchTargetTassia,
-julyBranchTargetMachakos,
-julyBranchTargetMtwapa,
-julyBranchTargetKasarani,
-julyBranchTargetEldoret,
-julyBranchTargetBusia,
-julyBranchTargetMsaGpo,
-julyBranchTargetKitale,
-julyBranchTargetKisii,
-
-// August
-augustBranchTargetSyokimau,
-augustBranchTargetTassia,
-augustBranchTargetMachakos,
-augustBranchTargetMtwapa,
-augustBranchTargetKasarani,
-augustBranchTargetEldoret,
-augustBranchTargetBusia,
-augustBranchTargetMsaGpo,
-augustBranchTargetKitale,
-augustBranchTargetKisii,
-
-// September
-septemberBranchTargetSyokimau,
-septemberBranchTargetTassia,
-septemberBranchTargetMachakos,
-septemberBranchTargetMtwapa,
-septemberBranchTargetKasarani,
-septemberBranchTargetEldoret,
-septemberBranchTargetBusia,
-septemberBranchTargetMsaGpo,
-septemberBranchTargetKitale,
-septemberBranchTargetKisii,
-
-// October
-octoberBranchTargetSyokimau,
-octoberBranchTargetTassia,
-octoberBranchTargetMachakos,
-octoberBranchTargetMtwapa,
-octoberBranchTargetKasarani,
-octoberBranchTargetEldoret,
-octoberBranchTargetBusia,
-octoberBranchTargetMsaGpo,
-octoberBranchTargetKitale,
-octoberBranchTargetKisii,
 performanceSummary,
+performanceSummaryMONTHLY,
   CASH,
     INSURANCE,
     OTHER_ACCOUNT,

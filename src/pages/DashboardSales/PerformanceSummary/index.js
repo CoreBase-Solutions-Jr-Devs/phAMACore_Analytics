@@ -10,11 +10,12 @@ import {
   setStartDate,
   setEndDate,
 } from "../../../slices/dashboardSales/SalesTarget/reducer";
-// import Customer from "./Customer";
+import { getDateRanges } from "../../../helpers/date_helper";
 import Performance from "./Performance";
 import useSalesAnalytics from "../../../Components/Hooks/useSalesAnalytics";
 import { getSalesTarget } from "../../../slices/dashboardSales/SalesTarget/thunk";
 import { clearSalesTargetData } from "../../../slices/dashboardSales/SalesTarget/reducer";
+import BranchTarget from "./BranchTarget";
 
 const PerformanceSummary = () => {
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ const PerformanceSummary = () => {
   const {
     salesTargetSummary = [],
     salesTargetBranch = [],
+    salesTargetMONTHLY_PIVOT = [],
     filters,
     loading,
     error,
@@ -65,6 +67,7 @@ const PerformanceSummary = () => {
     nonMemberABV,
     nonMemberSalesContribution,
     performanceSummary,
+    performanceSummaryMONTHLY,
     // netSales,
     // targetSales,
     // achievementPct,
@@ -76,46 +79,46 @@ const PerformanceSummary = () => {
     // targetVariance,
     // targetActionInsight,
   } = useSalesAnalytics(
-    [], // sales
-    [], // kpiOverdueAccounts
-    [], // salesType
-    [], // salesBranch
-    [], // salesBranch_Type
-    [], // salesChannel
-    [], // salesComparativeYTD
-    [], // salesComparativeMTD
-    [], // salesMonthly
-    [], // salesDaily
-    [], // monthlySales
-    [], // monthToDateSales
-    [], // lastYearMonthToDateSales
-    [], // lastYearMonthlySales
-
-    [], // marginAnalysisBand
-    [], // marginAnalysisDrilldown
-    [], // marginAnalysisSku
-
-    [], //  customerMemberAnalysisSummary,
-    [], //  customerMemberAnalysisBranch,
-     [], // customerMemberAnalysisCohort
-
-    [], // julySalesTarget
-    [], // augustSalesTarget
-    [], // septemberSalesTarget
-    [], // octoberSalesTarget
-
-    [], // salesTarget
-    salesTargetSummary, // salesTargetSummary
-    salesTargetBranch, // salesTargetBranch
-    filters,
-  );
+  [], // 1. sales
+  [], // 2. kpiOverdueAccounts
+  [], // 3. salesType
+  [], // 4. salesBranch
+  [], // 5. salesBranch_Type
+  [], // 6. salesChannel
+  [], // 7. salesComparativeYTD
+  [], // 8. salesComparativeMTD
+  [], // 9. salesMonthly
+  [], // 10. salesDaily
+  [], // 11. salesSubgroup
+  [], // 12. monthlySales
+  [], // 13. monthToDateSales
+  [], // 14. lastYearMonthToDateSales
+  [], // 15. lastYearMonthlySales
+  [], // 16. marginAnalysisBand
+  [], // 17. marginAnalysisDrilldown
+  [], // 18. marginAnalysisSku
+  [], // 19. customerMemberAnalysisSummary
+  [], // 20. customerMemberAnalysisBranch
+  [], // 21. customerMemberAnalysisCohort
+  [], // 22. julySalesTarget
+  [], // 23. augustSalesTarget
+  [], // 24. septemberSalesTarget
+  [], // 25. octoberSalesTarget
+  [], // 26. salesTarget
+  salesTargetSummary,      
+  salesTargetBranch,        
+  salesTargetMONTHLY_PIVOT, 
+  filters,                 
+);
 
   useEffect(() => {
+    const dateRanges = getDateRanges();
     const params = {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
       branchcode: filters.branch,
+      PivotMetric: 'ALL',
     };
 
     dispatch(
@@ -129,6 +132,14 @@ const PerformanceSummary = () => {
       getSalesTarget({
         ...params,
         groupBy: "BRANCH",
+      }),
+    );
+       dispatch(
+      getSalesTarget({
+        ...params,
+        groupBy: "MONTHLY",
+          startDate: dateRanges.currentYearStart,
+  endDate: dateRanges.today,
       }),
     );
   }, [dispatch]);
@@ -140,11 +151,13 @@ const PerformanceSummary = () => {
   }, [dispatch]);
 
   const handleApplyFilters = () => {
-    const params = {
+    const dateRanges = getDateRanges();
+   const params = {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
       branchcode: filters.branch,
+     PivotMetric: 'ALL',
     };
 
     dispatch(
@@ -160,10 +173,18 @@ const PerformanceSummary = () => {
         groupBy: "BRANCH",
       }),
     );
+       dispatch(
+      getSalesTarget({
+        ...params,
+        groupBy: "MONTHLY",
+          startDate: dateRanges.currentYearStart,
+  endDate: dateRanges.today,
+      }),
+    );
   };
   const selectedBranchName =
     filters.branch == null || filters.branch === ""
-      ? ""
+      ? "All Branches"
       : (salesTargetBranch || []).find(
           (m) => Number(m.branchID) === Number(filters.branch),
         )?.branchName || "Unknown Branch";
@@ -182,16 +203,6 @@ const PerformanceSummary = () => {
         <Row>
           <Col xl={12}>
             <Performance
-              //   netSales={netSales}
-              //   targetSales={targetSales}
-              //   achievementPct={achievementPct}
-              //   grossProfit={grossProfit}
-              //   grossMarginPct={grossMarginPct}
-              //   averageBasketValue={averageBasketValue}
-              //   transactionCount={transactionCount}
-              //   totalBranches={totalBranches}
-              //   targetVariance={targetVariance}
-              //   targetActionInsight={targetActionInsight}
               performanceSummary={performanceSummary}
               selectedBranchName={selectedBranchName}
               loading={loading}
@@ -199,7 +210,15 @@ const PerformanceSummary = () => {
               rightClickBtn={toggleRightColumn}
             />
           </Col>
-          <FilterActions
+         
+        </Row>
+        <Row>
+          <Col xl={12}>
+          
+          <BranchTarget 
+          data = {performanceSummaryMONTHLY}/>
+          </Col>
+           <FilterActions
             branch={filters.branch}
             dateRange={filters.dateRange}
             startDate={filters.startDate}
