@@ -4,8 +4,8 @@ import { pick, num } from "./apiRow";
 
 // FETCH SIZES (0 = everything). Kept here so they are easy to tune against live data.
 export const CRITICAL_TOP_N = 0;      // Class A items only, so the full list stays small
-export const SLOW_MOVER_TOP_N = 500;  // ranked by capital tied up; the KPI card carries the full count
-export const IMBALANCE_TOP_N = 300;   // ranked by imbalance severity
+export const SLOW_MOVER_TOP_N = 0;  // ranked by capital tied up; the KPI card carries the full count
+export const IMBALANCE_TOP_N = 0;   // ranked by imbalance severity
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
