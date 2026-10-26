@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Card, CardBody, CardHeader, Row, Col } from "reactstrap";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { Card, CardBody, CardHeader, Badge } from "reactstrap";
+import { exportToExcel } from "../../../helpers/export_helper";
+import CardExportButtons from "../../../Components/Common/CardExportButtons";
 
 const Breakdown = ({
-       CASH,
+  CASH,
   INSURANCE,
   OTHER_ACCOUNT,
   RETURN,
@@ -13,19 +14,16 @@ const Breakdown = ({
   loading,
   rightClickBtn,
 }) => {
-   const { branch, dateRange, startDate, endDate } = useSelector(
-    (state) => state.powerbi.filters,
-);
-
   // Keep all five channels visible, even before API data loads.
   const channels = [
-    { sales_channel: "CASH", ...CASH },
-    { sales_channel: "INSURANCE", ...INSURANCE },
-    { sales_channel: "OTHER_ACCOUNT", ...OTHER_ACCOUNT },
-    { sales_channel: "RETURN", ...RETURN },
-    { sales_channel: "TOTAL", ...TOTAL },
+    { sales_channel: "TOTAL", ...(TOTAL ?? {}) },
+    { sales_channel: "CASH", ...(CASH ?? {}) },
+    { sales_channel: "INSURANCE", ...(INSURANCE ?? {}) },
+    { sales_channel: "OTHER_ACCOUNT", ...(OTHER_ACCOUNT ?? {}) },
+    { sales_channel: "RETURN", ...(RETURN ?? {}) },
   ];
-    const formatAmount = (value) =>
+
+  const formatAmount = (value) =>
     Number(value ?? 0).toLocaleString("en-KE", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -33,132 +31,261 @@ const Breakdown = ({
 
   const formatNumber = (value) =>
     Number(value ?? 0).toLocaleString("en-KE");
+
+  const getBadgeColor = (percentage) => {
+    if (
+      percentage == null ||
+      percentage === "" ||
+      Number.isNaN(Number(percentage))
+    ) {
+      return "bg-danger-subtle text-danger";
+    }
+
+    const value = Number(percentage);
+
+    if (value < 10) {
+      return "bg-danger-subtle text-danger";
+    }
+
+    if (value < 50) {
+      return "bg-warning-subtle text-warning-emphasis";
+    }
+
+    if (value < 100) {
+      return "bg-info-subtle text-info";
+    }
+
+    return "bg-success-subtle text-success";
+  };
+
+  const getTotalCellStyle = (isTotal) => ({
+    backgroundColor: isTotal ? "light" : undefined,
+    fontWeight: isTotal ? 700 : undefined,
+    whiteSpace: "nowrap",
+  });
+
+  const numericHeaders = [
+    "Trans",
+    "Line Items",
+    "Unique Clients",
+    "Units Sold",
+    "Sales Excl. (KES)",
+    "Tax (KES)",
+    "Sales Incl. (KES)",
+    "COGS (KES)",
+    "GP (KES)",
+    "GP Margin (%)",
+    "Avg Order Value (KES)",
+    "Sales Share (%)",
+  ];
+
+  // Export all five channels to Excel.
+  const handleExportExcel = () => {
+    const rows = channels.map((item) => ({
+      "Sales Channel": item.sales_channel.replace(/_/g, " "),
+      Trans: Number(item.transaction_count ?? 0),
+      "Line Items": Number(item.total_line_items ?? 0),
+      "Unique Clients": Number(item.unique_clients ?? 0),
+      "Units Sold": Number(item.total_units_sold ?? 0),
+      "Sales Excl. (KES)": Number(item.total_sales_excl ?? 0),
+      "Tax (KES)": Number(item.total_tax ?? 0),
+      "Sales Incl. (KES)": Number(item.total_sales_incl ?? 0),
+      "COGS (KES)": Number(item.total_cogs ?? 0),
+      "GP (KES)": Number(item.gross_profit ?? 0),
+      "GP Margin (%)": Number(item.gross_margin_perc ?? 0),
+      "Avg Order Value (KES)": Number(item.avg_order_value ?? 0),
+      "Sales Share (%)": Number(item.sales_share_perc ?? 0),
+    }));
+
+    const todayStr = new Date()
+      .toLocaleDateString("en-GB")
+      .replace(/\//g, "-");
+
+    const safeBranchName = (selectedBranchName || "All_Branches")
+      .replace(/[^a-z0-9_-]/gi, "_");
+
+    exportToExcel(
+      rows,
+      `Sales_Channel_Performance_${safeBranchName}_${todayStr}`
+    );
+  };
+
   return (
-       <React.Fragment>
-              {/* <div className="mb-3">
-    <h4 className="card-title mb-1">Sales Performance Overview</h4>
-  
-  </div> */}
-        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-    <h4 className="card-title mb-0">
-      {/* Sales Performance Overview */}
-      </h4>
+    <Card className="card-height-100" id="sales-top-customers-card">
+     <CardHeader className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h4 className="card-title mb-1">
+      Sales Channel Performance
+    </h4>
+    <p className="text-muted mb-0 fs-6">
+      Overview of sales, profitability, and transaction activity
+      across channels
+    </p>
+  </div>
 
-          <div className="d-flex align-items-center gap-2 ">
-            <span>Filtered From:</span>
-            <strong>{startDate}</strong> to <strong>{endDate}</strong>
+  <CardExportButtons
+    targetId="sales-channel-breakdown-card"
+    title="Sales Channel Performance"
+    onExport={handleExportExcel}
+  />
+</CardHeader>
+
+      <CardBody>
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            {typeof error === "string"
+              ? error
+              : "Failed to load sales channel data."}
           </div>
+        )}
 
-          <div className="d-flex align-items-center gap-2 ">
-            <span>Selected Branch:</span>
-            <strong>{selectedBranchName}</strong>
-          </div>
-
-          <div className="d-flex align-items-center gap-2 no-print">
-            {/* <button
-                  type="button"
-                  className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
-                  onClick={handleExportExcel}
-                  title="Export Key Metrics to Excel"
+        <div className="table-responsive table-card">
+          <table className="table table-hover table-bordered align-middle table-nowrap mb-0">
+            <thead className="table-light">
+              <tr>
+                <th
+                  className="text-start"
+                  style={{
+                    position: "sticky",
+                    left: 0,
+                    zIndex: 3,
+                    minWidth: "145px",
+                    whiteSpace: "nowrap",
+                  }}
                 >
-                  <i className="ri-file-excel-2-line align-bottom"></i>
-                  <span>Export Excel</span>
-                </button> */}
+                  Sales Channel
+                </th>
 
-            {/* <button
-                  type="button"
-                  className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
-                  onClick={handlePrint}
-                  title="Print Dashboard"
-                >
-                  <i className="ri-printer-line align-bottom"></i>
-                  <span>Print</span>
-                </button> */}
-
-            <button
-              type="button"
-              className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-              onClick={rightClickBtn}
-            >
-              <i className="ri-filter-fill"></i>
-              Filter
-            </button>
-          </div>
-        </div>
-        <div>
- 
-                <Card className="card-height-100" id="sales-top-customers-card">
-        <CardBody>
-       
-
-      <div className="table-responsive table-card">
-        <table className="table align-middle table-nowrap mb-0">
-          <thead className="table-light">
-            <tr >
-              <th>Sales</th>
-              <th>Trans</th>
-              <th>Line Items</th>
-              <th>Unique Clients</th>
-              <th>Units Sold</th>
-              <th>Sales Excl. (KES)</th>
-              <th>Tax(KES)</th>
-              <th>Sales Incl.(KES)</th>
-              <th>COGS(KES)</th>
-              <th>GP(KES)</th>
-              <th>GP Margin(%)</th>
-              <th>Avg Order Value (KES)</th>
-              <th>Sales Share(%)</th>
-         
-            </tr>
-          </thead>
-{loading && (
-         <div
-                className="spinner-border text-primary"
-                role="status"
-              />
-      )}
-
-      {error && (
-        <div className="alert alert-danger" role="alert">
-          {typeof error === "string"
-            ? error
-            : "Failed to load sales channel data."}
-        </div>
-      )}
-          <tbody>
-            {channels.map((item) => (
-              <tr
-                key={item.sales_channel}
-            
-              >
-                <td className="fw-medium">
-                  {item.sales_channel.replace("_", " ")}
-                </td>
-
-                <td>{formatNumber(item.transaction_count)}</td>
-                <td>{formatNumber(item.total_line_items)}</td>
-                <td>{formatNumber(item.unique_clients)}</td>
-                <td>{formatNumber(item.total_units_sold)}</td>
-                <td>{formatAmount(item.total_sales_excl)}</td>
-                <td>{formatAmount(item.total_tax)}</td>
-                <td>{formatAmount(item.total_sales_incl)}</td>
-                <td>{formatAmount(item.total_cogs)}</td>
-                <td>{formatAmount(item.gross_profit)}</td>
-                <td>{formatAmount(item.gross_margin_perc)}%</td>
-                <td>{formatAmount(item.avg_order_value)}</td>
-                <td>{formatAmount(item.sales_share_perc)}%</td>
-
+                {numericHeaders.map((header) => (
+                  <th
+                    key={header}
+                    className="text-end"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={numericHeaders.length + 1}
+                    className="text-center py-4"
+                  >
+                    <div
+                      className="spinner-border spinner-border-sm text-primary me-2"
+                      role="status"
+                      aria-label="Loading"
+                    />
+                    Loading sales channel data...
+                  </td>
+                </tr>
+              ) : (
+                channels.map((item) => {
+                  const isTotal = item.sales_channel === "TOTAL";
+                  const totalStyle = getTotalCellStyle(isTotal);
+
+                  return (
+                    <tr
+                      key={item.sales_channel}
+                      className={isTotal ? "fw-bold bg-light" : ""}
+                    >
+                      <td
+                        className="text-start"
+                        style={{
+                          ...totalStyle,
+                          position: "sticky",
+                          left: 0,
+                          zIndex: 2,
+                          minWidth: "145px",
+                        }}
+                      >
+                        {item.sales_channel.replace(/_/g, " ")}
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        {formatNumber(item.transaction_count)}
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        {formatNumber(item.total_line_items)}
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        {formatNumber(item.unique_clients)}
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        {formatNumber(item.total_units_sold)}
+                      </td>
+
+                      <td
+                        className="text-end text-info"
+                        style={totalStyle}
+                      >
+                        {formatAmount(item.total_sales_excl)}
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        {formatAmount(item.total_tax)}
+                      </td>
+
+                      <td
+                        className="text-end text-primary"
+                        style={totalStyle}
+                      >
+                        {formatAmount(item.total_sales_incl)}
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        {formatAmount(item.total_cogs)}
+                      </td>
+
+                      <td
+                        className="text-end text-success"
+                        style={totalStyle}
+                      >
+                        {formatAmount(item.gross_profit)}
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        <Badge
+                          pill
+                          className={`px-2 py-1 ${getBadgeColor(
+                            item.gross_margin_perc
+                          )}`}
+                        >
+                          {formatAmount(item.gross_margin_perc)}%
+                        </Badge>
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        {formatAmount(item.avg_order_value)}
+                      </td>
+
+                      <td className="text-end" style={totalStyle}>
+                        <Badge
+                          pill
+                          className={`px-2 py-1 ${getBadgeColor(
+                            item.sales_share_perc
+                          )}`}
+                        >
+                          {formatAmount(item.sales_share_perc)}%
+                        </Badge>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </CardBody>
-      </Card>
-      </div>
-      </React.Fragment>
+    </Card>
   );
 };
 
 export default Breakdown;
-

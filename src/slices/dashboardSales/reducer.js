@@ -27,11 +27,12 @@ const initialState = {
   salesBranch: [],
   salesBranch_Type: [],
   salesChannel: [],
+
   salesComparativeYTD: [],
   salesComparativeMTD: [],
   salesMonthly: [],
   salesDaily: [],
-
+salesSubgroup: [],
 
 
 
@@ -292,6 +293,9 @@ const powerBISlice = createSlice({
             state.salesDaily = result;
             break;
 
+             case "SUBGROUP":
+            state.salesSubgroup = result;
+            break;
           default:
             break;
         }

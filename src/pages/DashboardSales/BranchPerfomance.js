@@ -53,7 +53,7 @@ const BranchPerformance = ({
             <div className="text-center py-5">
               <h6 className="text-danger mb-2">{error} </h6>
             </div>
-          ) : chartSeries.length === 0 ? (
+          ) : branchData.length === 0 ? (
             <div className="text-center py-5">
               <h6 className="text-muted mb-2">
                 No branch performance sales data available

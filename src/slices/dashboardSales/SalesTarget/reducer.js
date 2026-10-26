@@ -225,7 +225,7 @@ extraReducers: (builder) => {
     case "BRANCH":
       state.salesTargetBranch = result;
 
-       case "MONTHLY_PIVOT":
+       case "MONTHLY":
       state.salesTargetMONTHLY_PIVOT = result;
 
       break;

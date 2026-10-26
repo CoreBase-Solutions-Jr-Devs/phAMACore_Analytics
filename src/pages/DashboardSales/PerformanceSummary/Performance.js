@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Card, CardBody, Row, Col } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
-
+import {
+  exportDashboardReportToExcel,
+  triggerPrint,
+} from "../../../helpers/export_helper";
 const Performance = ({
 //   netSales,
 //   targetSales,
@@ -22,12 +25,98 @@ performanceSummary,
   const { branch, dateRange, startDate, endDate } = useSelector(
     (state) => state.salesTarget.filters,
   );
-console.log("Current filters:", {
-  branch,
-  dateRange,
-  startDate,
-  endDate,
-});
+const handleExportExcel = () => {
+    const todayStr = new Date()
+      .toLocaleDateString("en-GB")
+      .replace(/\//g, "-");
+
+    const fileName = `Performance_Key_Metrics_${todayStr}`;
+
+    const metadata = [
+      {
+        label: "Report",
+        value: "Performance Key Metrics",
+      },
+      {
+        label: "Generated Date",
+        value: new Date().toLocaleString("en-GB"),
+      },
+      {
+        label: "Selected Branch",
+        value: selectedBranchName || "All Branches",
+      },
+      {
+        label: "Date Range Filter",
+        value: `${startDate || ""} to ${endDate || ""}`,
+      },
+    ];
+
+    const rows = [
+      {
+        Metric: "Net Sales",
+        "Value (KES)": Number(
+          performanceSummary?.actualSalesExcl ?? 0,
+        ),
+      },
+      {
+        Metric: "Target Sales",
+        "Value (KES)": Number(
+          performanceSummary?.targetSales ?? 0,
+        ),
+      },
+      {
+        Metric: "Achievement (%)",
+        "Value (KES)": Number(
+          performanceSummary?.achievementPct ?? 0,
+        ),
+      },
+      {
+        Metric: "Gross Profit",
+        "Value (KES)": Number(
+          performanceSummary?.grossProfit ?? 0,
+        ),
+      },
+      {
+        Metric: "Gross Margin (%)",
+        "Value (KES)": Number(
+          performanceSummary?.grossMarginPct ?? 0,
+        ),
+      },
+      {
+        Metric: "Average Basket Value",
+        "Value (KES)": Number(
+          performanceSummary?.avgBasketValue ?? 0,
+        ),
+      },
+      {
+        Metric: "Transactions",
+        "Value (KES)": Number(
+          performanceSummary?.totalTransactions ?? 0,
+        ),
+      },
+    ];
+
+    const sections = [
+      {
+        title: "Performance Key Metrics",
+        headers: ["Metric", "Value (KES)"],
+        data: rows,
+      },
+    ];
+
+    exportDashboardReportToExcel(
+      {
+        title: "Performance Key Metrics Report",
+        metadata,
+        sections,
+      },
+      fileName,
+    );
+  };
+
+  const handlePrint = () => {
+    triggerPrint();
+  };
   return (
     <div>
       <React.Fragment>
@@ -45,7 +134,7 @@ console.log("Current filters:", {
           </div>
 
           <div className="d-flex align-items-center gap-2 no-print">
-            {/* <button
+            <button
                   type="button"
                   className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
                   onClick={handleExportExcel}
@@ -53,9 +142,9 @@ console.log("Current filters:", {
                 >
                   <i className="ri-file-excel-2-line align-bottom"></i>
                   <span>Export Excel</span>
-                </button> */}
+                </button>
 
-            {/* <button
+            <button
                   type="button"
                   className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
                   onClick={handlePrint}
@@ -63,7 +152,7 @@ console.log("Current filters:", {
                 >
                   <i className="ri-printer-line align-bottom"></i>
                   <span>Print</span>
-                </button> */}
+                </button>
 
             <button
               type="button"
@@ -105,7 +194,7 @@ console.log("Current filters:", {
                   <p className="font-medium mb-0">Net Sales</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-secondary">
-                    {Number(performanceSummary?.actualSalesExcl ?? 0).toLocaleString(
+                    KES {Number(performanceSummary?.actualSalesExcl ?? 0).toLocaleString(
                       "en-KE",
                     )}
                   </h3>
@@ -123,8 +212,7 @@ console.log("Current filters:", {
                   <p className="mb-0 text-muted mt-auto ">
                   Achievement:
                   <span className="fw-semibold ms-1">
-                 {Number(performanceSummary?.achievementPct ?? 0).toFixed(1)}% of
-                total sales
+                 {Number(performanceSummary?.achievementPct ?? 0).toFixed(1)}% 
                   </span>
                 </p>
               </CardBody>
@@ -138,7 +226,7 @@ console.log("Current filters:", {
                   <p className="font-medium mb-0">Gross Profit</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-warning">
-                    {Number(performanceSummary?.grossProfit ?? 0).toLocaleString(
+                   KES {Number(performanceSummary?.grossProfit ?? 0).toLocaleString(
                       "en-KE",
                     )}
                   </h3>
@@ -159,7 +247,7 @@ console.log("Current filters:", {
                   <p className="font-medium mb-0">Avg Basket Value</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-danger">
-                    {Number(performanceSummary?.averageBasketValue ?? 0).toLocaleString(
+                    KES {Number(performanceSummary?.avgBasketValue ?? 0).toLocaleString(
                       "en-KE",
                     )}
                   </h3>
@@ -178,7 +266,7 @@ console.log("Current filters:", {
                   <p className="font-medium mb-0">Transactions</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-danger">
-                    {Number(performanceSummary?.transactionCount ?? 0)}
+                    {Number(performanceSummary?.totalTransactions ?? 0)}
                   </h3>
                 </div>
 

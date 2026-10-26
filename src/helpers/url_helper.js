@@ -92,3 +92,4 @@ export const GET_POWERBI_CUSTOMER_MEMBER_ANALYSIS = "/api/PowerBI/PowerBIKPICust
 
 export const GET_POWERBI_SALES_TARGET = "/api/PowerBI/PowerBIKPISalesTargets";
 
+export const GET_POWERBI_INVENTORY_PROFIT_SUMMARY = "/api/PowerBI/PowerBIKPIInventoryProfitSummary";
