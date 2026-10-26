@@ -1,11 +1,11 @@
-import { cleanBranchName } from "../../helpers/branch_helper";
-import { getInclusiveDays } from "./dateHelper";
+import { cleanBranchName, resolveBranchName } from "../../helpers/branch_helper";
+import { getInclusiveDays, parseApiDate } from "./dateHelper";
 import { pick, num } from "./apiRow";
 
 // FETCH SIZES (0 = everything). Kept here so they are easy to tune against live data.
 export const CRITICAL_TOP_N = 0;      // Class A items only, so the full list stays small
-export const SLOW_MOVER_TOP_N = 500;  // ranked by capital tied up; the KPI card carries the full count
-export const IMBALANCE_TOP_N = 300;   // ranked by imbalance severity
+export const SLOW_MOVER_TOP_N = 0;  // ranked by capital tied up; the KPI card carries the full count
+export const IMBALANCE_TOP_N = 0;   // ranked by imbalance severity
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -22,7 +22,7 @@ export const getLookbackDays = (startDate, endDate) =>
 export const KPI_META = [
     { id: 3, label: "Items below Reorder Level", subtitle: "Below safety minimum" },
     { id: 4, label: "Class A Items Out of Stock", subtitle: "Top revenue items at zero stock" },
-    { id: 5, label: "Near Expiry (≤ 90 days)", subtitle: "Products at risk" },
+    { id: 5, label: "Near Expiry (≤ 90 days)", subtitle: "Batches nearing expiry" },
     { id: 6, label: "Slow Movers & Dead Stock", subtitle: "Low velocity in the window" },
     { id: 7, label: "Overstocked Items", subtitle: "> Target max cover" },
     { id: 8, label: "Branch Imbalances (> 20%)", subtitle: "Transfer candidates" },
@@ -55,9 +55,21 @@ const bucketFor = (days) => {
  * Batches with stock on hand that have already expired or expire within 90 days.
  * One row per batch, so the widgets, the table and the exports all reconcile.
  */
-export const getExpiryRows = (batchRows = []) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+export const getExpiryRows = (batchRows = [], options = {}) => {
+    const { branchCode = null, branches = [], asOfDate = null } = options;
+    const referenceDate = parseApiDate(asOfDate) || new Date();
+    referenceDate.setHours(0, 0, 0, 0);
+
+    const activeBranchCode =
+        branchCode !== undefined && branchCode !== null &&
+        branchCode !== "" && branchCode !== "All Branches" &&
+        !Number.isNaN(Number(branchCode)) && Number(branchCode) > 0
+            ? Number(branchCode)
+            : null;
+
+    const targetBranchName = activeBranchCode
+        ? cleanBranchName(resolveBranchName(activeBranchCode, branches)).toLowerCase()
+        : "";
 
     return (Array.isArray(batchRows) ? batchRows : [])
         .map((item) => {
@@ -65,16 +77,32 @@ export const getExpiryRows = (batchRows = []) => {
             if (!expiry || isNaN(expiry.getTime())) return null;
             expiry.setHours(0, 0, 0, 0);
 
+            const branch = cleanBranchName(pick(item, "branchName", "branch_name") || "");
+            const rowBranchId = pick(item, "branchID", "branch_id", "branchCode", "bcode");
+
+            if (activeBranchCode) {
+                if (rowBranchId !== undefined && rowBranchId !== null && String(rowBranchId) !== "") {
+                    if (Number(rowBranchId) !== activeBranchCode) return null;
+                } else if (
+                    targetBranchName &&
+                    !targetBranchName.startsWith("branch ") &&
+                    branch &&
+                    branch.toLowerCase() !== targetBranchName
+                ) {
+                    return null;
+                }
+            }
+
             const qty = num(pick(item, "qtyBal", "closing_qty"));
-            const daysRemaining = Math.round((expiry - today) / MS_PER_DAY);
+            const daysRemaining = Math.floor((expiry.getTime() - referenceDate.getTime()) / MS_PER_DAY);
             if (qty <= 0 || daysRemaining > 90) return null;
 
             const bucket = bucketFor(daysRemaining);
             return {
                 code: pick(item, "invCode", "item_code") || "",
                 product: pick(item, "invName", "itemName", "item_name") || "",
-                batch: pick(item, "batchNo", "batch_no", "batch", "batchNumber", "lotNo") || "",
-                branch: cleanBranchName(pick(item, "branchName", "branch_name") || ""),
+                batch: pick(item, "batchNo", "batch_no", "batch", "batchNumber", "lotNo", "stockInNo") || "",
+                branch,
                 expiry,
                 daysRemaining,
                 qty,
@@ -86,6 +114,53 @@ export const getExpiryRows = (batchRows = []) => {
         .filter(Boolean)
         .sort((a, b) => a.daysRemaining - b.daysRemaining);
 };
+
+// SLOW MOVING STOCK (PowerBIKPIStockHealth, GroupBy = SLOW_MOVERS)
+
+/**
+ * Normalises the slow mover rows into the shape shown in the table and the export.
+ * Status is binary: Dead Stock (flagged as dead or nothing sold in the window) or Slow Mover.
+ */
+export const buildSlowMovingRows = (slowMovingStock = []) =>
+    (Array.isArray(slowMovingStock) ? slowMovingStock : []).map((row, index) => {
+        const unitsSold = num(row.units_sold_window ?? row.totalQty);
+        const category = String(row.movement_category || row.status || "").toUpperCase();
+        const isDead = category.includes("DEAD") || unitsSold === 0;
+        const itemCode = String(row.item_code || row.item_Code || "");
+        const subGroup = row.item_subgroup && row.item_subgroup !== "Unassigned" ? row.item_subgroup : "";
+
+        return {
+            id: `${itemCode || index}-${row.branch_id ?? row.branch_code ?? index}-${index}`,
+            itemCode,
+            name: String(row.item_name || row.item_Name || row.item_code || "Unknown Item"),
+            category: String(subGroup || row.item_group || "General"),
+            group: String(row.item_group || ""),
+            subGroup: String(subGroup),
+            branch: cleanBranchName(row.branch_name || row.branchName || (row.branch_id ? `Branch ${row.branch_id}` : "All Branches")),
+            stockQty: num(row.current_stock_qty),
+            unitsSold,
+            daysCover: Math.round(num(row.days_of_inventory)),
+            unitAvgCost: num(row.unit_avg_cost),
+            tiedUpCapital: num(row.tied_up_capital),
+            isDead,
+            statusLabel: isDead ? "Dead Stock" : "Slow Mover",
+            actionInsight: String(row.action_insight || ""),
+        };
+    });
+
+/** Sorts slow mover rows by name (alphabetical) or by one of the numeric columns. */
+export const sortSlowMovingRows = (rows = [], sortField = "tiedUpCapital", sortDesc = true) =>
+    [...rows].sort((a, b) => {
+        if (sortField === "name") {
+            return sortDesc ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
+        }
+        const av = a[sortField] ?? 0;
+        const bv = b[sortField] ?? 0;
+        return sortDesc ? bv - av : av - bv;
+    });
+
+export const formatSlowDaysCover = (days) =>
+    days >= 999 ? "999+ days" : `${Number(days || 0).toLocaleString()} days`;
 
 // TRANSFER SUGGESTIONS (PowerBIKPIStockHealth, GroupBy = IMBALANCES)
 
@@ -104,7 +179,7 @@ export const buildTransferSuggestions = (imbalances = [], lookbackDays = 30) =>
             itemCode: row.item_code || "",
             product: row.item_name || row.item_code || "Unknown item",
             group: row.item_group || "-",
-            branch: cleanBranchName(row.branch_name || `Branch ${row.branch_id ?? ""}`),
+            branch: cleanBranchName(row.branch_name || row.branchName || `Branch ${row.branch_id ?? ""}`),
             deficit,
             stock,
             sales,
@@ -115,25 +190,61 @@ export const buildTransferSuggestions = (imbalances = [], lookbackDays = 30) =>
             coverBefore: coverDays(stock, sales, lookbackDays),
             coverAfter: coverDays(deficit ? stock + qty : stock - qty, sales, lookbackDays),
             insight: [row.action_insight, row.network_context].filter(Boolean).join(" "),
+            rankPos: num(row.rank_pos) || index + 1,
+            companyStock: num(row.company_stock),
+            companySales: num(row.company_sales),
+            actionInsight: row.action_insight || (deficit ? "Urgent transfer required from surplus branch" : "Transfer excess stock to deficit branches"),
+            networkContext: row.network_context || "—",
         };
     });
 
 // KPI COMPUTATION
 
-export const computeKPIs = (batchExpiryRows = [], stockHealth = [], imbalances = []) => {
+export const IMBALANCE_STATUS_FILTERS = [
+    { key: "ALL", label: "All" },
+    { key: "DEFICIT", label: "Deficit" },
+    { key: "SURPLUS", label: "Surplus" },
+];
+
+/** Extracts sorted unique branch names from the StockHealth imbalances payload. */
+export const getImbalanceBranches = (imbalances = []) => {
+    const branches = new Set();
+    (Array.isArray(imbalances) ? imbalances : []).forEach((row) => {
+        if (!row) return;
+        const name = cleanBranchName(
+            row.branch_name || row.branchName || (row.branch_id != null ? `Branch ${row.branch_id}` : "")
+        );
+        if (name && name !== "-") {
+            branches.add(name);
+        }
+    });
+    return Array.from(branches).sort((a, b) => a.localeCompare(b));
+};
+
+/** Keeps the API's severity ranking (rank_pos) and applies the Deficit / Surplus and Branch filters. */
+export const filterTransferSuggestions = (suggestions = [], statusFilter = "ALL", branchFilter = "") =>
+    suggestions
+        .filter((item) => {
+            if (branchFilter && branchFilter !== "ALL" && item.branch !== branchFilter) return false;
+            if (statusFilter === "DEFICIT") return item.deficit;
+            if (statusFilter === "SURPLUS") return !item.deficit;
+            return true;
+        })
+        .sort((a, b) => a.rankPos - b.rankPos);
+
+// KPI COMPUTATION
+
+export const computeKPIs = (batchExpiryRows = [], stockHealth = [], imbalances = [], expiryOptions = {}) => {
     const health = (Array.isArray(stockHealth) ? stockHealth[0] : stockHealth) || {};
-    const nearExpiry = new Set(
-        getExpiryRows(batchExpiryRows)
-            .filter((row) => row.daysRemaining >= 0)
-            .map((row) => row.code || row.product)
-    );
+    const nearExpiry = getExpiryRows(batchExpiryRows, expiryOptions)
+        .filter((row) => row.daysRemaining >= 0).length;
 
     return {
         3: num(health.min_breached_skus),
         // critical_stocked_out_skus is what the summary actually returns; the old
         // out_of_stock_skus field never existed and fell back to the whole catalogue.
         4: num(health.critical_stocked_out_skus),
-        5: nearExpiry.size,
+        5: nearExpiry,
         6: num(health.slow_mover_skus) + num(health.dead_stock_skus),
         7: num(health.overstocked_skus),
         8: (imbalances || []).length,

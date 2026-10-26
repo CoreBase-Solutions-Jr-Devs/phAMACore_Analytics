@@ -1,41 +1,49 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import ImbalanceAlertList from "./ImbalanceAlertList";
-import { buildTransferSuggestions, getLookbackDays } from "../../../utils/StockInventoryUtils";
+import {
+    buildTransferSuggestions,
+    filterTransferSuggestions,
+    getLookbackDays,
+} from "../../../utils/StockInventoryUtils";
 
 const MAX_ROWS = 100;
 
 // Transfer suggestions come straight from PowerBIKPIStockHealth (GroupBy = IMBALANCES),
 // replacing the old client-side engine that needed every closing-stock line in the browser.
-const ImbalanceAlerts = ({ searchTerm = "", sortAscending = true }) => {
+// Rows keep the API's severity ranking; the Deficit / Surplus and Branch filters narrow the list.
+const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL", branchFilter = "" }) => {
     const {
         imbalances = [],
         loadingImbalances = false,
         errorImbalances = null,
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
 
-    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
+    const activeFilters = appliedFilters || filters;
+
+    const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
 
     const alerts = useMemo(() => {
         const term = searchTerm.trim().toLowerCase();
         const list = buildTransferSuggestions(imbalances, lookbackDays).filter(
             (item) =>
                 !term ||
-                [item.product, item.itemCode, item.branch, item.group].some((field) =>
+                [item.product, item.itemCode, item.branch, item.group, item.networkContext].some((field) =>
                     String(field).toLowerCase().includes(term)
                 )
         );
-        return list.sort((a, b) =>
-            sortAscending ? a.product.localeCompare(b.product) : b.product.localeCompare(a.product)
-        );
-    }, [imbalances, lookbackDays, searchTerm, sortAscending]);
+        return filterTransferSuggestions(list, statusFilter, branchFilter);
+    }, [imbalances, lookbackDays, searchTerm, statusFilter, branchFilter]);
 
     return (
         <>
             <ImbalanceAlertList
                 alerts={alerts.slice(0, MAX_ROWS)}
                 searchTerm={searchTerm}
+                statusFilter={statusFilter}
+                branchFilter={branchFilter}
                 isLoading={loadingImbalances}
                 error={errorImbalances}
             />

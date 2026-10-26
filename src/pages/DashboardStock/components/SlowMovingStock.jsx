@@ -1,111 +1,91 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Spinner } from "reactstrap";
 import { useSelector } from "react-redux";
-import { cleanBranchName } from "../../../helpers/branch_helper";
-import { getLookbackDays } from "../../utils/StockInventoryUtils";
+import {
+    buildSlowMovingRows,
+    formatSlowDaysCover,
+    getLookbackDays,
+    sortSlowMovingRows,
+} from "../../utils/StockInventoryUtils";
 
 const MAX_ROWS = 100;
-
-const formatDaysCover = (item) => {
-    if (item.daysOfInventory !== null && !isNaN(item.daysOfInventory)) {
-        if (item.daysOfInventory >= 9999) return "No sales";
-        return `${Math.round(item.daysOfInventory).toLocaleString()}d`;
-    }
-    if (item.daysSince !== null) {
-        return `${item.daysSince}d inactive`;
-    }
-    return "-";
-};
 
 const SlowMovingStock = ({
     items,
     searchTerm = "",
-    sortAscending = true,
+    sortField = "tiedUpCapital",
+    sortDesc = true,
+    onSort,
 }) => {
+    const [hoverInfo, setHoverInfo] = useState(null);
+
     const {
         slowMovingStock = [],
         loadingSlowMovingStock = false,
         errorSlowMovingStock = null,
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
 
-    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
+    const activeFilters = appliedFilters || filters;
+    const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
+
+    const handleCellHover = (e, info) => {
+        setHoverInfo({
+            ...info,
+            x: e.clientX,
+            y: e.clientY,
+        });
+    };
+
+    const handleMouseMove = (e) => {
+        if (hoverInfo) {
+            setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setHoverInfo(null);
+    };
 
     const processed = useMemo(() => {
         // 1. Determine data source: prop items -> Redux slowMovingStock
-        let rawList = [];
-
-        if (Array.isArray(items) && items.length > 0) {
-            rawList = items;
-        } else if (Array.isArray(slowMovingStock) && slowMovingStock.length > 0) {
-            rawList = slowMovingStock;
-        }
+        const rawList = Array.isArray(items) && items.length > 0 ? items : slowMovingStock;
 
         // 2. Normalize items to uniform shape
-        const normalized = rawList.map((item) => {
-            const itemName = item.item_name || item.item_Name || "Unknown Item";
-            const itemCode = item.item_code || item.item_Code || "";
-            const itemGroup = item.item_group || "-";
-            const itemSubGroup = item.item_subgroup || "-";
-            const category = item.movement_category || item.status || "SLOW_MOVER";
-
-            let statusLabel = "Slow";
-            let badgeClass = "warning";
-
-            if (category === "DEAD_STOCK" || category === "Dead Stock") {
-                statusLabel = "Dead Stock";
-                badgeClass = "danger";
-            } else if (category === "SLOW_MOVER" || category === "Slow Mover" || category === "Slow") {
-                statusLabel = "Slow";
-                badgeClass = "warning";
-            } else if (category === "Moderate") {
-                statusLabel = "Moderate";
-                badgeClass = "info";
-            } else {
-                statusLabel = category;
-                badgeClass = "secondary";
-            }
-
-            return {
-                ...item,
-                itemName,
-                itemCode,
-                itemGroup,
-                itemSubGroup,
-                statusLabel,
-                badgeClass,
-                unitsSold: item.units_sold_window !== undefined ? Number(item.units_sold_window) : (item.totalQty ?? 0),
-                currentStock: item.current_stock_qty !== undefined ? Number(item.current_stock_qty) : undefined,
-                tiedUpCapital: item.tied_up_capital !== undefined ? Number(item.tied_up_capital) : undefined,
-                daysOfInventory: item.days_of_inventory !== undefined ? Number(item.days_of_inventory) : null,
-                branchName: cleanBranchName(item.branch_name || item.branchName),
-                daysSince: item.daysSince !== undefined ? item.daysSince : null,
-                actionInsight: item.action_insight,
-            };
-        });
+        const normalized = buildSlowMovingRows(rawList);
 
         // 3. Filter by search term (item name, code, category, or branch)
         const term = (searchTerm || "").trim().toLowerCase();
         const filtered = term
-            ? normalized.filter((item) => {
-                  return (
-                      item.itemName.toLowerCase().includes(term) ||
-                      item.itemCode.toLowerCase().includes(term) ||
-                      item.itemGroup.toLowerCase().includes(term) ||
-                      item.itemSubGroup.toLowerCase().includes(term) ||
-                      (item.branchName && item.branchName.toLowerCase().includes(term))
-                  );
-              })
+            ? normalized.filter((item) =>
+                  [item.name, item.itemCode, item.group, item.subGroup, item.branch].some((field) =>
+                      String(field || "").toLowerCase().includes(term)
+                  )
+              )
             : normalized;
 
-        // 4. Sort alphabetically by itemName (null keeps the API order: most capital tied up first)
-        if (sortAscending === null) return filtered;
-        return [...filtered].sort((a, b) => {
-            return sortAscending
-                ? a.itemName.localeCompare(b.itemName)
-                : b.itemName.localeCompare(a.itemName);
-        });
-    }, [items, slowMovingStock, searchTerm, sortAscending]);
+        // 4. Sort by the selected column (default: most capital tied up first)
+        return sortSlowMovingRows(filtered, sortField, sortDesc);
+    }, [items, slowMovingStock, searchTerm, sortField, sortDesc]);
+
+    const renderSortIcon = (field) => {
+        if (sortField !== field) return null;
+        return <i className={`ms-1 text-primary ${sortDesc ? "ri-arrow-down-line" : "ri-arrow-up-line"}`}></i>;
+    };
+
+    const renderSortableHeader = (field, label, className = "") => (
+        <th
+            scope="col"
+            className={className}
+            role={onSort ? "button" : undefined}
+            onClick={onSort ? () => onSort(field) : undefined}
+            style={onSort ? { cursor: "pointer", userSelect: "none" } : undefined}
+        >
+            {label}
+            {renderSortIcon(field)}
+        </th>
+    );
 
     if (loadingSlowMovingStock && (!processed || processed.length === 0)) {
         return (
@@ -147,71 +127,262 @@ const SlowMovingStock = ({
     }
 
     return (
-        <div>
-            <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto" }}>
-                <table className="table table-borderless table-centered table-nowrap mb-0">
+        <div style={{ position: "relative" }}>
+            <div
+                className="table-responsive"
+                style={{ maxHeight: "400px", overflowY: "auto" }}
+                onMouseLeave={handleMouseLeave}
+            >
+                <table className="table table-borderless table-centered table-nowrap mb-0 w-100">
                     <thead className="text-muted table-light sticky-top">
                         <tr>
-                            <th scope="col">Product</th>
-                            <th scope="col">Category</th>
+                            {renderSortableHeader("name", "Product")}
                             <th scope="col">Branch</th>
-                            <th scope="col" className="text-end">Stock</th>
-                            <th scope="col" className="text-end">Sold ({lookbackDays}d)</th>
-                            <th scope="col" className="text-end">Days Cover</th>
-                            <th scope="col" className="text-end">Tied-Up Capital (KES)</th>
+                            {renderSortableHeader("stockQty", "Stock Qty", "text-end")}
+                            <th scope="col" className="text-end">Sold ({lookbackDays}D)</th>
+                            {renderSortableHeader("daysCover", "Days Cover", "text-end")}
+                            {renderSortableHeader("tiedUpCapital", "Tied-Up Capital", "text-end")}
                             <th scope="col" className="text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {processed.slice(0, MAX_ROWS).map((item, idx) => (
-                            <tr
-                                key={`${item.itemCode}-${item.branchName}-${idx}`}
-                                data-id={idx}
-                                title={item.actionInsight || undefined}
-                            >
-                                <th scope="row" className="fw-medium">
-                                    {item.itemName}
-                                    {item.itemCode && (
-                                        <small className="text-muted d-block fw-normal">
-                                            {item.itemCode}
-                                        </small>
-                                    )}
-                                </th>
-                                <td className="text-muted">
-                                    {item.itemGroup || "-"}
-                                    <small className="text-muted d-block">
-                                        {item.itemSubGroup === "Unassigned" ? "-" :
-                                            item.itemSubGroup || "-"
+                        {processed.slice(0, MAX_ROWS).map((item, idx) => {
+                            const tone = item.isDead ? "danger" : "warning";
+                            const toneColor = item.isDead ? "#f06548" : "#f7b84b";
+
+                            return (
+                                <tr key={item.id} data-id={idx}>
+                                    <th
+                                        scope="row"
+                                        className="fw-medium"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: item.name,
+                                                badgeColor: toneColor,
+                                                mainValue: item.itemCode ? `SKU: ${item.itemCode}` : item.name,
+                                                mainColor: "#299cdb",
+                                                subText: `Category: ${item.category} · Branch: ${item.branch}`,
+                                                extraText: item.actionInsight || undefined,
+                                            })
                                         }
-                                    </small>
-                                </td>
-                                <td>{item.branchName || "-"}</td>
-                                <td className="text-end">
-                                    {item.currentStock !== undefined
-                                        ? item.currentStock.toLocaleString()
-                                        : "-"}
-                                </td>
-                                <td className="text-end">{item.unitsSold.toLocaleString()}</td>
-                                <td className="text-end">{formatDaysCover(item)}</td>
-                                <td className="text-end fw-medium">
-                                    {item.tiedUpCapital !== undefined
-                                        ? item.tiedUpCapital.toLocaleString(undefined, {
-                                              maximumFractionDigits: 0,
-                                          })
-                                        : "-"}
-                                </td>
-                                <td className="text-center">
-                                    <span
-                                        className={`badge rounded-pill border border-${item.badgeClass} text-${item.badgeClass} bg-${item.badgeClass}-subtle fs-11 fw-normal px-2 py-1`}
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
                                     >
-                                        {item.statusLabel}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
+                                        {item.name}
+                                        <small className="text-muted d-block fw-normal">
+                                            {[item.itemCode, item.category].filter(Boolean).join(" · ")}
+                                        </small>
+                                    </th>
+                                    <td
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: item.branch || "Branch Location",
+                                                badgeColor: "#405189",
+                                                mainValue: `${item.stockQty.toLocaleString()} units on hand`,
+                                                mainColor: "#00e396",
+                                                subText: `${item.unitsSold.toLocaleString()} units sold in ${lookbackDays} days`,
+                                                extraText: `Movement status: ${item.statusLabel}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {item.branch || "-"}
+                                    </td>
+                                    <td
+                                        className="text-end fw-semibold"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: "Current Stock On Hand",
+                                                badgeColor: "#299cdb",
+                                                mainValue: `${item.stockQty.toLocaleString()} units`,
+                                                mainColor: "#299cdb",
+                                                subText: `Sold in window: ${item.unitsSold.toLocaleString()} units`,
+                                                extraText: `Days of Inventory Cover: ${formatSlowDaysCover(item.daysCover)}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {item.stockQty.toLocaleString()}
+                                    </td>
+                                    <td
+                                        className="text-end text-muted"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: `Units Sold (${lookbackDays} Days)`,
+                                                badgeColor: "#0ab39c",
+                                                mainValue: `${item.unitsSold.toLocaleString()} units sold`,
+                                                mainColor: "#0ab39c",
+                                                subText: `Current stock: ${item.stockQty.toLocaleString()} units`,
+                                                extraText: item.unitsSold === 0 ? "Zero movement in the selected lookback period" : undefined,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {item.unitsSold.toLocaleString()}
+                                    </td>
+                                    <td
+                                        className="text-end text-muted"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: "Days of Inventory Cover",
+                                                badgeColor: toneColor,
+                                                mainValue: formatSlowDaysCover(item.daysCover),
+                                                mainColor: toneColor,
+                                                subText: `Stock: ${item.stockQty.toLocaleString()} · Sold: ${item.unitsSold.toLocaleString()}`,
+                                                extraText: item.daysCover >= 999 ? "Extremely high cover / zero sales recorded" : undefined,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {formatSlowDaysCover(item.daysCover)}
+                                    </td>
+                                    <td
+                                        className="text-end fw-semibold"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: "Tied-Up Capital Valuation",
+                                                badgeColor: "#00e396",
+                                                mainValue: `KES ${item.tiedUpCapital.toLocaleString(undefined, {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                })}`,
+                                                mainColor: "#00e396",
+                                                subText: `Unit Avg Cost: KES ${item.unitAvgCost.toLocaleString(undefined, {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                })}`,
+                                                extraText: `Holding ${item.stockQty.toLocaleString()} units at ${item.branch}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <span>
+                                            KES {item.tiedUpCapital.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        </span>
+                                    </td>
+                                    <td
+                                        className="text-center"
+                                        onMouseEnter={(e) =>
+                                            handleCellHover(e, {
+                                                title: item.statusLabel,
+                                                badgeColor: toneColor,
+                                                mainValue: item.statusLabel,
+                                                mainColor: toneColor,
+                                                subText: item.actionInsight || (item.isDead ? "No sales in lookback period" : "High days of inventory cover"),
+                                                extraText: `Tied-up Capital: KES ${item.tiedUpCapital.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+                                            })
+                                        }
+                                        onMouseMove={handleMouseMove}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <span
+                                            className={`badge rounded-pill border border-${tone} text-${tone} bg-${tone}-subtle fs-11 fw-normal px-2 py-1`}
+                                        >
+                                            {item.statusLabel}
+                                        </span>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
+
+            {/* Custom Floating Hover Tooltip matching Stock Value By Branch (BarChartTwo) */}
+            {hoverInfo && (
+                <div
+                    style={{
+                        position: "fixed",
+                        left: `${hoverInfo.x}px`,
+                        top: `${hoverInfo.y}px`,
+                        transform:
+                            hoverInfo.x > (typeof window !== "undefined" && window.innerWidth ? window.innerWidth - 340 : 600)
+                                ? hoverInfo.y < 100
+                                    ? "translate(-100%, 15px)"
+                                    : "translate(-100%, -120%)"
+                                : hoverInfo.y < 100
+                                ? "translate(15px, 15px)"
+                                : "translate(15px, -120%)",
+                        pointerEvents: "none",
+                        zIndex: 99999,
+                        backgroundColor: "rgba(33, 37, 41, 0.95)",
+                        color: "#fff",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
+                        fontSize: "12px",
+                        lineHeight: "1.4",
+                        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.25)",
+                        whiteSpace: "nowrap",
+                        transition: "opacity 0.1s ease",
+                    }}
+                >
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            fontWeight: 600,
+                            marginBottom: "3px",
+                        }}
+                    >
+                        <span
+                            style={{
+                                width: "9px",
+                                height: "9px",
+                                borderRadius: "50%",
+                                backgroundColor: hoverInfo.badgeColor || "#00e396",
+                                display: "inline-block",
+                            }}
+                        />
+                        <span>{hoverInfo.title}</span>
+                    </div>
+                    {hoverInfo.mainValue && (
+                        <div
+                            style={{
+                                color: hoverInfo.mainColor || "#00e396",
+                                fontWeight: 700,
+                                fontSize: "13px",
+                            }}
+                        >
+                            {hoverInfo.mainValue}
+                        </div>
+                    )}
+                    {hoverInfo.subText && (
+                        <div
+                            style={{
+                                fontSize: "11px",
+                                color: "#adb5bd",
+                                marginTop: "2px",
+                                whiteSpace: "normal",
+                                maxWidth: "340px",
+                            }}
+                        >
+                            {hoverInfo.subText}
+                        </div>
+                    )}
+                    {hoverInfo.extraText && (
+                        <div
+                            style={{
+                                fontSize: "11px",
+                                color: "#e9ecef",
+                                marginTop: "4px",
+                                borderTop: "1px solid rgba(255,255,255,0.12)",
+                                paddingTop: "4px",
+                                whiteSpace: "normal",
+                                maxWidth: "340px",
+                            }}
+                        >
+                            {hoverInfo.extraText}
+                        </div>
+                    )}
+                </div>
+            )}
+
             {processed.length > MAX_ROWS && (
                 <p className="text-muted fs-12 text-center mt-2 mb-0">
                     Showing {MAX_ROWS} of {processed.length.toLocaleString()} items. Search to narrow the

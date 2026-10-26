@@ -17,17 +17,20 @@ const BarChartThree = ({
         loadingTotalStockValueByBranch,
         loadingKPISalesTransactions,
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
+
+    const activeFilters = appliedFilters || filters;
 
     const periodDays = useMemo(() => {
         if (kpiSalesPeriodDays && kpiSalesPeriodDays > 1) {
             return kpiSalesPeriodDays;
         }
-        if (filters?.startDate && filters?.endDate) {
-            return getPeriodDays(filters.startDate, filters.endDate);
+        if (activeFilters?.startDate && activeFilters?.endDate) {
+            return getPeriodDays(activeFilters.startDate, activeFilters.endDate);
         }
         return 1;
-    }, [kpiSalesPeriodDays, filters?.startDate, filters?.endDate]);
+    }, [kpiSalesPeriodDays, activeFilters?.startDate, activeFilters?.endDate]);
 
     const chartData = useMemo(() => {
         // If caller explicitly passed props, respect them (e.g. storybook / tests / overrides)

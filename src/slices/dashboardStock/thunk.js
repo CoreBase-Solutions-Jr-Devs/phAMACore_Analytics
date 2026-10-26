@@ -86,10 +86,24 @@ export const fetchBatchExpiry = createAsyncThunk(
 
 export const fetchBatchExpiryNeo = createAsyncThunk(
   "stockInventory/fetchBatchExpireDetailsNeo",
-  async (params, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await getBatchExpiryNeoApi(params);
-      return response.data ?? response;
+      const { clientid = 1, branchcode, startDate, endDate } = params;
+      const payload = { clientid };
+      if (startDate) payload.startDate = startDate;
+      if (endDate) payload.endDate = endDate;
+      if (
+        branchcode !== undefined &&
+        branchcode !== null &&
+        branchcode !== "" &&
+        !Number.isNaN(Number(branchcode)) &&
+        Number(branchcode) > 0
+      ) {
+        payload.branchcode = Number(branchcode);
+      }
+
+      const response = await getBatchExpiryNeoApi(payload);
+      return toList(response);
     }
     catch (error) {
       return rejectWithValue(
@@ -423,5 +437,3 @@ export const fetchKPISalesTransactions = createAsyncThunk(
     }
   }
 );
-
-

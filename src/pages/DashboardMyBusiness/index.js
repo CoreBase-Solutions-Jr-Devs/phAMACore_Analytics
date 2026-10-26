@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,7 +11,7 @@ import StockPurchases from "./StockPurchases";
 import ReceivablesAgeing from "./ReceivablesAgeing";
 import StockMovements from "./StockMovements";
 import SalesCollection from "./SalesCollection";
-import { setBranch } from "../../slices/dashboardMyBusiness/reducer";
+import { applyFilters } from "../../slices/dashboardMyBusiness/reducer";
 import { fetchMonthlyTrend, fetchSalesByType } from "../../slices/dashboardMyBusiness/thunk";
 import {
   saveActiveBranch,
@@ -32,40 +32,52 @@ export default function DashboardMyBusiness() {
   const [rightColumn, setRightColumn] = useState(false);
   const [kpiData, setKpiData] = useState({});
 
-  const toggleRightColumn = () => {
+  const toggleRightColumn = useCallback(() => {
     setRightColumn((prev) => !prev);
-  };
+  }, []);
 
-  const { filters = {} } = useSelector(
-    (state) =>
-      state.DashboardMyBusiness ||
-      state.MyBusiness || { filters: {} }
+  const appliedFilters = useSelector(
+    (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
   );
 
   // Sync URL branchId into Redux state when URL changes
   useEffect(() => {
-    if (branchCode) {
-      dispatch(setBranch(branchCode));
+    if (branchCode && appliedFilters.branch !== branchCode) {
+      dispatch(applyFilters({ branch: branchCode }));
       saveActiveBranch("mybusiness", branchCode);
     }
-  }, [dispatch, branchCode]);
+  }, [dispatch, branchCode, appliedFilters.branch]);
 
   // One shared fetch feeds the three trend cards, and one feeds Sales Composition + VAT
   useEffect(() => {
-    const range = { startDate: filters.startDate, endDate: filters.endDate, branch: filters.branch ?? null };
+    const range = {
+      startDate: appliedFilters.startDate,
+      endDate: appliedFilters.endDate,
+      branch: appliedFilters.branch ?? null,
+    };
     dispatch(fetchMonthlyTrend(range));
     dispatch(fetchSalesByType(range));
-  }, [dispatch, filters.startDate, filters.endDate, filters.branch]);
+  }, [dispatch, appliedFilters.startDate, appliedFilters.endDate, appliedFilters.branch]);
 
-  const handleApplyFilters = () => {
-    setRightColumn(false);
-    if (filters.branch) {
-      saveActiveBranch("mybusiness", filters.branch);
-      navigate(`/dashboard/branch/${filters.branch}`);
-    } else {
-      navigate("/dashboard");
-    }
-  };
+  const handleApplyFilters = useCallback(
+    (draftFilters) => {
+      const nextBranch =
+        draftFilters && "branch" in draftFilters
+          ? draftFilters.branch
+          : appliedFilters.branch;
+
+      dispatch(applyFilters(draftFilters));
+      setRightColumn(false);
+      if (nextBranch) {
+        saveActiveBranch("mybusiness", nextBranch);
+        navigate(`/dashboard/branch/${nextBranch}`);
+      } else {
+        saveActiveBranch("mybusiness", null);
+        navigate("/dashboard");
+      }
+    },
+    [dispatch, navigate, appliedFilters.branch]
+  );
 
   const branchDisplayName = isBranchView
     ? cleanBranchName(getCachedBranchName(branchCode) || `Branch ${branchCode}`)

@@ -20,15 +20,21 @@ const KPI_ICON_MAP = {
 const WidgetsOne = () => {
 
     const {
-        batchExpiryNeo = [], stockHealth = [], imbalances = [], filters = {},
+        batchExpiryNeo = [], stockHealth = [], imbalances = [], branches = [], filters = {}, appliedFilters,
         loadingBatchExpiryNeo, loadingStockHealth, loadingImbalances, errorStockHealth,
     } = useSelector((state) => state.StockInventory ?? {});
 
-    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
+    const activeFilters = appliedFilters || filters;
+    const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
 
     const kpis = useMemo(
-        () => computeKPIs(batchExpiryNeo, stockHealth, imbalances),
-        [batchExpiryNeo, stockHealth, imbalances]
+        () =>
+            computeKPIs(batchExpiryNeo, stockHealth, imbalances, {
+                branchCode: activeFilters.branch,
+                branches,
+                asOfDate: activeFilters.endDate,
+            }),
+        [batchExpiryNeo, stockHealth, imbalances, activeFilters.branch, branches, activeFilters.endDate]
     );
 
     const meta = useMemo(

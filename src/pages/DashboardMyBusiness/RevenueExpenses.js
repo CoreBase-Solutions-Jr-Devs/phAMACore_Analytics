@@ -8,7 +8,7 @@ import CardExportButtons from "../../Components/Common/CardExportButtons";
 import TrendCardBody, { exportStamp, money } from "./TrendCardBody";
 
 const RevenueExpenses = () => {
-  const { monthlyTrend = [], loadingMonthlyTrend, errorMonthlyTrend, filters = {} } = useSelector(
+  const { monthlyTrend = [], loadingMonthlyTrend, errorMonthlyTrend, appliedFilters = {} } = useSelector(
     (state) => state.DashboardMyBusiness || {}
   );
 
@@ -62,7 +62,7 @@ const RevenueExpenses = () => {
           </div>
           <div className="d-flex align-items-center gap-2">
             <span className="badge bg-light text-primary">
-              {filters.startDate} - {filters.endDate}
+              {appliedFilters.startDate} - {appliedFilters.endDate}
             </span>
             <CardExportButtons
               onExport={handleExportExcel}

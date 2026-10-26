@@ -1,32 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Offcanvas, OffcanvasHeader, OffcanvasBody } from "reactstrap";
 import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import {
-  setBranch,
-  setDateRange,
-  setStartDate,
-  setEndDate,
+  resetFilters,
+  computeDateRangeValues,
 } from "../../slices/dashboardMyBusiness/reducer";
 import {
   getCachedBranchesMap,
   saveCachedBranches,
   cleanBranchName,
+  saveActiveBranch,
 } from "../../helpers/branch_helper";
 import { getBranches } from "../../helpers/fakebackend_helper";
-import { DEFAULT_DATE_RANGE } from "../utils/dateHelper";
 
-const dateOptions = ["Today","Yesterday","Last 7 Days","This Week","Last Week","This Month","Month to Date","Last Month","This Year","Year To Date","Custom"];
+const dateOptions = ["Today","Yesterday","Last 7 Days","This Week","Last Week","This Month","Month to Date","Last Month","This Year","Year To Date","Last Year","Custom"];
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const {
-    filters: { branch, dateRange, startDate, endDate },
-  } = useSelector(
-    (state) => state.DashboardMyBusiness || state.MyBusiness || { filters: {} }
+  const appliedFilters = useSelector(
+    (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
   );
+
+  // Local draft state so changing selections does not touch Redux or trigger re-renders/APIs
+  // until the user explicitly clicks Select or Reset.
+  const [draftBranch, setDraftBranch] = useState(appliedFilters.branch ?? null);
+  const [draftDateRange, setDraftDateRange] = useState(appliedFilters.dateRange || "Month to Date");
+  const [draftStartDate, setDraftStartDate] = useState(appliedFilters.startDate || "");
+  const [draftEndDate, setDraftEndDate] = useState(appliedFilters.endDate || "");
+
+  // Sync draft state with currently applied filters whenever the filter drawer opens
+  useEffect(() => {
+    if (rightColumn) {
+      setDraftBranch(appliedFilters.branch ?? null);
+      setDraftDateRange(appliedFilters.dateRange || "Month to Date");
+      setDraftStartDate(appliedFilters.startDate || "");
+      setDraftEndDate(appliedFilters.endDate || "");
+    }
+  }, [
+    rightColumn,
+    appliedFilters.branch,
+    appliedFilters.dateRange,
+    appliedFilters.startDate,
+    appliedFilters.endDate,
+  ]);
 
   const [branchesList, setBranchesList] = useState([]);
 
@@ -64,26 +85,78 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
     };
   }, []);
 
-  const isCustom = dateRange === "Custom";
+  const isCustom = draftDateRange === "Custom";
 
-  const handleDateChange = (type, selectedDates) => {
-    if (!selectedDates?.length) return;
-    const formatted = selectedDates[0].toLocaleDateString("en-GB");
-    dispatch(setDateRange("Custom"));
-    if (type === "startDate") dispatch(setStartDate(formatted));
-    if (type === "endDate") dispatch(setEndDate(formatted));
+  const handleDateRangeSelect = (e) => {
+    const nextRange = e.target.value;
+    setDraftDateRange(nextRange);
+    if (nextRange !== "Custom") {
+      const { startDate, endDate } = computeDateRangeValues(
+        nextRange,
+        draftStartDate,
+        draftEndDate
+      );
+      setDraftStartDate(startDate);
+      setDraftEndDate(endDate);
+    }
+  };
+
+  const handleDateChangeRef = useRef(null);
+  handleDateChangeRef.current = (type, selectedDates) => {
+    if (!isCustom) return;
+    const selected = selectedDates?.[0];
+    if (!(selected instanceof Date) || isNaN(selected.getTime())) return;
+
+    const formatted = selected.toLocaleDateString("en-GB");
+    if (type === "startDate" && formatted !== draftStartDate) {
+      setDraftStartDate(formatted);
+    }
+    if (type === "endDate" && formatted !== draftEndDate) {
+      setDraftEndDate(formatted);
+    }
+  };
+
+  const handleSelect = () => {
+    if (typeof onApply === "function") {
+      onApply({
+        branch: draftBranch,
+        dateRange: draftDateRange,
+        startDate: draftStartDate,
+        endDate: draftEndDate,
+      });
+    }
   };
 
   const handleReset = () => {
-    dispatch(setBranch(null));
-    dispatch(setDateRange(DEFAULT_DATE_RANGE));
+    dispatch(resetFilters());
+    saveActiveBranch("mybusiness", null);
+    if (typeof hideRightColumn === "function") {
+      hideRightColumn();
+    }
+    navigate("/dashboard");
   };
 
-  const pickerProps = {
-    className: `form-control ${isCustom ? "" : "bg-light text-primary"}`,
-    options: { dateFormat: "d/m/Y", allowInput: isCustom, clickOpens: isCustom },
-    readOnly: !isCustom,
-  };
+  const startPickerOptions = useMemo(
+    () => ({
+      dateFormat: "d/m/Y",
+      allowInput: isCustom,
+      clickOpens: isCustom,
+      onChange: [(dates) => handleDateChangeRef.current("startDate", dates)],
+    }),
+    [isCustom]
+  );
+
+  const endPickerOptions = useMemo(
+    () => ({
+      dateFormat: "d/m/Y",
+      allowInput: isCustom,
+      clickOpens: isCustom,
+      onChange: [(dates) => handleDateChangeRef.current("endDate", dates)],
+    }),
+    [isCustom]
+  );
+
+  const pickerClassName = `form-control ${isCustom ? "" : "bg-light text-primary"}`;
 
   return (
     <Offcanvas
@@ -102,9 +175,9 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
           <div className="col-8">
             <select
               className="form-select"
-              value={branch ?? ""}
+              value={draftBranch ?? ""}
               onChange={(e) =>
-                dispatch(setBranch(e.target.value === "" ? null : Number(e.target.value)))
+                setDraftBranch(e.target.value === "" ? null : Number(e.target.value))
               }
             >
               <option value="">All Branches</option>
@@ -122,8 +195,8 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
           <div className="col-8">
             <select
               className="form-select"
-              value={dateRange}
-              onChange={(e) => dispatch(setDateRange(e.target.value))}
+              value={draftDateRange}
+              onChange={handleDateRangeSelect}
             >
               {dateOptions.map((option) => (
                 <option key={option} value={option}>
@@ -138,9 +211,10 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
           <label className="col-4 col-form-label">Start Date</label>
           <div className="col-8">
             <Flatpickr
-              {...pickerProps}
-              value={startDate}
-              onChange={(dates) => handleDateChange("startDate", dates)}
+              className={pickerClassName}
+              options={startPickerOptions}
+              readOnly={!isCustom}
+              value={draftStartDate}
             />
           </div>
         </div>
@@ -149,9 +223,10 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
           <label className="col-4 col-form-label">End Date</label>
           <div className="col-8">
             <Flatpickr
-              {...pickerProps}
-              value={endDate}
-              onChange={(dates) => handleDateChange("endDate", dates)}
+              className={pickerClassName}
+              options={endPickerOptions}
+              readOnly={!isCustom}
+              value={draftEndDate}
             />
           </div>
         </div>
@@ -159,7 +234,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
         <hr className="mb-2 mt-3" />
 
         <div className="d-flex justify-content-end gap-2">
-          <button className="btn btn-success" onClick={onApply}>Select</button>
+          <button className="btn btn-success" onClick={handleSelect}>Select</button>
           <button className="btn btn-warning" onClick={handleReset}>Reset</button>
           <button className="btn btn-danger" onClick={hideRightColumn}>Close</button>
         </div>

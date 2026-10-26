@@ -14,9 +14,10 @@ const Section = ({ rightClickBtn }) => {
     imbalances = [],
     branches = [],
     filters = {},
+    appliedFilters,
   } = useSelector((state) => state.StockInventory ?? {});
 
-  const { branch, startDate, endDate } = filters;
+  const { branch, startDate, endDate } = appliedFilters || filters;
   const lookbackDays = getLookbackDays(startDate, endDate);
 
   const isBranchView = Boolean(branch && branch !== "All Branches");
@@ -27,9 +28,14 @@ const Section = ({ rightClickBtn }) => {
     );
   }, [branch, branches, isBranchView]);
 
+  const expiryOptions = useMemo(
+    () => ({ branchCode: branch, branches, asOfDate: endDate }),
+    [branch, branches, endDate]
+  );
+
   const kpis = useMemo(
-    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances),
-    [batchExpiryNeo, stockHealth, imbalances]
+    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances, expiryOptions),
+    [batchExpiryNeo, stockHealth, imbalances, expiryOptions]
   );
 
   // Stock figures are live: show when the valuation was taken
@@ -57,17 +63,33 @@ const Section = ({ rightClickBtn }) => {
       Status: k.subtitle || "",
     }));
 
-    // 2. Expiry Watch (expired + next 90 days, one row per batch)
-    const expiryRows = getExpiryRows(batchExpiryNeo).map((row) => ({
-      Product: row.product,
-      Batch: row.batch || "-",
-      Branch: row.branch,
-      ExpiryDate: row.expiry.toLocaleDateString("en-GB"),
-      DaysRemaining: row.daysRemaining,
-      QtyBalance: row.qty.toLocaleString(),
-      CostValue: formatAmount(row.value),
-      Action: row.action,
-    }));
+    // 2. Expiry Watch (separated into Expired and Write-Off Risk)
+    const allExpiryRows = getExpiryRows(batchExpiryNeo, expiryOptions);
+    const expiredRows = allExpiryRows
+      .filter((row) => row.daysRemaining < 0)
+      .map((row) => ({
+        Product: row.product,
+        Batch: row.batch || "-",
+        Branch: row.branch,
+        ExpiryDate: row.expiry.toLocaleDateString("en-GB"),
+        DaysExpired: Math.abs(row.daysRemaining),
+        QtyBalance: row.qty.toLocaleString(),
+        CostValue: formatAmount(row.value),
+        Action: row.action,
+      }));
+
+    const writeOffRiskRows = allExpiryRows
+      .filter((row) => row.daysRemaining >= 0)
+      .map((row) => ({
+        Product: row.product,
+        Batch: row.batch || "-",
+        Branch: row.branch,
+        ExpiryDate: row.expiry.toLocaleDateString("en-GB"),
+        DaysRemaining: row.daysRemaining,
+        QtyBalance: row.qty.toLocaleString(),
+        CostValue: formatAmount(row.value),
+        Action: row.action,
+      }));
 
     // 3. Slow Moving Stock
     const slowMovingRows = (slowMovingStock || []).map((item) => ({
@@ -98,11 +120,19 @@ const Section = ({ rightClickBtn }) => {
       },
     ];
 
-    if (expiryRows.length > 0) {
+    if (expiredRows.length > 0) {
       sections.push({
-        title: "Expiry Watch (Expired + 90-Day Write-Off Risk)",
+        title: "Expired Products",
+        headers: ["Product", "Batch", "Branch", "ExpiryDate", "DaysExpired", "QtyBalance", "CostValue", "Action"],
+        data: expiredRows,
+      });
+    }
+
+    if (writeOffRiskRows.length > 0) {
+      sections.push({
+        title: "Write-Off Risk Products (0 - 90 Days)",
         headers: ["Product", "Batch", "Branch", "ExpiryDate", "DaysRemaining", "QtyBalance", "CostValue", "Action"],
-        data: expiryRows,
+        data: writeOffRiskRows,
       });
     }
 

@@ -10,8 +10,99 @@ import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
-const today = new Date();
-const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+export const computeDateRangeValues = (type, currentStart = "", currentEnd = "") => {
+  switch (type) {
+    case "Today": {
+      const now = new Date();
+      return { startDate: formatDMY(now), endDate: formatDMY(now) };
+    }
+
+    case "Yesterday": {
+      const y = new Date();
+      y.setDate(y.getDate() - 1);
+      return { startDate: formatDMY(y), endDate: formatDMY(y) };
+    }
+
+    case "This Week": {
+      const now = new Date();
+      const start = new Date(now);
+      start.setDate(now.getDate() - now.getDay());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return { startDate: formatDMY(start), endDate: formatDMY(end) };
+    }
+
+    case "Last Week": {
+      const now = new Date();
+      const currentWeekStart = new Date(now);
+      currentWeekStart.setDate(now.getDate() - now.getDay());
+
+      const start = new Date(currentWeekStart);
+      start.setDate(currentWeekStart.getDate() - 7);
+
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return { startDate: formatDMY(start), endDate: formatDMY(end) };
+    }
+
+    case "This Month": {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      return { startDate: formatDMY(start), endDate: formatDMY(end) };
+    }
+
+    case "Month to Date":
+    case "Month To Date": {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      return { startDate: formatDMY(start), endDate: formatDMY(now) };
+    }
+
+    case "Last Month": {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const end = new Date(now.getFullYear(), now.getMonth(), 0);
+      return { startDate: formatDMY(start), endDate: formatDMY(end) };
+    }
+
+    case "Last 7 Days": {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - 6);
+      return { startDate: formatDMY(start), endDate: formatDMY(end) };
+    }
+
+    case "This Year":
+    case "Year To Date": {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 1);
+      return { startDate: formatDMY(start), endDate: formatDMY(now) };
+    }
+
+    case "Last Year": {
+      const now = new Date();
+      const start = new Date(now.getFullYear() - 1, 0, 1);
+      const end = new Date(now.getFullYear() - 1, 11, 31);
+      return { startDate: formatDMY(start), endDate: formatDMY(end) };
+    }
+
+    default:
+      return { startDate: currentStart, endDate: currentEnd };
+  }
+};
+
+const defaultFilters = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  return {
+    branch: null,
+    dateRange: DEFAULT_DATE_RANGE,
+    startDate: formatDMY(start),
+    endDate: formatDMY(now),
+    groupBy: "SUMMARY",
+  };
+};
 
 const initialState = {
   inventoryProfitSummaryUser: [],
@@ -37,13 +128,8 @@ const initialState = {
   errorAccountBalance: null,
   errorCashbookSummary: null,
 
-  filters: {
-    branch: null,
-    dateRange: DEFAULT_DATE_RANGE,
-    startDate: formatDMY(monthStart),
-    endDate: formatDMY(today),
-    groupBy: "SUMMARY",
-  },
+  filters: defaultFilters(),
+  appliedFilters: defaultFilters(),
 };
 
 const DashboardMyBusinessSlice = createSlice({
@@ -57,103 +143,13 @@ const DashboardMyBusinessSlice = createSlice({
     setDateRange: (state, action) => {
       const type = action.payload;
       state.filters.dateRange = type;
-
-      switch (type) {
-        case "Today": {
-          const now = new Date();
-          state.filters.startDate = formatDMY(now);
-          state.filters.endDate = formatDMY(now);
-          break;
-        }
-
-        case "Yesterday": {
-          const y = new Date();
-          y.setDate(y.getDate() - 1);
-          state.filters.startDate = formatDMY(y);
-          state.filters.endDate = formatDMY(y);
-          break;
-        }
-
-        case "This Week": {
-          const now = new Date();
-          const start = new Date(now);
-          start.setDate(now.getDate() - now.getDay());
-          const end = new Date(start);
-          end.setDate(start.getDate() + 6);
-
-          state.filters.startDate = formatDMY(start);
-          state.filters.endDate = formatDMY(end);
-          break;
-        }
-
-        case "Last Week": {
-          const now = new Date();
-          const currentWeekStart = new Date(now);
-          currentWeekStart.setDate(now.getDate() - now.getDay());
-
-          const start = new Date(currentWeekStart);
-          start.setDate(currentWeekStart.getDate() - 7);
-
-          const end = new Date(start);
-          end.setDate(start.getDate() + 6);
-
-          state.filters.startDate = formatDMY(start);
-          state.filters.endDate = formatDMY(end);
-          break;
-        }
-
-        case "This Month": {
-          const now = new Date();
-          const start = new Date(now.getFullYear(), now.getMonth(), 1);
-          const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-          state.filters.startDate = formatDMY(start);
-          state.filters.endDate = formatDMY(end);
-          break;
-        }
-
-        case "Month to Date": {
-          const now = new Date();
-          const start = new Date(now.getFullYear(), now.getMonth(), 1);
-
-          state.filters.startDate = formatDMY(start);
-          state.filters.endDate = formatDMY(now);
-          break;
-        }
-
-        case "Last Month": {
-          const now = new Date();
-          const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-          const end = new Date(now.getFullYear(), now.getMonth(), 0);
-
-          state.filters.startDate = formatDMY(start);
-          state.filters.endDate = formatDMY(end);
-          break;
-        }
-
-        case "Last 7 Days": {
-          const end = new Date();
-          const start = new Date();
-          start.setDate(end.getDate() - 6);
-
-          state.filters.startDate = formatDMY(start);
-          state.filters.endDate = formatDMY(end);
-          break;
-        }
-
-        case "This Year":
-        case "Year To Date": {
-          const now = new Date();
-          const start = new Date(now.getFullYear(), 0, 1);
-
-          state.filters.startDate = formatDMY(start);
-          state.filters.endDate = formatDMY(now);
-          break;
-        }
-
-        default:
-          break;
-      }
+      const { startDate, endDate } = computeDateRangeValues(
+        type,
+        state.filters.startDate,
+        state.filters.endDate
+      );
+      state.filters.startDate = startDate;
+      state.filters.endDate = endDate;
     },
 
     setStartDate: (state, action) => {
@@ -166,6 +162,22 @@ const DashboardMyBusinessSlice = createSlice({
 
     setGroupBy: (state, action) => {
       state.filters.groupBy = action.payload;
+    },
+
+    applyFilters: (state, action) => {
+      if (action.payload && typeof action.payload === "object") {
+        state.filters = {
+          ...state.filters,
+          ...action.payload,
+        };
+      }
+      state.appliedFilters = { ...state.filters };
+    },
+
+    resetFilters: (state) => {
+      const defaults = defaultFilters();
+      state.filters = { ...defaults };
+      state.appliedFilters = { ...defaults };
     },
 
     clearMyBusinessData: () => initialState,
@@ -287,6 +299,8 @@ export const {
   setStartDate,
   setEndDate,
   setGroupBy,
+  applyFilters,
+  resetFilters,
   clearMyBusinessData,
 } = DashboardMyBusinessSlice.actions;
 

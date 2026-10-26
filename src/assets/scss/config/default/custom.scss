@@ -131,3 +131,37 @@ button:has(.ri-printer-line),
         }
     }
 }
+
+
+/* ====================================================
+   Company Color (#c58c4f) Buttons (Solid & Outline)
+   ==================================================== */
+.btn-caramel {
+    background-color: #c58c4f !important;
+    border-color: #c58c4f !important;
+    color: #fff !important;
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+        background-color: #b07a40 !important;
+        border-color: #a6723b !important;
+        color: #fff !important;
+    }
+}
+
+.btn-outline-caramel {
+    color: #c58c4f !important;
+    border-color: #c58c4f !important;
+    background-color: transparent !important;
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+        background-color: #c58c4f !important;
+        border-color: #c58c4f !important;
+        color: #fff !important;
+    }
+}

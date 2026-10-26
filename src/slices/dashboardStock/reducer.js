@@ -6,6 +6,14 @@ import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 const monthStart = () => new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
+const defaultFilters = () => ({
+  branch: null,
+  // Month to Date by default: a one-day window made the cover and velocity figures meaningless
+  dateRange: DEFAULT_DATE_RANGE,
+  startDate: formatDMY(monthStart()),
+  endDate: formatDMY(new Date()),
+});
+
 export const initialState = {
   dailyClosingStock: [],
   stockMovements: [],
@@ -41,13 +49,8 @@ export const initialState = {
   errorCriticalStockouts: null,
   errorSlowMovingStock: null,
   errorKPISalesTransactions: null,
-  filters: {
-    branch: null,
-    // Month to Date by default: a one-day window made the cover and velocity figures meaningless
-    dateRange: DEFAULT_DATE_RANGE,
-    startDate: formatDMY(monthStart()),
-    endDate: formatDMY(new Date()),
-  },
+  filters: defaultFilters(),
+  appliedFilters: defaultFilters(),
 };
 
 const StockInventorySlice = createSlice({
@@ -152,7 +155,8 @@ const StockInventorySlice = createSlice({
           break;
         }
 
-        case "This Year": {
+        case "This Year":
+        case "Year To Date": {
           const today = new Date();
           const start = new Date(today.getFullYear(), 0, 1);
 
@@ -184,6 +188,14 @@ const StockInventorySlice = createSlice({
     },
     setEndDate: (state, action) => {
       state.filters.endDate = action.payload;
+    },
+    applyFilters: (state) => {
+      state.appliedFilters = { ...state.filters };
+    },
+    resetFilters: (state) => {
+      const defaults = defaultFilters();
+      state.filters = { ...defaults };
+      state.appliedFilters = { ...defaults };
     },
   },
   extraReducers: (builder) => {
@@ -396,6 +408,14 @@ const StockInventorySlice = createSlice({
   },
 });
 
-export const { resetInventoryState, setBranch, setDateRange, setStartDate, setEndDate } = StockInventorySlice.actions;
+export const {
+  resetInventoryState,
+  setBranch,
+  setDateRange,
+  setStartDate,
+  setEndDate,
+  applyFilters,
+  resetFilters,
+} = StockInventorySlice.actions;
 
 export default StockInventorySlice.reducer;

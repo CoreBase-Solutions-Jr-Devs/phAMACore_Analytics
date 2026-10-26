@@ -21,7 +21,7 @@ import {
     fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
 } from '../../slices/dashboardStock/thunk';
-import { setBranch } from '../../slices/dashboardStock/reducer';
+import { setBranch, applyFilters } from '../../slices/dashboardStock/reducer';
 import { resolveBranchName, saveActiveBranch, cleanBranchName } from '../../helpers/branch_helper';
 
 import CriticalStockChart from './components/CriticalStockChart';
@@ -36,29 +36,59 @@ import { transformStockVsSalesVelocity, getPeriodDays } from './Charts/Custom/ut
 import { suggestedOrderQty } from './components/CriticalStockChart';
 import {
     buildTransferSuggestions,
+    buildSlowMovingRows,
+    sortSlowMovingRows,
+    formatSlowDaysCover,
+    filterTransferSuggestions,
+    getImbalanceBranches,
+    IMBALANCE_STATUS_FILTERS,
     getExpiryRows,
     getLookbackDays,
     CRITICAL_TOP_N,
     IMBALANCE_TOP_N,
     SLOW_MOVER_TOP_N,
 } from '../utils/StockInventoryUtils';
-import { addDaysApi } from '../utils/dateHelper';
+import { addDaysApi, parseApiDate } from '../utils/dateHelper';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortAscending, setSortAscending] = useState(true);
+    // Slow moving stock: sort by column, most capital tied up first by default
+    const [sortField, setSortField] = useState("tiedUpCapital");
+    const [sortDesc, setSortDesc] = useState(true);
 
     const [imbalanceSearchTerm, setImbalanceSearchTerm] = useState("");
-    const [imbalanceSortAscending, setImbalanceSortAscending] = useState(true);
+    // Transfer suggestions: keep the API severity ranking, filter by Deficit / Surplus and Branch
+    const [imbalanceStatusFilter, setImbalanceStatusFilter] = useState("ALL");
+    const [imbalanceBranchFilter, setImbalanceBranchFilter] = useState("");
+
+    const handleSlowMovingSort = (field) => {
+        if (sortField === field) {
+            setSortDesc((prev) => !prev);
+        } else {
+            setSortField(field);
+            setSortDesc(field !== "name");
+        }
+    };
+
+    const renderSlowSortIcon = (field) =>
+        sortField === field ? (
+            <i className={`ms-1 ${sortDesc ? "ri-arrow-down-line" : "ri-arrow-up-line"}`}></i>
+        ) : null;
+
+    const getImbalanceTabBtnClass = (key) => {
+        const isActive = imbalanceStatusFilter === key;
+        if (key === "DEFICIT") return isActive ? "btn-danger" : "btn-outline-danger";
+        if (key === "SURPLUS") return isActive ? "btn-success" : "btn-outline-success";
+        return isActive ? "btn-caramel" : "btn-outline-caramel";
+    };
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { branchId } = useParams();
 
-    const branchCode = branchId ? Number(branchId) : null;
-    const isBranchView = !!branchCode;
+    const urlBranchCode = branchId ? Number(branchId) : null;
 
     const {
         batchExpiryNeo = [],
@@ -70,13 +100,19 @@ const DashboardStock = () => {
         slowMovingStock = [],
         imbalances = [],
         filters = {},
+        appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
+
+    const activeFilters = appliedFilters || filters;
+
+    const branchCode = activeFilters.branch ? Number(activeFilters.branch) : null;
+    const isBranchView = !!branchCode;
 
     const branchDisplayName = isBranchView
         ? cleanBranchName(resolveBranchName(branchCode, branches))
         : "";
 
-    const lookbackDays = getLookbackDays(filters.startDate, filters.endDate);
+    const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
 
     const [rightColumn, setRightColumn] = useState(false);
 
@@ -88,32 +124,38 @@ const DashboardStock = () => {
 
     // Sync URL branchId into Redux state and persist active branch when URL changes
     useEffect(() => {
-        dispatch(setBranch(branchCode));
-        if (branchCode) {
-            saveActiveBranch("stock", branchCode);
+        dispatch(setBranch(urlBranchCode));
+        dispatch(applyFilters());
+        if (urlBranchCode) {
+            saveActiveBranch("stock", urlBranchCode);
         }
-    }, [dispatch, branchCode]);
+    }, [dispatch, urlBranchCode]);
 
     // Fetch branches once on mount
     useEffect(() => {
         dispatch(fetchBranches({ clientid: 1 }));
     }, [dispatch]);
 
-    // Stock position: live figures that only depend on the branch, not on the date filter.
+    // Stock position: live figures that depend on the branch.
     useEffect(() => {
         const branchcode = branchCode || null;
 
         dispatch(fetchKPITotalStockValueByBranch({ clientid: 1, whichcost: 1, branchcode }));
+    }, [dispatch, branchCode]);
 
-        // Expiry is a fixed window around today (expired in the last 12 months up to 90 days
-        // ahead). It used to take the dashboard date range, so a one-day filter returned nothing.
+    // Batch expiry: 12-month lookback up to 90 days ahead of the filtered end date (or today),
+    // filtered by the selected branch.
+    useEffect(() => {
+        const branchcode = branchCode || null;
+        const asOf = parseApiDate(activeFilters.endDate) || new Date();
+
         dispatch(fetchBatchExpiryNeo({
             clientid: 1,
             branchcode,
-            startDate: addDaysApi(-365),
-            endDate: addDaysApi(90),
+            startDate: addDaysApi(-365, asOf),
+            endDate: addDaysApi(90, asOf),
         }));
-    }, [dispatch, branchCode]);
+    }, [dispatch, branchCode, activeFilters.endDate]);
 
     // Movement-based figures: follow the branch and the date filter.
     // The per-line closing stock and stock movement downloads were dropped: the stock health
@@ -123,7 +165,7 @@ const DashboardStock = () => {
             clientid: 1,
             branchcode: branchCode || null,
             LookbackDays: lookbackDays,
-            AsOfDate: filters.endDate,
+            AsOfDate: activeFilters.endDate,
         };
 
         dispatch(fetchKPIStockHealth(health));
@@ -132,22 +174,22 @@ const DashboardStock = () => {
         dispatch(fetchKPIImbalances({ ...health, TopN: IMBALANCE_TOP_N }));
         dispatch(fetchKPISalesTransactions({
             clientid: 1,
-            startDate: filters.startDate,
-            endDate: filters.endDate,
+            startDate: activeFilters.startDate,
+            endDate: activeFilters.endDate,
             GroupBy: "BRANCH",
             branchcode: branchCode || null,
         }));
-    }, [dispatch, branchCode, filters.startDate, filters.endDate, lookbackDays]);
+    }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate, lookbackDays]);
 
     const periodDays = useMemo(() => {
         if (kpiSalesPeriodDays && kpiSalesPeriodDays > 1) {
             return kpiSalesPeriodDays;
         }
-        if (filters?.startDate && filters?.endDate) {
-            return getPeriodDays(filters.startDate, filters.endDate);
+        if (activeFilters?.startDate && activeFilters?.endDate) {
+            return getPeriodDays(activeFilters.startDate, activeFilters.endDate);
         }
         return 1;
-    }, [kpiSalesPeriodDays, filters?.startDate, filters?.endDate]);
+    }, [kpiSalesPeriodDays, activeFilters?.startDate, activeFilters?.endDate]);
 
     const handleExportCriticalStock = () => {
         const rows = (criticalStockouts || []).map((item) => ({
@@ -198,7 +240,11 @@ const DashboardStock = () => {
     };
 
     const handleExportExpiryWatch = () => {
-        const rows = getExpiryRows(batchExpiryNeo).map((row) => ({
+        const rows = getExpiryRows(batchExpiryNeo, {
+            branchCode,
+            branches,
+            asOfDate: activeFilters.endDate,
+        }).map((row) => ({
             "Product": row.product,
             "Batch": row.batch || "-",
             "Branch": row.branch,
@@ -213,52 +259,75 @@ const DashboardStock = () => {
     };
 
     const handleExportSlowMovingStock = () => {
-        const rows = (slowMovingStock || []).map((item) => {
-            const category = item.movement_category || item.status || "SLOW_MOVER";
-            let statusLabel = "Slow";
-            if (category === "DEAD_STOCK" || category === "Dead Stock") statusLabel = "Dead Stock";
-            else if (category === "Moderate") statusLabel = "Moderate";
-
-            return {
-                "Item Name": item.item_name || item.item_Name || "Unknown Item",
-                "Item Code": item.item_code || item.item_Code || "",
-                "Category / Group": item.item_group || "-",
-                "Branch": cleanBranchName(item.branch_name || item.branchName || ""),
-                "Current Stock": item.current_stock_qty !== undefined ? Number(item.current_stock_qty).toLocaleString() : "-",
-                [`Units Sold (${lookbackDays} Days)`]: item.units_sold_window !== undefined ? Number(item.units_sold_window).toLocaleString() : (item.totalQty ?? "-"),
-                "Tied Up Capital (KES)": item.tied_up_capital !== undefined ? Number(item.tied_up_capital).toLocaleString(undefined, { minimumFractionDigits: 2 }) : "-",
-                "Days of Inventory": Number(item.days_of_inventory) >= 9999 ? "No sales" : (item.days_of_inventory ?? "-"),
-                "Movement Status": statusLabel,
-                "Action Insight": item.action_insight || "-",
-            };
-        });
+        const rows = sortSlowMovingRows(buildSlowMovingRows(slowMovingStock), sortField, sortDesc).map((item) => ({
+            "Item Name": item.name,
+            "Item Code": item.itemCode,
+            "Category": item.category,
+            "Branch": item.branch,
+            "Stock Qty": item.stockQty.toLocaleString(),
+            [`Sold (${lookbackDays}D)`]: item.unitsSold.toLocaleString(),
+            "Days Cover": formatSlowDaysCover(item.daysCover),
+            "Unit Avg Cost (KES)": item.unitAvgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            "Tied-Up Capital (KES)": item.tiedUpCapital.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            "Status": item.statusLabel,
+            "Action Insight": item.actionInsight || "-",
+        }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
         exportToExcel(rows, `Slow_Moving_Stock_${todayStr}`);
     };
 
+    const imbalanceBranches = useMemo(
+        () => getImbalanceBranches(imbalances),
+        [imbalances]
+    );
+
+    useEffect(() => {
+        if (imbalanceBranchFilter && !imbalanceBranches.includes(imbalanceBranchFilter)) {
+            setImbalanceBranchFilter("");
+        }
+    }, [imbalanceBranches, imbalanceBranchFilter]);
+
+    const imbalanceCounts = useMemo(() => {
+        const list = buildTransferSuggestions(imbalances, lookbackDays).filter(
+            (item) => !imbalanceBranchFilter || item.branch === imbalanceBranchFilter
+        );
+        const deficit = list.filter((item) => item.deficit).length;
+        return { deficit, surplus: list.length - deficit };
+    }, [imbalances, lookbackDays, imbalanceBranchFilter]);
+
     const handleExportImbalanceAlerts = () => {
-        const rows = buildTransferSuggestions(imbalances, lookbackDays).map((a) => ({
+        const suggestions = filterTransferSuggestions(
+            buildTransferSuggestions(imbalances, lookbackDays),
+            imbalanceStatusFilter,
+            imbalanceBranchFilter
+        );
+        const rows = suggestions.map((a) => ({
             "Product": a.product,
             "Item Code": a.itemCode,
-            "Category / Group": a.group,
+            "Category": a.group,
             "Branch": a.branch,
-            "Position": a.deficit ? "Needs stock" : "Has surplus",
+            "Status": a.deficit ? "Deficit" : "Surplus",
+            "Imbalance Gap %": Number(a.gap.toFixed(1)),
             "Branch Stock": a.stock.toLocaleString(),
-            "Stock Share %": a.stockShare,
-            "Sales Share %": a.salesShare,
-            "Suggested Transfer Units": a.qty.toLocaleString(),
-            "Days Cover Before": a.coverBefore ?? "No sales",
-            "Days Cover After": a.coverAfter ?? "No sales",
-            "Insight": a.insight || "-",
+            "Company Stock": a.companyStock.toLocaleString(),
+            "Stock Share %": Number(a.stockShare.toFixed(1)),
+            "Branch Sales": a.sales.toLocaleString(),
+            "Company Sales": a.companySales.toLocaleString(),
+            "Sales Share %": Number(a.salesShare.toFixed(1)),
+            "Required Transfer Units": a.qty.toLocaleString(),
+            "Network Counterpart": a.networkContext,
+            "Action": a.actionInsight,
         }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
         exportToExcel(rows, `InterBranch_Transfer_Suggestions_${todayStr}`);
     };
 
     const handleApplyFilters = () => {
+        dispatch(applyFilters());
         setRightColumn(false);
 
         if (filters.branch) {
+            saveActiveBranch("stock", filters.branch);
             navigate(`/dashboard-stock/branch/${filters.branch}`);
         } else {
             navigate('/dashboard-stock');
@@ -409,16 +478,28 @@ const DashboardStock = () => {
 
                                             <Col xs="auto">
                                                 <button
-                                                    className="btn btn-outline-secondary"
-                                                    onClick={() => setSortAscending((prev) => !prev)}
+                                                    type="button"
+                                                    className={`btn ${sortField === "name" ? "btn-caramel" : "btn-outline-caramel"}`}
+                                                    onClick={() => handleSlowMovingSort("name")}
                                                 >
-                                                    {sortAscending ? "A–Z ▲" : "Z–A ▼"}
+                                                    Sort by Name{renderSlowSortIcon("name")}
+                                                </button>
+                                            </Col>
+                                            <Col xs="auto">
+                                                <button
+                                                    type="button"
+                                                    className={`btn ${sortField === "tiedUpCapital" ? "btn-caramel" : "btn-outline-caramel"}`}
+                                                    onClick={() => handleSlowMovingSort("tiedUpCapital")}
+                                                >
+                                                    Sort by Capital{renderSlowSortIcon("tiedUpCapital")}
                                                 </button>
                                             </Col>
                                         </Row>
                                         <SlowMovingStock
                                             searchTerm={searchTerm}
-                                            sortAscending={sortAscending}
+                                            sortField={sortField}
+                                            sortDesc={sortDesc}
+                                            onSort={handleSlowMovingSort}
                                         />
                                     </div>
                                 </CardBody>
@@ -440,7 +521,36 @@ const DashboardStock = () => {
                                 </CardHeader>
 
                                 <CardBody>
-                                    <p className="text-muted mb-3 small">Branches holding over 20% more or less of an item's stock than their share of its sales. These are suggestions only; no transfer has been raised.</p>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                        <p className="text-muted mb-0 small">
+                                            Branches holding over 20% more or less of an item's stock than their share of its sales. These are suggestions only; no transfer has been raised.
+                                        </p>
+
+                                        <div className="d-flex align-items-center gap-2 ms-auto">
+                                            <label
+                                                htmlFor="imbalance-branch-filter"
+                                                className="text-muted small mb-0 text-nowrap fw-medium"
+                                            >
+                                                <i className="ri-filter-3-line me-1 align-middle"></i>
+                                                Branch:
+                                            </label>
+                                            <select
+                                                id="imbalance-branch-filter"
+                                                className="form-select form-select-sm"
+                                                style={{ minWidth: "180px", width: "auto" }}
+                                                value={imbalanceBranchFilter}
+                                                onChange={(e) => setImbalanceBranchFilter(e.target.value)}
+                                                aria-label="Filter imbalances by branch"
+                                            >
+                                                <option value="">All Branches</option>
+                                                {imbalanceBranches.map((branchName) => (
+                                                    <option key={branchName} value={branchName}>
+                                                        {branchName}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
 
                                     <Row className="mb-3 align-items-center g-2">
                                         <Col>
@@ -453,18 +563,29 @@ const DashboardStock = () => {
                                         </Col>
 
                                         <Col xs="auto">
-                                            <button
-                                                className="btn btn-outline-secondary"
-                                                onClick={() => setImbalanceSortAscending((prev) => !prev)}
-                                                title={imbalanceSortAscending ? "Sort A–Z" : "Sort Z–A"}
-                                            >
-                                                {imbalanceSortAscending ? "A–Z ▲" : "Z–A ▼"}
-                                            </button>
+                                            <div className="btn-group" role="group" aria-label="Filter by imbalance status">
+                                                {IMBALANCE_STATUS_FILTERS.map((tab) => (
+                                                    <button
+                                                        key={tab.key}
+                                                        type="button"
+                                                        className={`btn ${getImbalanceTabBtnClass(tab.key)}`}
+                                                        onClick={() => setImbalanceStatusFilter(tab.key)}
+                                                    >
+                                                        {tab.label}
+                                                        {tab.key !== "ALL" && (
+                                                            <span className="badge bg-light text-body ms-1">
+                                                                {tab.key === "DEFICIT" ? imbalanceCounts.deficit : imbalanceCounts.surplus}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </Col>
                                     </Row>
                                     <ImbalanceAlerts
                                         searchTerm={imbalanceSearchTerm}
-                                        sortAscending={imbalanceSortAscending}
+                                        statusFilter={imbalanceStatusFilter}
+                                        branchFilter={imbalanceBranchFilter}
                                     />
                                 </CardBody>
                             </Card>
