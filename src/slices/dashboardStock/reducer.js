@@ -1,18 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIImbalances, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
-import { saveCachedBranches, cleanBranchName } from "../../helpers/branch_helper";
+import { saveCachedBranches, cleanBranchName, getActiveBranch } from "../../helpers/branch_helper";
 import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 const monthStart = () => new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
-const defaultFilters = () => ({
-  branch: null,
+const defaultFilters = (branch = 0) => ({
+  branch: branch ?? 0,
   // Month to Date by default: a one-day window made the cover and velocity figures meaningless
   dateRange: DEFAULT_DATE_RANGE,
   startDate: formatDMY(monthStart()),
   endDate: formatDMY(new Date()),
 });
+
+const persistedBranch = getActiveBranch("stock") ?? 0;
 
 export const initialState = {
   dailyClosingStock: [],
@@ -49,8 +51,8 @@ export const initialState = {
   errorCriticalStockouts: null,
   errorSlowMovingStock: null,
   errorKPISalesTransactions: null,
-  filters: defaultFilters(),
-  appliedFilters: defaultFilters(),
+  filters: defaultFilters(persistedBranch),
+  appliedFilters: defaultFilters(persistedBranch),
 };
 
 const StockInventorySlice = createSlice({
@@ -189,11 +191,20 @@ const StockInventorySlice = createSlice({
     setEndDate: (state, action) => {
       state.filters.endDate = action.payload;
     },
-    applyFilters: (state) => {
+    applyFilters: (state, action) => {
+      if (action.payload && typeof action.payload === "object") {
+        state.filters = {
+          ...state.filters,
+          ...action.payload,
+        };
+      }
       state.appliedFilters = { ...state.filters };
     },
+    syncDraftFilters: (state) => {
+      state.filters = { ...state.appliedFilters };
+    },
     resetFilters: (state) => {
-      const defaults = defaultFilters();
+      const defaults = defaultFilters(0);
       state.filters = { ...defaults };
       state.appliedFilters = { ...defaults };
     },
@@ -415,6 +426,7 @@ export const {
   setStartDate,
   setEndDate,
   applyFilters,
+  syncDraftFilters,
   resetFilters,
 } = StockInventorySlice.actions;
 
