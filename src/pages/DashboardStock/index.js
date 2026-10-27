@@ -544,7 +544,7 @@ const DashboardStock = () => {
                                 <CardBody>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                                         <p className="text-muted mb-0 small">
-                                            Branches holding over 20% more or less of an item's stock than their share of its sales. These are suggestions only; no transfer has been raised.
+                                            Branches with a difference 20% of an item's stock against its sales. These are suggestions only; no transfer has been raised.
                                         </p>
 
                                         <div className="d-flex align-items-center gap-2 ms-auto">

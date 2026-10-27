@@ -5,6 +5,7 @@ import { getAccountBalance, getKPIOverdueDebtors } from "../../helpers/fakebacke
 import { formatCompact, formatCurrency } from "../utils/formatHelper";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
+import FloatingTooltip from "../../Components/Common/FloatingTooltip";
 import { toList, pick, num } from "../utils/apiRow";
 import { exportStamp, money } from "./TrendCardBody";
 
@@ -50,6 +51,25 @@ const ReceivablesAgeing = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sort, setSort] = useState({ key: "balance", desc: true });
+  const [hoverInfo, setHoverInfo] = useState(null);
+
+  const handleCellHover = (e, info) => {
+    setHoverInfo({
+      ...info,
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (hoverInfo) {
+      setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoverInfo(null);
+  };
 
   const appliedFilters = useSelector(
     (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
@@ -207,9 +227,13 @@ const ReceivablesAgeing = () => {
       </CardHeader>
 
       <CardBody>
-        <div className="table-responsive table-card" style={{ maxHeight: "380px", overflowY: "auto" }}>
+        <div
+          className="table-responsive table-card"
+          style={{ maxHeight: "380px", overflowY: "auto" }}
+          onMouseLeave={handleMouseLeave}
+        >
           <table className="table table-borderless table-centered table-nowrap mb-0">
-            <thead className="text-muted table-light sticky-top">
+            <thead className="text-muted table-light sticky-top" style={{ zIndex: 1 }}>
               <tr>
                 {COLUMNS.map((col) => (
                   <th
@@ -243,43 +267,70 @@ const ReceivablesAgeing = () => {
                   </td>
                 </tr>
               ) : (
-                sorted.slice(0, MAX_ROWS).map((item, index) => (
-                  <tr key={`${item.code}-${index}`}>
-                    <td className="fw-medium">
-                      <div>{item.customer}</div>
-                      <small className="text-muted">
-                        {item.code}
-                        {item.terms ? ` · ${item.terms}` : ""}
-                      </small>
-                    </td>
-                    <td className="text-muted fs-12">{item.category}</td>
-                    <td className="fw-semibold" title={formatCurrency(item.balance, "KES", 2)}>
-                      {formatCompact(item.balance)}
-                      {item.overLimit > 0 && (
-                        <i
-                          className="ri-error-warning-line text-danger ms-1"
-                          title={`Over credit limit by ${formatCurrency(item.overLimit, "KES", 0)}`}
-                        />
-                      )}
-                    </td>
-                    <td className={item.overdue > 0 ? "text-danger fw-medium" : "text-muted"}>
-                      {item.overdue == null ? "-" : formatCompact(item.overdue)}
-                    </td>
-                    <td>{item.maxDays == null ? "-" : item.maxDays}</td>
-                    <td className="text-muted fs-12">{item.lastPayment}</td>
-                    <td>
-                      <span className={`badge bg-${item.color}-subtle text-${item.color}`}>{item.status}</span>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge bg-${item.riskColor}-subtle text-${item.riskColor}`}
-                        title={item.insight}
-                      >
-                        {item.risk}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                sorted.slice(0, MAX_ROWS).map((item, index) => {
+                  const riskHex =
+                    item.riskColor === "danger"
+                      ? "#f06548"
+                      : item.riskColor === "warning"
+                      ? "#f7b84b"
+                      : "#0ab39c";
+                  return (
+                    <tr
+                      key={`${item.code}-${index}`}
+                      onMouseEnter={(e) =>
+                        handleCellHover(e, {
+                          title: item.customer,
+                          badgeColor: riskHex,
+                          mainValue: `Balance: ${formatCurrency(item.balance, "KES", 2)}`,
+                          mainColor: "#00e396",
+                          subText: [
+                            item.code && `Code: ${item.code}`,
+                            item.terms && `Terms: ${item.terms}`,
+                            item.overdue != null && `Overdue: ${formatCurrency(item.overdue, "KES", 2)}`,
+                            item.maxDays != null && `${item.maxDays}d overdue`,
+                          ]
+                            .filter(Boolean)
+                            .join(" · "),
+                          extraText:
+                            item.insight ||
+                            (item.overLimit > 0
+                              ? `Over credit limit by ${formatCurrency(item.overLimit, "KES", 0)} · Risk: ${item.risk} (${item.status})`
+                              : `Ageing: ${item.status} · Risk: ${item.risk} · Last Payment: ${item.lastPayment}`),
+                        })
+                      }
+                      onMouseMove={handleMouseMove}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <td className="fw-medium">
+                        <div>{item.customer}</div>
+                        <small className="text-muted">
+                          {item.code}
+                          {item.terms ? ` · ${item.terms}` : ""}
+                        </small>
+                      </td>
+                      <td className="text-muted fs-12">{item.category}</td>
+                      <td className="fw-semibold">
+                        {formatCompact(item.balance)}
+                        {item.overLimit > 0 && (
+                          <i className="ri-error-warning-line text-danger ms-1" />
+                        )}
+                      </td>
+                      <td className={item.overdue > 0 ? "text-danger fw-medium" : "text-muted"}>
+                        {item.overdue == null ? "-" : formatCompact(item.overdue)}
+                      </td>
+                      <td>{item.maxDays == null ? "-" : item.maxDays}</td>
+                      <td className="text-muted fs-12">{item.lastPayment}</td>
+                      <td>
+                        <span className={`badge bg-${item.color}-subtle text-${item.color}`}>{item.status}</span>
+                      </td>
+                      <td>
+                        <span className={`badge bg-${item.riskColor}-subtle text-${item.riskColor}`}>
+                          {item.risk}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -290,6 +341,7 @@ const ReceivablesAgeing = () => {
             order. The Excel export contains all of them.
           </small>
         )}
+        <FloatingTooltip hoverInfo={hoverInfo} />
       </CardBody>
     </Card>
   );

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import ReactApexChart from "react-apexcharts";
 import { Spinner } from "reactstrap";
+import FloatingTooltip from "../../../../Components/Common/FloatingTooltip";
 import { cleanBranchName } from "../../../../helpers/branch_helper";
 import { toList, pick, num } from "../../../utils/apiRow";
 
@@ -179,14 +180,17 @@ const BarChartTwo = () => {
             );
 
             if (idx !== -1) {
-                const rect = container.getBoundingClientRect();
                 setHoverInfo({
-                    branch: chartData.branches[idx],
-                    rawValue: chartData.rawValues[idx],
-                    valM: chartData.values[idx],
-                    color: colors[idx],
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top,
+                    title: chartData.branches[idx],
+                    badgeColor: colors[idx],
+                    mainValue: `KES ${Number(chartData.rawValues[idx] || 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    })}`,
+                    mainColor: "#00e396",
+                    subText: `Valuation: ${chartData.values[idx].toFixed(2)}M`,
+                    x: e.clientX,
+                    y: e.clientY,
                 });
                 return;
             }
@@ -207,14 +211,17 @@ const BarChartTwo = () => {
             }
 
             if (idx >= 0 && idx < chartData.branches.length) {
-                const rect = container.getBoundingClientRect();
                 setHoverInfo({
-                    branch: chartData.branches[idx],
-                    rawValue: chartData.rawValues[idx],
-                    valM: chartData.values[idx],
-                    color: colors[idx],
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top,
+                    title: chartData.branches[idx],
+                    badgeColor: colors[idx],
+                    mainValue: `KES ${Number(chartData.rawValues[idx] || 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    })}`,
+                    mainColor: "#00e396",
+                    subText: `Valuation: ${chartData.values[idx].toFixed(2)}M`,
+                    x: e.clientX,
+                    y: e.clientY,
                 });
                 return;
             }
@@ -353,80 +360,7 @@ const BarChartTwo = () => {
                 height={380}
             />
 
-            {hoverInfo && (
-                <div
-                    style={{
-                        position: "absolute",
-                        left: `${hoverInfo.x}px`,
-                        top: `${hoverInfo.y}px`,
-                        transform:
-                            hoverInfo.x > 250
-                                ? hoverInfo.y < 50
-                                    ? "translate(-100%, 15px)"
-                                    : "translate(-100%, -120%)"
-                                : hoverInfo.y < 50
-                                ? "translate(10px, 15px)"
-                                : "translate(10px, -120%)",
-                        pointerEvents: "none",
-                        zIndex: 9999,
-                        backgroundColor: "rgba(33, 37, 41, 0.95)",
-                        color: "#fff",
-                        borderRadius: "6px",
-                        padding: "8px 12px",
-                        fontSize: "12px",
-                        lineHeight: "1.4",
-                        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.25)",
-                        whiteSpace: "nowrap",
-                        transition: "opacity 0.1s ease",
-                    }}
-                >
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            fontWeight: 600,
-                            marginBottom: "3px",
-                        }}
-                    >
-                        <span
-                            style={{
-                                width: "9px",
-                                height: "9px",
-                                borderRadius: "50%",
-                                backgroundColor: hoverInfo.color,
-                                display: "inline-block",
-                            }}
-                        />
-                        <span>{hoverInfo.branch}</span>
-                    </div>
-                    <div
-                        style={{
-                            color: "#00e396",
-                            fontWeight: 700,
-                            fontSize: "13px",
-                        }}
-                    >
-                        KES{" "}
-                        {Number(hoverInfo.rawValue || 0).toLocaleString(
-                            undefined,
-                            {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                            }
-                        )}
-                    </div>
-                    <div
-                        style={{
-                            fontSize: "11px",
-                            color: "#adb5bd",
-                            marginTop: "2px",
-                        }}
-                    >
-                        Valuation: {hoverInfo.valM.toFixed(2)}M
-                    </div>
-                </div>
-            )}
+            <FloatingTooltip hoverInfo={hoverInfo} />
         </div>
     );
 };

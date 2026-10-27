@@ -31,7 +31,7 @@ export const KPI_META = [
 export const getKPIMeta = ({ lookbackDays = 30, imbalanceCapped = false } = {}) =>
     KPI_META.map((widget) => {
         if (widget.id === 6) return { ...widget, subtitle: `Low or no sales in ${lookbackDays} days` };
-        if (widget.id === 8 && imbalanceCapped) return { ...widget, suffix: "+", subtitle: "Top transfer candidates" };
+        if (widget.id === 8 && imbalanceCapped) return { ...widget, subtitle: "Top transfer candidates" };
         return widget;
     });
 

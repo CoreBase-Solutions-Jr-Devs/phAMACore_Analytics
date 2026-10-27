@@ -5,6 +5,7 @@ import { getKPIStockHealth } from "../../helpers/fakebackend_helper";
 import { formatNumber } from "../utils/formatHelper";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
+import FloatingTooltip from "../../Components/Common/FloatingTooltip";
 import { cleanBranchName } from './../../helpers/branch_helper';
 
 const formatDMY = (date) => {
@@ -37,6 +38,25 @@ const StockMovements = () => {
   const [stockAlerts, setStockAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hoverInfo, setHoverInfo] = useState(null);
+
+  const handleCellHover = (e, info) => {
+    setHoverInfo({
+      ...info,
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (hoverInfo) {
+      setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoverInfo(null);
+  };
 
   const appliedFilters = useSelector(
     (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
@@ -126,9 +146,13 @@ const StockMovements = () => {
       </CardHeader>
 
       <CardBody>
-        <div className="table-responsive table-card" style={{ maxHeight: "380px", overflowY: "auto" }}>
+        <div
+          className="table-responsive table-card"
+          style={{ maxHeight: "380px", overflowY: "auto" }}
+          onMouseLeave={handleMouseLeave}
+        >
           <table className="table table-borderless table-centered table-nowrap mb-0">
-            <thead className="text-muted table-light sticky-top">
+            <thead className="text-muted table-light sticky-top" style={{ zIndex: 1 }}>
               <tr>
                 <th>Product</th>
                 <th>Category</th>
@@ -163,10 +187,35 @@ const StockMovements = () => {
               ) : (
                 stockAlerts.map((item, index) => {
                   const badge = getStatusBadge(item.stockout_risk_status);
+                  const branchName = cleanBranchName(item.branch_name || `Branch ${item.branch_id}`);
+                  const badgeHex =
+                    badge.color === "danger"
+                      ? "#f06548"
+                      : badge.color === "warning"
+                      ? "#f7b84b"
+                      : badge.color === "info"
+                      ? "#299cdb"
+                      : "#0ab39c";
+                  const minReorder = item.effective_min_qty ?? item.branch_min_qty;
+
                   return (
-                    <tr key={`${item.item_code}-${item.branch_id}-${index}`}>
+                    <tr
+                      key={`${item.item_code}-${item.branch_id}-${index}`}
+                      onMouseEnter={(e) =>
+                        handleCellHover(e, {
+                          title: item.item_name || item.item_code || "Product",
+                          badgeColor: badgeHex,
+                          mainValue: `${formatNumber(item.current_stock_qty)} in stock · ${badge.label}`,
+                          mainColor: badgeHex,
+                          subText: `Branch: ${branchName} · Min Reorder: ${formatNumber(minReorder)} · Monthly Demand: ${formatNumber(item.monthly_demand)}`,
+                          extraText: item.action_insight || (item.item_code ? `SKU: ${item.item_code} · Category: ${item.item_subgroup || item.item_group || "-"}` : undefined),
+                        })
+                      }
+                      onMouseMove={handleMouseMove}
+                      onMouseLeave={handleMouseLeave}
+                    >
                       <td className="fw-medium">
-                        <div title={item.item_name}>{item.item_name}</div>
+                        <div>{item.item_name}</div>
                         <small className="text-muted">{item.item_code}</small>
                       </td>
                       <td className="text-muted">
@@ -182,16 +231,13 @@ const StockMovements = () => {
                         {formatNumber(item.current_stock_qty)}
                       </td>
                       <td>
-                        {formatNumber(
-                          item.effective_min_qty ?? item.branch_min_qty
-                        )}
+                        {formatNumber(minReorder)}
                       </td>
                       <td>{formatNumber(item.monthly_demand)}</td>
-                      <td>{cleanBranchName(item.branch_name || `Branch ${item.branch_id}`)}</td>
+                      <td>{branchName}</td>
                       <td>
                         <span
                           className={`badge bg-${badge.color}-subtle text-${badge.color}`}
-                          title={item.action_insight}
                         >
                           {badge.label}
                         </span>
@@ -203,6 +249,7 @@ const StockMovements = () => {
             </tbody>
           </table>
         </div>
+        <FloatingTooltip hoverInfo={hoverInfo} />
       </CardBody>
     </Card>
   );
