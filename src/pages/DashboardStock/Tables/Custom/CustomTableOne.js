@@ -4,6 +4,7 @@ import { Alert, Input } from "reactstrap";
 import TableContainer from "../../../../Components/Common/TableContainerReactTable";
 import { useSelector } from "react-redux";
 import { exportToExcel } from "../../../../helpers/export_helper";
+import FloatingTooltip from "../../../../Components/Common/FloatingTooltip";
 import { getExpiryRows } from "../../../utils/StockInventoryUtils";
 import { formatCompact } from "../../../utils/formatHelper";
 
@@ -57,6 +58,25 @@ const ExpiryProductTable = ({
     searchIdPrefix = "table-search",
 }) => {
     const [searchValue, setSearchValue] = useState("");
+    const [hoverInfo, setHoverInfo] = useState(null);
+
+    const handleCellHover = (e, info) => {
+        setHoverInfo({
+            ...info,
+            x: e.clientX,
+            y: e.clientY,
+        });
+    };
+
+    const handleMouseMove = (e) => {
+        if (hoverInfo) {
+            setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setHoverInfo(null);
+    };
 
     const hasBatch = useMemo(() => rows.some((row) => row.batch), [rows]);
 
@@ -81,11 +101,31 @@ const ExpiryProductTable = ({
                 header: "Product",
                 accessorKey: "product",
                 enableColumnFilter: false,
-                cell: (cell) => (
-                    <Link to="#" className="fw-medium">
-                        {cell.getValue()}
-                    </Link>
-                ),
+                cell: (cell) => {
+                    const row = cell.row.original;
+                    const isExp = row.days < 0;
+                    const toneColor = isExp || row.days <= 30 ? "#f06548" : row.days <= 60 ? "#f7b84b" : "#299cdb";
+                    return (
+                        <Link
+                            to="#"
+                            className="fw-medium"
+                            onMouseEnter={(e) =>
+                                handleCellHover(e, {
+                                    title: row.product,
+                                    badgeColor: toneColor,
+                                    mainValue: `KES ${row.value} (${row.total} units)`,
+                                    mainColor: "#00e396",
+                                    subText: `${row.branch}${row.batch ? ` · Batch: ${row.batch}` : ""} · Expiry: ${row.date}`,
+                                    extraText: `${isExp ? `Expired ${Math.abs(row.days)}d ago` : `${row.days} days remaining`} · Action: ${row.status}`,
+                                })
+                            }
+                            onMouseMove={handleMouseMove}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            {cell.getValue()}
+                        </Link>
+                    );
+                },
             },
             ...(hasBatch
                 ? [{ header: "Batch", accessorKey: "batch", enableColumnFilter: false }]
@@ -126,7 +166,31 @@ const ExpiryProductTable = ({
                 ),
                 accessorKey: "status",
                 enableColumnFilter: false,
-                cell: (cell) => renderActionBadge(cell.getValue()),
+                cell: (cell) => {
+                    const row = cell.row.original;
+                    const isExp = row.days < 0;
+                    const toneColor = isExp || row.days <= 30 ? "#f06548" : row.days <= 60 ? "#f7b84b" : "#299cdb";
+                    return (
+                        <div
+                            onMouseEnter={(e) =>
+                                handleCellHover(e, {
+                                    title: row.status,
+                                    badgeColor: toneColor,
+                                    mainValue: `${row.product}${row.batch ? ` (${row.batch})` : ""}`,
+                                    mainColor: toneColor,
+                                    subText: `Branch: ${row.branch} · Qty: ${row.total} · Value: KES ${row.value}`,
+                                    extraText: isExp
+                                        ? `Expired ${Math.abs(row.days)} days ago (${row.date})`
+                                        : `Expires in ${row.days} days (${row.date})`,
+                                })
+                            }
+                            onMouseMove={handleMouseMove}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            {renderActionBadge(cell.getValue())}
+                        </div>
+                    );
+                },
             },
             {
                 header: () => (
@@ -209,15 +273,18 @@ const ExpiryProductTable = ({
                 </button>
             </div>
 
-            <TableContainer
-                columns={columns || []}
-                data={filteredTable || []}
-                customPageSize={8}
-                isGlobalFilter={false}
-                isLoading={isLoading}
-                tableClass="table-centered align-middle table-nowrap mb-0"
-                theadClass="text-muted table-light"
-            />
+            <div onMouseLeave={handleMouseLeave}>
+                <TableContainer
+                    columns={columns || []}
+                    data={filteredTable || []}
+                    customPageSize={8}
+                    isGlobalFilter={false}
+                    isLoading={isLoading}
+                    tableClass="table-centered align-middle table-nowrap mb-0"
+                    theadClass="text-muted table-light"
+                />
+            </div>
+            <FloatingTooltip hoverInfo={hoverInfo} />
         </div>
     );
 };

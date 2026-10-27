@@ -5,6 +5,10 @@
 .table {
     >thead {
         border-color: $table-border-color;
+
+        &.sticky-top {
+            z-index: 1;
+        }
     }
     >:not(:first-child) {
         border-top-width: $table-border-width;
