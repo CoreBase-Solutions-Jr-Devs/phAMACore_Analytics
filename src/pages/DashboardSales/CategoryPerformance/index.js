@@ -149,7 +149,7 @@ const CategoryPerformance = () => {
         endDate: filters.endDate,
         branchcode: filters.branch,
         groupBy: "SUBGROUP",
-                IncludeCollections: 1,
+                // IncludeCollections: 1,
 
       }),
     );
