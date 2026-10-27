@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Card, CardBody, Row, Col } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
-
+import {
+  exportDashboardReportToExcel,
+  triggerPrint,
+} from "../../../helpers/export_helper";
 const Customer = ({
   totalActiveMembers,
   newMembersOnboarded,
@@ -25,6 +28,107 @@ const Customer = ({
   const { branch, dateRange, startDate, endDate } = useSelector(
     (state) => state.customerMemberAnalysis.filters,
   );
+  const handleExportExcel = () => {
+  const todayStr = new Date()
+    .toLocaleDateString("en-GB")
+    .replace(/\//g, "-");
+
+  const metadata = [
+    {
+      label: "Report",
+      value: "Customer Member Analysis",
+    },
+    {
+      label: "Generated Date",
+      value: new Date().toLocaleString("en-GB"),
+    },
+    {
+      label: "Selected Branch",
+      value: selectedBranchName || "All Branches",
+    },
+    {
+      label: "Date Range Filter",
+      value: `${startDate || ""} to ${endDate || ""}`,
+    },
+  ];
+
+  const rows = [
+    {
+      "Key Metric": "Total Members",
+      "Member Count": Number(totalActiveMembers ?? 0),
+      "Transactions": Number(totalStoreTransactions ?? 0),
+      "Sales (KES)": Number(totalStoreSales ?? 0),
+      "Average Basket Value (KES)": Number(overallAverageBasketValue ?? 0),
+    },
+    {
+      "Key Metric": "New Members",
+      "Member Count": Number(newMembersOnboarded ?? 0),
+      "Transactions": Number(newMemberTransactions ?? 0),
+      "Sales (KES)": Number(newMemberSales ?? 0),
+      "Average Basket Value (KES)": Number(newMemberABV ?? 0),
+    },
+    {
+      "Key Metric": "Returning Members",
+      "Member Count": Number(returningMembers ?? 0),
+      "Transactions": Number(repeatMemberTransactions ?? 0),
+      "Sales (KES)": Number(repeatMemberSales ?? 0),
+      "Average Basket Value (KES)": Number(repeatMemberABV ?? 0),
+    },
+  ];
+
+  const sections = [
+    {
+      title: "Customer Membership Key Metrics",
+      headers: [
+        "Key Metric",
+        "Member Count",
+        "Transactions",
+        "Sales (KES)",
+        "Average Basket Value (KES)",
+      ],
+      data: rows,
+    },
+    {
+      title: "Member Transaction Share",
+      headers: ["Metric", "Value"],
+      data: [
+        {
+          Metric: "Member Transaction Share (%)",
+          Value: Number(memberTransactionShare ?? 0),
+        },
+      ],
+    },
+  ];
+
+  // Include the action insight when available.
+  if (memberActionInsight) {
+    sections.push({
+      title: "Member Action Insight",
+      headers: ["Insight"],
+      data: [
+        {
+          Insight:
+            typeof memberActionInsight === "string"
+              ? memberActionInsight
+              : JSON.stringify(memberActionInsight),
+        },
+      ],
+    });
+  }
+
+  exportDashboardReportToExcel(
+    {
+      title: "Customer Member Analysis Report",
+      metadata,
+      sections,
+    },
+    `Customer_Member_Analysis_${todayStr}`,
+  );
+};
+
+const handlePrint = () => {
+  triggerPrint();
+};
   return (
     <div>
       <React.Fragment>
@@ -42,7 +146,7 @@ const Customer = ({
           </div>
 
           <div className="d-flex align-items-center gap-2 no-print">
-            {/* <button
+            <button
                   type="button"
                   className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
                   onClick={handleExportExcel}
@@ -50,9 +154,9 @@ const Customer = ({
                 >
                   <i className="ri-file-excel-2-line align-bottom"></i>
                   <span>Export Excel</span>
-                </button> */}
+                </button>
 
-            {/* <button
+            <button
                   type="button"
                   className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
                   onClick={handlePrint}
@@ -60,7 +164,7 @@ const Customer = ({
                 >
                   <i className="ri-printer-line align-bottom"></i>
                   <span>Print</span>
-                </button> */}
+                </button>
 
             <button
               type="button"

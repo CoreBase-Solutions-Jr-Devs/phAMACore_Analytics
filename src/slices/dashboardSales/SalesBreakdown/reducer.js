@@ -1,15 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
 
-  getInventoryProfitSummary,
+  getKPISalesTransactions,
 
-} from "./thunk";
-import { getInventoryProfitSummary } from "../../../helpers/fakebackend_helper";
+} from "../thunk";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
-inventoryProfitSummarySubgroup: [],
+
+  salesChannel: [],
+
+
   loading: false,
   error: null,
 
@@ -22,8 +24,8 @@ inventoryProfitSummarySubgroup: [],
   },
 };
 
-const inventoryProfitSummarySlice = createSlice({
-  name: "inventoryProfitSummary",
+const salesBreakdownSlice = createSlice({
+  name: "salesBreakdown",
   initialState,
 
   reducers: {
@@ -180,30 +182,34 @@ const inventoryProfitSummarySlice = createSlice({
       state.filters.groupBy = action.payload;
     },
 
-    clearMarginAnalysisData: () => initialState,
+    clearSalesBreakdownData: () => initialState,
   },
 
   extraReducers: (builder) => {
     builder
+ 
+      // ------------------------------------------
+      // KPI SALES TRANSACTIONS
+      // ------------------------------------------
 
-      .addCase(getInventoryProfitSummary.pending, (state) => {
+      .addCase(getKPISalesTransactions.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
 
-      .addCase(getInventoryProfitSummary.fulfilled, (state, action) => {
+      .addCase(getKPISalesTransactions.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
         const result = action.payload?.result || action.payload || [];
-
-      
-        state.inventoryProfitSummary = result;
+        
 
         switch (groupBy) {
-          case "SUBGROUP":
-            state.inventoryProfitSummarySubgroup = result;
+      
+
+          case "CHANNEL":
+            state.salesChannel = result;
             break;
 
           default:
@@ -211,16 +217,16 @@ const inventoryProfitSummarySlice = createSlice({
         }
       })
 
-      .addCase(getInventoryProfitSummary.rejected, (state, action) => {
+      .addCase(getKPISalesTransactions.rejected, (state, action) => {
         state.loading = false;
         state.error =
           action.payload?.message ||
           action.payload ||
           action.error.message ||
-          "Error loading margin analysis";
+          "Error loading KPI sales transactions";
       })
-   
-  ;
+
+      ;
   },
 });
 
@@ -230,7 +236,7 @@ export const {
   setDateRange,
   setStartDate,
   setEndDate,
-  clearMarginAnalysisData,
-} = inventoryProfitSummarySlice.actions;
+  clearSalesBreakdownData,
+} = salesBreakdownSlice.actions;
 
-export default inventoryProfitSummarySlice.reducer;
+export default salesBreakdownSlice.reducer;

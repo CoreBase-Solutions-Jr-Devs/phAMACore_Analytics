@@ -171,7 +171,7 @@ const Products = ({
         accessorKey: "group_name",
         meta: { sticky: "group" },
         cell: ({ getValue }) => (
-          <span className="fw-semibold text-primary">{getValue() ?? 0}</span>
+          <span className="fw-semibold text-body">{getValue() ?? 0}</span>
         ),
       },
       {

@@ -26,13 +26,12 @@ const initialState = {
   salesSummary: [],
   salesBranch: [],
   salesBranch_Type: [],
-  salesChannel: [],
+ 
 
   salesComparativeYTD: [],
   salesComparativeMTD: [],
   salesMonthly: [],
   salesDaily: [],
-salesSubgroup: [],
 
 
 
@@ -258,7 +257,7 @@ const powerBISlice = createSlice({
         const result = action.payload?.result || action.payload || [];
 
         // Store the latest KPI sales result
-        state.KPISales = result;
+        
 
         switch (groupBy) {
           case "TYPE":
@@ -273,9 +272,7 @@ const powerBISlice = createSlice({
             state.salesBranch_Type = result;
             break;
 
-          case "CHANNEL":
-            state.salesChannel = result;
-            break;
+        
 
           case "COMPARATIVE_YTD":
             state.salesComparativeYTD = result;
@@ -293,9 +290,8 @@ const powerBISlice = createSlice({
             state.salesDaily = result;
             break;
 
-             case "SUBGROUP":
-            state.salesSubgroup = result;
-            break;
+          
+            
           default:
             break;
         }

@@ -22,7 +22,7 @@ marginAnalysisSKU: [],
   error: null,
 
   filters: {
-    branchcode: "",
+    branchcode: "All Branches",
     dateRange: "Today",
     startDate: new Date().toLocaleDateString("en-GB"),
     endDate: new Date().toLocaleDateString("en-GB"),

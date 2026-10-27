@@ -23,6 +23,8 @@ const MarginAnalysis = () => {
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
 const [selectedMarginBand, setSelectedMarginBand] = useState("ALL");
+ const [selectedBranchName, setSelectedBranchName] =
+    useState("All Branches");
   const {
     marginAnalysisBand = [],
     marginAnalysisDrilldown = [],
@@ -75,8 +77,7 @@ const {
   filters, // 30. filters
 );
 
-  console.log("Raw marginAnalysisBand from Redux:", marginAnalysisBand);
-console.log("Is array:", Array.isArray(marginAnalysisBand));
+
 
 const handleMarginBandSelect = (band) => {
   setSelectedMarginBand(band);
@@ -174,12 +175,12 @@ const handleMarginBandSelect = (band) => {
     }),
   );
 };
-  const selectedBranchName =
-    filters.branch == null || filters.branch === ""
-      ? "All Branches"
-      : (marginAnalysisDrilldown || []).find(
-          (m) => Number(m.branch_id) === Number(filters.branch),
-        )?.branch_name || "Unknown Branch";
+  // const selectedBranchName =
+  //   filters.branch == null || filters.branch === ""
+  //     ? "All Branches"
+  //     : (marginAnalysisDrilldown || []).find(
+  //         (m) => Number(m.branch_id) === Number(filters.branch),
+  //       )?.branch_name || "Unknown Branch";
   document.title = "Margin Analysis | phAMACore Analytics";
 
   return (
@@ -227,6 +228,8 @@ const handleMarginBandSelect = (band) => {
             onBranchChange={(value) =>
               dispatch(setBranch(value === "" ? null : Number(value)))
             }
+                                    onBranchNameChange={setSelectedBranchName}
+
             onDateRangeChange={(value) => dispatch(setDateRange(value))}
             onStartDateChange={(value) => dispatch(setStartDate(value))}
             onEndDateChange={(value) => dispatch(setEndDate(value))}

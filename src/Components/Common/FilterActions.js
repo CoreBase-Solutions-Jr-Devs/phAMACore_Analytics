@@ -11,6 +11,7 @@ const FilterActions = ({
   endDate,
   onBranchChange,
   onDateRangeChange,
+   onBranchNameChange, // Add this
   onStartDateChange,
   onEndDateChange,
   onApply,
@@ -227,28 +228,39 @@ const FilterActions = ({
                   </label>
 
                   <div className="col-8">
-                    <select
-                      className="form-select"
-                      value={branch ?? ""}
-                      onChange={(e) =>
-                        onBranchChange(e.target.value)
-                      }
-                    >
-                      <option value="">
-                        {loading && branchOptions.length === 0
-                          ? "Loading branches..."
-                          : "All Branches"}
-                      </option>
+               <select
+  className="form-select"
+  value={branch ?? ""}
+  onChange={(e) => {
+    const selectedValue = e.target.value;
 
-                      {branchOptions.map((b) => (
-                        <option
-                          key={b.branchCode}
-                          value={b.branchCode}
-                        >
-                          {b.branchName || b.branchCode}
-                        </option>
-                      ))}
-                    </select>
+    onBranchChange(
+      selectedValue === "" ? null : Number(selectedValue),
+    );
+
+    const selectedBranch = branchOptions.find(
+      (b) => String(b.branchCode) === selectedValue,
+    );
+
+    onBranchNameChange?.(
+      selectedValue === ""
+        ? "All Branches"
+        : selectedBranch?.branchName || "",
+    );
+  }}
+>
+  <option value="">
+    {loading && branchOptions.length === 0
+      ? "Loading branches..."
+      : "All Branches"}
+  </option>
+
+  {branchOptions.map((b) => (
+    <option key={b.branchCode} value={b.branchCode}>
+      {b.branchName || b.branchCode}
+    </option>
+  ))}
+</select>
                   </div>
                 </div>
 

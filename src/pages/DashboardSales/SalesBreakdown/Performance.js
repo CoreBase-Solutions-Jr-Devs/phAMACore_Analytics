@@ -19,7 +19,7 @@ const Performance = ({
   rightClickBtn,
 }) => {
    const { branch, dateRange, startDate, endDate } = useSelector(
-    (state) => state.powerbi.filters,
+    (state) => state.salesBreakdown.filters,
 );
 
 const handleExportExcel = () => {

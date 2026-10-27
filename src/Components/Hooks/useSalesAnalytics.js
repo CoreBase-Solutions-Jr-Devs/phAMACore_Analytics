@@ -482,28 +482,71 @@ const OTHER_ACCOUNT = getChannelData("OTHER_ACCOUNT");
 const RETURN = getChannelData("RETURN");
 const TOTAL = getChannelData("TOTAL");
 
-const categoryPerformance = (Array.isArray(salesSubgroup) ? salesSubgroup : [])
-  .reduce(
-    (totals, item) => ({
-      total_sales_incl:
-        totals.total_sales_incl + Number(item.total_sales_incl ?? 0),
+const categoryPerformance = Array.isArray(salesSubgroup)
+  ? salesSubgroup
+  : [];
 
-      gross_profit:
-        totals.gross_profit + Number(item.gross_profit ?? 0),
+const categoryTotals = (Array.isArray(categoryPerformance)
+  ? categoryPerformance
+  : []
+).reduce(
+  (totals, item) => ({
+    total_sales_excl:
+      totals.total_sales_excl + Number(item.total_sales_excl ?? 0),
 
-      total_units_sold:
-        totals.total_units_sold + Number(item.total_units_sold ?? 0),
+    total_tax:
+      totals.total_tax + Number(item.total_tax ?? 0),
 
-      active_items_count:
-        totals.active_items_count + Number(item.active_items_count ?? 0),
-    }),
-    {
-      total_sales_incl: 0,
-      gross_profit: 0,
-      total_units_sold: 0,
-      active_items_count: 0,
-    },
-  );
+    total_sales_incl:
+      totals.total_sales_incl + Number(item.total_sales_incl ?? 0),
+
+    total_cogs:
+      totals.total_cogs + Number(item.total_cogs ?? 0),
+
+    gross_profit:
+      totals.gross_profit + Number(item.gross_profit ?? 0),
+
+    total_units_sold:
+      totals.total_units_sold + Number(item.total_units_sold ?? 0),
+
+    active_items_count:
+      totals.active_items_count + Number(item.active_items_count ?? 0),
+
+    transaction_count:
+      totals.transaction_count + Number(item.transaction_count ?? 0),
+
+    total_line_items:
+      totals.total_line_items + Number(item.total_line_items ?? 0),
+
+    unique_clients:
+      totals.unique_clients + Number(item.unique_clients ?? 0),
+  }),
+  {
+    total_sales_excl: 0,
+    total_tax: 0,
+    total_sales_incl: 0,
+    total_cogs: 0,
+    gross_profit: 0,
+    total_units_sold: 0,
+    active_items_count: 0,
+    transaction_count: 0,
+    total_line_items: 0,
+    unique_clients: 0,
+  }
+);
+
+const categoryGrossMargin =
+  categoryTotals.total_sales_excl > 0
+    ? (categoryTotals.gross_profit / categoryTotals.total_sales_excl) * 100
+    : 0;
+
+// Use the API's total sales including tax and transaction count
+// to calculate the overall average order value.
+const categoryAvgOrderValue =
+  categoryTotals.transaction_count > 0
+    ? categoryTotals.total_sales_incl / categoryTotals.transaction_count
+    : 0;
+
   return {
     formatAmount,
     totalRevenue,
@@ -584,6 +627,9 @@ performanceSummaryMONTHLY,
     RETURN,
     TOTAL,
     categoryPerformance,
+    categoryTotals,
+    categoryAvgOrderValue,
+categoryGrossMargin,
 // netSales,
 // targetSales,
 // achievementPct,

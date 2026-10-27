@@ -9,12 +9,12 @@ import {
   setDateRange,
   setStartDate,
   setEndDate,
-} from "../../../slices/dashboardSales/reducer";
+} from "../../../slices/dashboardSales/CategoryPerformance/reducer";
 // import Customer from "./Customer";
 import Products from "./Products";
 import useSalesAnalytics from "../../../Components/Hooks/useSalesAnalytics";
 import { getKPISalesTransactions } from "../../../slices/dashboardSales/thunk";
-import { clearSalesData } from "../../../slices/dashboardSales/reducer";
+import { clearCategoryPerformanceData } from "../../../slices/dashboardSales/CategoryPerformance/reducer";
 import Category from "./Category"
 
 const CategoryPerformance = () => {
@@ -23,104 +23,62 @@ const CategoryPerformance = () => {
   const [rightColumn, setRightColumn] = useState(false);
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
+const [selectedBranchName, setSelectedBranchName] =
+  useState("All Branches");
 
   const {
+  
+    salesBranch = [],
+
+  } = useSelector((state) => state.powerbi);
+ const {
     // salesTargetSummary = [],
     // salesTargetBranch = [],
-    salesBranch = [],
+    // salesBranch = [],
     // salesChannel = [],
     salesSubgroup = [],
     filters,
     loading,
     error,
-  } = useSelector((state) => state.powerbi);
-
+  } = useSelector((state) => state.categoryPerformance);
   const {
-    // totalActiveMembers,
-    // newMembersOnboarded,
-    // returningMembers,
-    // newMemberTransactions,
-    // newMemberSales,
-    // newMemberABV,
-    // repeatMemberTransactions,
-    // repeatMemberSales,
-    // repeatMemberABV,
-    // totalStoreTransactions,
-    // totalStoreSales,
-    // overallAverageBasketValue,
-    // memberTransactionShare,
-    // memberActionInsight,
-    // newCohortMemberCount,
-    // newCohortTransactions,
-    // newCohortSalesExcl,
-    // newCohortSalesIncl,
-    // newCohortABV,
-    // newCohortSalesContribution,
-    // repeatCohortMemberCount,
-    // repeatCohortTransactions,
-    // repeatCohortSalesExcl,
-    // repeatCohortSalesIncl,
-    // repeatCohortABV,
-    // repeatCohortSalesContribution,
-    // nonMemberCount,
-    // nonMemberTransactions,
-    // nonMemberSalesExcl,
-    // nonMemberSalesIncl,
-    // nonMemberABV,
-    // nonMemberSalesContribution,
-    // performanceSummary,
-    // netSales,
-    // targetSales,
-    // achievementPct,
-    // grossProfit,
-    // grossMarginPct,
-    // averageBasketValue,
-    // transactionCount,
-    // totalBranches,
-    // targetVariance,
-    // targetActionInsight,
-    // CASH,
-    // INSURANCE,
-    // OTHER_ACCOUNT,
-    // RETURN,
-    // TOTAL,
+ 
     categoryPerformance,
+    categoryTotals,
+     categoryAvgOrderValue,
+    categoryGrossMargin,
   } = useSalesAnalytics(
-    //  sales,
-    [], // kpiOverdueAccounts
-    [], // salesType
-    [], // salesBranch
-    [], // salesBranch_Type
-    [], // salesChannel,
-    [], // salesComparativeYTD
-    [], // salesComparativeMTD
-    [], // salesMonthly
-    [], // salesDaily
-    salesSubgroup,
-    [], // monthlySales
-    [], // monthToDateSales
-    [], // lastYearMonthToDateSales
-    [], // lastYearMonthlySales
-
-    [], // marginAnalysisBand
-    [], // marginAnalysisDrilldown
-    [], // marginAnalysisSku
-
-    [], //  customerMemberAnalysisSummary,
-    [], //  customerMemberAnalysisBranch,
-    [], // customerMemberAnalysisCohort
-
-    [], // julySalesTarget
-    [], // augustSalesTarget
-    [], // septemberSalesTarget
-    [], // octoberSalesTarget
-
-    [], // salesTarget
-    [], // salesTargetSummary
-    [], // salesTargetBranch
-
-    filters,
-  );
+  [], // 1. sales
+  [], // 2. kpiOverdueAccounts
+  [], // 3. salesType
+  [], // 4. salesBranch
+  [], // 5. salesBranch_Type
+  [], // 6. salesChannel
+  [], // 7. salesComparativeYTD
+  [], // 8. salesComparativeMTD
+  [], // 9. salesMonthly
+  [], // 10. salesDaily
+    salesSubgroup ,
+  [], // 12. monthlySales
+  [], // 13. monthToDateSales
+  [], // 14. lastYearMonthToDateSales
+  [], // 15. lastYearMonthlySales
+ [], //  marginAnalysisBand      
+   [], // marginAnalysisDrilldown 
+  [], //  marginAnalysisSKU        
+  [], // 19. customerMemberAnalysisSummary
+  [], // 20. customerMemberAnalysisBranch
+  [], // 21. customerMemberAnalysisCohort
+  [], // 22. julySalesTarget
+  [], // 23. augustSalesTarget
+  [], // 24. septemberSalesTarget
+  [], // 25. octoberSalesTarget
+  [], // 26. salesTarget
+  [], // 27. salesTargetSummary
+  [], // 28. salesTargetBranch
+  [], // 29. salesTargetMONTHLY_PIVOT
+  filters, // 30. filters
+);
 
   useEffect(() => {
     dispatch(
@@ -130,14 +88,14 @@ const CategoryPerformance = () => {
         endDate: filters.endDate,
         branchcode: filters.branch,
         groupBy: "SUBGROUP",
-        // IncludeCollections: 1,
+      
       }),
     );
   }, [dispatch]);
 
   useEffect(() => {
     return () => {
-      dispatch(clearSalesData());
+      dispatch(clearCategoryPerformanceData());
     };
   }, [dispatch]);
 
@@ -149,17 +107,19 @@ const CategoryPerformance = () => {
         endDate: filters.endDate,
         branchcode: filters.branch,
         groupBy: "SUBGROUP",
-                // IncludeCollections: 1,
+              
 
       }),
     );
   };
-  const selectedBranchName =
-    filters.branch == null || filters.branch === ""
-      ? "All Branches"
-      : (salesBranch || []).find(
-          (m) => Number(m.branch_id) === Number(filters.branch),
-        )?.branch_name || "";
+  // const selectedBranchName =
+  //   filters.branch == null || filters.branch === ""
+  //     ? "All Branches"
+  //     :( 
+  //     (salesBranch || []).find(
+  //         (m) => Number(m.branch_id) === Number(filters.branch),
+  //       )?.branch_name || ""
+  //       ).replace(/^AXCESS PHARMACY\s*-\s*/i, "");
 
   document.title = "Category Performance| phAMACore Analytics";
 
@@ -175,7 +135,9 @@ const CategoryPerformance = () => {
 <Row>
   <Col xl={12}>
   <Category
-                categoryPerformance={categoryPerformance}
+                categoryPerformance={categoryTotals}
+                 categoryAvgOrderValue={categoryAvgOrderValue}
+    categoryGrossMargin={categoryGrossMargin}
               rightClickBtn={toggleRightColumn}
 selectedBranchName ={selectedBranchName}
   />
@@ -200,6 +162,7 @@ selectedBranchName ={selectedBranchName}
             onBranchChange={(value) =>
               dispatch(setBranch(value === "" ? null : Number(value)))
             }
+                        onBranchNameChange={setSelectedBranchName}
             onDateRangeChange={(value) => dispatch(setDateRange(value))}
             onStartDateChange={(value) => dispatch(setStartDate(value))}
             onEndDateChange={(value) => dispatch(setEndDate(value))}

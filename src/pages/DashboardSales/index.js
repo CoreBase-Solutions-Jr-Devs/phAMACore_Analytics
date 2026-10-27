@@ -42,6 +42,9 @@ const DashboardSales = () => {
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
 
+const [selectedBranchName, setSelectedBranchName] =
+  useState("All Branches");
+
   const {
     sales = [],
     
@@ -54,7 +57,7 @@ const DashboardSales = () => {
     salesType = [],
     salesBranch = [],
     salesBranch_Type = [],
-    salesChannel = [],
+   
     salesComparativeMTD = [],
     salesComparativeYTD = [],
 
@@ -103,7 +106,7 @@ const DashboardSales = () => {
     salesType,
     salesBranch,
     salesBranch_Type,
-   salesChannel,
+   [], // salesChannel,
     salesComparativeMTD,
     salesComparativeYTD,
     filters,
@@ -194,12 +197,7 @@ const DashboardSales = () => {
       }),
     );
 
-     dispatch(
-      getKPISalesTransactions({
-        ...params,
-        groupBy: "CHANNEL",
-      }),
-    );
+  
 
      dispatch(
       getKPISalesTransactions({
@@ -230,11 +228,12 @@ const DashboardSales = () => {
     );
   }, [dispatch,]);
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearSalesData());
-    };
-  }, [dispatch]);
+useEffect(() => {
+  return () => {
+  
+    dispatch(clearSalesData());
+  };
+}, [dispatch]);
 
   const handleApplyFilters = () => {
     dispatch(
@@ -250,7 +249,7 @@ const DashboardSales = () => {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-      branchcode: branchId,
+        branchcode: filters.branch,
     };
 
     dispatch(
@@ -274,13 +273,7 @@ const DashboardSales = () => {
       }),
     );
 
-    
-     dispatch(
-      getKPISalesTransactions({
-        ...params,
-        groupBy: "CHANNEL",
-      }),
-    );
+  
 
      dispatch(
       getKPISalesTransactions({
@@ -309,15 +302,13 @@ const DashboardSales = () => {
         includeZeroBal: "false",
       }),
     );
-
- 
   };
-  const selectedBranchName =
-    filters.branch == null || filters.branch === ""
-      ? "All Branches"
-      : (salesBranch || []).find(
-          (m) => Number(m.branch_id) === Number(filters.branch),
-        )?.branch_name || "";
+  // const selectedBranchName =
+  //   filters.branch == null || filters.branch === ""
+  //     ? "All Branches"
+  //     : (salesBranch || []).find(
+  //         (m) => Number(m.branch_id) === Number(filters.branch),
+  //       )?.branch_name || "";
         
   document.title = "Sales Dashboard | phAMACore Analytics";
 
@@ -443,6 +434,8 @@ const DashboardSales = () => {
                     onBranchChange={(value) =>
                       dispatch(setBranch(value === "" ? null : Number(value)))
                     }
+                      onBranchNameChange={setSelectedBranchName}
+
                     onDateRangeChange={(value) =>
                       dispatch(setDateRange(value))
                     }

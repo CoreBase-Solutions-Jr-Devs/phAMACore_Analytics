@@ -75,10 +75,10 @@ const MAVERICK_SPEND_GROUP_BYS = [
 const DashboardPurchaseOrders = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
-  const { branchId } = useParams();
+  // const { branchId } = useParams();
 
-  const branchCode = branchId ?? null;
-  const isBranchView = !!branchCode;
+  // const branchCode = branchId ?? null;
+  // const isBranchView = !!branchCode;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -304,7 +304,7 @@ useEffect(() => {
     clientid: 1,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    branchcode: branchId,
+    branchcode: filters.branch,
     itemCode: "",
     supplierCode: "",
     groupBy: "ITEM_MATRIX",
@@ -315,7 +315,7 @@ useEffect(() => {
 
 const goodsReceivedParams = {
   clientid: 1,
-  branchcode: branchId,
+    branchcode: filters.branch,
 };
 
 dispatch(
@@ -340,7 +340,7 @@ dispatch(
       clientid: 1,
       startDate: dates.currentYearStart,
       endDate: dates.today,
-      branchcode: branchId ,
+    branchcode: filters.branch,
     },
     ACTUAL_SPEND_GROUP_BYS
   );
@@ -351,7 +351,7 @@ dispatch(
       clientid: 1,
       startDate: dates.lastYearStart,
       endDate: dates.lastYearToday,
-      branchcode: branchId ,
+    branchcode: filters.branch,
     },
 ACTUAL_SPEND_GROUP_BYS
   );
@@ -362,7 +362,7 @@ ACTUAL_SPEND_GROUP_BYS
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-      branchcode: branchId ,
+    branchcode: filters.branch,
       TopN: 0,
     },
     KPI_GROUP_BYS
@@ -373,7 +373,7 @@ ACTUAL_SPEND_GROUP_BYS
           clientid: 1,
         mode: "AGING",
         accountType: "SUPPLIER",
-          branchcode: branchId,
+    branchcode: filters.branch,
       dateFrom:  filters.startDate,
     dateTo:  filters.endDate,
     periodFrom: getPeriod(filters.startDate),
@@ -388,7 +388,7 @@ ACTUAL_SPEND_GROUP_BYS
     clientid: 1,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    branchcode: branchId,
+    branchcode: filters.branch,
     supplier_code: "",
     TopN: 0,
   },
@@ -401,7 +401,7 @@ dispatchGroupByRequests(
     clientid: 1,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    branchcode: branchId,
+    branchcode: filters.branch,
     ThresholdPerc: 10,
     ChangeType: "ALL",
     ItemCode: "",
@@ -416,7 +416,7 @@ dispatchGroupByRequests(
     clientid: 1,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    branchcode: branchId,
+    branchcode: filters.branch,
     TopN: 0,
   },
   MAVERICK_SPEND_GROUP_BYS
@@ -442,7 +442,7 @@ const handleApplyFilters = () => {
 
 const goodsReceivedParams = {
   clientid: 1,
-  branchcode: filters.branch ?? null,
+    branchcode: filters.branch,
 };
 
 dispatch(
@@ -467,7 +467,7 @@ dispatch(
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-      branchcode: filters.branch ?? null,
+    branchcode: filters.branch,
       TopN: 0,
     },
     KPI_GROUP_BYS
@@ -478,7 +478,7 @@ dispatch(
           clientid: 1,
         mode: "AGING",
         accountType: "SUPPLIER",
-          branchcode: filters.branch ?? null,
+    branchcode: filters.branch,
       dateFrom:  filters.startDate,
     dateTo:  filters.endDate,
     periodFrom: getPeriod(filters.startDate),
@@ -493,7 +493,7 @@ dispatch(
     clientid: 1,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    branchcode: filters.branch ?? null,
+    branchcode: filters.branch,
     supplier_code: "",
     TopN: 0,
   },
@@ -506,7 +506,7 @@ dispatchGroupByRequests(
     clientid: 1,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    branchcode: filters.branch ?? null,
+    branchcode: filters.branch,
     ThresholdPerc: 10,
     ChangeType: "ALL",
     ItemCode: "",
@@ -520,7 +520,7 @@ dispatchGroupByRequests(
     clientid: 1,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    branchcode: filters.branch ?? null,
+    branchcode: filters.branch,
     itemCode: "",
     supplierCode: "",
     groupBy: "ITEM_MATRIX",
@@ -535,21 +535,19 @@ dispatchGroupByRequests(
     clientid: 1,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    branchcode: filters.branch ?? null,
+    branchcode: filters.branch,
     TopN: 0,
   },
   MAVERICK_SPEND_GROUP_BYS
 );
-
-  if (filters.branch) {
-    navigate(
-      `/dashboard-purchase-orders/branch/${filters.branch}`
-    );
-  } else {
-    navigate("/dashboard-purchase-orders");
-  }
 };
-
+  const selectedBranchName =
+    filters.branch == null || filters.branch === ""
+      ? "All Branches"
+      : (salesBranch || []).find(
+          (m) => Number(m.branch_ID) === Number(filters.branch),
+        )?.branch_name || "";
+        
   return (
     <React.Fragment>
       <div className="page-content">
@@ -557,13 +555,8 @@ dispatchGroupByRequests(
           <BreadCrumb
             title="Purchases"
             pageTitle="Dashboards"
-            subtitle={
-              isBranchView
-                ? KPIBranch.find(
-                    (item) => item.branch_ID === Number(branchCode),
-                  )?.branch_name
-                : undefined
-            }
+                subtitle= {selectedBranchName}
+
           />
           <Row>
             <Col>
@@ -578,43 +571,45 @@ dispatchGroupByRequests(
                     priceAlerts={priceAlerts}
                     maverickSpend={maverickSpend}
                     maverickSpendPercentage={maverickSpendPercentage}
+                                  selectedBranchName={selectedBranchName}
+
                     error={error}
                     loading={loading}
                   />
                 </Row>
                 <Row>
                   <Col xl={6}>
-                    {isBranchView ? (
+                    {/* {isBranchView ? (
                       <SalesByLocations
                         data={spendByCategory}
                         totalSpend={totalSpend}
                         error={error}
                         loading={loading}
                       />
-                    ) : (
+                    ) : ( */}
                       <StoreVisits
                         data={branchData}
                         error={error}
                         loading={loading}
                       />
-                    )}
+                    {/* )} */}
                   </Col>
 
                   <Col xl={6}>
-                    {isBranchView ? (
+                    {/* {isBranchView ? (
                       <SupplierSpendBottom
                         supplierData={bottomSuppliers}
                         error={error}
                         loading={loading}
                       />
-                    ) : (
+                    ) : ( */}
                       <SalesByLocations
                         data={spendByCategory}
                         totalSpend={totalSpend}
                         error={error}
                         loading={loading}
                       />
-                    )}
+                    {/* )} */}
                   </Col>
                   <Row>
                     <Col xl={6}>

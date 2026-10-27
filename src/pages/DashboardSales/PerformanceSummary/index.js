@@ -23,7 +23,8 @@ const PerformanceSummary = () => {
   const [rightColumn, setRightColumn] = useState(false);
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
-
+const [selectedBranchName, setSelectedBranchName] =
+  useState("All Branches");
   const {
     salesTargetSummary = [],
     salesTargetBranch = [],
@@ -187,12 +188,12 @@ const PerformanceSummary = () => {
       }),
     );
   };
-  const selectedBranchName =
-    filters.branch == null || filters.branch === ""
-      ? "All Branches"
-      : (salesTargetBranch || []).find(
-          (m) => Number(m.branchID) === Number(filters.branch),
-        )?.branchName || "Unknown Branch";
+  // const selectedBranchName =
+  //   filters.branch == null || filters.branch === ""
+  //     ? "All Branches"
+  //     : (salesTargetBranch || []).find(
+  //         (m) => Number(m.branchID) === Number(filters.branch),
+  //       )?.branchName || "Unknown Branch";
 
   document.title = "Performance Summary| phAMACore Analytics";
 
@@ -231,6 +232,8 @@ const PerformanceSummary = () => {
             onBranchChange={(value) =>
               dispatch(setBranch(value === "" ? null : Number(value)))
             }
+                        onBranchNameChange={setSelectedBranchName}
+
             onDateRangeChange={(value) => dispatch(setDateRange(value))}
             onStartDateChange={(value) => dispatch(setStartDate(value))}
             onEndDateChange={(value) => dispatch(setEndDate(value))}

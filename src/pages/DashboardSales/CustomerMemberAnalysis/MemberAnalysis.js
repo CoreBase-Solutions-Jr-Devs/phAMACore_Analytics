@@ -1,6 +1,11 @@
 
 import React from "react";
 import { Card, CardBody, CardHeader, Badge } from "reactstrap";
+import {
+  exportToExcel,
+  triggerPrint,
+} from "../../../helpers/export_helper";
+import CardExportButtons from "../../../Components/Common/CardExportButtons";
 
 const MemberAnalysis = ({
   newCohortMemberCount,
@@ -88,6 +93,31 @@ const MemberAnalysis = ({
     return "bg-success-subtle text-success";
   };
 
+  const handleExportExcel = () => {
+  const rows = cohorts.map((item) => ({
+    Cohort: item.name,
+    Members: Number(item.members ?? 0),
+    Transactions: Number(item.transactions ?? 0),
+    "Sales Excl. Tax (KES)": Number(item.salesExcl ?? 0),
+    "Sales Incl. Tax (KES)": Number(item.salesIncl ?? 0),
+    "Average Basket (KES)": Number(item.averageBasket ?? 0),
+    "Sales Contribution (%)": Number(item.contribution ?? 0),
+  }));
+
+  const todayStr = new Date()
+    .toLocaleDateString("en-GB")
+    .replace(/\//g, "-");
+
+  exportToExcel(
+    rows,
+    `Customer_Cohort_Analysis_${todayStr}`,
+  );
+};
+
+const handlePrint = () => {
+  triggerPrint();
+};
+
   return (
     <Card
       className="card-height-100 border shadow-sm"
@@ -103,13 +133,13 @@ const MemberAnalysis = ({
               Customer segments, transaction activity, and sales contribution
             </p>
           </div>
-{/* 
-          <Badge
-            color="light"
-            className="text-dark border px-1 py-1"
-          >
-            {cohorts.length} Cohorts
-          </Badge> */}
+ <div className="ms-auto">
+    <CardExportButtons
+      targetId="margin-drilldown-card"
+      title="Margin Drilldown"
+      onExport={handleExportExcel}
+    />
+  </div>
         </div>
       </CardHeader>
 

@@ -29,6 +29,8 @@ import StockInventoryReducer from "./dashboardStock/reducer";
 
 // Dashboard My Business
 import DashboardMyBusinessReducer from "./dashboardMyBusiness/reducer";
+import SalesBreakdownReducer from "./dashboardSales/SalesBreakdown/reducer";
+import CategoryPerformanceReducer from "./dashboardSales/CategoryPerformance/reducer";
 
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
@@ -48,6 +50,8 @@ const rootReducer = combineReducers({
     salesTarget:SalesTargetReducer,
     marginAnalysis:MarginAnalysisReducer,
     customerMemberAnalysis:CustomerMemberAnalysisReducer,
+     salesBreakdown:SalesBreakdownReducer,
+    categoryPerformance:CategoryPerformanceReducer,
 });
 
 export default rootReducer;

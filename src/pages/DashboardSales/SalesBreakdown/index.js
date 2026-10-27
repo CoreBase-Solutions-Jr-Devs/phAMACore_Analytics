@@ -9,13 +9,13 @@ import {
   setDateRange,
   setStartDate,
   setEndDate,
-} from "../../../slices/dashboardSales/reducer";
+} from "../../../slices/dashboardSales/SalesBreakdown/reducer";
 // import Customer from "./Customer";
 import Breakdown from "./Breakdown";
 import Performance from "./Performance";
 import useSalesAnalytics from "../../../Components/Hooks/useSalesAnalytics";
 import { getKPISalesTransactions } from "../../../slices/dashboardSales/thunk";
-import { clearSalesData } from "../../../slices/dashboardSales/reducer";
+import { clearSalesBreakdownData } from "../../../slices/dashboardSales/SalesBreakdown/reducer";
 // import { groupBy } from "lodash";
 
 const SalesBreakdown = () => {
@@ -24,16 +24,18 @@ const SalesBreakdown = () => {
   const [rightColumn, setRightColumn] = useState(false);
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
-
+const [selectedBranchName, setSelectedBranchName] =
+  useState("All Branches");
   const {
-    // salesTargetSummary = [],
-    // salesTargetBranch = [],
-    performanceSummary,
-    salesBranch = [],
+  
     salesChannel = [],
     filters,
     loading,
     error,
+  } = useSelector((state) => state.salesBreakdown);
+    const {
+    salesBranch = [],
+  
   } = useSelector((state) => state.powerbi);
 
   const {
@@ -121,24 +123,32 @@ const SalesBreakdown = () => {
     filters,
   );
 
-  useEffect(() => {
-    dispatch(
-      getKPISalesTransactions({
-        clientid: 1,
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        branchcode: filters.branch,
-        groupBy: "CHANNEL",
-        // IncludeCollections: 1,
-      }),
-    );
-  }, [dispatch]);
+useEffect(() => {
+  const params = {
+    clientid: 1,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    branchcode: filters.branch,
+    groupBy: "CHANNEL",
+  };
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearSalesData());
-    };
-  }, [dispatch]);
+  console.log(
+    "%c[SalesBreakdown] Initial API request",
+    "color: blue; font-weight: bold;",
+    params,
+  );
+
+  console.trace("[SalesBreakdown] Dispatch call stack");
+
+  dispatch(getKPISalesTransactions(params));
+}, [dispatch]);
+
+useEffect(() => {
+  return () => {
+    console.log("[SalesBreakdown] Unmounting — clearSalesData dispatched");
+    dispatch(clearSalesBreakdownData());
+  };
+}, [dispatch]);
 
   const handleApplyFilters = () => {
     dispatch(
@@ -152,12 +162,12 @@ const SalesBreakdown = () => {
       }),
     );
   };
-  const selectedBranchName =
-    filters.branch == null || filters.branch === ""
-      ? "All Branches"
-      : (salesBranch || []).find(
-          (m) => Number(m.branchID) === Number(filters.branch),
-        )?.branchName || "";
+  // const selectedBranchName =
+  //   filters.branch == null || filters.branch === ""
+  //     ? "All Branches"
+  //     : (salesBranch || []).find(
+  //         (m) => Number(m.branchID) === Number(filters.branch),
+  //       )?.branchName || "";
 
   document.title = "Sales Breakdown| phAMACore Analytics";
 
@@ -177,7 +187,7 @@ const SalesBreakdown = () => {
               OTHER_ACCOUNT={OTHER_ACCOUNT}
               RETURN={RETURN}
               TOTAL={TOTAL}
-              performanceSummary={performanceSummary}
+              // performanceSummary={performanceSummary}
               selectedBranchName={selectedBranchName}
               loading={loading}
               error={error}
@@ -203,6 +213,7 @@ const SalesBreakdown = () => {
             onBranchChange={(value) =>
               dispatch(setBranch(value === "" ? null : Number(value)))
             }
+            onBranchNameChange={setSelectedBranchName}
             onDateRangeChange={(value) => dispatch(setDateRange(value))}
             onStartDateChange={(value) => dispatch(setStartDate(value))}
             onEndDateChange={(value) => dispatch(setEndDate(value))}

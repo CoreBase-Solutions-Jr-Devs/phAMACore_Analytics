@@ -108,10 +108,12 @@ const BranchTarget = ({
       };
 
       // Initialise all 12 months.
-      MONTHS.forEach(({ key }) => {
-        row[`${key}Sales`] = 0;
-        row[`${key}Target`] = 0;
-      });
+  MONTHS.forEach(({ key }) => {
+  row[`${key}Sales`] = 0;
+  row[`${key}Target`] = 0;
+  row[`${key}Variance`] = 0;
+  row[`${key}Achievement`] = 0;
+});
 
       // Populate the monthly Sales and Target values.
       branchRecords.forEach((item) => {
@@ -134,6 +136,13 @@ const BranchTarget = ({
         row[`${month.key}Target`] = Number(
           item.targetSales ?? 0
         );
+         row[`${month.key}Variance`] = Number(
+    item.variance ?? 0,
+  );
+
+  row[`${month.key}Achievement`] = Number(
+    item.achievementPct ?? 0,
+  );
       });
 
       return row;
@@ -192,16 +201,19 @@ const BranchTarget = ({
         Branch: branch.branchName,
       };
 
-      MONTHS.forEach((month) => {
-        const sales = branch[`${month.key}Sales`];
-        const target = branch[`${month.key}Target`];
-        const variance = getVariancePct(sales, target);
+     MONTHS.forEach((month) => {
+  const sales = branch[`${month.key}Sales`];
+  const target = branch[`${month.key}Target`];
+  const variance = branch[`${month.key}Variance`];
+  const achievement = branch[`${month.key}Achievement`];
 
-        row[`${month.label} Sales (KES)`] = Number(sales ?? 0);
-        row[`${month.label} Target (KES)`] = Number(target ?? 0);
-        row[`${month.label} Var (%)`] =
-          variance == null ? "" : Number(variance.toFixed(1));
-      });
+  row[`${month.label} Sales (KES)`] = Number(sales ?? 0);
+  row[`${month.label} Target (KES)`] = Number(target ?? 0);
+  row[`${month.label} Variance (KES)`] = Number(variance ?? 0);
+  row[`${month.label} Achievement (%)`] = Number(
+    achievement ?? 0,
+  );
+});
 
       return row;
     });
@@ -305,7 +317,7 @@ const BranchTarget = ({
                     {MONTHS.map((month) => (
                       <th
                         key={month.key}
-                        colSpan={3}
+                        colSpan={4}
                         className="table-light text-center"
                         style={{
                           backgroundColor: "#f3f6f9",
@@ -333,14 +345,15 @@ const BranchTarget = ({
                           Target
                         </th>
 
-                        <th
-                          className="table-light text-end fw-normal"
-                          style={{
-                            borderRight: "1px solid #cbd5e1",
-                          }}
-                        >
-                          Var %
-                        </th>
+                     < th className="table-light text-end fw-normal">
+      Var (KES)
+    </th>
+    <th
+      className="table-light text-end fw-normal"
+      style={{ borderRight: "1px solid #cbd5e1" }}
+    >
+      Pct (%)
+    </th>
                       </React.Fragment>
                     ))}
                   </tr>
@@ -370,10 +383,8 @@ const BranchTarget = ({
                           const target =
                             branch[`${month.key}Target`];
 
-                          const percentage = getVariancePct(
-                            sales,
-                            target
-                          );
+                         const variance = branch[`${month.key}Variance`];
+  const achievement = branch[`${month.key}Achievement`];
 
                           return (
                             <React.Fragment key={month.key}>
@@ -391,23 +402,28 @@ const BranchTarget = ({
                                 {formatAmount(target)}
                               </td>
 
-                              <td
-                                className="text-end"
-                                style={{
-                                  borderRight:
-                                    "1px solid #cbd5e1",
-                                }}
-                              >
-                                <Badge
-                                  className={getBadgeColor(
-                                    percentage
-                                  )}
-                                >
-                                  {percentage == null
-                                    ? "0"
-                                    : `${percentage.toFixed(1)}%`}
-                                </Badge>
-                              </td>
+                            <td
+        className="text-end fw-semibold"
+        style={{
+          color:
+            variance > 0
+              ? "#198754"
+              : variance < 0
+                ? "#dc3545"
+                : undefined,
+        }}
+      >
+        {formatAmount(variance)}
+      </td>
+
+      <td
+        className="text-end"
+        style={{ borderRight: "1px solid #cbd5e1" }}
+      >
+        <Badge className={getBadgeColor(achievement)}>
+          {achievement.toFixed(1)}%
+        </Badge>
+      </td>
                             </React.Fragment>
                           );
                         })}
@@ -416,7 +432,7 @@ const BranchTarget = ({
                   ) : (
                     <tr>
                       <td
-                        colSpan={1 + MONTHS.length * 3}
+                        colSpan={1 + MONTHS.length * 4}
                         className="text-center py-4 text-muted"
                       >
                         {sourceData.length === 0

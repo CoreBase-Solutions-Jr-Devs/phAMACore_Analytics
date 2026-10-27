@@ -25,6 +25,8 @@ const CustomerMemberAnalysis = () => {
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
 
+  const [selectedBranchName, setSelectedBranchName] =
+    useState("All Branches");
   const {
 
     customerMemberAnalysis= [],
@@ -173,16 +175,14 @@ const {
             groupBy: "COHORT",
           }),
         );
-      console.log("SELECT BUTTON CLICKED");
-  console.log("Current filters:", filters);
-  console.log("API request parameters:", params);
+  
   };
-  const selectedBranchName =
-  filters.branch == null || filters.branch === ""
-    ? "All Branches"
-    : (customerMemberAnalysisBranch || []).find(
-        (m) => Number(m.branch_id) === Number(filters.branch),
-      )?.branch_name || "Unknown Branch";
+  // const selectedBranchName =
+  // filters.branch == null || filters.branch === ""
+  //   ? "All Branches"
+  //   : (customerMemberAnalysisBranch || []).find(
+  //       (m) => Number(m.branch_id) === Number(filters.branch),
+  //     )?.branch_name || "Unknown Branch";
 
   document.title = "Customer Member Analysis | phAMACore Analytics";
 
@@ -255,6 +255,8 @@ const {
           onBranchChange={(value) =>
             dispatch(setBranch(value === "" ? null : Number(value)))
           }
+                      onBranchNameChange={setSelectedBranchName}
+
           onDateRangeChange={(value) =>
             dispatch(setDateRange(value))
           }
