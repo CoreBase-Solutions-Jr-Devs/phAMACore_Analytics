@@ -314,7 +314,7 @@ const DashboardSales = () => {
   };
   const selectedBranchName =
     filters.branch == null || filters.branch === ""
-      ? ""
+      ? "All Branches"
       : (salesBranch || []).find(
           (m) => Number(m.branch_id) === Number(filters.branch),
         )?.branch_name || "";

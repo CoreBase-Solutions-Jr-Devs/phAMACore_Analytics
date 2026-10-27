@@ -117,13 +117,14 @@ const PerformanceSummary = () => {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-      branchcode: filters.branch,
+   
       PivotMetric: 'ALL',
     };
 
     dispatch(
       getSalesTarget({
         ...params,
+           branchcode: filters.branch,
         groupBy: "SUMMARY",
       }),
     );
@@ -131,12 +132,14 @@ const PerformanceSummary = () => {
     dispatch(
       getSalesTarget({
         ...params,
+           branchcode: filters.branch,
         groupBy: "BRANCH",
       }),
     );
        dispatch(
       getSalesTarget({
         ...params,
+        
         groupBy: "MONTHLY",
           startDate: dateRanges.currentYearStart,
   endDate: dateRanges.today,
@@ -156,13 +159,14 @@ const PerformanceSummary = () => {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-      branchcode: filters.branch,
+
      PivotMetric: 'ALL',
     };
 
     dispatch(
       getSalesTarget({
         ...params,
+              branchcode: filters.branch,
         groupBy: "SUMMARY",
       }),
     );
@@ -170,6 +174,7 @@ const PerformanceSummary = () => {
     dispatch(
       getSalesTarget({
         ...params,
+              branchcode: filters.branch,
         groupBy: "BRANCH",
       }),
     );
