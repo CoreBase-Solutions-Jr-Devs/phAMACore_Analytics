@@ -5,7 +5,7 @@ import TableContainer from "../../../../Components/Common/TableContainerReactTab
 import { useSelector } from "react-redux";
 import { exportToExcel } from "../../../../helpers/export_helper";
 import FloatingTooltip from "../../../../Components/Common/FloatingTooltip";
-import { getExpiryRows } from "../../../utils/StockInventoryUtils";
+import { getExpiryRows, EXPIRY_BUCKETS } from "../../../utils/StockInventoryUtils";
 import { formatCompact } from "../../../utils/formatHelper";
 
 const mapRowForTable = (row) => ({
@@ -56,8 +56,10 @@ const ExpiryProductTable = ({
     exportPrefix = "ExpiryWatch_Stock",
     searchPlaceholder = "Search Products...",
     searchIdPrefix = "table-search",
+    actionOptions = null,
 }) => {
     const [searchValue, setSearchValue] = useState("");
+    const [actionFilter, setActionFilter] = useState("ALL");
     const [hoverInfo, setHoverInfo] = useState(null);
 
     const handleCellHover = (e, info) => {
@@ -85,15 +87,22 @@ const ExpiryProductTable = ({
         [rows]
     );
 
+    // Client-side only: counts per action from the main-filtered rows
+    const actionCounts = useMemo(
+        () => rows.reduce((acc, row) => ({ ...acc, [row.status]: (acc[row.status] || 0) + 1 }), {}),
+        [rows]
+    );
+
     const filteredTable = useMemo(() => {
         const term = searchValue.trim().toLowerCase();
-        if (!term) return rows;
+        const byAction = actionFilter === "ALL" ? rows : rows.filter((row) => row.status === actionFilter);
+        if (!term) return byAction;
 
-        return rows.filter((row) =>
+        return byAction.filter((row) =>
             [row.product, row.batch, row.branch, row.date, row.total, row.status, row.value]
                 .some((field) => String(field ?? "").toLowerCase().includes(term))
         );
-    }, [rows, searchValue]);
+    }, [rows, searchValue, actionFilter]);
 
     const columns = useMemo(
         () => [
@@ -262,6 +271,29 @@ const ExpiryProductTable = ({
                     </div>
                 </div>
 
+                {actionOptions && (
+                    <div className="d-flex flex-wrap gap-1 no-print" role="group" aria-label="Filter by action">
+                        {[{ action: "ALL", color: "secondary" }, ...actionOptions].map(({ action, color }) => {
+                            const isActive = actionFilter === action;
+                            const count = action === "ALL" ? rows.length : actionCounts[action] || 0;
+                            return (
+                                <button
+                                    key={action}
+                                    type="button"
+                                    className={`btn btn-sm ${isActive ? `btn-${color}` : `btn-outline-${color}`}`}
+                                    onClick={() => setActionFilter(action)}
+                                    aria-pressed={isActive}
+                                >
+                                    {action === "ALL" ? "All" : action}
+                                    <span className={`badge ms-1 ${isActive ? "bg-light text-body" : `bg-${color}`}`}>
+                                        {count.toLocaleString()}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
+
                 <button
                     type="button"
                     className="btn btn-sm btn-soft-success btn-export-excel d-flex align-items-center gap-1 no-print"
@@ -288,6 +320,9 @@ const ExpiryProductTable = ({
         </div>
     );
 };
+
+// Write-Off Risk actions (excludes the "expired" bucket)
+const WRITE_OFF_ACTIONS = EXPIRY_BUCKETS.filter((b) => b.id !== "expired");
 
 const CustomTableOne = () => {
     const {
@@ -348,6 +383,7 @@ const CustomTableOne = () => {
                 exportPrefix="WriteOff_Risk_Stock"
                 searchPlaceholder="Search Write-Off Risk Products..."
                 searchIdPrefix="writeoff-table-search"
+                actionOptions={WRITE_OFF_ACTIONS}
             />
 
             <hr className="my-4" />
