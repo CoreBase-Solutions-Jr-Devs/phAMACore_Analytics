@@ -103,24 +103,24 @@ const BarChartOne = ({
         colors: resolvedColors,
         dataLabels: { enabled: false },
         stroke: { width: 1, colors: ['transparent'] },
-        annotations: {
-            xaxis: [
-                {
-                    x: reorderLine,
-                    borderColor: '#c58c4f',
-                    borderWidth: 2,
-                    strokeDashArray: 4,
-                    label: {
-                        borderColor: '#c58c4f',
-                        style: { color: '#fff', background: '#c58c4f', fontSize: '10px' },
-                        text: `Reorder @ ${reorderLine}d`,
-                        position: 'top',
-                        orientation: 'horizontal',
-                        offsetY: -4,
-                    },
-                },
-            ],
-        },
+        // annotations: {
+        //     // xaxis: [
+        //     //     // {
+        //     //     //     // x: reorderLine,
+        //     //     //     // borderColor: '#c58c4f',
+        //     //     //     // borderWidth: 2,
+        //     //     //     // strokeDashArray: 4,
+        //     //     //     // label: {
+        //     //     //     //     borderColor: '#c58c4f',
+        //     //     //     //     style: { color: '#fff', background: '#c58c4f', fontSize: '10px' },
+        //     //     //     //     text: `Reorder @ ${reorderLine}d`,
+        //     //     //     //     position: 'top',
+        //     //     //     //     orientation: 'horizontal',
+        //     //     //     //     offsetY: -4,
+        //     //     //     // },
+        //     //     // },
+        //     // ],
+        // },
         xaxis: {
             min: 0,
             max: axisMax,
@@ -268,9 +268,9 @@ const BarChartOne = ({
             <div className="px-2 pt-3 mt-2 border-top">
                 <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div>
-                        <div className="text-muted small mb-1">
+                        {/* <div className="text-muted small mb-1">
                             <strong>Threshold:</strong> Vertical Line = Reorder @ {reorderLine} days of cover.
-                        </div>
+                        </div> */}
 
                         <div className="d-flex flex-wrap gap-3 small">
                             {LEGEND_ITEMS.map(({ color, label }) => (

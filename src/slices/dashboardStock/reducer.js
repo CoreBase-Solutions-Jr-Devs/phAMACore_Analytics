@@ -127,13 +127,24 @@ const StockInventorySlice = createSlice({
           break;
         }
 
-        case "Month to Date":
+        case "Month To Date":
         case "This Month": {
           const today = new Date();
           const start = new Date(today.getFullYear(), today.getMonth(), 1);
 
           state.filters.startDate = formatDMY(start);
           state.filters.endDate = formatDMY(today);
+          break;
+        }
+
+        case "Month To Yesterday": {
+          const today = new Date();
+          const start = new Date(today.getFullYear(), today.getMonth(), 1);
+          const end = new Date(today);
+          end.setDate(end.getDate() - 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
           break;
         }
 
@@ -164,6 +175,17 @@ const StockInventorySlice = createSlice({
 
           state.filters.startDate = formatDMY(start);
           state.filters.endDate = formatDMY(today);
+          break;
+        }
+
+        case "Year To Yesterday": {
+          const today = new Date();
+          const start = new Date(today.getFullYear(), 0, 1);
+          const end = new Date(today);
+          end.setDate(end.getDate() - 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(end);
           break;
         }
 

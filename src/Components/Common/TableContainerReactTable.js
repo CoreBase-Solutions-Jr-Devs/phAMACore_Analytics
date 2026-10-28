@@ -1,12 +1,8 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { CardBody, Col, Row, Table } from "reactstrap";
-import { Link } from "react-router-dom";
+import TablePagination from "./TablePagination";
 
 import {
-  Column,
-  Table as ReactTable,
-  ColumnFiltersState,
-  FilterFn,
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
@@ -105,31 +101,24 @@ const TableContainer = ({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel()
+    getSortedRowModel: getSortedRowModel(),
+    initialState: { pagination: { pageIndex: 0, pageSize: customPageSize || 10 } },
   });
 
-  const {
-    getHeaderGroups,
-    getRowModel,
-    getCanPreviousPage,
-    getCanNextPage,
-    getPageOptions,
-    setPageIndex,
-    nextPage,
-    previousPage,
-    setPageSize,
-    getState
-  } = table;
+  const { getHeaderGroups, getRowModel, getPageCount, getPrePaginationRowModel, setPageIndex, setPageSize, getState } = table;
 
   useEffect(() => {
-    (customPageSize) && setPageSize((customPageSize));
+    customPageSize && setPageSize(customPageSize);
   }, [customPageSize, setPageSize]);
 
   const { pageIndex, pageSize } = getState().pagination;
-  const totalResults = data.length;
-  const startResult = totalResults === 0 ? 0 : pageIndex * pageSize + 1;
-  const endResult = Math.min((pageIndex + 1) * pageSize, totalResults);
-  
+  const pageCount = getPageCount();
+
+  // Keep the page in range if the row count shrinks (search, branch change, refresh)
+  useEffect(() => {
+    if (pageCount > 0 && pageIndex > pageCount - 1) setPageIndex(pageCount - 1);
+  }, [pageCount, pageIndex, setPageIndex]);
+
   return (
     <Fragment>
       {isGlobalFilter && <Row className="mb-3">
@@ -206,29 +195,13 @@ const TableContainer = ({
         </Table>
       </div>
 
-      <Row className="align-items-center mt-2 g-3 text-center text-sm-start">
-        <div className="col-sm">
-          <div className="text-muted">Showing{" "}<span className="fw-semibold">{startResult}</span> - <span className="fw-semibold">{endResult}</span> {" "}of{" "} <span className="fw-semibold">{totalResults}</span>{" "}Results
-          </div>
-        </div>
-        <div className="col-sm-auto">
-          <ul className="pagination pagination-separated pagination-md justify-content-center justify-content-sm-start mb-0">
-            <li className={!getCanPreviousPage() ? "page-item disabled" : "page-item"}>
-              <Link to="#" className="page-link" onClick={previousPage}>Previous</Link>
-            </li>
-            {getPageOptions().map((item, key) => (
-              <React.Fragment key={key}>
-                <li className="page-item">
-                  <Link to="#" className={getState().pagination.pageIndex === item ? "page-link active" : "page-link"} onClick={() => setPageIndex(item)}>{item + 1}</Link>
-                </li>
-              </React.Fragment>
-            ))}
-            <li className={!getCanNextPage() ? "page-item disabled" : "page-item"}>
-              <Link to="#" className="page-link" onClick={nextPage}>Next</Link>
-            </li>
-          </ul>
-        </div>
-      </Row>
+      <TablePagination
+        pageIndex={pageIndex}
+        pageCount={pageCount}
+        pageSize={pageSize}
+        totalResults={getPrePaginationRowModel().rows.length}
+        onPageChange={setPageIndex}
+      />
     </Fragment>
   );
 };

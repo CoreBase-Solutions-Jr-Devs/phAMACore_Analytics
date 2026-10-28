@@ -10,7 +10,8 @@ const ITEMS_PER_PAGE = 15;
 
 const ABC_HELP =
     "ABC class ranks items by sales revenue over the last 90 days, company-wide. " +
-    "Class A items are the top sellers that together make up about 80% of revenue.";
+    "Class A items are the top sellers that together make up 80% of revenue." +
+    "Class B items are the next 15% of revenue, and Class C items are the remaining 5%.";
 const ORDER_HELP =
     "Estimate only: one month of demand plus the minimum level, less stock on hand. " +
     "It ignores stock on order, pack sizes and supplier minimums.";
@@ -412,11 +413,9 @@ const CriticalStockChart = () => {
                                                 <small className="text-muted d-block">{item.item_code}</small>
                                             </td>
                                             <td className="text-muted">
-                                                {item.item_group || "-"}
+                                                {/* {item.item_group || "-"} */}
                                                 <small className="text-muted d-block">
-                                                    {item.item_subgroup === "Unassigned" ? "-" :
-                                                        item.item_subgroup || "-"
-                                                    }
+                                                    {item.item_subgroup}
                                                 </small>
                                             </td>
                                             <td>{branchName}</td>
@@ -461,9 +460,9 @@ const CriticalStockChart = () => {
                     </div>
 
                     <div className="px-2 pt-3 mt-2 border-top d-flex align-items-center justify-content-between flex-wrap gap-3">
-                        <div className="text-muted small">
+                        {/* <div className="text-muted small">
                             <strong>Threshold:</strong> Vertical Line = Reorder @ 7 days of cover.
-                        </div>
+                        </div> */}
                         <div className="ms-auto">
                             {abcFilterControl}
                         </div>

@@ -52,11 +52,18 @@ export const computeDateRangeValues = (type, currentStart = "", currentEnd = "")
       return { startDate: formatDMY(start), endDate: formatDMY(end) };
     }
 
-    case "Month to Date":
     case "Month To Date": {
       const now = new Date();
       const start = new Date(now.getFullYear(), now.getMonth(), 1);
       return { startDate: formatDMY(start), endDate: formatDMY(now) };
+    }
+
+    case "Month To Yesterday":{
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const yesterday = new Date();
+      yesterday.setDate(now.getDate() - 1);
+      return { startDate: formatDMY(start), endDate: formatDMY(yesterday)};      
     }
 
     case "Last Month": {
@@ -78,6 +85,14 @@ export const computeDateRangeValues = (type, currentStart = "", currentEnd = "")
       const now = new Date();
       const start = new Date(now.getFullYear(), 0, 1);
       return { startDate: formatDMY(start), endDate: formatDMY(now) };
+    }
+
+    case "Year To Yesterday": {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 1);
+      const yesterday = new Date();
+      yesterday.setDate(now.getDate() - 1);
+      return { startDate: formatDMY(start), endDate: formatDMY(yesterday) };
     }
 
     case "Last Year": {
