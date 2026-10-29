@@ -26,11 +26,6 @@ const CategoryPerformance = () => {
 const [selectedBranchName, setSelectedBranchName] =
   useState("All Branches");
 
-  const {
-  
-    salesBranch = [],
-
-  } = useSelector((state) => state.powerbi);
  const {
     // salesTargetSummary = [],
     // salesTargetBranch = [],
@@ -138,6 +133,8 @@ const [selectedBranchName, setSelectedBranchName] =
                 categoryPerformance={categoryTotals}
                  categoryAvgOrderValue={categoryAvgOrderValue}
     categoryGrossMargin={categoryGrossMargin}
+      loading={loading}
+              error={error}
               rightClickBtn={toggleRightColumn}
 selectedBranchName ={selectedBranchName}
   />
@@ -151,7 +148,7 @@ selectedBranchName ={selectedBranchName}
               selectedBranchName={selectedBranchName}
               loading={loading}
               error={error}
-              rightClickBtn={toggleRightColumn}
+              // rightClickBtn={toggleRightColumn}
             />
           </Col>
           <FilterActions

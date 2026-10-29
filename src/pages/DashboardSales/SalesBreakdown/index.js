@@ -203,6 +203,8 @@ useEffect(() => {
               OTHER_ACCOUNT={OTHER_ACCOUNT}
               RETURN={RETURN}
               TOTAL={TOTAL}
+                 loading={loading}
+              error={error}
             />
           </Col>
           <FilterActions

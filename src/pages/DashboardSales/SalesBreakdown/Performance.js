@@ -166,7 +166,7 @@ const handlePrint = () => {
                   <p className="font-medium mb-0">Total</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-secondary">
-                    {Number(TOTAL?.total_sales_incl ?? 0).toLocaleString(
+                    KES {Number(TOTAL?.total_sales_incl ?? 0).toLocaleString(
                       "en-KE",
                     )}
                   </h3>
@@ -191,7 +191,7 @@ const handlePrint = () => {
                   <p className="font-medium mb-0">Insurance</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-warning">
-                    {Number(INSURANCE?.total_sales_incl ?? 0).toLocaleString(
+                    KES {Number(INSURANCE?.total_sales_incl ?? 0).toLocaleString(
                       "en-KE",
                     )}
                   </h3>
@@ -217,7 +217,7 @@ const handlePrint = () => {
                   <p className="font-medium mb-0">Other_Account</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-danger">
-                    {Number(OTHER_ACCOUNT?.total_sales_incl ?? 0).toLocaleString(
+                   KES {Number(OTHER_ACCOUNT?.total_sales_incl ?? 0).toLocaleString(
                       "en-KE",
                     )}
                   </h3>
@@ -242,7 +242,9 @@ const handlePrint = () => {
                   <p className="font-medium mb-0">Return</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-danger">
-                    {Number(RETURN?.total_sales_incl ?? 0)}
+                    KES {Number(RETURN?.total_sales_incl ?? 0).toLocaleString(
+                      "en-KE",
+                    )}
                   </h3>
                 </div>
               
@@ -265,7 +267,9 @@ const handlePrint = () => {
                   <p className="font-medium mb-0">Cash</p>
 
                   <h3 className="mt-2 ff-secondary fw-semibold text-danger">
-                    {Number(CASH?.total_sales_incl ?? 0)}
+                    KES {Number(CASH?.total_sales_incl ?? 0).toLocaleString(
+                      "en-KE",
+                    )}
                   </h3>
                 </div>
 

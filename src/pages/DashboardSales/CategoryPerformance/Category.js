@@ -135,19 +135,19 @@ const handleExportExcel = () => {
             </button>
           </div>
         </div>
-        {loading ? (
-          <div className="text-center py-5">
-            <div
-              className="spinner-border text-primary"
-              role="status"
-              aria-label="Loading performance metrics"
-            ></div>
-          </div>
-        ) : error ? (
-          <div className="text-center py-5">
-            <p className="text-danger mb-0">{error}</p>
-          </div>
-        ) : (
+       {loading ? (
+        <div className="text-center py-5">
+          <div
+            className="spinner-border text-primary"
+            role="status"
+            aria-label="Loading performance metrics"
+          ></div>
+        </div>
+      ) : error ? (
+        <div className="text-center py-5">
+          <p className="text-danger mb-0">{error}</p>
+        </div>
+      ) : (
           <Row
             className="g-2 row-cols-1 row-cols-sm-2 row-cols-md-3  row-cols-lg-4"
             id="margin-band-widgets"
