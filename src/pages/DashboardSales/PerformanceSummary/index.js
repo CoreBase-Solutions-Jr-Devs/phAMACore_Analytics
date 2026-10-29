@@ -223,6 +223,8 @@ const [selectedBranchName, setSelectedBranchName] =
           
           <BranchTarget 
           data = {performanceSummaryMONTHLY}/>
+             loading={loading}
+              error={error}
           </Col>
            <FilterActions
             branch={filters.branch}

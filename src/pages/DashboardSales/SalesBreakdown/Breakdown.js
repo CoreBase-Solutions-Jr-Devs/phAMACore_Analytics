@@ -23,38 +23,26 @@ const Breakdown = ({
     { sales_channel: "RETURN", ...(RETURN ?? {}) },
   ];
 
-  const formatAmount = (value) =>
-    Number(value ?? 0).toLocaleString("en-KE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+  const formatAmount = (value) => Number(value ?? 0).toLocaleString("en-KE");
 
-  const formatNumber = (value) =>
-    Number(value ?? 0).toLocaleString("en-KE");
+  const formatNumber = (value) => Number(value ?? 0).toLocaleString("en-KE");
 
   const getBadgeColor = (percentage) => {
-    if (
-      percentage == null ||
-      percentage === "" ||
-      Number.isNaN(Number(percentage))
-    ) {
-      return "bg-danger-subtle text-danger";
+    if (percentage == null || Number.isNaN(Number(percentage))) {
+      return "bg-warning-subtle text-warning";
     }
 
-    const value = Number(percentage);
+    // if (percentage < 0) {
+    //   return "bg-danger-subtle text-danger";
+    // }
 
-    if (value < 10) {
-      return "bg-danger-subtle text-danger";
+    if (percentage < 10) {
+      return "bg-danger-subtle text-danger-emphasis";
     }
 
-    if (value < 50) {
-      return "bg-warning-subtle text-warning-emphasis";
+    if (percentage < 50) {
+      return "bg-primary-subtle text-primary-emphasis";
     }
-
-    if (value < 100) {
-      return "bg-info-subtle text-info";
-    }
-
     return "bg-success-subtle text-success";
   };
 
@@ -97,38 +85,36 @@ const Breakdown = ({
       "Sales Share (%)": Number(item.sales_share_perc ?? 0),
     }));
 
-    const todayStr = new Date()
-      .toLocaleDateString("en-GB")
-      .replace(/\//g, "-");
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
 
-    const safeBranchName = (selectedBranchName || "All_Branches")
-      .replace(/[^a-z0-9_-]/gi, "_");
+    const safeBranchName = (selectedBranchName || "All_Branches").replace(
+      /[^a-z0-9_-]/gi,
+      "_",
+    );
 
     exportToExcel(
       rows,
-      `Sales_Channel_Performance_${safeBranchName}_${todayStr}`
+      `Sales_Channel_Performance_${safeBranchName}_${todayStr}`,
     );
   };
 
   return (
     <Card className="card-height-100" id="sales-top-customers-card">
-     <CardHeader className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-  <div>
-    <h4 className="card-title mb-1">
-      Sales Channel Performance
-    </h4>
-    <p className="text-muted mb-0 fs-6">
-      Overview of sales, profitability, and transaction activity
-      across channels
-    </p>
-  </div>
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-2 gap-2">
+        <div>
+          <h4 className="card-title mb-1">Sales Channel Performance</h4>
+          <p className="text-muted mb-0 fs-6">
+            Overview of sales, profitability, and transaction activity across
+            channels
+          </p>
+        </div>
 
-  <CardExportButtons
-    targetId="sales-channel-breakdown-card"
-    title="Sales Channel Performance"
-    onExport={handleExportExcel}
-  />
-</CardHeader>
+        <CardExportButtons
+          targetId="sales-channel-breakdown-card"
+          title="Sales Channel Performance"
+          onExport={handleExportExcel}
+        />
+      </CardHeader>
 
       <CardBody>
         {error && (
@@ -151,6 +137,7 @@ const Breakdown = ({
                     zIndex: 3,
                     minWidth: "145px",
                     whiteSpace: "nowrap",
+                    backgroundColor: "#f3f6f9",
                   }}
                 >
                   Sales Channel
@@ -194,7 +181,7 @@ const Breakdown = ({
                       className={isTotal ? "fw-bold bg-light" : ""}
                     >
                       <td
-                        className="text-start"
+                         className={`text-start ${isTotal ? "bg-light" : "bg-white"}`}
                         style={{
                           ...totalStyle,
                           position: "sticky",
@@ -222,10 +209,7 @@ const Breakdown = ({
                         {formatNumber(item.total_units_sold)}
                       </td>
 
-                      <td
-                        className="text-end text-info"
-                        style={totalStyle}
-                      >
+                      <td className="text-end text-primary" style={totalStyle}>
                         {formatAmount(item.total_sales_excl)}
                       </td>
 
@@ -233,10 +217,7 @@ const Breakdown = ({
                         {formatAmount(item.total_tax)}
                       </td>
 
-                      <td
-                        className="text-end text-primary"
-                        style={totalStyle}
-                      >
+                      <td className="text-end text-caramel" style={totalStyle}>
                         {formatAmount(item.total_sales_incl)}
                       </td>
 
@@ -244,19 +225,16 @@ const Breakdown = ({
                         {formatAmount(item.total_cogs)}
                       </td>
 
-                      <td
-                        className="text-end text-success"
-                        style={totalStyle}
-                      >
+                      <td className="text-end text-success" style={totalStyle}>
                         {formatAmount(item.gross_profit)}
                       </td>
 
                       <td className="text-end" style={totalStyle}>
                         <Badge
                           pill
-                          className={`px-2 py-1 ${getBadgeColor(
-                            item.gross_margin_perc
-                          )}`}
+                          className={getBadgeColor(
+                            item.gross_margin_perc,
+                          )}
                         >
                           {formatAmount(item.gross_margin_perc)}%
                         </Badge>
@@ -269,9 +247,9 @@ const Breakdown = ({
                       <td className="text-end" style={totalStyle}>
                         <Badge
                           pill
-                          className={`px-2 py-1 ${getBadgeColor(
-                            item.sales_share_perc
-                          )}`}
+                          className={getBadgeColor(
+                            item.sales_share_perc,
+                          )}
                         >
                           {formatAmount(item.sales_share_perc)}%
                         </Badge>
