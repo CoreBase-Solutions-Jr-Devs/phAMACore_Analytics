@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Spinner } from "reactstrap";
 import { useSelector } from "react-redux";
+import FloatingTooltip from "../../../Components/Common/FloatingTooltip";
 import {
     buildSlowMovingRows,
     formatSlowDaysCover,
@@ -134,7 +135,7 @@ const SlowMovingStock = ({
                 onMouseLeave={handleMouseLeave}
             >
                 <table className="table table-borderless table-centered table-nowrap mb-0 w-100">
-                    <thead className="text-muted table-light sticky-top">
+                    <thead className="text-muted table-light sticky-top" style={{ zIndex: 1 }}>
                         <tr>
                             {renderSortableHeader("name", "Product")}
                             <th scope="col">Branch</th>
@@ -294,94 +295,7 @@ const SlowMovingStock = ({
             </div>
 
             {/* Custom Floating Hover Tooltip matching Stock Value By Branch (BarChartTwo) */}
-            {hoverInfo && (
-                <div
-                    style={{
-                        position: "fixed",
-                        left: `${hoverInfo.x}px`,
-                        top: `${hoverInfo.y}px`,
-                        transform:
-                            hoverInfo.x > (typeof window !== "undefined" && window.innerWidth ? window.innerWidth - 340 : 600)
-                                ? hoverInfo.y < 100
-                                    ? "translate(-100%, 15px)"
-                                    : "translate(-100%, -120%)"
-                                : hoverInfo.y < 100
-                                ? "translate(15px, 15px)"
-                                : "translate(15px, -120%)",
-                        pointerEvents: "none",
-                        zIndex: 99999,
-                        backgroundColor: "rgba(33, 37, 41, 0.95)",
-                        color: "#fff",
-                        borderRadius: "6px",
-                        padding: "8px 12px",
-                        fontSize: "12px",
-                        lineHeight: "1.4",
-                        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.25)",
-                        whiteSpace: "nowrap",
-                        transition: "opacity 0.1s ease",
-                    }}
-                >
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            fontWeight: 600,
-                            marginBottom: "3px",
-                        }}
-                    >
-                        <span
-                            style={{
-                                width: "9px",
-                                height: "9px",
-                                borderRadius: "50%",
-                                backgroundColor: hoverInfo.badgeColor || "#00e396",
-                                display: "inline-block",
-                            }}
-                        />
-                        <span>{hoverInfo.title}</span>
-                    </div>
-                    {hoverInfo.mainValue && (
-                        <div
-                            style={{
-                                color: hoverInfo.mainColor || "#00e396",
-                                fontWeight: 700,
-                                fontSize: "13px",
-                            }}
-                        >
-                            {hoverInfo.mainValue}
-                        </div>
-                    )}
-                    {hoverInfo.subText && (
-                        <div
-                            style={{
-                                fontSize: "11px",
-                                color: "#adb5bd",
-                                marginTop: "2px",
-                                whiteSpace: "normal",
-                                maxWidth: "340px",
-                            }}
-                        >
-                            {hoverInfo.subText}
-                        </div>
-                    )}
-                    {hoverInfo.extraText && (
-                        <div
-                            style={{
-                                fontSize: "11px",
-                                color: "#e9ecef",
-                                marginTop: "4px",
-                                borderTop: "1px solid rgba(255,255,255,0.12)",
-                                paddingTop: "4px",
-                                whiteSpace: "normal",
-                                maxWidth: "340px",
-                            }}
-                        >
-                            {hoverInfo.extraText}
-                        </div>
-                    )}
-                </div>
-            )}
+            <FloatingTooltip hoverInfo={hoverInfo} />
 
             {processed.length > MAX_ROWS && (
                 <p className="text-muted fs-12 text-center mt-2 mb-0">

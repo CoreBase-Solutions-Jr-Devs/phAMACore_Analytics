@@ -201,3 +201,32 @@
         }
     }
 }
+
+
+// Keep chart tooltips wrapped and clamped inside the viewport
+.apexcharts-tooltip {
+    max-width: min(340px, calc(100vw - 24px)) !important;
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
+    .apexcharts-tooltip-title,
+    .apexcharts-tooltip-series-group,
+    .apexcharts-tooltip-y-group,
+    .apexcharts-tooltip-text,
+    .apexcharts-tooltip-text-y-label,
+    .apexcharts-tooltip-text-y-value {
+        white-space: normal !important;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    .apexcharts-tooltip-series-group {
+        align-items: flex-start;
+    }
+
+    .apexcharts-tooltip-marker {
+        flex-shrink: 0;
+        margin-top: 4px;
+    }
+}

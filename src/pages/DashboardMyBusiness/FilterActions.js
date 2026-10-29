@@ -16,7 +16,13 @@ import {
 } from "../../helpers/branch_helper";
 import { getBranches } from "../../helpers/fakebackend_helper";
 
-const dateOptions = ["Today","Yesterday","Last 7 Days","This Week","Last Week","This Month","Month to Date","Last Month","This Year","Year To Date","Last Year","Custom"];
+const dateOptions = [
+  "Today","Yesterday",
+  "Month To Date","Month To Yesterday","Last Month",
+  "Year To Date","Year To Yesterday","Last Year",
+  "Last 7 Days","This Week","Last Week",
+  "Custom"
+];
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const dispatch = useDispatch();

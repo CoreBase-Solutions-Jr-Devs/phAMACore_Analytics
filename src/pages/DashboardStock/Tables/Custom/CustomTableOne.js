@@ -4,7 +4,8 @@ import { Alert, Input } from "reactstrap";
 import TableContainer from "../../../../Components/Common/TableContainerReactTable";
 import { useSelector } from "react-redux";
 import { exportToExcel } from "../../../../helpers/export_helper";
-import { getExpiryRows } from "../../../utils/StockInventoryUtils";
+import FloatingTooltip from "../../../../Components/Common/FloatingTooltip";
+import { getExpiryRows, EXPIRY_BUCKETS } from "../../../utils/StockInventoryUtils";
 import { formatCompact } from "../../../utils/formatHelper";
 
 const mapRowForTable = (row) => ({
@@ -55,8 +56,29 @@ const ExpiryProductTable = ({
     exportPrefix = "ExpiryWatch_Stock",
     searchPlaceholder = "Search Products...",
     searchIdPrefix = "table-search",
+    actionOptions = null,
 }) => {
     const [searchValue, setSearchValue] = useState("");
+    const [actionFilter, setActionFilter] = useState("ALL");
+    const [hoverInfo, setHoverInfo] = useState(null);
+
+    const handleCellHover = (e, info) => {
+        setHoverInfo({
+            ...info,
+            x: e.clientX,
+            y: e.clientY,
+        });
+    };
+
+    const handleMouseMove = (e) => {
+        if (hoverInfo) {
+            setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setHoverInfo(null);
+    };
 
     const hasBatch = useMemo(() => rows.some((row) => row.batch), [rows]);
 
@@ -65,15 +87,22 @@ const ExpiryProductTable = ({
         [rows]
     );
 
+    // Client-side only: counts per action from the main-filtered rows
+    const actionCounts = useMemo(
+        () => rows.reduce((acc, row) => ({ ...acc, [row.status]: (acc[row.status] || 0) + 1 }), {}),
+        [rows]
+    );
+
     const filteredTable = useMemo(() => {
         const term = searchValue.trim().toLowerCase();
-        if (!term) return rows;
+        const byAction = actionFilter === "ALL" ? rows : rows.filter((row) => row.status === actionFilter);
+        if (!term) return byAction;
 
-        return rows.filter((row) =>
+        return byAction.filter((row) =>
             [row.product, row.batch, row.branch, row.date, row.total, row.status, row.value]
                 .some((field) => String(field ?? "").toLowerCase().includes(term))
         );
-    }, [rows, searchValue]);
+    }, [rows, searchValue, actionFilter]);
 
     const columns = useMemo(
         () => [
@@ -81,11 +110,31 @@ const ExpiryProductTable = ({
                 header: "Product",
                 accessorKey: "product",
                 enableColumnFilter: false,
-                cell: (cell) => (
-                    <Link to="#" className="fw-medium">
-                        {cell.getValue()}
-                    </Link>
-                ),
+                cell: (cell) => {
+                    const row = cell.row.original;
+                    const isExp = row.days < 0;
+                    const toneColor = isExp || row.days <= 30 ? "#f06548" : row.days <= 60 ? "#f7b84b" : "#299cdb";
+                    return (
+                        <Link
+                            to="#"
+                            className="fw-medium"
+                            onMouseEnter={(e) =>
+                                handleCellHover(e, {
+                                    title: row.product,
+                                    badgeColor: toneColor,
+                                    mainValue: `KES ${row.value} (${row.total} units)`,
+                                    mainColor: "#00e396",
+                                    subText: `${row.branch}${row.batch ? ` · Batch: ${row.batch}` : ""} · Expiry: ${row.date}`,
+                                    extraText: `${isExp ? `Expired ${Math.abs(row.days)}d ago` : `${row.days} days remaining`} · Action: ${row.status}`,
+                                })
+                            }
+                            onMouseMove={handleMouseMove}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            {cell.getValue()}
+                        </Link>
+                    );
+                },
             },
             ...(hasBatch
                 ? [{ header: "Batch", accessorKey: "batch", enableColumnFilter: false }]
@@ -126,7 +175,31 @@ const ExpiryProductTable = ({
                 ),
                 accessorKey: "status",
                 enableColumnFilter: false,
-                cell: (cell) => renderActionBadge(cell.getValue()),
+                cell: (cell) => {
+                    const row = cell.row.original;
+                    const isExp = row.days < 0;
+                    const toneColor = isExp || row.days <= 30 ? "#f06548" : row.days <= 60 ? "#f7b84b" : "#299cdb";
+                    return (
+                        <div
+                            onMouseEnter={(e) =>
+                                handleCellHover(e, {
+                                    title: row.status,
+                                    badgeColor: toneColor,
+                                    mainValue: `${row.product}${row.batch ? ` (${row.batch})` : ""}`,
+                                    mainColor: toneColor,
+                                    subText: `Branch: ${row.branch} · Qty: ${row.total} · Value: KES ${row.value}`,
+                                    extraText: isExp
+                                        ? `Expired ${Math.abs(row.days)} days ago (${row.date})`
+                                        : `Expires in ${row.days} days (${row.date})`,
+                                })
+                            }
+                            onMouseMove={handleMouseMove}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            {renderActionBadge(cell.getValue())}
+                        </div>
+                    );
+                },
             },
             {
                 header: () => (
@@ -198,6 +271,29 @@ const ExpiryProductTable = ({
                     </div>
                 </div>
 
+                {actionOptions && (
+                    <div className="d-flex flex-wrap gap-1 no-print" role="group" aria-label="Filter by action">
+                        {[{ action: "ALL", color: "secondary" }, ...actionOptions].map(({ action, color }) => {
+                            const isActive = actionFilter === action;
+                            const count = action === "ALL" ? rows.length : actionCounts[action] || 0;
+                            return (
+                                <button
+                                    key={action}
+                                    type="button"
+                                    className={`btn btn-sm ${isActive ? `btn-${color}` : `btn-outline-${color}`}`}
+                                    onClick={() => setActionFilter(action)}
+                                    aria-pressed={isActive}
+                                >
+                                    {action === "ALL" ? "All" : action}
+                                    <span className={`badge ms-1 ${isActive ? "bg-light text-body" : `bg-${color}`}`}>
+                                        {count.toLocaleString()}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
+
                 <button
                     type="button"
                     className="btn btn-sm btn-soft-success btn-export-excel d-flex align-items-center gap-1 no-print"
@@ -209,18 +305,24 @@ const ExpiryProductTable = ({
                 </button>
             </div>
 
-            <TableContainer
-                columns={columns || []}
-                data={filteredTable || []}
-                customPageSize={8}
-                isGlobalFilter={false}
-                isLoading={isLoading}
-                tableClass="table-centered align-middle table-nowrap mb-0"
-                theadClass="text-muted table-light"
-            />
+            <div onMouseLeave={handleMouseLeave}>
+                <TableContainer
+                    columns={columns || []}
+                    data={filteredTable || []}
+                    customPageSize={8}
+                    isGlobalFilter={false}
+                    isLoading={isLoading}
+                    tableClass="table-centered align-middle table-nowrap mb-0"
+                    theadClass="text-muted table-light"
+                />
+            </div>
+            <FloatingTooltip hoverInfo={hoverInfo} />
         </div>
     );
 };
+
+// Write-Off Risk actions (excludes the "expired" bucket)
+const WRITE_OFF_ACTIONS = EXPIRY_BUCKETS.filter((b) => b.id !== "expired");
 
 const CustomTableOne = () => {
     const {
@@ -281,6 +383,7 @@ const CustomTableOne = () => {
                 exportPrefix="WriteOff_Risk_Stock"
                 searchPlaceholder="Search Write-Off Risk Products..."
                 searchIdPrefix="writeoff-table-search"
+                actionOptions={WRITE_OFF_ACTIONS}
             />
 
             <hr className="my-4" />

@@ -102,7 +102,7 @@ const RightSidebar = (props) => {
     } = useSelector(selectLayoutProperties);
 
     // open offcanvas
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const toggleLeftCanvas = () => {
         setOpen(!open);
     };
@@ -158,11 +158,11 @@ const RightSidebar = (props) => {
             </div>}
 
             <div>
-                <div className="customizer-setting d-none d-md-block">
+                {/* <div className="customizer-setting d-none d-md-block">
                     <div onClick={toggleLeftCanvas} className="btn-info rounded-pill shadow-lg btn btn-icon btn-lg p-2 rounded-pill">
                         <i className='mdi mdi-spin mdi-cog-outline fs-22'></i>
                     </div>
-                </div>
+                </div> */}
                 <Offcanvas isOpen={open} toggle={toggleLeftCanvas} direction='end'>
                     <OffcanvasHeader className="d-flex align-items-center bg-primary bg-gradient p-3 offcanvas-header-dark" toggle={toggleLeftCanvas}>
                         <span className="m-0 me-2 text-white">Theme Customizer</span>
