@@ -7,7 +7,6 @@ import {
   getLastYearMonthlySales,
   getKPISalesTransactions,
   getKPIOverdueAccounts,
- 
   getBranches,
 } from "./thunk";
 
@@ -26,26 +25,21 @@ const initialState = {
   salesSummary: [],
   salesBranch: [],
   salesBranch_Type: [],
- 
 
   salesComparativeYTD: [],
   salesComparativeMTD: [],
   salesMonthly: [],
   salesDaily: [],
 
-
-
-
-
   loading: false,
   error: null,
 
   filters: {
     branchcode: "",
-    dateRange: "Today",
-    startDate: new Date().toLocaleDateString("en-GB"),
-    endDate: new Date().toLocaleDateString("en-GB"),
-   
+  dateRange: "Month To Yesterday",
+  startDate: formatDMY(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
+  endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
+
   },
 };
 
@@ -189,6 +183,20 @@ const powerBISlice = createSlice({
           break;
         }
 
+        case "Month To Yesterday": {
+          const today = new Date();
+
+          const start = new Date(today.getFullYear(), today.getMonth(), 1);
+
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(yesterday);
+
+          break;
+        }
+
         case "Custom":
           state.filters.dateRange = "Custom";
           break;
@@ -257,7 +265,6 @@ const powerBISlice = createSlice({
         const result = action.payload?.result || action.payload || [];
 
         // Store the latest KPI sales result
-        
 
         switch (groupBy) {
           case "TYPE":
@@ -271,8 +278,6 @@ const powerBISlice = createSlice({
           case "BRANCH_TYPE":
             state.salesBranch_Type = result;
             break;
-
-        
 
           case "COMPARATIVE_YTD":
             state.salesComparativeYTD = result;
@@ -290,8 +295,6 @@ const powerBISlice = createSlice({
             state.salesDaily = result;
             break;
 
-          
-            
           default:
             break;
         }
@@ -433,27 +436,27 @@ const powerBISlice = createSlice({
           action.error.message ||
           "Error loading overdue accounts";
       })
-      
-.addCase(getBranches.pending, (state) => {
-  state.loading = true;
-  state.error = null;
-})
 
-.addCase(getBranches.fulfilled, (state, action) => {
-  state.loading = false;
-  state.error = null;
+      .addCase(getBranches.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-  state.branches = action.payload?.result || action.payload || [];
-})
+      .addCase(getBranches.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
 
-.addCase(getBranches.rejected, (state, action) => {
-  state.loading = false;
-  state.error =
-    action.payload?.message ||
-    action.payload ||
-    action.error.message ||
-    "Error loading branches";
-});
+        state.branches = action.payload?.result || action.payload || [];
+      })
+
+      .addCase(getBranches.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading branches";
+      });
   },
 });
 

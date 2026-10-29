@@ -25,10 +25,9 @@ customerMemberAnalysisCohort: [],
 
   filters: {
     branchcode: "",
-    dateRange: "Today",
-    startDate: new Date().toLocaleDateString("en-GB"),
-    endDate: new Date().toLocaleDateString("en-GB"),
-   
+    dateRange: "Month To Yesterday",
+  startDate: formatDMY(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
+  endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),  
   },
 };
 
@@ -172,6 +171,20 @@ const customerMemberAnalysisSlice = createSlice({
           break;
         }
 
+         case "Month To Yesterday": {
+          const today = new Date();
+
+          const start = new Date(today.getFullYear(), today.getMonth(), 1);
+
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(yesterday);
+
+          break;
+        }
+        
         case "Custom":
           state.filters.dateRange = "Custom";
           break;
