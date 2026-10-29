@@ -7,7 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { setBranch, setDateRange, setStartDate, setEndDate, resetFilters } from "../../slices/dashboardStock/reducer";
 import { getCachedBranchesMap, cleanBranchName, saveActiveBranch } from "../../helpers/branch_helper";
 
-const dateOptions = ["Today", "Yesterday", "Last 7 Days", "Last Week", "This Week", "Month to Date", "Last Month", "This Year", "Last Year", "Custom"];
+const dateOptions = [
+    "Today", "Yesterday", 
+    "Month To Date", "Month To Yesterday", "Last Month", 
+    "Year To Date", "Year To Yesterday", "Last Year", 
+    "Last 7 Days", "Last Week", "This Week", 
+    "Custom"
+];
 
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
     const dispatch = useDispatch();
