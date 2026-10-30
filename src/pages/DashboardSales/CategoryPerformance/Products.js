@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Card, CardBody, CardHeader } from "reactstrap";
+import { Card, CardBody, CardHeader,Badge, } from "reactstrap";
 
 import { exportToExcel } from "../../../helpers/export_helper";
 import CardExportButtons from "../../../Components/Common/CardExportButtons";

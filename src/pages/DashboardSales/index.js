@@ -197,8 +197,6 @@ const [selectedBranchName, setSelectedBranchName] =
       }),
     );
 
-  
-
      dispatch(
       getKPISalesTransactions({
         ...params,
@@ -229,8 +227,7 @@ const [selectedBranchName, setSelectedBranchName] =
   }, [dispatch,]);
 
 useEffect(() => {
-  return () => {
-  
+  return () => {  
     dispatch(clearSalesData());
   };
 }, [dispatch]);
@@ -272,8 +269,6 @@ useEffect(() => {
         groupBy: "BRANCH_TYPE",
       }),
     );
-
-  
 
      dispatch(
       getKPISalesTransactions({

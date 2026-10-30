@@ -481,6 +481,9 @@ const BranchPerformanceChart = ({
 
 xaxis: {
   categories,
+   title: {
+        text: "Branches",
+      },
   labels: {
     rotate: -45,
     rotateAlways: true,

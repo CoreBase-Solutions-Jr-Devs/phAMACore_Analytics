@@ -165,12 +165,12 @@ const Navdata = () => {
           link: "/dashboard-purchase-orders",
           parentId: "purchase-orders",
         },
-        {
-          id: "branchview-purchase-orders",
-          label: "BranchView",
-          link: `/dashboard-purchase-orders/branch/${purchaseBranch}`,
-          parentId: "purchase-orders",
-        },
+        // {
+        //   id: "branchview-purchase-orders",
+        //   label: "BranchView",
+        //   link: `/dashboard-purchase-orders/branch/${purchaseBranch}`,
+        //   parentId: "purchase-orders",
+        // },
       ],
     },
   ];

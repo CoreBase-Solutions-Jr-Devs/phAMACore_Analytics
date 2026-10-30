@@ -9,7 +9,7 @@ import SalesByLocations from "./SalesByLocations";
 import YearToDatePurchases from "./YearToDatePurchases";
 import MonthToDatePurchases from "./MonthToDatePurchases";
 import SupplierSpendBottom from "./SupplierSpendBottom";
-import FilterActions from "./FilterActions";
+// import FilterActions from "./FilterActions";
 import SupplierSpend from "./SupplierSpend";
 import RecentOrders from "./RecentOrders";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
@@ -27,6 +27,13 @@ import {
     getGoodsReceived,
      getBestPricePerSupplier,
 } from "../../slices/dashboardPurchase/thunk";
+import FilterActions from "../../Components/Common/FilterActions";
+import {
+  setBranch,
+  setDateRange,
+  setStartDate,
+  setEndDate,
+} from "../../slices/dashboardPurchase/reducer";
 import {
 getKPIOverdueAccounts
 } from "../../slices/dashboardSales/thunk";
@@ -75,10 +82,6 @@ const MAVERICK_SPEND_GROUP_BYS = [
 const DashboardPurchaseOrders = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
-  // const { branchId } = useParams();
-
-  // const branchCode = branchId ?? null;
-  // const isBranchView = !!branchCode;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -89,6 +92,8 @@ const DashboardPurchaseOrders = () => {
     setRightColumn(!rightColumn);
   };
 
+  const [selectedBranchName, setSelectedBranchName] =
+    useState("All Branches");
 
 const {
   PurchaseOrders = [],
@@ -422,7 +427,7 @@ dispatchGroupByRequests(
   MAVERICK_SPEND_GROUP_BYS
 );
 
-}, [dispatch, branchId]);
+}, [dispatch]);
 
   useEffect(() => {
     return () => {
@@ -541,12 +546,12 @@ dispatchGroupByRequests(
   MAVERICK_SPEND_GROUP_BYS
 );
 };
-  const selectedBranchName =
-    filters.branch == null || filters.branch === ""
-      ? "All Branches"
-      : (salesBranch || []).find(
-          (m) => Number(m.branch_ID) === Number(filters.branch),
-        )?.branch_name || "";
+  // const selectedBranchName =
+  //   filters.branch == null || filters.branch === ""
+  //     ? "All Branches"
+  //     : (salesBranch || []).find(
+  //         (m) => Number(m.branch_ID) === Number(filters.branch),
+  //       )?.branch_name || "";
         
   return (
     <React.Fragment>
@@ -656,11 +661,30 @@ dispatchGroupByRequests(
                 </Row>
               </div>
             </Col>
-            <FilterActions
-              onApply={handleApplyFilters}
-              rightColumn={rightColumn}
-              hideRightColumn={toggleRightColumn}
-            />
+        
+          <FilterActions
+                  branch={filters.branch}
+                    dateRange={filters.dateRange}
+                    startDate={filters.startDate}
+                    endDate={filters.endDate}
+                    onBranchChange={(value) =>
+                      dispatch(setBranch(value === "" ? null : Number(value)))
+                    }
+                      onBranchNameChange={setSelectedBranchName}
+
+                    onDateRangeChange={(value) =>
+                      dispatch(setDateRange(value))
+                    }
+                    onStartDateChange={(value) =>
+                      dispatch(setStartDate(value))
+                    }
+                    onEndDateChange={(value) =>
+                      dispatch(setEndDate(value))
+                    }
+            onApply={handleApplyFilters}
+            rightColumn={rightColumn}
+            hideRightColumn={toggleRightColumn}
+          />
           </Row>
         </Container>
       </div>

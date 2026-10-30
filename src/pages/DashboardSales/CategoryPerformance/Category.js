@@ -199,7 +199,7 @@ const handleExportExcel = () => {
                   <div>
                     <p className="font-medium mb-0">Active Items</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-danger">
+                    <h3 className="mt-2 ff-secondary fw-semibold text-success">
                      {Number(categoryPerformance?.active_items_count ?? 0)}
                     </h3>
                                         <p className="mb-0 text-muted mt-auto ">Available for sale</p>

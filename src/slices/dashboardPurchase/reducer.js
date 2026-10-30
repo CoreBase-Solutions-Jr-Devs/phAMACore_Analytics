@@ -92,11 +92,11 @@ const initialState = {
 
   filters: {
     branchcode: "",
-    dateRange: "Today",
-    startDate: new Date().toLocaleDateString("en-GB"),
-    endDate: new Date().toLocaleDateString("en-GB"),
-    groupBy: "SUMMARY",
-    topN: 0,
+   dateRange: "Month To Yesterday",
+  startDate: formatDMY(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
+  endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
+    // groupBy: "SUMMARY",
+    // topN: 0,
   },
 };
 
@@ -244,6 +244,21 @@ const PurchaseOrdersSlice = createSlice({
 
           state.filters.startDate = formatDMY(start);
           state.filters.endDate = formatDMY(today);
+
+          break;
+        }
+
+        
+         case "Month To Yesterday": {
+          const today = new Date();
+
+          const start = new Date(today.getFullYear(), today.getMonth(), 1);
+
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(yesterday);
 
           break;
         }

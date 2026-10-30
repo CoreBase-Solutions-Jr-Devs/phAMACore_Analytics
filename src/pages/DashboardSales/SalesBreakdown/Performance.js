@@ -216,7 +216,7 @@ const handlePrint = () => {
                 <div>
                   <p className="font-medium mb-0">Other_Account</p>
 
-                  <h3 className="mt-2 ff-secondary fw-semibold text-danger">
+                  <h3 className="mt-2 ff-secondary fw-semibold text-info">
                    KES {Number(OTHER_ACCOUNT?.total_sales_incl ?? 0).toLocaleString(
                       "en-KE",
                     )}
@@ -241,7 +241,7 @@ const handlePrint = () => {
                 <div>
                   <p className="font-medium mb-0">Return</p>
 
-                  <h3 className="mt-2 ff-secondary fw-semibold text-danger">
+                  <h3 className="mt-2 ff-secondary fw-semibold text-success">
                     KES {Number(RETURN?.total_sales_incl ?? 0).toLocaleString(
                       "en-KE",
                     )}
