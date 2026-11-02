@@ -140,7 +140,7 @@ const Drilldown = ({
         },
       },
       {
-        header: "Margin %",
+        header: " Gross Margin %",
         accessorKey: "gross_margin_perc",
         cell: ({ getValue }) => {
           const value = getValue();

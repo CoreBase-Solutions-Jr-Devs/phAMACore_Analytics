@@ -9,7 +9,7 @@ import BranchPerformance from "./BranchPerfomance";
 import TopProducts from "./TopProducts";
 import BottomProducts from "./BottomProducts";
 import SalesmanRevenue from "./SalesmanRevenue";
-import ReceivablesAgeing from "./ReceivablesAgeing";
+import ReceivablesAgeing from "../DashboardSales/ReceivableAgeing/index";
 import TopCustomers from "./TopCustomers";
 import YearToDateSales from "./YearToDateSales";
 import MonthToDateSales from "./MonthToDateSales";
@@ -96,7 +96,7 @@ const [selectedBranchName, setSelectedBranchName] =
     overdueDebtorsCount,
     bottomProducts,
     salesmanData,
-    topCustomersData,
+    customerData,
     topProducts,
     monthlyChart,
     monthToDateChart,
@@ -341,7 +341,7 @@ useEffect(() => {
           />
         </Row>
         <Row>
-          <Col xl={6}>
+          <Col xl={12}>
          
               <BranchPerformance
                 branchData={branchData}
@@ -353,12 +353,13 @@ useEffect(() => {
                 error={error}
               />
             
-          </Col>
-
-          <Col xl={6}>
-          
-              {/* <TopProducts data={topProducts} error={error} loading={loading} /> */}
-                       <ReceivablesAgeing
+          </Col>         
+              {/* <TopProducts data={topProducts} error={error} loading={loading} /> */}         
+       
+        </Row>
+<Row>
+  <Col>
+                <ReceivablesAgeing
               kpiOverdueAccounts={kpiOverdueAccounts}
               currentReceivables={currentReceivables}
               // overdue1To30={overdue1To30}
@@ -371,11 +372,11 @@ useEffect(() => {
               error={error}
               loading={loading}
             />
-          </Col>
-        </Row>
+  </Col>
+</Row>
 
         <Row>
-          <Col xl={6}>
+          <Col >
             <SalesmanRevenue
               sales={sales}
               data={salesmanData}
@@ -389,17 +390,27 @@ useEffect(() => {
 
           </Col> */}
 
-          <Col xl={6}>
+          {/* <Col xl={6}>
             <TopCustomers
               sales={sales}
-              data={topCustomersData}
+              data={customerData}
+              formatAmount={formatAmount}
+              error={error}
+              loading={loading}
+            />
+          </Col> */}
+        </Row>
+        <Row>
+    <Col xl={12}>
+            <TopCustomers
+              sales={sales}
+              data={customerData}
               formatAmount={formatAmount}
               error={error}
               loading={loading}
             />
           </Col>
         </Row>
-
         <Row>
           <Col xl={6}>
             <YearToDateSales
