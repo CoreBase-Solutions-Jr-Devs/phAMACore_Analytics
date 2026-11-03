@@ -234,10 +234,19 @@ export const filterTransferSuggestions = (suggestions = [], statusFilter = "ALL"
 
 // KPI COMPUTATION
 
-export const computeKPIs = (batchExpiryRows = [], stockHealth = [], imbalances = [], expiryOptions = {}) => {
+export const computeKPIs = (
+    batchExpiryRows = [],
+    stockHealth = [],
+    imbalances = [],
+    expiryOptions = {},
+    slowMovingStock = null
+) => {
     const health = (Array.isArray(stockHealth) ? stockHealth[0] : stockHealth) || {};
     const nearExpiry = getExpiryRows(batchExpiryRows, expiryOptions)
         .filter((row) => row.daysRemaining >= 0).length;
+    const slowMoversCount = Array.isArray(slowMovingStock)
+        ? slowMovingStock.length
+        : num(health.slow_mover_skus) + num(health.dead_stock_skus);
 
     return {
         3: num(health.min_breached_skus),
@@ -245,7 +254,7 @@ export const computeKPIs = (batchExpiryRows = [], stockHealth = [], imbalances =
         // out_of_stock_skus field never existed and fell back to the whole catalogue.
         4: num(health.critical_stocked_out_skus),
         5: nearExpiry,
-        6: num(health.slow_mover_skus) + num(health.dead_stock_skus),
+        6: slowMoversCount,
         7: num(health.overstocked_skus),
         8: (imbalances || []).length,
     };

@@ -34,8 +34,8 @@ const Section = ({ rightClickBtn }) => {
   );
 
   const kpis = useMemo(
-    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances, expiryOptions),
-    [batchExpiryNeo, stockHealth, imbalances, expiryOptions]
+    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances, expiryOptions, slowMovingStock),
+    [batchExpiryNeo, stockHealth, imbalances, expiryOptions, slowMovingStock]
   );
 
   // Stock figures are live: show when the valuation was taken
