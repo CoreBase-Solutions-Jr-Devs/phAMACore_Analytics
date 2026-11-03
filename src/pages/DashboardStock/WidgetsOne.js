@@ -20,8 +20,8 @@ const KPI_ICON_MAP = {
 const WidgetsOne = () => {
 
     const {
-        batchExpiryNeo = [], stockHealth = [], slowMovingStock = [], imbalances = [], branches = [], filters = {}, appliedFilters,
-        loadingBatchExpiryNeo, loadingStockHealth, loadingSlowMovingStock, loadingImbalances, errorStockHealth,
+        batchExpiryNeo = [], stockHealth = [], criticalStockouts = [], slowMovingStock = [], imbalances = [], branches = [], filters = {}, appliedFilters,
+        loadingBatchExpiryNeo, loadingStockHealth, loadingCriticalStockouts, loadingSlowMovingStock, loadingImbalances, errorStockHealth,
     } = useSelector((state) => state.StockInventory ?? {});
 
     const activeFilters = appliedFilters || filters;
@@ -33,14 +33,15 @@ const WidgetsOne = () => {
                 batchExpiryNeo,
                 stockHealth,
                 imbalances,
+                slowMovingStock,
+                criticalStockouts,
                 {
                     branchCode: activeFilters.branch,
                     branches,
                     asOfDate: activeFilters.endDate,
                 },
-                slowMovingStock
             ),
-        [batchExpiryNeo, stockHealth, imbalances, activeFilters.branch, branches, activeFilters.endDate, slowMovingStock]
+        [batchExpiryNeo, stockHealth, imbalances, activeFilters.branch, branches, activeFilters.endDate, slowMovingStock, criticalStockouts]
     );
 
     const meta = useMemo(
@@ -49,7 +50,7 @@ const WidgetsOne = () => {
     );
 
     // Each card waits only for the call that feeds it
-    const loadingById = { 5: loadingBatchExpiryNeo, 6: loadingSlowMovingStock, 8: loadingImbalances };
+    const loadingById = { 4: loadingCriticalStockouts, 5: loadingBatchExpiryNeo, 6: loadingSlowMovingStock, 8: loadingImbalances };
     const errorStock = errorStockHealth;
 
     return (

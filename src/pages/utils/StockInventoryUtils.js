@@ -234,12 +234,27 @@ export const filterTransferSuggestions = (suggestions = [], statusFilter = "ALL"
 
 // KPI COMPUTATION
 
+export const normalizeAbcClass = (raw) =>
+    String(raw || "")
+        .toUpperCase()
+        .replace(/^CLASS[_\s-]*/, "")
+        .trim();
+
+export const isClassAStockedOut = (item) => {
+    if (!item) return false;
+    const isClassA = normalizeAbcClass(item.abc_class) === "A";
+    const status = String(item.stockout_risk_status || "").toUpperCase().trim();
+    const isZeroStock = num(item.current_stock_qty) === 0;
+    return isClassA && isZeroStock && status === "STOCKED_OUT";
+};
+
 export const computeKPIs = (
     batchExpiryRows = [],
     stockHealth = [],
     imbalances = [],
     expiryOptions = {},
-    slowMovingStock = null
+    slowMovingStock = null,
+    criticalStockouts = null
 ) => {
     const health = (Array.isArray(stockHealth) ? stockHealth[0] : stockHealth) || {};
     const nearExpiry = getExpiryRows(batchExpiryRows, expiryOptions)
@@ -247,12 +262,13 @@ export const computeKPIs = (
     const slowMoversCount = Array.isArray(slowMovingStock)
         ? slowMovingStock.length
         : num(health.slow_mover_skus) + num(health.dead_stock_skus);
+    const classAOutOfStockCount = Array.isArray(criticalStockouts)
+        ? criticalStockouts.filter(isClassAStockedOut).length
+        : num(health.critical_stocked_out_skus);
 
     return {
         3: num(health.min_breached_skus),
-        // critical_stocked_out_skus is what the summary actually returns; the old
-        // out_of_stock_skus field never existed and fell back to the whole catalogue.
-        4: num(health.critical_stocked_out_skus),
+        4: classAOutOfStockCount,
         5: nearExpiry,
         6: slowMoversCount,
         7: num(health.overstocked_skus),

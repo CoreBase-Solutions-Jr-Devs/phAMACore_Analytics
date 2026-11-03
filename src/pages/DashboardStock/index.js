@@ -384,7 +384,7 @@ const DashboardStock = () => {
                                                 Critical Stock Levels - MUST-NOT STOCKOUT items
                                             </h4>
                                             <p className="text-muted mb-0 small">
-                                                Class A items (top sellers making up about 80% of revenue over 90 days) at risk
+                                                Pareto Class ABC items (top revenue sellers) at risk
                                                 {criticalStockouts.length > 0 && ` · ${criticalStockouts.length.toLocaleString()} items`}
                                             </p>
                                         </div>

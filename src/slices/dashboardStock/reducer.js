@@ -380,6 +380,7 @@ const StockInventorySlice = createSlice({
       })
       .addCase(fetchKPICriticalStockouts.rejected, (state, action) => {
         state.loadingCriticalStockouts = false;
+        state.criticalStockouts = [];
         state.errorCriticalStockouts =
           action.payload?.message ||
           action.payload ||
