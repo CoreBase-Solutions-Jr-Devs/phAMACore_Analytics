@@ -127,46 +127,47 @@ const branchCategories = useMemo(
    * Revenue grouped by Sales Representative.
    * Used in the Salesman Revenue widget.
    * ------------------------------------------------------*/
-  const salesmanTotals = sales.reduce((acc, item) => {
-    const rep = item.staff_Name || "UNKNOWN REP";
-    const branch = item.brancch_Name || "UNKNOWN BRANCH";
-    const revenue = Number(item.revenue || 0);
-
-    const key = `${rep}__${branch}`;
-
-    if (!acc[key]) {
-      acc[key] = { rep, branch, revenue: 0 };
-    }
-
-    acc[key].revenue += revenue;
-
-    return acc;
-  }, {});
-
-  const salesmanData = Object.values(salesmanTotals);
+const salesmanData = sales.map((item) => ({
+  staff_ID: item.staff_ID,
+  staff_Name: item.staff_Name,
+  brancch_Name: item.brancch_Name.replace(
+        /^AXCESS PHARMACY\s*-\s*/i,
+        "",
+      ),
+  branch_ID: item.branch_ID,
+  totalSalesExcl: item.totalSalesExcl,
+  quantity_Sold: item.quantity_Sold,
+  gross_Profit: item.gross_Profit,
+  transaction_IDs: item.transaction_IDs,
+  invoice_Number: item.invoice_Number,
+  invoice_Date: item.invoice_Date,
+    item_Code: item.item_Code,
+  item_Name: item.item_Name,
+}));
 
   /* -------------------------------------------------------
    * Top customers ranked by total revenue.
    * ------------------------------------------------------*/
-  const customerTotals = sales.reduce((acc, item) => {
-    const name = item.client_Name || "UNKNOWN CUSTOMER";
-    const branch = item.brancch_Name || "UNKNOWN BRANCH";
-    const revenue = Number(item.revenue || 0);
-
-    const key = `${name}__${branch}`;
-
-    if (!acc[key]) {
-      acc[key] = { name, branch, revenue: 0 };
-    }
-
-    acc[key].revenue += revenue;
-
-    return acc;
-  }, {});
-
-  const topCustomersData = Object.values(customerTotals)
-    .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 10);
+const customerData = sales.map((item) => ({
+  client_ID: item.client_ID,
+  client_Name: item.client_Name,
+  brancch_Name: item.brancch_Name.replace(
+        /^AXCESS PHARMACY\s*-\s*/i,
+        "",
+      ),
+  branch_ID: item.branch_ID,
+  totalSalesExcl: item.totalSalesExcl,
+  quantity_Sold: item.quantity_Sold,
+  gross_Profit: item.gross_Profit,
+  transaction_IDs: item.transaction_IDs,
+  invoice_Number: item.invoice_Number,
+  invoice_Date: item.invoice_Date,
+  transaction_Type: item.transaction_Type,
+  item_Code: item.item_Code,
+  item_Name: item.item_Name,
+  group: item.group,
+  sub_Group: item.sub_Group,
+}));
   const overdue = Array.isArray(kpiOverdueAccounts) ? kpiOverdueAccounts : [];
 
   const currentReceivables = overdue.reduce(
@@ -571,7 +572,7 @@ const categoryAvgOrderValue =
     branchChartSeries,
     branchCategories,
     salesmanData,
-    topCustomersData,
+    customerData,
     topProducts,
     bottomProducts,
     monthlyChart,
