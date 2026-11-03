@@ -5,13 +5,18 @@ import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 const monthStart = () => new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+const yesterday = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d;
+};
 
 const defaultFilters = (branch = 0) => ({
   branch: branch ?? 0,
   // Month to Date by default: a one-day window made the cover and velocity figures meaningless
   dateRange: DEFAULT_DATE_RANGE,
   startDate: formatDMY(monthStart()),
-  endDate: formatDMY(new Date()),
+  endDate: formatDMY(yesterday()),
 });
 
 const persistedBranch = getActiveBranch("stock") ?? 0;

@@ -110,11 +110,14 @@ export const computeDateRangeValues = (type, currentStart = "", currentEnd = "")
 const defaultFilters = () => {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+
   return {
     branch: null,
     dateRange: DEFAULT_DATE_RANGE,
     startDate: formatDMY(start),
-    endDate: formatDMY(now),
+    endDate: formatDMY(yesterday),
     groupBy: "SUMMARY",
   };
 };
