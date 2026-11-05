@@ -98,7 +98,7 @@ export const getYearToDateInput = () => {
 // MONTH TO DATE (default dashboard range)
 // ===============================
 
-export const DEFAULT_DATE_RANGE = "Month to Date";
+export const DEFAULT_DATE_RANGE = "Month to Yesterday";
 
 export const getMonthToDateApi = () => {
   const today = new Date();

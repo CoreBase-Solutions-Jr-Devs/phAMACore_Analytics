@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Spinner } from "reactstrap";
 import BarChartOne from "../Charts/Custom/BarChartOne";
 import Pagination from "../../../Components/Common/Pagination";
 import FloatingTooltip from "../../../Components/Common/FloatingTooltip";
 import { cleanBranchName } from "../../../helpers/branch_helper";
+import { normalizeAbcClass } from "../../utils/StockInventoryUtils";
 
 const ITEMS_PER_PAGE = 15;
 
@@ -22,12 +23,6 @@ const ABC_FILTER_OPTIONS = [
     { key: "B", label: "B" },
     { key: "C", label: "C" },
 ];
-
-const normalizeAbcClass = (raw) =>
-    String(raw || "")
-        .toUpperCase()
-        .replace(/^CLASS[_\s-]*/, "")
-        .trim();
 
 const qty = (value) => Math.round(Number(value || 0)).toLocaleString();
 
@@ -52,6 +47,10 @@ const CriticalStockChart = () => {
     const [abcFilter, setAbcFilter] = useState("ALL");
     const [currentPage, setCurrentPage] = useState(1);
     const [hoverInfo, setHoverInfo] = useState(null);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [criticalStockouts]);
 
     const handleCellHover = (e, info) => {
         setHoverInfo({

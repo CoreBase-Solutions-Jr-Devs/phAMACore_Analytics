@@ -384,7 +384,7 @@ const DashboardStock = () => {
                                                 Critical Stock Levels - MUST-NOT STOCKOUT items
                                             </h4>
                                             <p className="text-muted mb-0 small">
-                                                Class A items (top sellers making up about 80% of revenue over 90 days) at risk
+                                                Pareto Class ABC items (top revenue sellers) at risk
                                                 {criticalStockouts.length > 0 && ` · ${criticalStockouts.length.toLocaleString()} items`}
                                             </p>
                                         </div>
@@ -484,6 +484,7 @@ const DashboardStock = () => {
                                 <CardBody>
                                     <p className="text-muted mb-3 small">
                                         Dead stock: no sales in {lookbackDays} days. Slow: over 180 days of stock on hand, or under 5% sold.
+                                        {slowMovingStock.length > 0 && ` · ${slowMovingStock.length.toLocaleString()} items`}
                                         {slowMovingStock.length >= SLOW_MOVER_TOP_N && SLOW_MOVER_TOP_N > 0 && ` Top ${SLOW_MOVER_TOP_N} by capital tied up.`}
                                     </p>
                                     <div id="users">

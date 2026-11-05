@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import {
   loginUserAPI,
+  logoutUserAPI,
 } from "../../../helpers/fakebackend_helper";
 import { setAuthorization } from "../../../helpers/api_helper";
 
@@ -12,8 +13,13 @@ export const loginUser = createAsyncThunk(
       const response = await loginUserAPI(data);
       const authUser = response.data;
 
-      localStorage.setItem( "authUser", JSON.stringify(authUser));
+      localStorage.setItem("authUser", JSON.stringify(authUser));
       setAuthorization(authUser.token);
+      setTimeout(() => {
+        toast.success("Login successful!", {
+          autoClose: 2000,
+        });
+      }, 500);
 
       return authUser;
     } catch (error) {
@@ -30,11 +36,27 @@ export const loginUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk(
   "login/logoutUser",
-  async () => {
-    localStorage.removeItem("authUser");
-    setAuthorization(null);
-
-    return true;
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("authUser"))?.token;
+      if (token) {
+        await logoutUserAPI({ token });
+        toast.success("Logout successful!", {
+          autoClose: 2000,
+        });
+      }
+      return true;
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error(error?.response?.data?.detail || error.message, {
+        autoClose: 3000,
+      });
+      return rejectWithValue(
+        error?.response?.data?.detail || error.message || "Logout failed!"
+      );
+    } finally {
+      localStorage.removeItem("authUser");
+      setAuthorization(null);
+    }
   }
 );
-

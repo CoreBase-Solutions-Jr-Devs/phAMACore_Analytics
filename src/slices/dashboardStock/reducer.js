@@ -5,13 +5,18 @@ import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 const monthStart = () => new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+const yesterday = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d;
+};
 
 const defaultFilters = (branch = 0) => ({
   branch: branch ?? 0,
-  // Month to Date by default: a one-day window made the cover and velocity figures meaningless
-  dateRange: DEFAULT_DATE_RANGE,
+  // Month to Yesterday by default: a one-day window made the cover and velocity figures meaningless
+  dateRange: DEFAULT_DATE_RANGE === "Month to Yesterday" ? "Month To Yesterday" : DEFAULT_DATE_RANGE,
   startDate: formatDMY(monthStart()),
-  endDate: formatDMY(new Date()),
+  endDate: formatDMY(yesterday()),
 });
 
 const persistedBranch = getActiveBranch("stock") ?? 0;
@@ -128,6 +133,7 @@ const StockInventorySlice = createSlice({
         }
 
         case "Month To Date":
+        case "Month to Date":
         case "This Month": {
           const today = new Date();
           const start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -137,7 +143,8 @@ const StockInventorySlice = createSlice({
           break;
         }
 
-        case "Month To Yesterday": {
+        case "Month To Yesterday":
+        case "Month to Yesterday": {
           const today = new Date();
           const start = new Date(today.getFullYear(), today.getMonth(), 1);
           const end = new Date(today);
@@ -169,7 +176,8 @@ const StockInventorySlice = createSlice({
         }
 
         case "This Year":
-        case "Year To Date": {
+        case "Year To Date":
+        case "Year to Date": {
           const today = new Date();
           const start = new Date(today.getFullYear(), 0, 1);
 
@@ -178,7 +186,8 @@ const StockInventorySlice = createSlice({
           break;
         }
 
-        case "Year To Yesterday": {
+        case "Year To Yesterday":
+        case "Year to Yesterday": {
           const today = new Date();
           const start = new Date(today.getFullYear(), 0, 1);
           const end = new Date(today);
@@ -371,6 +380,7 @@ const StockInventorySlice = createSlice({
       })
       .addCase(fetchKPICriticalStockouts.rejected, (state, action) => {
         state.loadingCriticalStockouts = false;
+        state.criticalStockouts = [];
         state.errorCriticalStockouts =
           action.payload?.message ||
           action.payload ||
@@ -385,10 +395,11 @@ const StockInventorySlice = createSlice({
       })
       .addCase(fetchKPISlowMovingStock.fulfilled, (state, action) => {
         state.loadingSlowMovingStock = false;
-        state.slowMovingStock = action.payload;
+        state.slowMovingStock = action.payload || [];
       })
       .addCase(fetchKPISlowMovingStock.rejected, (state, action) => {
         state.loadingSlowMovingStock = false;
+        state.slowMovingStock = [];
         state.errorSlowMovingStock =
           action.payload?.message ||
           action.payload ||

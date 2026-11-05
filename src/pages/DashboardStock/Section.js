@@ -10,6 +10,7 @@ const Section = ({ rightClickBtn }) => {
     batchExpiryNeo = [],
     totalStockValueByBranch = [],
     stockHealth = [],
+    criticalStockouts = [],
     slowMovingStock = [],
     imbalances = [],
     branches = [],
@@ -34,8 +35,8 @@ const Section = ({ rightClickBtn }) => {
   );
 
   const kpis = useMemo(
-    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances, expiryOptions),
-    [batchExpiryNeo, stockHealth, imbalances, expiryOptions]
+    () => computeKPIs(batchExpiryNeo, stockHealth, imbalances, expiryOptions, slowMovingStock, criticalStockouts),
+    [batchExpiryNeo, stockHealth, imbalances, expiryOptions, slowMovingStock, criticalStockouts]
   );
 
   // Stock figures are live: show when the valuation was taken

@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Spinner } from "reactstrap";
 import { useSelector } from "react-redux";
 import FloatingTooltip from "../../../Components/Common/FloatingTooltip";
+import TablePagination from "../../../Components/Common/TablePagination";
 import {
     buildSlowMovingRows,
     formatSlowDaysCover,
@@ -19,6 +20,7 @@ const SlowMovingStock = ({
     onSort,
 }) => {
     const [hoverInfo, setHoverInfo] = useState(null);
+    const [pageIndex, setPageIndex] = useState(0);
 
     const {
         slowMovingStock = [],
@@ -70,6 +72,17 @@ const SlowMovingStock = ({
         return sortSlowMovingRows(filtered, sortField, sortDesc);
     }, [items, slowMovingStock, searchTerm, sortField, sortDesc]);
 
+    useEffect(() => {
+        setPageIndex(0);
+    }, [searchTerm, sortField, sortDesc, slowMovingStock]);
+
+    const pageCount = Math.max(Math.ceil(processed.length / MAX_ROWS), 1);
+    const safePageIndex = Math.min(pageIndex, pageCount - 1);
+    const pageRows = useMemo(
+        () => processed.slice(safePageIndex * MAX_ROWS, (safePageIndex + 1) * MAX_ROWS),
+        [processed, safePageIndex]
+    );
+
     const renderSortIcon = (field) => {
         if (sortField !== field) return null;
         return <i className={`ms-1 text-primary ${sortDesc ? "ri-arrow-down-line" : "ri-arrow-up-line"}`}></i>;
@@ -88,7 +101,7 @@ const SlowMovingStock = ({
         </th>
     );
 
-    if (loadingSlowMovingStock && (!processed || processed.length === 0)) {
+    if (loadingSlowMovingStock) {
         return (
             <div
                 className="d-flex flex-column align-items-center justify-content-center py-4 text-center"
@@ -100,7 +113,7 @@ const SlowMovingStock = ({
         );
     }
 
-    if (errorSlowMovingStock && (!processed || processed.length === 0)) {
+    if (errorSlowMovingStock) {
         return (
             <div
                 className="d-flex flex-column align-items-center justify-content-center py-4 text-center text-danger"
@@ -147,7 +160,7 @@ const SlowMovingStock = ({
                         </tr>
                     </thead>
                     <tbody>
-                        {processed.slice(0, MAX_ROWS).map((item, idx) => {
+                        {pageRows.map((item, idx) => {
                             const tone = item.isDead ? "danger" : "warning";
                             const toneColor = item.isDead ? "#f06548" : "#f7b84b";
 
@@ -296,6 +309,14 @@ const SlowMovingStock = ({
 
             {/* Custom Floating Hover Tooltip matching Stock Value By Branch (BarChartTwo) */}
             <FloatingTooltip hoverInfo={hoverInfo} />
+
+            <TablePagination
+                pageIndex={safePageIndex}
+                pageCount={pageCount}
+                totalResults={processed.length}
+                pageSize={MAX_ROWS}
+                onPageChange={setPageIndex}
+            />
 
             {processed.length > MAX_ROWS && (
                 <p className="text-muted fs-12 text-center mt-2 mb-0">
