@@ -7,12 +7,11 @@ const LogoutModal = ({ show, onConfirm, onClose }) => {
         <Modal isOpen={show} toggle={onClose} centered fade>
             <ModalBody className="py-3 px-5">
                 <div className="mt-2 text-center">
-                    <lord-icon
-                        src="https://cdn.lordicon.com/nocovwne.json"
-                        trigger="loop"
-                        colors="primary:#0ab39c,secondary:#f06548"
-                        style={{ width: "100px", height: "100px" }}
-                    ></lord-icon>
+                    <div className="avatar-lg mx-auto">
+                        <div className="avatar-title bg-gray text-caramel display-5 rounded-circle">
+                            <i className="mdi mdi-logout"></i>
+                        </div>
+                    </div>
 
                     <div className="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
                         <h4>Confirm Logout</h4>

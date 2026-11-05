@@ -35,7 +35,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   // Local draft state so changing selections does not touch Redux or trigger re-renders/APIs
   // until the user explicitly clicks Select or Reset.
   const [draftBranch, setDraftBranch] = useState(appliedFilters.branch ?? null);
-  const [draftDateRange, setDraftDateRange] = useState(appliedFilters.dateRange || "Month to Date");
+  const [draftDateRange, setDraftDateRange] = useState(appliedFilters.dateRange || "Month to Yesterday");
   const [draftStartDate, setDraftStartDate] = useState(appliedFilters.startDate || "");
   const [draftEndDate, setDraftEndDate] = useState(appliedFilters.endDate || "");
 
@@ -43,7 +43,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   useEffect(() => {
     if (rightColumn) {
       setDraftBranch(appliedFilters.branch ?? null);
-      setDraftDateRange(appliedFilters.dateRange || "Month to Date");
+      setDraftDateRange(appliedFilters.dateRange || "Month to Yesterday");
       setDraftStartDate(appliedFilters.startDate || "");
       setDraftEndDate(appliedFilters.endDate || "");
     }

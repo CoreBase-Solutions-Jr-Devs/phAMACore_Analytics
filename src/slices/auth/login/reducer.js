@@ -6,7 +6,6 @@ const initialState = {
   loading: false,
   error: null,
   isUserLogout: false,
- 
 };
 
 const loginSlice = createSlice({
@@ -23,10 +22,12 @@ const loginSlice = createSlice({
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.isUserLogout = false;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        state.isUserLogout = false;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -34,21 +35,23 @@ const loginSlice = createSlice({
       })
 
       // LOGOUT
-    .addCase(logoutUser.pending, (state) => {
-  state.loading = true;
-})
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.isUserLogout = false;
+      })
 
-.addCase(logoutUser.fulfilled, (state) => {
-  state.loading = false;
-  state.user = null;
-  state.isUserLogout = true;
-})
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.isUserLogout = true;
+      })
 
-.addCase(logoutUser.rejected, (state, action) => {
-  state.loading = false;
-  state.error = action.payload;
-  state.isUserLogout = false; 
-})
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isUserLogout = true;
+      })
   },
 });
 

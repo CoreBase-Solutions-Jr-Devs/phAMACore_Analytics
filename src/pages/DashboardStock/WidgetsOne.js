@@ -3,7 +3,7 @@ import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useSelector } from "react-redux";
-import { computeKPIs, getKPIMeta, getLookbackDays, IMBALANCE_TOP_N } from "../utils/StockInventoryUtils";
+import { computeKPIs, countClassA, getKPIMeta, getLookbackDays, IMBALANCE_TOP_N } from "../utils/StockInventoryUtils";
 
 
 const KPI_ICON_MAP = {
@@ -20,30 +20,45 @@ const KPI_ICON_MAP = {
 const WidgetsOne = () => {
 
     const {
-        batchExpiryNeo = [], stockHealth = [], imbalances = [], branches = [], filters = {}, appliedFilters,
-        loadingBatchExpiryNeo, loadingStockHealth, loadingImbalances, errorStockHealth,
+        batchExpiryNeo = [], stockHealth = [], criticalStockouts = [], slowMovingStock = [], imbalances = [], branches = [], filters = {}, appliedFilters,
+        loadingBatchExpiryNeo, loadingStockHealth, loadingCriticalStockouts, loadingSlowMovingStock, loadingImbalances, errorStockHealth,
     } = useSelector((state) => state.StockInventory ?? {});
 
     const activeFilters = appliedFilters || filters;
     const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
 
+    // Argument order must match computeKPIs(batchExpiryRows, stockHealth, imbalances,
+    // expiryOptions, slowMovingStock, criticalStockouts).
     const kpis = useMemo(
         () =>
-            computeKPIs(batchExpiryNeo, stockHealth, imbalances, {
-                branchCode: activeFilters.branch,
-                branches,
-                asOfDate: activeFilters.endDate,
-            }),
-        [batchExpiryNeo, stockHealth, imbalances, activeFilters.branch, branches, activeFilters.endDate]
+            computeKPIs(
+                batchExpiryNeo,
+                stockHealth,
+                imbalances,
+                {
+                    branchCode: activeFilters.branch,
+                    branches,
+                    asOfDate: activeFilters.endDate,
+                },
+                slowMovingStock,
+                criticalStockouts,
+            ),
+        [batchExpiryNeo, stockHealth, imbalances, activeFilters.branch, branches, activeFilters.endDate, slowMovingStock, criticalStockouts]
     );
 
+    const classAAtRisk = useMemo(() => countClassA(criticalStockouts), [criticalStockouts]);
+
     const meta = useMemo(
-        () => getKPIMeta({ lookbackDays, imbalanceCapped: imbalances.length >= IMBALANCE_TOP_N }),
-        [lookbackDays, imbalances.length]
+        () => getKPIMeta({
+            lookbackDays,
+            imbalanceCapped: IMBALANCE_TOP_N > 0 && imbalances.length >= IMBALANCE_TOP_N,
+            classAAtRisk,
+        }),
+        [lookbackDays, imbalances.length, classAAtRisk]
     );
 
     // Each card waits only for the call that feeds it
-    const loadingById = { 5: loadingBatchExpiryNeo, 8: loadingImbalances };
+    const loadingById = { 4: loadingCriticalStockouts, 5: loadingBatchExpiryNeo, 6: loadingSlowMovingStock, 8: loadingImbalances };
     const errorStock = errorStockHealth;
 
     return (

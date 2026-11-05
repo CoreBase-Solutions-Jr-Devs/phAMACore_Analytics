@@ -202,6 +202,21 @@ export const fetchKPITotalStockValueByBranch = createAsyncThunk(
   }
 );
 
+const formatAsOfDate = (asOfDate) => {
+  if (!asOfDate) return null;
+  if (typeof asOfDate === "string" && /^\d{2}\/\d{2}\/\d{4}$/.test(asOfDate)) {
+    return asOfDate;
+  }
+  const d = new Date(asOfDate);
+  if (!isNaN(d.getTime())) {
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+  return asOfDate;
+};
+
 export const fetchKPIStockHealth = createAsyncThunk(
   "stockInventory/fetchKPIStockHealth",
   async (params = {}, { rejectWithValue }) => {
@@ -212,11 +227,11 @@ export const fetchKPIStockHealth = createAsyncThunk(
         branchcode: branchcode && Number(branchcode) > 0 ? Number(branchcode) : 0,
       };
       if (LookbackDays) payload.LookbackDays = LookbackDays;
-      if (AsOfDate) payload.AsOfDate = AsOfDate;
+      const formattedAsOf = formatAsOfDate(AsOfDate);
+      if (formattedAsOf) payload.AsOfDate = formattedAsOf;
 
       const response = await getKPIStockHealthApi(payload);
-      const data = response.data ?? response;
-      return Array.isArray(data) ? data : [data];
+      return toList(response);
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.message ||
@@ -237,6 +252,7 @@ export const fetchKPICriticalStockouts = createAsyncThunk(
         branchcode = 0,
         GroupBy = "CRITICAL_STOCKOUTS",
         TopN = 0,
+        LookbackDays,
         AsOfDate = null,
       } = params;
 
@@ -246,27 +262,12 @@ export const fetchKPICriticalStockouts = createAsyncThunk(
         GroupBy,
         TopN,
       };
-
-      if (AsOfDate) {
-        // Date format DD/MM/YYYY
-        if (typeof AsOfDate === "string" && /^\d{2}\/\d{2}\/\d{4}$/.test(AsOfDate)) {
-          payload.AsOfDate = AsOfDate;
-        } else {
-          const d = new Date(AsOfDate);
-          if (!isNaN(d.getTime())) {
-            const day = String(d.getDate()).padStart(2, "0");
-            const month = String(d.getMonth() + 1).padStart(2, "0");
-            const year = d.getFullYear();
-            payload.AsOfDate = `${day}/${month}/${year}`;
-          } else {
-            payload.AsOfDate = AsOfDate;
-          }
-        }
-      }
+      if (LookbackDays) payload.LookbackDays = LookbackDays;
+      const formattedAsOf = formatAsOfDate(AsOfDate);
+      if (formattedAsOf) payload.AsOfDate = formattedAsOf;
 
       const response = await getKPIStockHealthApi(payload);
-      const data = response.data ?? response;
-      return Array.isArray(data) ? data : [data];
+      return toList(response);
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.message ||
@@ -299,26 +300,13 @@ export const fetchKPISlowMovingStock = createAsyncThunk(
         LookbackDays,
       };
 
-      if (AsOfDate) {
-        // Date format DD/MM/YYYY
-        if (typeof AsOfDate === "string" && /^\d{2}\/\d{2}\/\d{4}$/.test(AsOfDate)) {
-          payload.AsOfDate = AsOfDate;
-        } else {
-          const d = new Date(AsOfDate);
-          if (!isNaN(d.getTime())) {
-            const day = String(d.getDate()).padStart(2, "0");
-            const month = String(d.getMonth() + 1).padStart(2, "0");
-            const year = d.getFullYear();
-            payload.AsOfDate = `${day}/${month}/${year}`;
-          } else {
-            payload.AsOfDate = AsOfDate;
-          }
-        }
-      }
+      const formattedAsOf = formatAsOfDate(AsOfDate);
+      if (formattedAsOf) payload.AsOfDate = formattedAsOf;
 
       const response = await getKPIStockHealthApi(payload);
-      const data = response.data ?? response;
-      return Array.isArray(data) ? data : [data];
+      return toList(response).filter(
+        (row) => row && (row.item_code || row.item_Code || row.item_name || row.item_Name)
+      );
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.message ||
@@ -344,11 +332,11 @@ export const fetchKPIImbalances = createAsyncThunk(
         TopN,
         LookbackDays,
       };
-      if (AsOfDate) payload.AsOfDate = AsOfDate;
+      const formattedAsOf = formatAsOfDate(AsOfDate);
+      if (formattedAsOf) payload.AsOfDate = formattedAsOf;
 
       const response = await getKPIStockHealthApi(payload);
-      const data = response.data ?? response;
-      return (Array.isArray(data) ? data : [data]).filter((row) => row && row.item_code);
+      return toList(response).filter((row) => row && row.item_code);
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.message ||
