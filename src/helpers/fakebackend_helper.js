@@ -118,6 +118,9 @@ export const getKPILeadTime = (params) =>
 export const getGoodsReceived = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_GOODS_RECEIVED, { params });
 
+export const getLastYearGoodsReceived = (params) =>
+  PowerBIAPI.get(url.GET_POWERBI_GOODS_RECEIVED, { params });
+
 export const getBestPricePerSupplier = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_BEST_PRICE, { params });
 

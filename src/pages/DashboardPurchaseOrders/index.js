@@ -25,6 +25,7 @@ import {
     getKPIPriceAlerts,
     getKPILeadTime,
     getGoodsReceived,
+    getLastYearGoodsReceived,
      getBestPricePerSupplier,
 } from "../../slices/dashboardPurchase/thunk";
 import FilterActions from "../../Components/Common/FilterActions";
@@ -318,24 +319,23 @@ useEffect(() => {
   })
 );
 
-const goodsReceivedParams = {
-  clientid: 1,
-    branchcode: filters.branch,
-};
-
 dispatch(
   getGoodsReceived({
-    ...goodsReceivedParams,
+   
       startDate: dates.currentMonthStart,
       endDate: dates.today,
+        clientid: 1,
+    branchcode: filters.branch,
   })
 );
 
 dispatch(
-  getGoodsReceived({
-    ...goodsReceivedParams,
+  getLastYearGoodsReceived({
+   
     startDate: dates.lastYearMonthStart,
     endDate: dates.lastYearToday,
+      clientid: 1,
+    branchcode: filters.branch,
   })
 );
 
@@ -445,26 +445,26 @@ const handleApplyFilters = () => {
   //   })
   // );
 
-const goodsReceivedParams = {
-  clientid: 1,
-    branchcode: filters.branch,
-};
+// const goodsReceivedParams = {
+//   clientid: 1,
+//     branchcode: filters.branch,
+// };
 
-dispatch(
-  getGoodsReceived({
-    ...goodsReceivedParams,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-  })
-);
+// dispatch(
+//   getGoodsReceived({
+//     ...goodsReceivedParams,
+//     startDate: filters.startDate,
+//     endDate: filters.endDate,
+//   })
+// );
 
-dispatch(
-  getGoodsReceived({
-    ...goodsReceivedParams,
-    startDate: getPreviousYearDate(filters.startDate),
-    endDate: getPreviousYearDate(filters.endDate),
-  })
-);
+// dispatch(
+//   getGoodsReceived({
+//     ...goodsReceivedParams,
+//     startDate: getPreviousYearDate(filters.startDate),
+//     endDate: getPreviousYearDate(filters.endDate),
+//   })
+// );
 
   dispatchGroupByRequests(
     getKPIPurchases,

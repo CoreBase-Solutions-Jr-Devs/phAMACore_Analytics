@@ -24,13 +24,15 @@ const YearToDatePurchases = ({categories, series, formatAmount}) => {
   return (
     <React.Fragment>
       <Card id="purchases-ytd-card">
-        <CardHeader className="border-0 align-items-center d-flex justify-content-between flex-wrap gap-2">
-          <h4 className="card-title mb-0 flex-grow-1">Year to Date Comparative Purchases Line Graph (YTD) </h4>
+          <CardHeader className="p-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <h4 className="card-title mb-0 ">Year to Date Comparative Line Graph(YTD) </h4>
+            <div className="d-flex align-items-center">
           <CardExportButtons
             targetId="purchases-ytd-card"
             title="Year To Date Purchases"
             onExport={handleExportExcel}
           />
+          </div>
         </CardHeader>
 
         <CardBody className="p-0 pb-2">
@@ -58,6 +60,7 @@ const YearToDatePurchases = ({categories, series, formatAmount}) => {
     />
     <span className="text-muted">2025</span>
   </div>
+    
 </div>
               <RevenueCharts categories={categories} series={series} formatAmount={formatAmount} dataColors='["--vz-primary", "--vz-success", "--vz-danger"]' />
             </div>

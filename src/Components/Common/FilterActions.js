@@ -42,11 +42,13 @@ const FilterActions = ({
     "This Week",
     "Last Week",
     "Month To Yesterday",
-    "This Month",
-    "Last Month",
     "Month To Date",
-    "This Year",
+    // "This Month",
+    "Last Month",
+    
+    // "This Year",
     "Year To Date",
+     "Year To Yesterday",
     "Last Year",
     "Custom",
   ];

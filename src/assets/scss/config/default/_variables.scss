@@ -805,12 +805,12 @@ $mark-bg:                     #fcf8e3;
 // Customizes the `.table` component with basic values, each used across all table variations.
 
 // scss-docs-start table-variables
-$table-cell-padding-y:        .75rem;
-$table-cell-padding-x:        .6rem;
-$table-cell-padding-y-sm:     .3rem;
-$table-cell-padding-x-sm:     .25rem;
+$table-cell-padding-y:        .4rem;
+$table-cell-padding-x:        .4rem;
+$table-cell-padding-y-sm:     .2rem;
+$table-cell-padding-x-sm:     .2rem;
 
-$table-cell-vertical-align:   top;
+$table-cell-vertical-align:   middle;
 
 $table-color:                 var(--#{$prefix}body-color);
 $table-bg:                    transparent;
@@ -842,8 +842,6 @@ $table-group-separator-color: currentcolor;
 $table-caption-color:         var(--#{$prefix}secondary-color);
 
 $table-bg-scale:              -80%;
-// scss-docs-end table-variables
-
 // scss-docs-start table-loop
 $table-variants: (
   "primary":    shift-color($primary, $table-bg-scale),

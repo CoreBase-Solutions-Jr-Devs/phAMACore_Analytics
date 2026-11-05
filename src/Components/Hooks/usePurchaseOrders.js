@@ -293,16 +293,16 @@ const actualSpendChart = useMemo(() => {
     endDate = new Date(year, month - 1, day);
   }
 
-  const endMonth = endDate.getMonth() + 1;
+  // const endMonth = endDate.getMonth() + 1;
 
   // January → selected month
-  const months = Array.from(
-    { length: endMonth },
-    (_, i) =>
-      new Date(2000, i, 1).toLocaleString("en-US", {
-        month: "short",
-      })
-  );
+const months = Array.from(
+  { length: 12 },
+  (_, i) =>
+    new Date(2000, i, 1).toLocaleString("en-US", {
+      month: "short",
+    })
+);
 
   const currentYearMap = Object.fromEntries(
     months.map((month) => [month, 0])
@@ -412,11 +412,18 @@ const monthToDateChart = useMemo(() => {
   const currentMonth = now.getMonth();
   const today = now.getDate();
 
+  
   // Days 1 -> today
-  const DAYS = Array.from(
-    { length: today },
-    (_, i) => i + 1
-  );
+const daysInMonth = new Date(
+  currentYear,
+  currentMonth + 1,
+  0
+).getDate();
+
+const DAYS = Array.from(
+  { length: daysInMonth },
+  (_, i) => i + 1
+);
 
   // Maps for current year and last year
   const currentYearMap = DAYS.reduce((acc, day) => {
@@ -476,7 +483,24 @@ const monthToDateChart = useMemo(() => {
       );
     }
   });
+ console.log("========== MTD PURCHASES DEBUG ==========");
 
+console.log("Current year:", currentYear);
+console.log("Last year:", lastYear);
+
+console.log("GoodsReceived:", GoodsReceived);
+console.log("LastYearGoodsReceived:", LastYearGoodsReceived);
+
+console.log("Current year map:", currentYearMap);
+console.log("Last year map:", lastYearMap);
+
+console.log("Current year chart data:", DAYS.map(
+  (day) => currentYearMap[day]
+));
+
+console.log("Last year chart data:", DAYS.map(
+  (day) => lastYearMap[day]
+));
   return {
     categories: DAYS.map(String),
 
@@ -495,6 +519,7 @@ const monthToDateChart = useMemo(() => {
       },
     ],
   };
+
 }, [GoodsReceived, LastYearGoodsReceived]);
 
 

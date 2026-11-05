@@ -4,7 +4,11 @@ import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 
 const RevenueCharts = ({ dataColors, series, categories = [] }) => {
   const colors = getChartColorsArray(dataColors);
+const currentMonth = new Date().toLocaleString("en-US", {
+  month: "short",
+});
 
+const currentMonthExists = categories.includes(currentMonth);
   const options = {
     chart: {
       height: 370,
@@ -15,8 +19,8 @@ const RevenueCharts = ({ dataColors, series, categories = [] }) => {
     },
 
     stroke: {
-      curve: "smooth",
-      width: 3,
+      curve: "straight",
+      width: 2,
       dashArray: [0, 6],
     },
 
@@ -40,9 +44,18 @@ const RevenueCharts = ({ dataColors, series, categories = [] }) => {
       axisBorder: {
         show: false,
       },
+        labels: {
+    formatter: (value) => {
+      const monthIndex = categories.indexOf(value);
+      return monthIndex % 2 === 0 ? value : "";
+    },
+  },
     },
 
     yaxis: {
+         title: {
+        text: "Purchases (KES)",
+      },
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
@@ -57,6 +70,42 @@ const RevenueCharts = ({ dataColors, series, categories = [] }) => {
         formatter: (val) => Number(val).toLocaleString(),
       },
     },
+    tooltip: {
+  x: {
+    formatter: (value, { dataPointIndex }) => {
+      return categories[dataPointIndex];
+    },
+  },
+  y: {
+    formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
+  },
+},
+
+annotations: {
+  xaxis: currentMonthExists
+    ? [
+        {
+          x: currentMonth,
+          borderColor: "#C68E45",
+          strokeDashArray: 2,
+          borderWidth: 2,
+          label: {
+            text: "currentMonth",
+            position: "top",
+            orientation: "horizontal",
+            borderColor: "#C68E45",
+             padding: "2px 6px",
+                borderRadius: "4px",
+            style: {
+              color: "#fff",
+              background: "#C68E45",
+              fontSize: "11px",
+            },
+          },
+        },
+      ]
+    : [],
+},
   };
 
   return (
@@ -77,6 +126,17 @@ const MonthToDateCharts = ({
 }) => {
   const colors = getChartColorsArray(dataColors);
 
+
+  const today = new Date().getDate();
+
+  const currentDate = categories.find(
+    (date) => Number(date) === today
+  );
+
+  const todayIndex = categories.findIndex(
+    (date) => Number(date) === today
+  );
+
   const options = {
     chart: {
       height: 370,
@@ -87,8 +147,8 @@ const MonthToDateCharts = ({
     },
 
     stroke: {
-      curve: "smooth",
-      width: 3,
+      curve: "straight",
+      width: 2,
       dashArray: [0, 6],
     },
 
@@ -112,9 +172,18 @@ const MonthToDateCharts = ({
       axisBorder: {
         show: false,
       },
+       labels: {
+    formatter: (value) => {
+      const day = Number(value);
+      return day === 1 || day % 5 === 0 ? day : "";
+    },
+  },
     },
 
     yaxis: {
+        title: {
+        text: "Purchases (KES)",
+      },
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
@@ -124,23 +193,61 @@ const MonthToDateCharts = ({
       },
     },
 
-    tooltip: {
-      y: {
-        formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
-      },
-    },
+tooltip: {
+  x: {
+    formatter: (value) => `Day ${value}`,
+  },
+  y: {
+    formatter: (val) =>
+      Number(val || 0).toLocaleString("en-KE"),
+  },
+},
   };
 
   return (
+  
+   <div style={{ position: "relative" }}>
     <ReactApexChart
-      // dir="ltr"
       options={options}
       series={series}
       type="line"
       height={350}
     />
-  );
-};
+  
+    <div
+      style={{
+        position: "absolute",
+        top: 35,
+        bottom: 55,
+      left: `calc(60px + ${
+  (todayIndex / (categories.length - 1)) * 85
+}%)`,
+        borderLeft: "2px dotted #C68E45",
+        pointerEvents: "none",
+        zIndex: 5,
+      }}
+    />
+        <div
+        style={{
+          position: "absolute",
+          top: 10,
+          left: `calc(60px + ${(todayIndex / (categories.length - 1)) * 85}%)`,
+          transform: "translateX(-50%)",
+          color: "#fff",
+          fontSize: "11px",
+          backgroundColor: "#C68E45",
+          padding: "2px 6px",
+          borderRadius: "4px",
+          // fontWeight: 500,
+          pointerEvents: "none",
+          zIndex: 6,
+        }}
+      >
+        Today
+      </div>
+  </div>
+    );
+  };
 
 const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
   let barchartCountriesColors = [];
@@ -325,24 +432,24 @@ const StoreVisitsCharts = ({
       },
     },
 
-    tooltip: {
-      shared: false,
-      intersect: true,
-      enabledOnSeries: [0],
+   tooltip: {
+  shared: true,
+  intersect: false,
+  enabledOnSeries: [0, 1],
 
-      x: {
-        formatter: (value, { dataPointIndex }) =>
-          categories[dataPointIndex] || value,
-      },
+  x: {
+    formatter: (value, { dataPointIndex }) =>
+      categories[dataPointIndex] || value,
+  },
 
-      y: {
-        formatter: (value) =>
-          `KES ${Number(value || 0).toLocaleString("en-KE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`,
-      },
-    },
+  y: {
+    formatter: (value) =>
+      `KES ${Number(value || 0).toLocaleString("en-KE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+  },
+},
 
     colors: [chartColors[0], chartColors[0]],
   };

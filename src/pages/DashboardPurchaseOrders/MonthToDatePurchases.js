@@ -24,18 +24,20 @@ const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
   return (
     <React.Fragment>
       <Card id="purchases-mtd-card">
-        <CardHeader className="border-0 align-items-center d-flex justify-content-between flex-wrap gap-2">
+          <CardHeader className="p-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
           <h4 className="card-title mb-0 flex-grow-1">
-            Month to Date Comparative Purchases Line Graph(MTD){" "}
+            Month to Date Comparative Line Graph(MTD){" "}
           </h4>
+              <div className="d-flex align-items-center">
           <CardExportButtons
             targetId="purchases-mtd-card"
             title="Month To Date Purchases"
             onExport={handleExportExcel}
           />
+          </div>
         </CardHeader>
 
-        <CardBody className="p-0 pb-2">
+        <CardBody className="p-2 ">
           <div className="w-100">
             <div dir="ltr">
               <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2">
@@ -60,6 +62,7 @@ const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
                   />
                   <span className="text-muted">2025</span>
                 </div>
+                    
               </div>
               <MonthToDateCharts
                 categories={categories}
