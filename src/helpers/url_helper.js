@@ -1,8 +1,3 @@
-import { AuthAPI, PowerBIAPI, LogoutAPI  } from "./api_helper";
-
-import { setAuthorization } from "./api_helper";
-
-
 //REGISTER
 export const POST_FAKE_REGISTER = "/auth/signup";
 

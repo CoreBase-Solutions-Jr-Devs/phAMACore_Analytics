@@ -44,9 +44,9 @@ export const profileAPI = (data) => {
   return AuthAPI.put(url.PUT_PROFILE, data);
 };
 
-// export const logoutUserAPI = () => {
-//   return LogoutAPI.post(url.POST_LOGOUT, );
-// };
+export const logoutUserAPI = (data = {}) => {
+  return AuthAPI.post(url.POST_LOGOUT, data);
+};
 
 export const forgotPasswordAPI = (data) => {
   return AuthAPI.post(url.POST_FORGOT_PASSWORD, data);
