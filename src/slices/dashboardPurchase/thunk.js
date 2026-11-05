@@ -13,6 +13,7 @@ import {
   getKPILeadTime as getKPILeadTimeApi,
   getGoodsReceived as getGoodsReceivedApi,
   getBestPricePerSupplier as getBestPricePerSupplierApi,
+  getLastYearGoodsReceived as getLastYearGoodsReceivedApi,
  
 } from "../../helpers/fakebackend_helper";
 
@@ -125,6 +126,19 @@ export const getGoodsReceived = createAsyncThunk(
       return response.data || response;
     } catch (error) {
       toast.error("Failed to fetch goods received", { autoClose: 3000 });
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const getLastYearGoodsReceived = createAsyncThunk(
+  "powerbi/getLastYearGoodsReceived",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getLastYearGoodsReceivedApi(params);
+      return response.data || response;
+    } catch (error) {
+      toast.error("Failed to fetch last year goods received", { autoClose: 3000 });
       return rejectWithValue(error.message);
     }
   },

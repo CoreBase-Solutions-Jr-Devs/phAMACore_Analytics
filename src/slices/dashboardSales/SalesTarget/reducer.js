@@ -184,6 +184,20 @@ const salesTargetSlice = createSlice({
           break;
         }
         
+        case "Year To Yesterday": {
+  const today = new Date();
+
+  const start = new Date(today.getFullYear(), 0, 1);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  state.filters.startDate = formatDMY(start);
+  state.filters.endDate = formatDMY(yesterday);
+
+  break;
+}
+
         case "Custom":
           state.filters.dateRange = "Custom";
           break;

@@ -11,6 +11,7 @@ import {
   getKPIPriceAlerts,
   getKPILeadTime,
   getGoodsReceived,
+  getLastYearGoodsReceived,
   getBestPricePerSupplier,
 } from "./thunk";
 
@@ -92,9 +93,11 @@ const initialState = {
 
   filters: {
     branchcode: "",
-   dateRange: "Month To Yesterday",
-  startDate: formatDMY(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
-  endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
+    dateRange: "Month To Yesterday",
+    startDate: formatDMY(
+      new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    ),
+    endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
     // groupBy: "SUMMARY",
     // topN: 0,
   },
@@ -248,11 +251,24 @@ const PurchaseOrdersSlice = createSlice({
           break;
         }
 
-        
-         case "Month To Yesterday": {
+        case "Month To Yesterday": {
           const today = new Date();
 
           const start = new Date(today.getFullYear(), today.getMonth(), 1);
+
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(yesterday);
+
+          break;
+        }
+
+        case "Year To Yesterday": {
+          const today = new Date();
+
+          const start = new Date(today.getFullYear(), 0, 1);
 
           const yesterday = new Date(today);
           yesterday.setDate(today.getDate() - 1);
@@ -760,15 +776,7 @@ const PurchaseOrdersSlice = createSlice({
         state.loading = false;
         state.error = null;
 
-        const data = action.payload?.result || action.payload || [];
-
-        const period = action.meta.arg?.period;
-
-        if (period === "LAST_YEAR") {
-          state.LastYearGoodsReceived = data;
-        } else {
-          state.GoodsReceived = data;
-        }
+        state.GoodsReceived = action.payload?.result || action.payload || [];
       })
 
       .addCase(getGoodsReceived.rejected, (state, action) => {
@@ -780,6 +788,31 @@ const PurchaseOrdersSlice = createSlice({
           "Error loading goods received";
       })
 
+      // ------------------------------------------
+      // GOODS RECEIVED
+      // ------------------------------------------
+
+      .addCase(getLastYearGoodsReceived.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getLastYearGoodsReceived.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        state.LastYearGoodsReceived =
+          action.payload?.result || action.payload || [];
+      })
+
+      .addCase(getLastYearGoodsReceived.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading last year goods received";
+      })
       // ------------------------------------------
       // BEST PRICE PER SUPPLIER
       // ------------------------------------------
@@ -806,31 +839,31 @@ const PurchaseOrdersSlice = createSlice({
           "Error loading best price per supplier";
       })
 
-          // ------------------------------------------
-          // KPI OVERDUE ACCOUNTS
-          // ------------------------------------------
-      
-          .addCase(getKPIOverdueAccounts.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-          })
-      
-          .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
-            state.loading = false;
-            state.error = null;
-      
-            state.kpiOverdueAccounts =
-              action.payload?.result || action.payload || [];
-          })
-      
-          .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
-            state.loading = false;
-            state.error =
-              action.payload?.message ||
-              action.payload ||
-              action.error.message ||
-              "Error loading overdue accounts";
-          });
+      // ------------------------------------------
+      // KPI OVERDUE ACCOUNTS
+      // ------------------------------------------
+
+      .addCase(getKPIOverdueAccounts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        state.kpiOverdueAccounts =
+          action.payload?.result || action.payload || [];
+      })
+
+      .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          action.error.message ||
+          "Error loading overdue accounts";
+      });
   },
 });
 
