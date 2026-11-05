@@ -22,16 +22,14 @@ const useSalesAnalytics = (
   customerMemberAnalysisSummary = [],
   customerMemberAnalysisBranch = [],
   customerMemberAnalysisCohort = [],
-
-  // Monthly Sales Targets
   julySalesTarget = [],
   augustSalesTarget = [],
   septemberSalesTarget = [],
   octoberSalesTarget = [],
-  salesTarget= [],
-salesTargetSummary= [],
-salesTargetBranch= [],
-salesTargetMONTHLY_PIVOT= [],
+  salesTarget = [],
+  salesTargetSummary = [],
+  salesTargetBranch = [],
+  salesTargetMONTHLY_PIVOT = [],
   filters = {},
 ) => {
   const formatAmount = (value) => {
@@ -96,78 +94,71 @@ salesTargetMONTHLY_PIVOT= [],
       .map((item) => item.invoice_Number),
   ).size;
 
- const branchData = useMemo(
-  () =>
-    (Array.isArray(salesBranch) ? salesBranch : []).map((item) => ({
-      name: (item.branch_name || "UNKNOWN BRANCH").replace(
-        /^AXCESS PHARMACY\s*-\s*/i,
-        "",
-      ),
-      amount: Number(item.net_sales_incl ?? 0),
-    })),
-  [salesBranch],
-);
+  const branchData = useMemo(
+    () =>
+      (Array.isArray(salesBranch) ? salesBranch : []).map((item) => ({
+        name: (item.branch_name || "UNKNOWN BRANCH").replace(
+          /^AXCESS PHARMACY\s*-\s*/i,
+          "",
+        ),
+        amount: Number(item.net_sales_incl ?? 0),
+      })),
+    [salesBranch],
+  );
 
-const branchChartSeries = useMemo(
-  () => [
-    {
-      name: "Revenue",
-      data: branchData.map((branch) => branch.amount),
-    },
-  ],
-  [branchData],
-);
+  const branchChartSeries = useMemo(
+    () => [
+      {
+        name: "Revenue",
+        data: branchData.map((branch) => branch.amount),
+      },
+    ],
+    [branchData],
+  );
 
-const branchCategories = useMemo(
-  () => branchData.map((branch) => branch.name),
-  [branchData],
-);
+  const branchCategories = useMemo(
+    () => branchData.map((branch) => branch.name),
+    [branchData],
+  );
 
   /* -------------------------------------------------------
-   * Revenue grouped by Sales Representative.
    * Used in the Salesman Revenue widget.
    * ------------------------------------------------------*/
-const salesmanData = sales.map((item) => ({
-  staff_ID: item.staff_ID,
-  staff_Name: item.staff_Name,
-  brancch_Name: item.brancch_Name.replace(
-        /^AXCESS PHARMACY\s*-\s*/i,
-        "",
-      ),
-  branch_ID: item.branch_ID,
-  totalSalesExcl: item.totalSalesExcl,
-  quantity_Sold: item.quantity_Sold,
-  gross_Profit: item.gross_Profit,
-  transaction_IDs: item.transaction_IDs,
-  invoice_Number: item.invoice_Number,
-  invoice_Date: item.invoice_Date,
+  const salesmanData = sales.map((item) => ({
+    staff_ID: item.staff_ID,
+    staff_Name: item.staff_Name,
+    brancch_Name: item.brancch_Name.replace(/^AXCESS PHARMACY\s*-\s*/i, ""),
+    branch_ID: item.branch_ID,
+    totalSalesExcl: item.totalSalesExcl,
+    quantity_Sold: item.quantity_Sold,
+    gross_Profit: item.gross_Profit,
+    transaction_IDs: item.transaction_IDs,
+    invoice_Number: item.invoice_Number,
+    invoice_Date: item.invoice_Date,
     item_Code: item.item_Code,
-  item_Name: item.item_Name,
-}));
+    item_Name: item.item_Name,
+  }));
 
   /* -------------------------------------------------------
    * Top customers ranked by total revenue.
    * ------------------------------------------------------*/
-const customerData = sales.map((item) => ({
-  client_ID: item.client_ID,
-  client_Name: item.client_Name,
-  brancch_Name: item.brancch_Name.replace(
-        /^AXCESS PHARMACY\s*-\s*/i,
-        "",
-      ),
-  branch_ID: item.branch_ID,
-  totalSalesExcl: item.totalSalesExcl,
-  quantity_Sold: item.quantity_Sold,
-  gross_Profit: item.gross_Profit,
-  transaction_IDs: item.transaction_IDs,
-  invoice_Number: item.invoice_Number,
-  invoice_Date: item.invoice_Date,
-  transaction_Type: item.transaction_Type,
-  item_Code: item.item_Code,
-  item_Name: item.item_Name,
-  group: item.group,
-  sub_Group: item.sub_Group,
-}));
+  const customerData = sales.map((item) => ({
+    client_ID: item.client_ID,
+    client_Name: item.client_Name,
+    brancch_Name: item.brancch_Name.replace(/^AXCESS PHARMACY\s*-\s*/i, ""),
+    branch_ID: item.branch_ID,
+    totalSalesExcl: item.totalSalesExcl,
+    quantity_Sold: item.quantity_Sold,
+    gross_Profit: item.gross_Profit,
+    transaction_IDs: item.transaction_IDs,
+    invoice_Number: item.invoice_Number,
+    invoice_Date: item.invoice_Date,
+    transaction_Type: item.transaction_Type,
+    item_Code: item.item_Code,
+    item_Name: item.item_Name,
+    group: item.group,
+    sub_Group: item.sub_Group,
+  }));
   const overdue = Array.isArray(kpiOverdueAccounts) ? kpiOverdueAccounts : [];
 
   const currentReceivables = overdue.reduce(
@@ -211,7 +202,6 @@ const customerData = sales.map((item) => ({
 
   /* -------------------------------------------------------
    * Top 5 best-selling products.
-   * Products are ranked by quantity sold.
    * ------------------------------------------------------*/
   const topProducts = useMemo(() => {
     const totals = {};
@@ -245,45 +235,57 @@ const customerData = sales.map((item) => ({
   const monthlyChart = useMemo(() => {
     const data = salesComparativeMTD || [];
 
-    console.log("YTD API Data:", data);
+  return {
+    categories: data.map((item) => item.month_name),
 
-    return {
-      categories: data.map((item) => item.month_name),
-      series: [
-        {
-          name: String(data[0]?.current_year ?? ""),
-          data: data.map((item) => Number(item.current_year_sales) || 0),
-        },
-        {
-          name: String(data[0]?.prior_year ?? ""),
-          data: data.map((item) => Number(item.prior_year_sales) || 0),
-        },
-      ],
-    };
-  }, [salesComparativeMTD]);
+    series: [
+      {
+        name: "2026",
+        data: data.map((item) => Number(item.current_year_sales || 0)),
+      },
+      {
+        name: "2025",
+        data: data.map((item) => Number(item.prior_year_sales || 0)),
+      },
+    ],
+
+    salesVariance: data.map((item) =>
+      Number(item.sales_variance || 0)
+    ),
+
+    salesGrowth: data.map((item) => Number(item.growth_perc) || 0),
+
+  };
+}, [salesComparativeMTD]);
 
   /* -------------------------------------------------------
    * Month-to-Date Revenue Chart
    * ------------------------------------------------------*/
-  const monthToDateChart = useMemo(() => {
-    const data = salesComparativeYTD || [];
 
-    console.log("MTD API Data:", data);
+const monthToDateChart = useMemo(() => {
+  const data = salesComparativeYTD || [];
 
-    return {
-      categories: data.map((item) => item.day_no),
-      series: [
-        {
-          name: String(data[0]?.curr_date?.slice(0, 4) ?? ""),
-          data: data.map((item) => Number(item.current_year_sales) || 0),
-        },
-        {
-          name: String(data[0]?.prior_date?.slice(0, 4) ?? ""),
-          data: data.map((item) => Number(item.prior_year_sales) || 0),
-        },
-      ],
-    };
-  }, [salesComparativeYTD]);
+  return {
+    categories: data.map((item) => item.day_no),
+
+    series: [
+      {
+        name: String(data[0]?.curr_date?.slice(0, 4) ?? ""),
+        data: data.map((item) => Number(item.current_year_sales) || 0),
+      },
+      {
+        name: String(data[0]?.prior_date?.slice(0, 4) ?? ""),
+        data: data.map((item) => Number(item.prior_year_sales) || 0),
+      },
+    ],
+
+    salesVariance: data.map((item) => Number(item.sales_variance) || 0),
+    salesGrowth: data.map((item) => Number(item.growth_perc) || 0),
+    grossProfit: data.map((item) => Number(item.current_year_gp) || 0),
+    CostOfGoods: data.map((item) => Number(item.current_year_cogs) || 0),
+  };
+}, [salesComparativeYTD]);
+
 
   const topProductsData = sales.reduce((acc, item) => {
     const name = item.item_Name || "UNKNOWN PRODUCT";
@@ -349,7 +351,6 @@ const customerData = sales.map((item) => ({
   const marginBand30To45 = getMarginBand("30% to 45%");
   const marginBandAbove45 = getMarginBand(">45%");
 
-  // Margin Analysis — Drilldown response
   const marginDrilldown = Array.isArray(marginAnalysisDrilldown)
     ? marginAnalysisDrilldown
     : [];
@@ -434,7 +435,6 @@ const customerData = sales.map((item) => ({
   const nonMemberCohort =
     cohortData.find((item) => item.cohort_type === "NON_MEMBER") || {};
 
-  // NEW MEMBERS
   const newCohortMemberCount = Number(newMemberCohort.member_count ?? 0);
   const newCohortTransactions = Number(newMemberCohort.transaction_count ?? 0);
   const newCohortSalesExcl = Number(newMemberCohort.sales_value_excl ?? 0);
@@ -444,7 +444,6 @@ const customerData = sales.map((item) => ({
     newMemberCohort.sales_contribution_pct ?? 0,
   );
 
-  // REPEAT MEMBERS
   const repeatCohortMemberCount = Number(repeatMemberCohort.member_count ?? 0);
   const repeatCohortTransactions = Number(
     repeatMemberCohort.transaction_count ?? 0,
@@ -460,7 +459,6 @@ const customerData = sales.map((item) => ({
     repeatMemberCohort.sales_contribution_pct ?? 0,
   );
 
-  // NON-MEMBERS
   const nonMemberCount = Number(nonMemberCohort.member_count ?? 0);
   const nonMemberTransactions = Number(nonMemberCohort.transaction_count ?? 0);
   const nonMemberSalesExcl = Number(nonMemberCohort.sales_value_excl ?? 0);
@@ -470,83 +468,73 @@ const customerData = sales.map((item) => ({
     nonMemberCohort.sales_contribution_pct ?? 0,
   );
 
-const performanceSummary = salesTargetSummary?.[0] ?? {};
-const performanceSummaryMONTHLY =
-  salesTargetMONTHLY_PIVOT ?? [];
+  const performanceSummary = salesTargetSummary?.[0] ?? {};
+  const performanceSummaryMONTHLY = salesTargetMONTHLY_PIVOT ?? [];
 
-const getChannelData = (channel) =>
-  salesChannel.find((item) => item.sales_channel === channel) || {};
+  const getChannelData = (channel) =>
+    salesChannel.find((item) => item.sales_channel === channel) || {};
 
-const CASH = getChannelData("CASH");
-const INSURANCE = getChannelData("INSURANCE");
-const OTHER_ACCOUNT = getChannelData("OTHER_ACCOUNT");
-const RETURN = getChannelData("RETURN");
-const TOTAL = getChannelData("TOTAL");
+  const CASH = getChannelData("CASH");
+  const INSURANCE = getChannelData("INSURANCE");
+  const OTHER_ACCOUNT = getChannelData("OTHER_ACCOUNT");
+  const RETURN = getChannelData("RETURN");
+  const TOTAL = getChannelData("TOTAL");
 
-const categoryPerformance = Array.isArray(salesSubgroup)
-  ? salesSubgroup
-  : [];
+  const categoryPerformance = Array.isArray(salesSubgroup) ? salesSubgroup : [];
 
-const categoryTotals = (Array.isArray(categoryPerformance)
-  ? categoryPerformance
-  : []
-).reduce(
-  (totals, item) => ({
-    total_sales_excl:
-      totals.total_sales_excl + Number(item.total_sales_excl ?? 0),
+  const categoryTotals = (
+    Array.isArray(categoryPerformance) ? categoryPerformance : []
+  ).reduce(
+    (totals, item) => ({
+      total_sales_excl:
+        totals.total_sales_excl + Number(item.total_sales_excl ?? 0),
 
-    total_tax:
-      totals.total_tax + Number(item.total_tax ?? 0),
+      total_tax: totals.total_tax + Number(item.total_tax ?? 0),
 
-    total_sales_incl:
-      totals.total_sales_incl + Number(item.total_sales_incl ?? 0),
+      total_sales_incl:
+        totals.total_sales_incl + Number(item.total_sales_incl ?? 0),
 
-    total_cogs:
-      totals.total_cogs + Number(item.total_cogs ?? 0),
+      total_cogs: totals.total_cogs + Number(item.total_cogs ?? 0),
 
-    gross_profit:
-      totals.gross_profit + Number(item.gross_profit ?? 0),
+      gross_profit: totals.gross_profit + Number(item.gross_profit ?? 0),
 
-    total_units_sold:
-      totals.total_units_sold + Number(item.total_units_sold ?? 0),
+      total_units_sold:
+        totals.total_units_sold + Number(item.total_units_sold ?? 0),
 
-    active_items_count:
-      totals.active_items_count + Number(item.active_items_count ?? 0),
+      active_items_count:
+        totals.active_items_count + Number(item.active_items_count ?? 0),
 
-    transaction_count:
-      totals.transaction_count + Number(item.transaction_count ?? 0),
+      transaction_count:
+        totals.transaction_count + Number(item.transaction_count ?? 0),
 
-    total_line_items:
-      totals.total_line_items + Number(item.total_line_items ?? 0),
+      total_line_items:
+        totals.total_line_items + Number(item.total_line_items ?? 0),
 
-    unique_clients:
-      totals.unique_clients + Number(item.unique_clients ?? 0),
-  }),
-  {
-    total_sales_excl: 0,
-    total_tax: 0,
-    total_sales_incl: 0,
-    total_cogs: 0,
-    gross_profit: 0,
-    total_units_sold: 0,
-    active_items_count: 0,
-    transaction_count: 0,
-    total_line_items: 0,
-    unique_clients: 0,
-  }
-);
+      unique_clients: totals.unique_clients + Number(item.unique_clients ?? 0),
+    }),
+    {
+      total_sales_excl: 0,
+      total_tax: 0,
+      total_sales_incl: 0,
+      total_cogs: 0,
+      gross_profit: 0,
+      total_units_sold: 0,
+      active_items_count: 0,
+      transaction_count: 0,
+      total_line_items: 0,
+      unique_clients: 0,
+    },
+  );
 
-const categoryGrossMargin =
-  categoryTotals.total_sales_excl > 0
-    ? (categoryTotals.gross_profit / categoryTotals.total_sales_excl) * 100
-    : 0;
+  const categoryGrossMargin =
+    categoryTotals.total_sales_excl > 0
+      ? (categoryTotals.gross_profit / categoryTotals.total_sales_excl) * 100
+      : 0;
 
-// Use the API's total sales including tax and transaction count
-// to calculate the overall average order value.
-const categoryAvgOrderValue =
-  categoryTotals.transaction_count > 0
-    ? categoryTotals.total_sales_incl / categoryTotals.transaction_count
-    : 0;
+  const categoryAvgOrderValue =
+    categoryTotals.transaction_count > 0
+      ? categoryTotals.total_sales_incl / categoryTotals.transaction_count
+      : 0;
 
   return {
     formatAmount,
@@ -620,9 +608,9 @@ const categoryAvgOrderValue =
     nonMemberSalesIncl,
     nonMemberABV,
     nonMemberSalesContribution,
-performanceSummary,
-performanceSummaryMONTHLY,
-  CASH,
+    performanceSummary,
+    performanceSummaryMONTHLY,
+    CASH,
     INSURANCE,
     OTHER_ACCOUNT,
     RETURN,
@@ -630,17 +618,17 @@ performanceSummaryMONTHLY,
     categoryPerformance,
     categoryTotals,
     categoryAvgOrderValue,
-categoryGrossMargin,
-// netSales,
-// targetSales,
-// achievementPct,
-// grossProfit,
-// grossMarginPct,
-// averageBasketValue,
-// transactionCount,
-// totalBranches,
-// targetVariance,
-// targetActionInsight,
+    categoryGrossMargin,
+    // netSales,
+    // targetSales,
+    // achievementPct,
+    // grossProfit,
+    // grossMarginPct,
+    // averageBasketValue,
+    // transactionCount,
+    // totalBranches,
+    // targetVariance,
+    // targetActionInsight,
   };
 };
 

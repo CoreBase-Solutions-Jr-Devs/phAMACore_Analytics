@@ -25,11 +25,10 @@ const SalesmanRevenue = ({ data = [], loading, error }) => {
           </div>
         ),
       }),
-
-      columnHelper.accessor("item_Name", {
+columnHelper.accessor("item_Name", {
   header: "Item",
   cell: (info) => (
-    <span className="fw-medium text-dark">
+    <span className="fw-medium text-dark ">
       {info.getValue() || "N/A"}
     </span>
   ),
@@ -46,10 +45,10 @@ const SalesmanRevenue = ({ data = [], loading, error }) => {
       }),
 
       columnHelper.accessor("totalSalesExcl", {
-        header: "SalesExcl.(KES)",
+        header: "SalesExcl.",
        
         cell: (info) => (
-          <span className="fw-bold text-success">
+          <span className="fw-semibold text-caramel">
             {Number(info.getValue() || 0).toLocaleString("en-KE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -59,7 +58,7 @@ const SalesmanRevenue = ({ data = [], loading, error }) => {
       }),
 
       columnHelper.accessor("quantity_Sold", {
-        header: "Quantity",
+        header: "Qty",
       
         cell: (info) => (
           <span className="badge bg-primary-subtle text-primary">
@@ -69,10 +68,10 @@ const SalesmanRevenue = ({ data = [], loading, error }) => {
       }),
 
       columnHelper.accessor("gross_Profit", {
-        header: "GrossProfit",
+        header: "Profit",
        
         cell: (info) => (
-          <span className="text-warning fw-semibold">
+          <span className="text-success fw-semibold">
             {Number(info.getValue() || 0).toLocaleString("en-KE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -81,18 +80,18 @@ const SalesmanRevenue = ({ data = [], loading, error }) => {
         ),
       }),
 
-      columnHelper.accessor("transaction_IDs", {
-        header: "TransID",
+      // columnHelper.accessor("transaction_IDs", {
+      //   header: "TransID",
         
-        cell: (info) => (
-          <span className="text-muted small">
-            {info.getValue() || "N/A"}
-          </span>
-        ),
-      }),
+      //   cell: (info) => (
+      //     <span className="text-muted small">
+      //       {info.getValue() || "N/A"}
+      //     </span>
+      //   ),
+      // }),
 
       columnHelper.accessor("invoice_Number", {
-        header: "InvNumber",
+        header: "InvNum",
        
       }),
 
@@ -107,31 +106,33 @@ const SalesmanRevenue = ({ data = [], loading, error }) => {
     ],
     [],
   );
- const handleExportExcel = () => {
-    const rows = data.map((item) => ({
-      Customer: item.client_Name || "",
-      "Customer ID": item.client_ID || "",
-      Branch: item.brancch_Name || "",
-      "Sales Excl. (KES)": Number(item.total_Sales_Excl || 0),
-      "Quantity Sold": item.quantity_Sold || 0,
-      "Gross Profit": item.gross_Profit || 0,
-      "Transaction ID": item.transaction_IDs || "",
-      "Invoice Number": item.invoice_Number || "",
-      "Invoice Date": item.invoice_Date || "",
-    }));
+const handleExportExcel = () => {
+  const rows = data.map((item) => ({
+    Salesperson: item.staff_Name || "Unknown Staff",
+    Item: item.item_Name || "N/A",
+    Branch: item.brancch_Name || "N/A",
+    "Sales Excl. (KES)": Number(item.totalSalesExcl || 0),
+    Qty: Number(item.quantity_Sold || 0),
+    "Gross Profit (KES)": Number(item.gross_Profit || 0),
+    // "Transaction ID": item.transaction_IDs || "N/A",
+    "Invoice Number": item.invoice_Number || "N/A",
+    "Invoice Date": item.invoice_Date
+      ? new Date(item.invoice_Date).toLocaleDateString("en-GB")
+      : "N/A",
+  }));
 
-    const todayStr = new Date()
-      .toLocaleDateString("en-GB")
-      .replace(/\//g, "-");
+  const todayStr = new Date()
+    .toLocaleDateString("en-GB")
+    .replace(/\//g, "-");
 
-    exportToExcel(rows, `SalesPerson_Revenue_${todayStr}`);
-  };
+  exportToExcel(rows, `Salesperson_Revenue_${todayStr}`);
+};
 
   return (
     <Card className="card-height-100" id="sales-salesman-revenue-card">
       <CardHeader className="align-items-center d-flex justify-content-between">
         <h4 className="card-title mb-0">
-          SalesPerson Sales Details
+          Sales by Salesperson 
         </h4>
             <CardExportButtons
                   targetId="sales-salesman-revenue-card"

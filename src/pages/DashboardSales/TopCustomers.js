@@ -19,7 +19,7 @@ const TopCustomers = ({ data = [], loading, error }) => {
               {row.original.client_Name || "Unknown Customer"}
             </div>
             <small className="text-muted">
-              ID: {row.original.client_ID || "N/A"}
+               {row.original.client_ID || "N/A"}
             </small>
           </div>
         ),
@@ -28,7 +28,7 @@ const TopCustomers = ({ data = [], loading, error }) => {
 columnHelper.accessor("item_Name", {
   header: "Item",
   cell: (info) => (
-    <span className="fw-medium text-dark">
+    <span className="fw-medium text-dark ">
       {info.getValue() || "N/A"}
     </span>
   ),
@@ -45,9 +45,9 @@ columnHelper.accessor("item_Name", {
 
     
       columnHelper.accessor("totalSalesExcl", {
-        header: "SalesExcl.(KES)",
+        header: "SalesExcl.",
         cell: (info) => (
-          <span className="fw-bold text-success">
+          <span className="fw-bold text-caramel">
             {Number(info.getValue() || 0).toLocaleString("en-KE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -57,7 +57,7 @@ columnHelper.accessor("item_Name", {
       }),
 
       columnHelper.accessor("quantity_Sold", {
-        header: "Quantity",
+        header: "Qty",
         cell: (info) => (
           <span className="badge bg-primary-subtle text-primary">
             {info.getValue() ?? 0}
@@ -66,9 +66,9 @@ columnHelper.accessor("item_Name", {
       }),
 
       columnHelper.accessor("gross_Profit", {
-        header: "GrossProfit",
+        header: "Profit",
         cell: (info) => (
-          <span className="fw-semibold text-warning">
+          <span className="fw-semibold text-success">
             {Number(info.getValue() || 0).toLocaleString("en-KE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -77,17 +77,17 @@ columnHelper.accessor("item_Name", {
         ),
       }),
 
-      columnHelper.accessor("transaction_IDs", {
-        header: "TransID",
-        cell: (info) => (
-          <span className="text-muted small">
-            {info.getValue() || "N/A"}
-          </span>
-        ),
-      }),
+      // columnHelper.accessor("transaction_IDs", {
+      //   header: "TransID",
+      //   cell: (info) => (
+      //     <span className="text-muted small">
+      //       {info.getValue() || "N/A"}
+      //     </span>
+      //   ),
+      // }),
 
       columnHelper.accessor("invoice_Number", {
-        header: "InvNumber",
+        header: "InvNum",
       }),
 
       columnHelper.accessor("invoice_Date", {
@@ -110,7 +110,7 @@ columnHelper.accessor("item_Name", {
       "Sales Excl. (KES)": Number(item.totalSalesExcl || 0),
       "Quantity Sold": item.quantity_Sold || 0,
       "Gross Profit": item.gross_Profit || 0,
-      "Transaction ID": item.transaction_IDs || "",
+      // "Transaction ID": item.transaction_IDs || "",
       "Invoice Number": item.invoice_Number || "",
       "Invoice Date": item.invoice_Date || "",
     }));
@@ -126,7 +126,7 @@ return (
   <Card className="card-height-100" id="sales-top-customers-card">
     <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
       <h4 className="card-title mb-0 flex-grow-1">
-        Customer Sales Details (KES)
+Sales by Customer
       </h4>
 
       <CardExportButtons
@@ -160,6 +160,8 @@ return (
           data={data}
           loading={loading}
           error={error}
+           
+
           searchInputWidth="450px"
           isGlobalFilter={true}
           isColumnFilter={false}

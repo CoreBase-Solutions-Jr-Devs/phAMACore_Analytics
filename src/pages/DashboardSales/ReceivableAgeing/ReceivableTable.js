@@ -75,36 +75,37 @@ const ReceivablesTabs = [
   const formatDate = (value) =>
     value ? new Date(value).toLocaleDateString("en-GB") : "-";
 
+
 const getCustomerRisk = (customer) => {
-  if (Number(customer.over_120 ?? 0) > 0) {
+  if (customer.over_120 != null) {
     return {
       label: "Critical",
       className: "bg-danger-subtle text-danger",
     };
   }
 
-  if (Number(customer.days_91_120 ?? 0) > 0) {
+  if (customer.days_91_120 != null) {
     return {
       label: "Very High",
       className: "bg-danger-subtle text-danger",
     };
   }
 
-  if (Number(customer.days_61_90 ?? 0) > 0) {
+  if (customer.days_61_90 != null) {
     return {
       label: "High",
       className: "bg-warning-subtle text-warning",
     };
   }
 
-  if (Number(customer.days_31_60 ?? 0) > 0) {
+  if (customer.days_31_60 != null) {
     return {
       label: "Moderate",
       className: "bg-info-subtle text-info",
     };
   }
 
-  if (Number(customer.current_0_30 ?? 0) > 0) {
+  if (customer.current_0_30 != null) {
     return {
       label: "Low",
       className: "bg-success-subtle text-success",
@@ -116,6 +117,7 @@ const getCustomerRisk = (customer) => {
     className: "bg-secondary-subtle text-secondary",
   };
 };
+
 
 // Clickable Action Insight cell
 const InsightCell = ({ insight, id, children }) => {
@@ -145,30 +147,66 @@ const ReceivablesAgeingTable = ({
   const [activeTab, setActiveTab] = useState("ALL");
 
   // Filter customers based on selected ageing range
-  const filteredData = useMemo(() => {
-    if (activeTab === "ALL") return data;
+const filteredData = useMemo(() => {
+  if (activeTab === "ALL") return data;
 
-    const selectedTab = ReceivablesTabs.find((tab) => tab.value === activeTab);
+  const selectedTab = ReceivablesTabs.find(
+    (tab) => tab.value === activeTab
+  );
 
-    if (!selectedTab?.field) return data;
+  if (!selectedTab?.field) return data;
 
-    return data.filter((item) => Number(item[selectedTab.field] ?? 0) > 0);
-  }, [data, activeTab]);
+  return data.filter(
+    (item) => Number(item[selectedTab.field] ?? 0) !== 0
+  );
+}, [data, activeTab]);
 
   // Customer counts for each tab
-  const tabCounts = useMemo(() => {
-    const counts = { ALL: data.length };
+const tabCounts = useMemo(() => {
+  const counts = { ALL: data.length };
 
-    ReceivablesTabs.forEach((tab) => {
-      if (tab.field) {
-        counts[tab.value] = data.filter(
-          (item) => Number(item[tab.field] ?? 0) > 0,
-        ).length;
-      }
-    });
+  ReceivablesTabs.forEach((tab) => {
+    if (tab.field) {
+      counts[tab.value] = data.filter(
+        (item) => Number(item[tab.field] ?? 0) !== 0
+      ).length;
+    }
+  });
 
-    return counts;
-  }, [data]);
+  console.table(counts);
+
+  return counts;
+}, [data]);
+
+// const filteredData = useMemo(() => {
+//   console.log("=== RECEIVABLES AGEING DEBUG ===");
+//   console.log("Active Tab:", activeTab);
+
+//   if (activeTab === "ALL") {
+//     console.log("Showing ALL customers:", data.length);
+//     return data;
+//   }
+
+//   const selectedTab = ReceivablesTabs.find(
+//     (tab) => tab.value === activeTab
+//   );
+
+//   console.log("Selected Tab:", selectedTab);
+//   console.log("Selected Ageing Field:", selectedTab?.field);
+
+//   if (!selectedTab?.field) return data;
+
+//   const filtered = data.filter(
+//     (item) =>
+//       item[selectedTab.field] !== null &&
+//       item[selectedTab.field] !== undefined
+//   );
+
+//   console.log("Filtered Customers:", filtered);
+//   console.log("Filtered Customer Count:", filtered.length);
+
+//   return filtered;
+// }, [data, activeTab]);
 
   const columns = useMemo(
     () => [
@@ -266,26 +304,33 @@ const ReceivablesAgeingTable = ({
     [],
   );
 
-  const handleExportExcel = () => {
-    const exportData = filteredData.map((item) => ({
-      "Customer Name": item.cusname,
-      "Customer Code": item.cuscode,
-      "Account Type": item.account_type,
-      "Total Balance": item.total_balance,
-      "Last Invoice Date": formatDate(item.last_invoice_date),
-      "Last Payment Date": formatDate(item.last_payment_date),
-      "Action Insight": item.action_insight,
-      Risk: getCustomerRisk(item).label,
-    }));
+const handleExportExcel = () => {
+  const exportData = filteredData.map((item) => ({
+    "Customer Name": item.cusname || "-",
+    "Customer Code": item.cuscode || "-",
+    "Account Type": item.account_type || "-",
+    "Total Balance (KES)": Number(item.total_balance || 0),
+    "Last Invoice Date": formatDate(item.last_invoice_date),
+    "Last Payment Date": formatDate(item.last_payment_date),
+    "Action Insight": item.action_insight || "-",
+    Risk: getCustomerRisk(item).label,
+  }));
 
-    const today = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+  const today = new Date()
+    .toLocaleDateString("en-GB")
+    .replace(/\//g, "-");
 
-    const selectedTab = ReceivablesTabs.find((tab) => tab.value === activeTab);
+  const selectedTab = ReceivablesTabs.find(
+    (tab) => tab.value === activeTab
+  );
 
-    const safeTabName = selectedTab.label.replace(/[^a-zA-Z0-9]+/g, "_");
+  const safeTabName = selectedTab.label.replace(/[^a-zA-Z0-9]+/g, "_");
 
-    exportToExcel(exportData, `Receivables_Ageing_${safeTabName}_${today}`);
-  };
+  exportToExcel(
+    exportData,
+    `Receivables_Ageing_${safeTabName}_${today}`
+  );
+};
 
   return (
     <Card id="receivables-ageing-details" className="shadow-sm">
@@ -298,9 +343,9 @@ const ReceivablesAgeingTable = ({
         </div>
 
         <CardExportButtons
+                          title="Receivables Ageing Details"
           targetId="receivables-ageing-details"
-          onExportExcel={handleExportExcel}
-        />
+onExport={handleExportExcel}        />
       </CardHeader>
 
       <CardBody>

@@ -25,10 +25,7 @@ import {
   getKPISalesTransactions,
   getKPIOverdueAccounts,
 } from "../../slices/dashboardSales/thunk";
-import {
-
-  getPeriod,
-} from "../../helpers/date_helper";
+import { getPeriod } from "../../helpers/date_helper";
 import { clearSalesData } from "../../slices/dashboardSales/reducer";
 import useSalesAnalytics from "../../Components/Hooks/useSalesAnalytics";
 
@@ -42,12 +39,11 @@ const DashboardSales = () => {
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
 
-const [selectedBranchName, setSelectedBranchName] =
-  useState("All Branches");
+  const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
 
   const {
     sales = [],
-    
+
     kpiSales = [],
     kpiOverdueAccounts = [],
     overdueSummary = [],
@@ -57,7 +53,7 @@ const [selectedBranchName, setSelectedBranchName] =
     salesType = [],
     salesBranch = [],
     salesBranch_Type = [],
-   
+
     salesComparativeMTD = [],
     salesComparativeYTD = [],
 
@@ -106,7 +102,7 @@ const [selectedBranchName, setSelectedBranchName] =
     salesType,
     salesBranch,
     salesBranch_Type,
-   [], // salesChannel,
+    [], // salesChannel,
     salesComparativeMTD,
     salesComparativeYTD,
     filters,
@@ -197,14 +193,14 @@ const [selectedBranchName, setSelectedBranchName] =
       }),
     );
 
-     dispatch(
+    dispatch(
       getKPISalesTransactions({
         ...params,
         groupBy: "COMPARATIVE_MTD",
       }),
     );
 
-     dispatch(
+    dispatch(
       getKPISalesTransactions({
         ...params,
         groupBy: "COMPARATIVE_YTD",
@@ -224,13 +220,13 @@ const [selectedBranchName, setSelectedBranchName] =
         includeZeroBal: false,
       }),
     );
-  }, [dispatch,]);
+  }, [dispatch]);
 
-useEffect(() => {
-  return () => {  
-    dispatch(clearSalesData());
-  };
-}, [dispatch]);
+  useEffect(() => {
+    return () => {
+      dispatch(clearSalesData());
+    };
+  }, [dispatch]);
 
   const handleApplyFilters = () => {
     dispatch(
@@ -246,7 +242,7 @@ useEffect(() => {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-        branchcode: filters.branch,
+      branchcode: filters.branch,
     };
 
     dispatch(
@@ -270,20 +266,20 @@ useEffect(() => {
       }),
     );
 
-     dispatch(
+    dispatch(
       getKPISalesTransactions({
         ...params,
         groupBy: "COMPARATIVE_MTD",
       }),
     );
 
-     dispatch(
+    dispatch(
       getKPISalesTransactions({
         ...params,
         groupBy: "COMPARATIVE_YTD",
       }),
     );
-    
+
     dispatch(
       getKPIOverdueAccounts({
         clientid: 1,
@@ -304,7 +300,7 @@ useEffect(() => {
   //     : (salesBranch || []).find(
   //         (m) => Number(m.branch_id) === Number(filters.branch),
   //       )?.branch_name || "";
-        
+
   document.title = "Sales Dashboard | phAMACore Analytics";
 
   return (
@@ -313,8 +309,7 @@ useEffect(() => {
         <BreadCrumb
           title="Sales"
           pageTitle="Dashboards"
-          subtitle=
-          {selectedBranchName}
+          subtitle={selectedBranchName}
         />
 
         <Row>
@@ -340,26 +335,23 @@ useEffect(() => {
             error={error}
           />
         </Row>
+
         <Row>
           <Col xl={12}>
-         
-              <BranchPerformance
-                branchData={branchData}
-                chartSeries={branchChartSeries}
-                categories={branchCategories}
-                totalRevenue={totalRevenue}
-                formatAmount={formatAmount}
-                loading={loading}
-                error={error}
-              />
-            
-          </Col>         
-              {/* <TopProducts data={topProducts} error={error} loading={loading} /> */}         
-       
+            <BranchPerformance
+              branchData={branchData}
+              chartSeries={branchChartSeries}
+              categories={branchCategories}
+              totalRevenue={totalRevenue}
+              formatAmount={formatAmount}
+              loading={loading}
+              error={error}
+            />
+          </Col>
         </Row>
-<Row>
-  <Col>
-                <ReceivablesAgeing
+        <Row>
+          <Col>
+            <ReceivablesAgeing
               kpiOverdueAccounts={kpiOverdueAccounts}
               currentReceivables={currentReceivables}
               // overdue1To30={overdue1To30}
@@ -372,11 +364,11 @@ useEffect(() => {
               error={error}
               loading={loading}
             />
-  </Col>
-</Row>
+          </Col>
+        </Row>
 
         <Row>
-          <Col >
+          <Col xl={6}>
             <SalesmanRevenue
               sales={sales}
               data={salesmanData}
@@ -385,47 +377,39 @@ useEffect(() => {
               loading={loading}
             />
           </Col>
-
-          {/* <Col xl={4}>
-
-          </Col> */}
-
-          {/* <Col xl={6}>
-            <TopCustomers
-              sales={sales}
-              data={customerData}
-              formatAmount={formatAmount}
-              error={error}
-              loading={loading}
-            />
-          </Col> */}
-        </Row>
-        <Row>
-    <Col xl={12}>
-            <TopCustomers
-              sales={sales}
-              data={customerData}
-              formatAmount={formatAmount}
-              error={error}
-              loading={loading}
-            />
-          </Col>
-        </Row>
-        <Row>
           <Col xl={6}>
-            <YearToDateSales
-              series={monthlyChart.series}
-              categories={monthlyChart.categories}
+            <TopCustomers
+              sales={sales}
+              data={customerData}
               formatAmount={formatAmount}
               error={error}
               loading={loading}
             />
           </Col>
-
+        </Row>
+       
+        <Row>
           <Col xl={6}>
             <MonthToDateSales
               series={monthToDateChart.series}
               categories={monthToDateChart.categories}
+              salesVariance={monthToDateChart.salesVariance}
+              salesGrowth={monthToDateChart.salesGrowth}
+              grossProfit={monthToDateChart.grossProfit}
+              CostOfGoods={monthToDateChart.CostOfGoods}
+              formatAmount={formatAmount}
+              error={error}
+              loading={loading}
+            />
+          </Col>
+          <Col xl={6}>
+            <YearToDateSales
+              series={monthlyChart.series}
+              categories={monthlyChart.categories}
+              salesVariance={monthlyChart.salesVariance}
+              salesGrowth={monthlyChart.salesGrowth}
+              grossProfit={monthlyChart.grossProfit}
+              CostOfGoods={monthlyChart.CostOfGoods}
               formatAmount={formatAmount}
               error={error}
               loading={loading}
@@ -433,24 +417,17 @@ useEffect(() => {
           </Col>
 
           <FilterActions
-                  branch={filters.branch}
-                    dateRange={filters.dateRange}
-                    startDate={filters.startDate}
-                    endDate={filters.endDate}
-                    onBranchChange={(value) =>
-                      dispatch(setBranch(value === "" ? null : Number(value)))
-                    }
-                      onBranchNameChange={setSelectedBranchName}
-
-                    onDateRangeChange={(value) =>
-                      dispatch(setDateRange(value))
-                    }
-                    onStartDateChange={(value) =>
-                      dispatch(setStartDate(value))
-                    }
-                    onEndDateChange={(value) =>
-                      dispatch(setEndDate(value))
-                    }
+            branch={filters.branch}
+            dateRange={filters.dateRange}
+            startDate={filters.startDate}
+            endDate={filters.endDate}
+            onBranchChange={(value) =>
+              dispatch(setBranch(value === "" ? null : Number(value)))
+            }
+            onBranchNameChange={setSelectedBranchName}
+            onDateRangeChange={(value) => dispatch(setDateRange(value))}
+            onStartDateChange={(value) => dispatch(setStartDate(value))}
+            onEndDateChange={(value) => dispatch(setEndDate(value))}
             onApply={handleApplyFilters}
             rightColumn={rightColumn}
             hideRightColumn={toggleRightColumn}

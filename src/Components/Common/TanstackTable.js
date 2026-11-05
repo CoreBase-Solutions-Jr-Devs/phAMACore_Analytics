@@ -176,8 +176,13 @@ const TanstackTable = ({
           ...containerStyle,
         }}
       >
-        <Table className={tableClass} style={tableStyle}>
-          <thead className={theadClass}>
+<Table
+  className={tableClass}
+  style={{
+    ...tableStyle,
+    fontSize: "12px",
+  }}
+>          <thead className={theadClass}>
             {customHeader ??
               getHeaderGroups().map((headerGroup) => (
                 <tr className={trClass} key={headerGroup.id}>
@@ -212,10 +217,14 @@ const TanstackTable = ({
                             : undefined
                         }
                         style={{
+                            // fontSize: "14px",
+                             // fontWeight: 600,
                           cursor: header.column.getCanSort()
                             ? "pointer"
                             : "default",
                           whiteSpace: "nowrap",
+                         
+   
                           position: sticky ? "sticky" : undefined,
                           ...stickyStyle,
                           zIndex: sticky ? 5 : undefined,
@@ -272,6 +281,7 @@ const TanstackTable = ({
                       key={cell.id}
                       className={cell.column.columnDef.meta?.tdClassName ?? ""}
                       style={{
+                          fontSize: "12px",
                         ...cell.column.columnDef.meta?.tdStyle,
                         ...(cell.column.columnDef.meta?.sticky
                           ? {
@@ -281,6 +291,7 @@ const TanstackTable = ({
                                   ? 0
                                   : "170px",
                               zIndex: 2,
+                              
                               backgroundColor: "var(--vz-card-bg, #fff)",
                               boxShadow: "2px 0 3px -3px rgba(0,0,0,0.35)",
                             }

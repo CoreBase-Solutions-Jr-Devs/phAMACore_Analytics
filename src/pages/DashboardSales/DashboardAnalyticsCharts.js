@@ -285,10 +285,29 @@ const ProgressiveSalesChart = ({
   dataColors,
   series,
   categories = [],
+  salesVariance,
+  salesGrowth,
+  grossProfit,
+  CostOfGoods,
   formatAmount,
 }) => {
   const colors = getChartColorsArray(dataColors);
+  const today = new Date();
 
+  const currentMonth = today.toLocaleString("en-GB", {
+    month: "short",
+  });
+
+  const currentMonthName = today.toLocaleString("en-GB", {
+    month: "long",
+  });
+
+  const currentMonthExists = categories.includes(currentMonth);
+  const getLastValidPoint = (data) =>
+    data.findLastIndex((value) => Number(value) > 0);
+
+  const currentYearIndex = categories.length - 1; // December
+  const priorYearIndex = getLastValidPoint(series[1]?.data || []);
   const options = {
     chart: {
       height: 370,
@@ -298,23 +317,51 @@ const ProgressiveSalesChart = ({
       },
       zoom: { enabled: true },
     },
-
-    stroke: {
-      curve: "smooth",
-      width: 3,
-      dashArray: [0, 6], // 2026 solid, 2025 dashed
-    },
-
-    dataLabels: {
-      enabled: false,
-    },
-
-    // Same color for both years
     colors: [colors[0], colors[0]],
 
-   legend: {
-  show: false,
-},
+    stroke: {
+      curve: "straight",
+      width: 2,
+      dashArray: [0, 6],
+    },
+
+    // dataLabels: {
+    //   enabled: true,
+
+    //   formatter: function (value, { seriesIndex, dataPointIndex }) {
+    //     // 2026 at December
+    //     if (seriesIndex === 0 && dataPointIndex === currentYearIndex) {
+    //       return `${today.getFullYear()}`;
+    //     }
+
+    //     // 2025 at its last valid point
+    //     if (seriesIndex === 1 && dataPointIndex === priorYearIndex) {
+    //       return `${today.getFullYear() - 1}`;
+    //     }
+
+    //     return "";
+    //   },
+
+    //   background: {
+    //     enabled: true,
+    //     foreColor: "#fff",
+    //     borderRadius: 4,
+    //     padding: 5,
+    //     opacity: 1,
+    //     borderWidth: 0,
+    //   },
+
+    //   style: {
+    //     fontSize: "12px",
+    //     fontWeight: 600,
+    //     colors: [
+    //       colors[0], // 2026 label
+    //       colors[0], // 2025 label
+    //     ],
+    //   },
+
+    //   offsetY: -12,
+    // },
 
     xaxis: {
       categories,
@@ -326,16 +373,138 @@ const ProgressiveSalesChart = ({
       axisBorder: {
         show: false,
       },
+
+      labels: {
+        formatter: (value) => {
+          const monthIndex = categories.indexOf(value);
+          return monthIndex % 2 === 0 ? value : "";
+        },
+      },
+    },
+    legend: {
+      show: false,
+    },
+
+    tooltip: {
+      shared: true,
+      intersect: false,
+
+      custom: function ({ dataPointIndex }) {
+        const currentSales = series[0]?.data?.[dataPointIndex] ?? 0;
+        const priorSales = series[1]?.data?.[dataPointIndex] ?? 0;
+
+        const variance = salesVariance?.[dataPointIndex] ?? 0;
+        const growth = salesGrowth?.[dataPointIndex];
+
+        return `
+      <div style="padding: 10px; font-size: 11px; min-width: 230px; background: #fff; color: #333; border-radius: 6px;">
+
+        <div style="font-weight: 500; margin-bottom: 10px;">
+          ${categories[dataPointIndex]}
+        </div>
+
+        <div style="margin-bottom: 5px;">
+          ${series[0]?.name}:
+          <strong>KES ${Number(currentSales).toLocaleString("en-KE")}</strong>
+        </div>
+
+        <div style="margin-bottom: 5px;">
+          ${series[1]?.name}:
+          <strong>KES ${Number(priorSales).toLocaleString("en-KE")}</strong>
+        </div>
+
+        <hr style="margin: 8px 0;" />
+
+        <div style="margin-bottom: 5px;">
+          Variance:
+          <strong class="${Number(variance) >= 0 ? "text-success" : "text-danger"}">
+            KES ${Number(variance).toLocaleString("en-KE")}
+          </strong>
+        </div>
+
+        <div>
+          Growth:
+          <strong class="${Number(growth) >= 0 ? "text-success" : "text-danger"}">
+            ${growth != null ? `${Number(growth).toFixed(2)}%` : "_"}
+          </strong>
+        </div>
+<div style="margin-bottom: 5px;">
+  Gross Profit:
+  <strong class="${
+    grossProfit == null || grossProfit === ""
+      ? "text-muted"
+      : Number(grossProfit) >= 0
+        ? "text-success"
+        : "text-danger"
+  }">
+    ${
+      grossProfit == null || grossProfit === ""
+        ? "_"
+        : `KES ${Number(grossProfit).toLocaleString("en-KE")}`
+    }
+  </strong>
+</div>
+
+<div style="margin-bottom: 5px;">
+  COGS:
+  <strong class="${
+    CostOfGoods == null || CostOfGoods === ""
+      ? "text-muted"
+      : Number(CostOfGoods) >= 0
+        ? "text-success"
+        : "text-danger"
+  }">
+    ${
+      CostOfGoods == null || CostOfGoods === ""
+        ? "_"
+        : `KES ${Number(CostOfGoods).toLocaleString("en-KE")}`
+    }
+  </strong>
+</div>
+      </div>
+    `;
+      },
     },
 
     yaxis: {
+      title: {
+        text: "Sales (KES)",
+      },
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
 
       labels: {
-  formatter: (val) =>
-          Number(val || 0).toLocaleString("en-KE"),      },
+        formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
+      },
+    },
+
+    annotations: {
+      xaxis: currentMonthExists
+        ? [
+            {
+              x: currentMonth,
+              borderColor: "#C68E45",
+              strokeDashArray: 5,
+              borderWidth: 2,
+
+              label: {
+                text: "currentMonth",
+                position: "top",
+                orientation: "horizontal",
+                borderColor: "#C68E45",
+                padding: "2px 6px",
+                borderRadius: "4px",
+                style: {
+                  color: "#fff",
+                  background: "#C68E45",
+                  fontSize: "11px",
+                  // fontWeight: 500,
+                },
+              },
+            },
+          ]
+        : [],
     },
   };
 
@@ -431,14 +600,13 @@ const ProgressiveSalesChart = ({
 //     );
 // };
 
-
 const BranchPerformanceChart = ({
   dataColors,
   series = [],
   categories = [],
   trendData = [],
 }) => {
-    const chartColors = getChartColorsArray(dataColors);
+  const chartColors = getChartColorsArray(dataColors);
 
   const barData = series[0]?.data || [];
 
@@ -479,31 +647,30 @@ const BranchPerformanceChart = ({
     //   size: [0, 4],
     // },
 
-xaxis: {
-  categories,
-   title: {
-        text: "Branches",
+    xaxis: {
+      categories,
+      //  title: {
+      //       text: "Branches",
+      //     },
+      labels: {
+        rotate: -45,
+        rotateAlways: true,
+        trim: false,
+        hideOverlappingLabels: false,
+        minHeight: 100,
+        maxHeight: 160,
+        style: {
+          fontSize: "10px",
+        },
       },
-  labels: {
-    rotate: -45,
-    rotateAlways: true,
-    trim: false,
-    hideOverlappingLabels: false,
-    minHeight: 100,
-    maxHeight: 160,
-    style: {
-      fontSize: "10px",
     },
-  },
-},
 
     yaxis: {
       title: {
-        text: "Revenue (KES)",
+        text: "Sales (KES)",
       },
       labels: {
-        formatter: (value) =>
-          Number(value || 0).toLocaleString("en-KE"),
+        formatter: (value) => Number(value || 0).toLocaleString("en-KE"),
       },
     },
 
@@ -519,17 +686,17 @@ xaxis: {
       },
     },
 
-    colors: [chartColors[0], chartColors[0] ],
+    colors: [chartColors[0], chartColors[0]],
   };
 
   const mixedSeries = [
     {
-      name: "Revenue",
+      name: "Sales",
       type: "bar",
       data: barData,
     },
     {
-      name: "Revenue Trend",
+      name: "Sales Trend",
       type: "line",
       data: trendData.length ? trendData : barData,
     },
@@ -548,10 +715,25 @@ xaxis: {
 const MonthToDateSalesChart = ({
   dataColors,
   series,
+  salesVariance,
+  salesGrowth,
+  CostOfGoods,
+  grossProfit,
   formatAmount,
   categories = [],
 }) => {
   const colors = getChartColorsArray(dataColors);
+
+  const today = new Date();
+
+  const todayDay = today.getDate();
+
+  const todayLabel = today.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+  });
+
+  const todayIndex = categories.findIndex((day) => Number(day) === todayDay);
 
   const options = {
     chart: {
@@ -566,41 +748,222 @@ const MonthToDateSalesChart = ({
     },
 
     stroke: {
-      curve: "smooth",
-      width: 3,
-      dashArray: [0, 6], // 2026 solid, 2025 dashed
+      curve: "straight",
+      width: 2,
+      dashArray: [0, 6],
     },
 
-    // Same color for both lines
     colors: [colors[0], colors[0]],
 
-   legend: {
-  show: false,
-},
+    legend: {
+      show: false,
+    },
 
+    tooltip: {
+      shared: true,
+      intersect: false,
+
+      custom: function ({ dataPointIndex }) {
+        const currentSales = series[0]?.data?.[dataPointIndex] ?? 0;
+        const priorSales = series[1]?.data?.[dataPointIndex] ?? 0;
+
+        const variance = salesVariance?.[dataPointIndex] ?? 0;
+        const growth = salesGrowth?.[dataPointIndex];
+        const profit = grossProfit?.[dataPointIndex];
+        const cost = CostOfGoods?.[dataPointIndex];
+        return `
+      <div style="padding: 10px; font-size: 11px; min-width: 230px; background: #fff; color: #333; border-radius: 6px;">
+
+        <div style="font-weight: 500; margin-bottom: 10px;">
+          Day ${categories[dataPointIndex]}
+        </div>
+
+        <div style="margin-bottom: 5px;">
+          ${series[0]?.name}:
+          <strong>KES ${Number(currentSales).toLocaleString("en-KE")}</strong>
+        </div>
+
+        <div style="margin-bottom: 5px;">
+          ${series[1]?.name}:
+          <strong>KES ${Number(priorSales).toLocaleString("en-KE")}</strong>
+        </div>
+
+        <hr style="margin: 8px 0;" />
+
+        <div style="margin-bottom: 5px;">
+          Variance:
+          <strong class="${Number(variance) >= 0 ? "text-success" : "text-danger"}">
+            KES ${Number(variance).toLocaleString("en-KE")}
+          </strong>
+        </div>
+
+        <div style="margin-bottom: 5px;">
+          Growth:
+          <strong class="${Number(growth) >= 0 ? "text-success" : "text-danger"}">
+            ${growth != null ? `${Number(growth).toFixed(2)}%` : "_"}
+          </strong>
+        </div>
+ <div style="margin-bottom: 5px;">
+  Gross Profit:
+  <strong class="${
+    grossProfit == null || profit === ""
+      ? "text-muted"
+      : Number(profit) >= 0
+        ? "text-success"
+        : "text-danger"
+  }">
+    ${
+      profit == null || profit === ""
+        ? "_"
+        : `KES ${Number(profit).toLocaleString("en-KE")}`
+    }
+  </strong>
+</div>
+
+<div style="margin-bottom: 5px;">
+  COGS:
+  <strong class="${
+    cost == null || cost === ""
+      ? "text-muted"
+      : Number(cost) >= 0
+        ? "text-success"
+        : "text-danger"
+  }">
+    ${
+      cost == null || cost === ""
+        ? "_"
+        : `KES ${Number(cost).toLocaleString("en-KE")}`
+    }
+  </strong>
+</div>
+       
+
+      </div>
+    `;
+      },
+    },
+
+    grid: {
+      padding: {
+        bottom: 0,
+      },
+    },
     xaxis: {
+      type: "category",
       categories,
+      tickPlacement: "on",
+
+      //   title: {
+      //   text: `Days of ${today.toLocaleDateString("en-GB", {
+      //     month: "long",
+      //   })} ${today.getFullYear() - 1} vs ${today.getFullYear()}`,
+      // },
+
+      labels: {
+        formatter: (value) => {
+          const day = Number(value);
+          return day === 1 || day % 5 === 0 ? day : "";
+        },
+      },
     },
 
     yaxis: {
+      title: {
+        text: "Sales (KES)",
+      },
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
-
       labels: {
-        formatter: (val) =>
-          Number(val || 0).toLocaleString("en-KE"),
+        formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
       },
     },
+    // annotations: {
+    //   points: [
+    //     {
+    //       x: categories[categories.length - 1],
+    //       y: series[0]?.data?.[series[0].data.length - 1],
+    //       marker: {
+    //         size: 0,
+    //       },
+    //       label: {
+    //         text: "2026",
+    //         borderColor: colors[0],
+    //         offsetX: -15,
+    //         offsetY: -12,
+    //         style: {
+    //           background: colors[0],
+    //           color: "#fff",
+    //           fontSize: "12px",
+    //           fontWeight: 600,
+    //         },
+    //       },
+    //     },
+    //     {
+    //       x: categories[categories.length - 1],
+    //       y: series[1]?.data?.[series[1].data.length - 1],
+    //       marker: {
+    //         size: 0,
+    //       },
+    //       label: {
+    //         text: "2025",
+    //         borderColor: colors[0],
+    //         offsetX: -15,
+    //         offsetY: -12,
+    //         style: {
+    //           background: colors[0],
+    //           color: "#fff",
+    //           fontSize: "12px",
+    //           fontWeight: 600,
+    //         },
+    //       },
+    //     },
+    //   ],
+    // },
   };
 
   return (
-    <ReactApexChart
-      options={options}
-      series={series}
-      type="line"
-      height={350}
-    />
+    <div style={{ position: "relative" }}>
+      <ReactApexChart
+        options={options}
+        series={series}
+        type="line"
+        height={350}
+      />
+
+      {/* Today vertical line */}
+      <div
+        style={{
+          position: "absolute",
+          top: 35,
+          bottom: 55,
+          left: `calc(70px + ${(todayIndex / (categories.length - 1)) * 85}%)`,
+          borderLeft: "2px dotted #C68E45",
+          pointerEvents: "none",
+          zIndex: 5,
+        }}
+      />
+
+      {/* Today label */}
+      <div
+        style={{
+          position: "absolute",
+          top: 10,
+          left: `calc(70px + ${(todayIndex / (categories.length - 1)) * 85}%)`,
+          transform: "translateX(-50%)",
+          color: "#fff",
+          fontSize: "11px",
+          backgroundColor: "#C68E45",
+          padding: "2px 6px",
+          borderRadius: "4px",
+          // fontWeight: 500,
+          pointerEvents: "none",
+          zIndex: 6,
+        }}
+      >
+        Today
+      </div>
+    </div>
   );
 };
 
@@ -765,7 +1128,7 @@ const UsersByDeviceCharts = ({ dataColors, series }) => {
 export {
   AudiencesCharts,
   AudiencesSessionsCharts,
-ProgressiveSalesChart,
+  ProgressiveSalesChart,
   MonthToDateSalesChart,
   BranchPerformanceChart,
   CountriesCharts,
