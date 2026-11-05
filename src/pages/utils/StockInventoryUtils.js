@@ -28,8 +28,13 @@ export const KPI_META = [
     { id: 8, label: "Branch Imbalances (> 20%)", subtitle: "Transfer candidates" },
 ];
 
-export const getKPIMeta = ({ lookbackDays = 30, imbalanceCapped = false } = {}) =>
+export const getKPIMeta = ({ lookbackDays = 30, imbalanceCapped = false, classAAtRisk = null } = {}) =>
     KPI_META.map((widget) => {
+        // Ties the card to the "Class A" badge in Critical Stock Levels, which counts every
+        // at-risk Class A row (stocked out, <= 7 days, below minimum), not only the stocked-out ones.
+        if (widget.id === 4 && classAAtRisk !== null) {
+            return { ...widget, subtitle: `Zero stock, of ${classAAtRisk.toLocaleString()} Class A items` };
+        }
         if (widget.id === 6) return { ...widget, subtitle: `Low or no sales in ${lookbackDays} days` };
         if (widget.id === 8 && imbalanceCapped) return { ...widget, subtitle: "Top transfer candidates" };
         return widget;
@@ -240,13 +245,23 @@ export const normalizeAbcClass = (raw) =>
         .replace(/^CLASS[_\s-]*/, "")
         .trim();
 
-export const isClassAStockedOut = (item) => {
+/**
+ * Out of stock = the API says STOCKED_OUT, or on-hand is zero or negative.
+ * Same rule the Critical Stock Levels table uses to colour a row red.
+ */
+export const isOutOfStock = (item) => {
     if (!item) return false;
-    const isClassA = normalizeAbcClass(item.abc_class) === "A";
     const status = String(item.stockout_risk_status || "").toUpperCase().trim();
-    const isZeroStock = num(item.current_stock_qty) === 0;
-    return isClassA && isZeroStock && status === "STOCKED_OUT";
+    return status === "STOCKED_OUT" || num(item.current_stock_qty) <= 0;
 };
+
+export const isClassA = (item) => Boolean(item) && normalizeAbcClass(item.abc_class) === "A";
+
+export const isClassAStockedOut = (item) => isClassA(item) && isOutOfStock(item);
+
+/** Same count the "Class A" badge shows in Critical Stock Levels (before any search). */
+export const countClassA = (criticalStockouts = []) =>
+    (Array.isArray(criticalStockouts) ? criticalStockouts : []).filter(isClassA).length;
 
 export const computeKPIs = (
     batchExpiryRows = [],

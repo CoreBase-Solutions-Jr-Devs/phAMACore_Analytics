@@ -3,7 +3,7 @@ import CountUp from "react-countup";
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { useSelector } from "react-redux";
-import { computeKPIs, getKPIMeta, getLookbackDays, IMBALANCE_TOP_N } from "../utils/StockInventoryUtils";
+import { computeKPIs, countClassA, getKPIMeta, getLookbackDays, IMBALANCE_TOP_N } from "../utils/StockInventoryUtils";
 
 
 const KPI_ICON_MAP = {
@@ -27,26 +27,34 @@ const WidgetsOne = () => {
     const activeFilters = appliedFilters || filters;
     const lookbackDays = getLookbackDays(activeFilters.startDate, activeFilters.endDate);
 
+    // Argument order must match computeKPIs(batchExpiryRows, stockHealth, imbalances,
+    // expiryOptions, slowMovingStock, criticalStockouts).
     const kpis = useMemo(
         () =>
             computeKPIs(
                 batchExpiryNeo,
                 stockHealth,
                 imbalances,
-                slowMovingStock,
-                criticalStockouts,
                 {
                     branchCode: activeFilters.branch,
                     branches,
                     asOfDate: activeFilters.endDate,
                 },
+                slowMovingStock,
+                criticalStockouts,
             ),
         [batchExpiryNeo, stockHealth, imbalances, activeFilters.branch, branches, activeFilters.endDate, slowMovingStock, criticalStockouts]
     );
 
+    const classAAtRisk = useMemo(() => countClassA(criticalStockouts), [criticalStockouts]);
+
     const meta = useMemo(
-        () => getKPIMeta({ lookbackDays, imbalanceCapped: imbalances.length >= IMBALANCE_TOP_N }),
-        [lookbackDays, imbalances.length]
+        () => getKPIMeta({
+            lookbackDays,
+            imbalanceCapped: IMBALANCE_TOP_N > 0 && imbalances.length >= IMBALANCE_TOP_N,
+            classAAtRisk,
+        }),
+        [lookbackDays, imbalances.length, classAAtRisk]
     );
 
     // Each card waits only for the call that feeds it

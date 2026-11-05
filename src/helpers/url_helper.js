@@ -18,6 +18,7 @@ export const SOCIAL_LOGIN = "/social-login";
 
 // CURRENT LOGIN
 export const POST_LOGIN = "/Auth";
+export const POST_LOGOUT = "/Auth/Logout";
 export const PUT_PROFILE = "/auth/profile";
 
 export const POST_FORGOT_PASSWORD = "/auth/reset-token";
@@ -84,7 +85,6 @@ export const GET_POWERBI_MAVERICK_SPEND =
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
 export const POST_EDIT_PROFILE = "/user";
 
-export const POST_LOGOUT = "/Auth/Logout";
 
 export const GET_POWERBI_MARGIN_ANALYSIS = "/api/PowerBI/PowerBIKPIMarginAnalysis";
 
