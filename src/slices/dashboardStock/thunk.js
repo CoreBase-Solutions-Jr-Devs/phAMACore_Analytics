@@ -9,6 +9,9 @@ import {
   getKPITotalStockValueByBranch as getKPITotalStockValueByBranchApi,
   getKPIStockHealth as getKPIStockHealthApi,
   getKPISalesTransactions as getKPISalesTransactionsApi,
+  getKPISellThroughAnalysis as getKPISellThroughAnalysisApi,
+  getKPIBranchOrderFillRate as getKPIBranchOrderFillRateApi,
+  getKPIBranchTransfers as getKPIBranchTransfersApi,
 }
   from "../../helpers/fakebackend_helper";
 import { cleanBranchName } from "../../helpers/branch_helper";
@@ -421,3 +424,141 @@ export const fetchKPISalesTransactions = createAsyncThunk(
     }
   }
 );
+
+export const fetchKPISellThroughAnalysis = createAsyncThunk(
+  "stockInventory/fetchKPISellThroughAnalysis",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const {
+        clientid = 1,
+        startDate,
+        endDate,
+        GroupBy = "RECEIPT_BATCH",
+        branchcode = 0,
+        BranchCode,
+        ItemCode = "",
+        ReceiptType = "ALL",
+        Status = "ALL",
+        TopN = 500,
+      } = params;
+
+      const resolvedBranch = BranchCode != undefined ?
+        BranchCode : branchcode && Number(branchcode) > 0 ?
+          String(branchcode) : "";
+
+      const payload = {
+        clientid,
+        GroupBy,
+        ReceiptType,
+        Status,
+        TopN,
+      };
+
+      if (startDate) payload.StartDate = startDate;
+      if (endDate) payload.EndDate = endDate;
+      if (resolvedBranch) payload.BranchCode = resolvedBranch;
+      if (ItemCode) payload.ItemCode = ItemCode;
+
+      const response = await getKPISellThroughAnalysisApi(payload);
+      return {
+        groupBy: GroupBy,
+        data: toList(response),
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.response?.data ||
+        error.message || "Failed to fetch sell-through analysis KPI!"
+      );
+    }
+  }
+)
+
+export const fetchKPIBranchOrderFillRate = createAsyncThunk(
+  "stockInventory/fetchKPIBranchOrderFillRate",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const {
+        clientid = 1,
+        startDate,
+        endDate,
+        branchcode = 0,
+        DestBranchCode,
+        SourceBranchCode = "",
+        ItemCode = "",
+        Status = "ALL",
+        GroupBy = "SUMMARY",
+        TopN = 500,
+      } = params;
+
+      const resolvedDestBranch = DestBranchCode != undefined ?
+        DestBranchCode : branchcode && Number(branchcode) > 0 ?
+          String(branchcode) : "";
+
+      const payload = {
+        clientid, Status, GroupBy, TopN,
+      };
+
+      if (startDate) payload.StartDate = startDate;
+      if (endDate) payload.EndDate = endDate;
+      if (resolvedDestBranch) payload.DestBranchCode = resolvedDestBranch;
+      if (SourceBranchCode) payload.SourceBranchCode = SourceBranchCode;
+      if (ItemCode) payload.ItemCode = ItemCode;
+
+      const response = await getKPIBranchOrderFillRateApi(payload);
+      return {
+        groupBy: GroupBy,
+        data: toList(response),
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.response?.data ||
+        error.message || "Failed to fetch branch order fill rates!" 
+      );
+    }
+  }
+);
+
+export const fetchKPIBranchTransfers = createAsyncThunk(
+  "stockInventory/fetchKPIBranchTransfers",
+  async (params = {}, { rejectWithValue }) => {
+    try { 
+      const {
+        clientid = 1,
+        startDate,
+        endDate,
+        branchcode = 0,
+        DestBranchCode,
+        SourceBranchCode = "",
+        ItemCode = "",
+        Status = "ALL",
+        GroupBy = "SUMMARY",
+        TopN = 500,
+      } = params;
+
+      const resolvedDestBranch = DestBranchCode != undefined ?
+        DestBranchCode : branchcode && Number(branchcode) > 0 ?
+          String(branchcode) : "";
+
+      const payload = {
+        clientid, Status, GroupBy, TopN,
+      };
+
+      if (startDate) payload.StartDate = startDate;
+      if (endDate) payload.EndDate = endDate;
+      if (resolvedDestBranch) payload.DestBranchCode = resolvedDestBranch;
+      if (SourceBranchCode) payload.SourceBranchCode = SourceBranchCode;
+      if (ItemCode) payload.ItemCode = ItemCode;
+
+      const response = await getKPIBranchTransfersApi(payload);
+      return {
+        groupBy: GroupBy,
+        data: toList(response),
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.response?.data ||
+        error.message || "Failed to fetch branch transfers!"
+      );
+    }
+  }
+)

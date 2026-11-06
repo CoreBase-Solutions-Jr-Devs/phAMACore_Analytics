@@ -14,9 +14,12 @@ import CustomTableOne from './Tables/Custom/CustomTableOne';
 import {
     fetchBatchExpiryNeo,
     fetchBranches,
+    fetchKPIBranchOrderFillRate,
+    fetchKPIBranchTransfers,
     fetchKPICriticalStockouts,
     fetchKPIImbalances,
     fetchKPISalesTransactions,
+    fetchKPISellThroughAnalysis,
     fetchKPISlowMovingStock,
     fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
@@ -204,6 +207,14 @@ const DashboardStock = () => {
             GroupBy: "BRANCH",
             branchcode,
         }));
+        dispatch(fetchKPISellThroughAnalysis({ ...periodParams, GroupBy: "RECEIPT_BATCH" }));
+        dispatch(fetchKPISellThroughAnalysis({ ...periodParams, GroupBy: "SKU_SUMMARY" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "SUMMARY" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "BRANCH_OFR" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "TOP_SHORTAGES" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "SUMMARY" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "BRANCH_BALANCE" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "IN_TRANSIT" }));
     }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate, lookbackDays]);
 
     const periodDays = useMemo(() => {

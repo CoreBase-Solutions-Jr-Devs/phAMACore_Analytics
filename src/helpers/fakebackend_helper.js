@@ -147,3 +147,12 @@ export const getOctoberSalesTarget = (params) =>
 
 export const getInventoryProfitSummary = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_INVENTORY_PROFIT_SUMMARY, { params });
+
+export const getKPISellThroughAnalysis = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_SELL_THROUGH_ANALYSIS, { params });
+
+export const getKPIBranchOrderFillRate = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_BRANCH_ORDER_FILL_RATE, { params });
+
+export const getKPIBranchTransfers = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_BRANCH_TRANSFERS, { params });
