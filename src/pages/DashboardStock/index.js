@@ -14,9 +14,12 @@ import CustomTableOne from './Tables/Custom/CustomTableOne';
 import {
     fetchBatchExpiryNeo,
     fetchBranches,
+    fetchKPIBranchOrderFillRate,
+    fetchKPIBranchTransfers,
     fetchKPICriticalStockouts,
     fetchKPIImbalances,
     fetchKPISalesTransactions,
+    fetchKPISellThroughAnalysis,
     fetchKPISlowMovingStock,
     fetchKPIStockHealth,
     fetchKPITotalStockValueByBranch,
@@ -27,6 +30,14 @@ import { resolveBranchName, saveActiveBranch, getActiveBranch, cleanBranchName }
 import CriticalStockChart from './components/CriticalStockChart';
 import SlowMovingStock from "./components/SlowMovingStock";
 import ImbalanceAlerts from './components/ImbalanceAlerts';
+import SellThroughSection, {
+    RECEIPT_TYPE_FILTERS,
+    SELL_THROUGH_VIEW_MODES,
+    normalizeSellThroughBatchRows,
+    normalizeSellThroughSkuRows,
+} from './components/SellThroughSection';
+import BranchOfrSection, { OFR_TABS } from './components/BranchOfrSection';
+import BranchTransfersSection from './components/BranchTransfersSection';
 import Section from './Section';
 import FilterActions from './FilterActions';
 
@@ -49,6 +60,7 @@ import {
     SLOW_MOVER_TOP_N,
 } from '../utils/StockInventoryUtils';
 import { addDaysApi, parseApiDate } from '../utils/dateHelper';
+import { pick, num } from '../utils/apiRow';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
@@ -62,6 +74,15 @@ const DashboardStock = () => {
     // Transfer suggestions: keep the API severity ranking, filter by Deficit / Surplus and Branch
     const [imbalanceStatusFilter, setImbalanceStatusFilter] = useState("ALL");
     const [imbalanceBranchFilter, setImbalanceBranchFilter] = useState("");
+
+    // Row 25: Time taken to sell stock (Sell-Through Analysis)
+    const [sellThroughViewMode, setSellThroughViewMode] = useState("RECEIPT_BATCH");
+    const [sellThroughReceiptType, setSellThroughReceiptType] = useState("ALL");
+    const [sellThroughSearchTerm, setSellThroughSearchTerm] = useState("");
+
+    // Row 26: Branch Order Fill Rate (OFR from LPOs made to Syokimau)
+    const [ofrActiveTab, setOfrActiveTab] = useState("BRANCH_OFR");
+    const [ofrSearchTerm, setOfrSearchTerm] = useState("");
 
     const handleSlowMovingSort = (field) => {
         if (sortField === field) {
@@ -106,6 +127,11 @@ const DashboardStock = () => {
         kpiSalesPeriodDays = 1,
         slowMovingStock = [],
         imbalances = [],
+        sellThroughReceiptBatch = [],
+        sellThroughSkuSummary = [],
+        branchOrderFillRateByBranch = [],
+        branchOrderFillRateDrilldown = [],
+        branchOrderFillRateTopShortages = [],
         filters = {},
         appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
@@ -192,6 +218,13 @@ const DashboardStock = () => {
             LookbackDays: lookbackDays,
             AsOfDate: activeFilters.endDate,
         };
+        const periodParams = {
+            clientid: 1,
+            startDate: activeFilters.startDate,
+            endDate: activeFilters.endDate,
+            branchcode,
+            TopN: 500,
+        };
 
         dispatch(fetchKPIStockHealth(health));
         dispatch(fetchKPICriticalStockouts({ ...health, GroupBy: "CRITICAL_STOCKOUTS", TopN: CRITICAL_TOP_N }));
@@ -204,6 +237,17 @@ const DashboardStock = () => {
             GroupBy: "BRANCH",
             branchcode,
         }));
+        dispatch(fetchKPISellThroughAnalysis({ ...periodParams, GroupBy: "RECEIPT_BATCH" }));
+        dispatch(fetchKPISellThroughAnalysis({ ...periodParams, GroupBy: "SKU_SUMMARY" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "SUMMARY" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "BRANCH_OFR" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "TOP_SHORTAGES" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "SUMMARY" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "BRANCH_BALANCE" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "IN_TRANSIT" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "TOP_SKUS" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "DRILLDOWN" }));
+        dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "DEST_STOCK_AGING" }));
     }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate, lookbackDays]);
 
     const periodDays = useMemo(() => {
@@ -345,6 +389,42 @@ const DashboardStock = () => {
         }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
         exportToExcel(rows, `InterBranch_Transfer_Suggestions_${todayStr}`);
+    };
+
+    const handleExportSellThrough = () => {
+        const source =
+            sellThroughViewMode === "SKU_SUMMARY"
+                ? normalizeSellThroughSkuRows(sellThroughSkuSummary)
+                : normalizeSellThroughBatchRows(sellThroughReceiptBatch);
+        const rows = source.map((r) => ({
+            "Product": r.itemName,
+            "Item Code": r.itemCode,
+            "Pack Size": r.packQty,
+            "Branch": r.branchName,
+            "Receipt Type": r.receiptType,
+            "Receipt Voucher": r.receiptDoc,
+            "Receipt Date": r.receiptDateFormatted,
+            "Batch": r.batchNo || "-",
+            "Qty Received (Packs)": r.qtyReceivedWp,
+            "Qty Sold Since Receipt (Packs)": r.qtySoldWp,
+            "Current Balance (Packs)": r.currentBranchStockWp,
+            "Days Held": r.daysHeld,
+            "Actual Sell-Through Days": r.actualSellThroughDays ?? "In progress",
+            "Estimated Stock Cover Days": r.estimatedCoverDays ?? "-",
+            "Status": r.batchStatus,
+            "Action Insight": r.actionInsight || "-",
+        }));
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `Sell_Through_Analysis_${todayStr}`);
+    };
+
+    const handleExportBranchOfr = () => {
+        let source = branchOrderFillRateByBranch;
+        if (ofrActiveTab === "ORDER_DRILLDOWN") source = branchOrderFillRateDrilldown;
+        else if (ofrActiveTab === "TOP_SHORTAGES") source = branchOrderFillRateTopShortages;
+        const rows = (Array.isArray(source) ? source : []).map((r) => ({ ...r }));
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        exportToExcel(rows, `Branch_Order_Fill_Rate_${ofrActiveTab}_${todayStr}`);
     };
 
     const handleApplyFilters = () => {
@@ -613,6 +693,147 @@ const DashboardStock = () => {
                             </Card>
                         </Col>
                     </Row>
+
+                    {/* ROW 25: TIME TAKEN TO SELL STOCK (SELL-THROUGH ANALYSIS) */}
+                    <Row>
+                        <Col xl={12}>
+                            <Card id="sell-through-analysis-card">
+                                <CardHeader>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div>
+                                            <h4 className="card-title mb-1">
+                                                TIME TAKEN TO SELL STOCK — SELL-THROUGH &amp; BATCH DEPLETION
+                                            </h4>
+                                            <p className="text-muted mb-0 small">
+                                                Purchase &amp; transfer receipt dates, quantity received vs sold, current balance, days held, and actual sell-through time vs estimated stock cover
+                                            </p>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                                            <div className="btn-group btn-group-sm" role="group" aria-label="Sell-through view mode">
+                                                {SELL_THROUGH_VIEW_MODES.map((m) => (
+                                                    <button
+                                                        key={m.key}
+                                                        type="button"
+                                                        className={`btn ${
+                                                            sellThroughViewMode === m.key
+                                                                ? "btn-primary"
+                                                                : "btn-outline-primary"
+                                                        }`}
+                                                        onClick={() => setSellThroughViewMode(m.key)}
+                                                    >
+                                                        {m.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <CardExportButtons
+                                                targetId="sell-through-analysis-card"
+                                                title="Time Taken to Sell Stock"
+                                                onExport={handleExportSellThrough}
+                                            />
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardBody>
+                                    <Row className="mb-3 align-items-center g-2">
+                                        <Col md={5}>
+                                            <input
+                                                className="form-control form-control-sm"
+                                                placeholder="Search product, SKU, batch, receipt voucher, or branch..."
+                                                value={sellThroughSearchTerm}
+                                                onChange={(e) => setSellThroughSearchTerm(e.target.value)}
+                                            />
+                                        </Col>
+                                        <Col md="auto" className="ms-md-auto">
+                                            <div className="btn-group btn-group-sm" role="group" aria-label="Filter by receipt type">
+                                                {RECEIPT_TYPE_FILTERS.map((t) => (
+                                                    <button
+                                                        key={t.key}
+                                                        type="button"
+                                                        className={`btn ${
+                                                            sellThroughReceiptType === t.key
+                                                                ? "btn-caramel"
+                                                                : "btn-outline-caramel"
+                                                        }`}
+                                                        onClick={() => setSellThroughReceiptType(t.key)}
+                                                    >
+                                                        {t.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                    <SellThroughSection
+                                        viewMode={sellThroughViewMode}
+                                        receiptTypeFilter={sellThroughReceiptType}
+                                        searchTerm={sellThroughSearchTerm}
+                                    />
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    {/* ROW 26: OFR FOR BRANCHES (FROM LPOS MADE TO SYOKIMAU) */}
+                    <Row>
+                        <Col xl={12}>
+                            <Card id="branch-ofr-card">
+                                <CardHeader>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div>
+                                            <h4 className="card-title mb-1">
+                                                BRANCH ORDER FILL RATE (OFR) — LPOS TO SYOKIMAU CENTRAL HUB
+                                            </h4>
+                                            <p className="text-muted mb-0 small">
+                                                Fulfillment fidelity for internal branch LPOs raised to Syokimau (Orders vs Dispatches vs Branch Receipts)
+                                            </p>
+                                        </div>
+                                        <CardExportButtons
+                                            targetId="branch-ofr-card"
+                                            title="Branch Order Fill Rate"
+                                            onExport={handleExportBranchOfr}
+                                        />
+                                    </div>
+                                </CardHeader>
+                                <CardBody>
+                                    <Row className="mb-3 align-items-center g-2">
+                                        <Col md={5}>
+                                            <input
+                                                className="form-control form-control-sm"
+                                                placeholder="Search branch, LPO voucher, or shortage SKU..."
+                                                value={ofrSearchTerm}
+                                                onChange={(e) => setOfrSearchTerm(e.target.value)}
+                                            />
+                                        </Col>
+                                        <Col md="auto" className="ms-md-auto">
+                                            <div className="btn-group btn-group-sm" role="group" aria-label="OFR view tabs">
+                                                {OFR_TABS.map((t) => (
+                                                    <button
+                                                        key={t.key}
+                                                        type="button"
+                                                        className={`btn ${
+                                                            ofrActiveTab === t.key
+                                                                ? "btn-caramel"
+                                                                : "btn-outline-caramel"
+                                                        }`}
+                                                        onClick={() => setOfrActiveTab(t.key)}
+                                                    >
+                                                        {t.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                    <BranchOfrSection
+                                        activeTab={ofrActiveTab}
+                                        searchTerm={ofrSearchTerm}
+                                    />
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    {/* ROWS 27 & 28: BRANCH TRANSFERS & BRANCH PULL TO SYOKIMAU */}
+                    <BranchTransfersSection />
+
                 </Container>
                 <FilterActions
                     onApply={handleApplyFilters}
