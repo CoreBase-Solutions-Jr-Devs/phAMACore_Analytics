@@ -165,12 +165,18 @@ const Navdata = () => {
           link: "/dashboard-purchase-orders",
           parentId: "purchase-orders",
         },
-        // {
-        //   id: "branchview-purchase-orders",
-        //   label: "BranchView",
-        //   link: `/dashboard-purchase-orders/branch/${purchaseBranch}`,
-        //   parentId: "purchase-orders",
-        // },
+        {
+          id: "Supplier-Invoice-Ageing",
+          label: "Supplier Ageing",
+          link: `/dashboard-purchase-orders/Supplier-Ageing`,
+          parentId: "purchase-orders",
+        },
+          {
+          id: "Category-Spend",
+          label: "Category Spend",
+          link: `/dashboard-purchase-orders/Category-Spend`,
+          parentId: "purchase-orders",
+        },
       ],
     },
   ];

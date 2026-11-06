@@ -11,7 +11,7 @@ import MonthToDatePurchases from "./MonthToDatePurchases";
 import SupplierSpendBottom from "./SupplierSpendBottom";
 // import FilterActions from "./FilterActions";
 import SupplierSpend from "./SupplierSpend";
-import RecentOrders from "./RecentOrders";
+
 import BreadCrumb from "../../Components/Common/BreadCrumb";
 // import RecentActivity from "./RecentActivity";
 import {
@@ -178,6 +178,7 @@ loading,
       priceAlerts,
   maverickSpend,
   maverickSpendPercentage,
+  spendBySupplier,
     topSuppliers,
     top2Suppliers,
     branchData,
@@ -583,7 +584,7 @@ dispatchGroupByRequests(
                   />
                 </Row>
                 <Row>
-                  <Col xl={6}>
+                  <Col xl={12}>
                     {/* {isBranchView ? (
                       <SalesByLocations
                         data={spendByCategory}
@@ -600,34 +601,31 @@ dispatchGroupByRequests(
                     {/* )} */}
                   </Col>
 
-                  <Col xl={6}>
-                    {/* {isBranchView ? (
-                      <SupplierSpendBottom
-                        supplierData={bottomSuppliers}
-                        error={error}
-                        loading={loading}
-                      />
-                    ) : ( */}
+                  {/* <Col xl={6}>
                       <SalesByLocations
                         data={spendByCategory}
                         totalSpend={totalSpend}
                         error={error}
                         loading={loading}
                       />
-                    {/* )} */}
-                  </Col>
+                  </Col> */}
                   <Row>
-                    <Col xl={6}>
+                      <Col xl={12}>
                       <SupplierSpend
-                        supplierData={topSuppliers}
-                        top2Suppliers={top2Suppliers}
-                        totalSpend={totalSpend}
+                        supplierData={spendBySupplier}
+                       
                         loading={loading}
                         error={error}
                       />
                     </Col>
+                  
+                 
+                    
+                  </Row>
+                  <Row>
+                  
                    
-                    <Col xl={6}>
+                    {/* <Col xl={12}>
                       <RecentOrders
                         formatAmount={formatAmount}
                         overdueSupplierAccounts={overdueSupplierAccounts}
@@ -639,7 +637,7 @@ dispatchGroupByRequests(
                         error={error}
                         loading={loading}
                       />
-                    </Col>
+                    </Col> */}
                   </Row>
                 </Row>
 

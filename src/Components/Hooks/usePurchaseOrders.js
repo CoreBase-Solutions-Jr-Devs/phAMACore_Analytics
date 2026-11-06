@@ -175,103 +175,77 @@ const group = (item?.branch_name || "UNKNOWN BRANCH")
   // SPEND BY SUPPLIER
   // Groups purchase-order spend by supplier
   // ============================================================
-const spendBySupplier = useMemo(() => {
-  return (KPISupplier || [])
-    .filter(Boolean)
-    .reduce((acc, item) => {
-      const supplier = item?.supplier_name || "Unknown";
-      const value = Number(item?.net_purchases_incl || 0);
-
-      acc[supplier] = value;
-
-      return acc;
-    }, {});
-}, [KPISupplier]);
+const spendBySupplier = KPISupplier || [];
 
 
   // ============================================================
   // TOP 7 SUPPLIERS
   // ============================================================
-  const topSuppliers = useMemo(() => {
+  // const topSuppliers = useMemo(() => {
 
-    return Object.entries(spendBySupplier)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 7)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }));
+  //   return Object.entries(spendBySupplier)
+  //     .sort((a, b) => b[1] - a[1])
+  //     .slice(0, 7)
+  //     .map(([name, value]) => ({
+  //       name,
+  //       value,
+  //     }));
 
-  }, [spendBySupplier]);
+  // }, [spendBySupplier]);
 
 
   // ============================================================
   // TOP 2 SUPPLIERS
   // ============================================================
-  const top2Suppliers = useMemo(() => {
+  // const top2Suppliers = useMemo(() => {
 
-    return Object.entries(spendBySupplier)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 2)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }));
+  //   return Object.entries(spendBySupplier)
+  //     .sort((a, b) => b[1] - a[1])
+  //     .slice(0, 2)
+  //     .map(([name, value]) => ({
+  //       name,
+  //       value,
+  //     }));
 
-  }, [spendBySupplier]);
+  // }, [spendBySupplier]);
 
 
   // ============================================================
   // BOTTOM 7 SUPPLIERS
   // ============================================================
-  const bottomSuppliers = useMemo(() => {
+  // const bottomSuppliers = useMemo(() => {
 
-    return Object.entries(spendBySupplier)
-      .sort((a, b) => a[1] - b[1])
-      .slice(0, 7)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }));
+  //   return Object.entries(spendBySupplier)
+  //     .sort((a, b) => a[1] - b[1])
+  //     .slice(0, 7)
+  //     .map(([name, value]) => ({
+  //       name,
+  //       value,
+  //     }));
 
-  }, [spendBySupplier]);
+  // }, [spendBySupplier]);
 
 
   // ============================================================
   // SPEND BY BRANCH
   // Groups purchase-order spend by branch
   // ============================================================
-const spendByCategory = useMemo(() => {
-  console.log("KPICategory:", KPICategory);
+const spendByCategory = KPICategory || [];
 
-  const grouped = (KPICategory || [])
-    .filter(Boolean)
-    .reduce((acc, item) => {
-      const name = item?.item_subgroup || "Unknown";
-      const value = Number(item?.net_purchases_incl || 0);
-
-      if (!acc[name]) {
-        acc[name] = 0;
-      }
-
-      acc[name] += value;
-
-      return acc;
-    }, {});
-  const data = Object.entries(grouped)
-    .map(([name, value]) => ({
-      name,
-      value,
-    }))
-    .sort((a, b) => b.value - a.value) // highest first
-    .slice(0, 5); // top 5
-
-  console.log("SpendByCategory:", data);
-
-  return data;
-}, [KPICategory]);
-
-
+const categoryTotals = spendByCategory.reduce(
+  (totals, item) => ({
+    grossPurchases: totals.grossPurchases + Number(item.gross_purchases_excl || 0),
+    purchaseReturns: totals.purchaseReturns + Number(item.purchase_returns_excl || 0),
+    netPurchasesIncl: totals.netPurchasesIncl + Number(item.net_purchases_incl || 0),
+    uniqueItems: totals.uniqueItems + Number(item.unique_items || 0),
+  }),
+  {
+    grossPurchases: 0,
+    purchaseReturns: 0,
+    netPurchasesIncl: 0,
+    uniqueItems: 0,
+  }
+);
 
   // ============================================================
   // YEAR-TO-DATE ACTUAL SPEND CHART
@@ -531,67 +505,67 @@ console.log("Last year chart data:", DAYS.map(
   // - Earliest due date
   // - Worst overdue value
   // ============================================================
-const overdue = kpiOverdueAccounts || [];
+const overdueSupplierAccounts = kpiOverdueAccounts || [];
 
 // Ageing totals
-const currentReceivables = overdue.reduce(
+const currentReceivables = overdueSupplierAccounts.reduce(
   (sum, item) => sum + Number(item.current_0_30 || 0),
   0
 );
 
-const overdue31To60 = overdue.reduce(
+const overdue31To60 = overdueSupplierAccounts.reduce(
   (sum, item) => sum + Number(item.days_31_60 || 0),
   0
 );
 
-const overdue61To90 = overdue.reduce(
+const overdue61To90 = overdueSupplierAccounts.reduce(
   (sum, item) => sum + Number(item.days_61_90 || 0),
   0
 );
 
-const overdue91To120 = overdue.reduce(
+const overdue91To120 = overdueSupplierAccounts.reduce(
   (sum, item) => sum + Number(item.days_91_120 || 0),
   0
 );
 
-const overdue120Plus = overdue.reduce(
+const overdue120Plus = overdueSupplierAccounts.reduce(
   (sum, item) => sum + Number(item.over_120 || 0),
   0
 );
 
-const totalPayables = overdue.reduce(
+const totalPayables = overdueSupplierAccounts.reduce(
   (sum, item) => sum + Number(item.total_balance || 0),
   0
 );
 
 // Data for overdue supplier table
-const overdueSupplierAccounts = overdue
-  .slice()
-  .sort(
-    (a, b) =>
-      Number(b.total_balance || 0) -
-      Number(a.total_balance || 0)
-  )
-  .slice(0, 5)
-  .map((item) => ({
-    supplier: item.cusname,
- cuscode: item.cuscode,
-    outstanding: Number(item.total_balance || 0),
+// const overdueSupplierAccounts = overdue
+//   .slice()
+//   .sort(
+//     (a, b) =>
+//       Number(b.total_balance || 0) -
+//       Number(a.total_balance || 0)
+//   )
+//   .slice(0, 5)
+//   .map((item) => ({
+//     supplier: item.cusname,
+//  cuscode: item.cuscode,
+//     outstanding: Number(item.total_balance || 0),
 
-    lastInvoice: item.last_invoice_date,
+//     lastInvoice: item.last_invoice_date,
 
-    ageing: {
-      current: Number(item.current_0_30 || 0),
-      days31To60: Number(item.days_31_60 || 0),
-      days61To90: Number(item.days_61_90 || 0),
-      days91To120: Number(item.days_91_120 || 0),
-      over120: Number(item.over_120 || 0),
-    },
+//     ageing: {
+//       current: Number(item.current_0_30 || 0),
+//       days31To60: Number(item.days_31_60 || 0),
+//       days61To90: Number(item.days_61_90 || 0),
+//       days91To120: Number(item.days_91_120 || 0),
+//       over120: Number(item.over_120 || 0),
+//     },
 
-    lastPayment: item.last_payment_date,
+//     lastPayment: item.last_payment_date,
 
-    action: item.action_insight,
-  }));
+//     action: item.action_insight,
+//   }));
 
 const bestPriceData = BestPricePerSupplier || [];
 
@@ -622,10 +596,9 @@ const bestPricePerSupplier = bestPriceData
     totalSpend,
     activeSuppliers,
     avgLeadTime,
-    bottomSuppliers,
+    
     spendBySupplier,
-    topSuppliers,
-    top2Suppliers,
+  
     branchData,
     priceAlerts,
     maverickSpendPercentage,
@@ -641,6 +614,7 @@ const bestPricePerSupplier = bestPriceData
     bestPricePerSupplier,
     // OverdueAccounts,
     spendByCategory,
+      categoryTotals,
   };
 };
 

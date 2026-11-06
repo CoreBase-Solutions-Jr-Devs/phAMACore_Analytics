@@ -11,7 +11,8 @@ import CustomerMemberAnalysis from "../pages/DashboardSales/CustomerMemberAnalys
 // import SalesTarget from "../pages/DashboardSales/SalesTarget";
 import PerformanceSummary from "../pages/DashboardSales/PerformanceSummary";
 import SalesBreakdown from "../pages/DashboardSales/SalesBreakdown";
-
+import SupplierAgeing from "../pages/DashboardPurchaseOrders/SupplierAgeing";
+import CategorySpend from "../pages/DashboardPurchaseOrders/CategorySpend";
 //login
 import Login from "../pages/Authentication/Login";
 import ForgetPasswordPage from "../pages/Authentication/ForgetPassword";
@@ -79,6 +80,18 @@ const authProtectedRoutes = [
   {
     path: "/dashboard-purchase-orders",
     component: <DashboardPurchaseOrders />,
+  },
+  //   {
+  //   path: "/dashboard-purchase-orders/Recent-Orders",
+  //   component: <RecentOrders />,
+  // },
+  {
+    path: "/dashboard-purchase-orders/Supplier-Ageing",
+    component: <SupplierAgeing />,
+  },
+   {
+    path: "/dashboard-purchase-orders/Category-Spend",
+    component: <CategorySpend />,
   },
   {
     path: "/dashboard-purchase-orders/branch/:branchId",

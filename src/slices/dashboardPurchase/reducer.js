@@ -359,9 +359,9 @@ const PurchaseOrdersSlice = createSlice({
             state.KPISummary = result;
             break;
 
-          case "CATEGORY":
-            state.KPICategory = result;
-            break;
+          // case "CATEGORY":
+          //   state.KPICategory = result;
+          //   break;
 
           case "SUPPLIER":
             state.KPISupplier = result;

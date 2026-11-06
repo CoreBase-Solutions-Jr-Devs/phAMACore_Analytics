@@ -31,6 +31,8 @@ import StockInventoryReducer from "./dashboardStock/reducer";
 import DashboardMyBusinessReducer from "./dashboardMyBusiness/reducer";
 import SalesBreakdownReducer from "./dashboardSales/SalesBreakdown/reducer";
 import CategoryPerformanceReducer from "./dashboardSales/CategoryPerformance/reducer";
+import SupplierAgeingReducer from "./dashboardPurchase/SupplierAgeing/reducer";
+import CategorySpendReducer from "./dashboardPurchase/CategorySpend/reducer";
 
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
@@ -52,6 +54,8 @@ const rootReducer = combineReducers({
     customerMemberAnalysis:CustomerMemberAnalysisReducer,
      salesBreakdown:SalesBreakdownReducer,
     categoryPerformance:CategoryPerformanceReducer,
+    supplierAgeing:SupplierAgeingReducer,
+    categorySpend: CategorySpendReducer,
 });
 
 export default rootReducer;
