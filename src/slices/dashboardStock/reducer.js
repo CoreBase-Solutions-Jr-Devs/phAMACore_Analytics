@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIImbalances, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIImbalances, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements, fetchKPISellThroughAnalysis, fetchKPIBranchOrderFillRate, fetchKPIBranchTransfers } from "./thunk";
 import { saveCachedBranches, cleanBranchName, getActiveBranch } from "../../helpers/branch_helper";
 import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
@@ -32,6 +32,23 @@ export const initialState = {
   criticalStockouts: [],
   slowMovingStock: [],
   imbalances: [],
+  sellThroughAnalysis: [],
+  sellThroughReceiptBatch: [],
+  sellThroughSkuSummary: [],
+  sellThroughDepletionDrillDown: [],
+  branchOrderFillRate: [],
+  branchOrderFillRateSummary: [],
+  branchOrderFillRateByBranch: [],
+  branchOrderFillRateDrilldown: [],
+  branchOrderFillRateTopShortages: [],
+  branchTransfers: [],
+  branchTransfersSummary: [],
+  branchTransfersBalance: [],
+  branchTransfersCorridor: [],
+  branchTransfersInTransit: [],
+  branchTransfersTopSkus: [],
+  branchTransfersDrilldown: [],
+  branchTransfersDestStockAging: [],
   loadingImbalances: false,
   errorImbalances: null,
   kpiSalesTransactions: [],
@@ -46,6 +63,9 @@ export const initialState = {
   loadingCriticalStockouts: false,
   loadingSlowMovingStock: false,
   loadingKPISalesTransactions: false,
+  loadingSellThroughAnalysis: false,
+  loadingBranchOrderFillRate: false,
+  loadingBranchTransfers: false,
   errorBranches: null,
   errorStock: null,
   errorMovements: null,
@@ -56,6 +76,9 @@ export const initialState = {
   errorCriticalStockouts: null,
   errorSlowMovingStock: null,
   errorKPISalesTransactions: null,
+  errorSellThroughAnalysis: null,
+  errorBranchOrderFillRate: null,
+  errorBranchTransfers: null,
   filters: defaultFilters(persistedBranch),
   appliedFilters: defaultFilters(persistedBranch),
 };
@@ -444,10 +467,119 @@ const StockInventorySlice = createSlice({
       .addCase(fetchKPISalesTransactions.rejected, (state, action) => {
         state.loadingKPISalesTransactions = false;
         state.errorKPISalesTransactions =
-          action.payload?.message ||
-          action.payload ||
-          action.error?.message ||
-          "Failed to fetch sales transactions KPI!";
+          action.payload?.message || action.payload ||
+          action.error?.message || "Failed to fetch sales transactions KPI!";
+      });
+
+    // Sell-Through Analysis
+    builder
+      .addCase(fetchKPISellThroughAnalysis.pending, (state) => {
+        state.loadingSellThroughAnalysis = true;
+        state.errorSellThroughAnalysis = null;
+      })
+      .addCase(fetchKPISellThroughAnalysis.fulfilled, (state, action) => {
+        state.loadingSellThroughAnalysis = false;
+        const { groupBy, data } = action.payload || {};
+        const rows = data || [];
+        state.sellThroughAnalysis = rows;
+        switch (groupBy) {
+          case "RECEIPT_BATCH":
+            state.sellThroughReceiptBatch = rows;
+            break;
+          case "SKU_SUMMARY":
+            state.sellThroughSkuSummary = rows;
+            break;
+          case "DEPLETION_DRILLDOWN":
+            state.sellThroughDepletionDrillDown = rows;
+            break;
+          default:
+            break;
+        }
+      })
+      .addCase(fetchKPISellThroughAnalysis.rejected, (state, action) => {
+        state.loadingSellThroughAnalysis = false;
+        state.errorSellThroughAnalysis =
+          action.payload?.message || action.payload ||
+          action.error?.message || "Failed to fetch sell-through analysis KPI!";
+      });
+
+    // Branch Order Fill Rate
+    builder
+      .addCase(fetchKPIBranchOrderFillRate.pending, (state) => {
+        state.loadingBranchOrderFillRate = true;
+        state.errorBranchOrderFillRate = null;
+      })
+      .addCase(fetchKPIBranchOrderFillRate.fulfilled, (state, action) => {
+        state.loadingBranchOrderFillRate = false;
+        const { groupBy, data } = action.payload || {};
+        const rows = data || [];
+        state.branchOrderFillRate = rows;
+        switch (groupBy) {
+          case "SUMMARY":
+            state.branchOrderFillRateSummary = rows;
+            break;
+          case "BRANCH_OFR":
+            state.branchOrderFillRateByBranch = rows;
+            break;
+          case "ORDER_DRILLDOWN":
+            state.branchOrderFillRateDrilldown = rows;
+            break;
+          case "TOP_SHORTAGES":
+            state.branchOrderFillRateTopShortages = rows;
+            break;
+          default:
+            break;
+        }
+      })
+      .addCase(fetchKPIBranchOrderFillRate.rejected, (state, action) => {
+        state.loadingBranchOrderFillRate = false;
+        state.errorBranchOrderFillRate =
+          action.payload?.message || action.payload ||
+          action.error?.message || "Failed to fetch branch order fill rate KPI!";
+      });
+
+    // Branch Transfers
+    builder
+      .addCase(fetchKPIBranchTransfers.pending, (state) => {
+        state.loadingBranchTransfers = true;
+        state.errorBranchTransfers = null;
+      })
+      .addCase(fetchKPIBranchTransfers.fulfilled, (state, action) => {
+        state.loadingBranchTransfers = false;
+        const { groupBy, data } = action.payload || {};
+        const rows = data || [];
+        state.branchTransfers = rows;
+        switch (groupBy) {
+          case "SUMMARY":
+            state.branchTransfersSummary = rows;
+            break;
+          case "BRANCH_BALANCE":
+            state.branchTransfersBalance = rows;
+            break;
+          case "CORRIDOR":
+            state.branchTransfersCorridor = rows;
+            break;
+          case "IN_TRANSIT":
+            state.branchTransfersInTransit = rows;
+            break;
+          case "TOP_SKUS":
+            state.branchTransfersTopSkus = rows;
+            break;
+          case "DRILLDOWN":
+            state.branchTransfersDrilldown = rows;
+            break;
+          case "DEST_STOCK_AGING":
+            state.branchTransfersDestStockAging = rows;
+            break;
+          default:
+            break;
+        }
+      })
+      .addCase(fetchKPIBranchTransfers.rejected, (state, action) => {
+        state.loadingBranchTransfers = false;
+        state.errorBranchTransfers =
+          action.payload?.message || action.payload ||
+          action.error?.message || "Failed to fetch branch transfers KPI!";
       });
   },
 });

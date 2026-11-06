@@ -23,45 +23,40 @@ export const GET_POWERBI_SALES =
 
 export const GET_POWERBI_KPISALES =
   "/api/PowerBi/PowerBIKPISalesTransactions";
-
 export const GET_POWERBI_KPI_OVERDUE_DEBTORS =
   "/api/PowerBi/PowerBIKPIOverdueAccounts";
-
 export const GET_POWERBI_PURCHASE_ORDERS =
   "/api/PowerBi/PowerBIPurchaseOrders";
-
 export const GET_POWERBI_KPIPURCHASES =
   "/api/PowerBi/PowerBIKPIPurchases";
 
 export const GET_POWERBI_STOCK =
   "/api/PowerBi/PowerBIDailyClosingStock";
-
 export const GET_POWERBI_MOVEMENTS =
   "/api/PowerBi/PowerBIStockMovements";
 
 export const GET_POWERBI_BATCH_EXPIRY =
   "/api/PowerBi/PowerBIBatchExpireDetails";
-
 export const GET_POWERBI_BATCH_EXPIRY_NEO = 
   "/api/PowerBi/PowerBIBatchExpireDetailsNeo";
-
 export const GET_POWERBI_BRANCHES = 
   "/api/PowerBi/PowerBIBranches";
-
 export const GET_POWERBI_KPI_OVERDUE_ACCOUNTS =
   "/api/PowerBi/PowerBIAccountBalance";
-  
 export const GET_POWERBI_KPI_TOTALSTOCKVALUEBYBRANCH =
   "/api/PowerBi/PowerBIKPITotalStockValueByBranch";
-
 export const GET_POWERBI_KPI_STOCKHEALTH = 
   "/api/PowerBi/PowerBIKPIStockHealth";
-
 export const GET_POWERBI_INVENTORY_PROFIT_SUMMARY_USER = 
   "/api/PowerBi/PowerBIInventoryProfitSummaryUser";
-
 export const GET_POWERBI_ACCOUNT_BALANCE = 
   "/api/PowerBi/PowerBIAccountBalance";
+export const GET_POWERBI_KPI_SELL_THROUGH_ANALYSIS = 
+  "/api/PowerBi/PowerBIKPISellThroughAnalysis";
+export const GET_POWERBI_KPI_BRANCH_ORDER_FILL_RATE = 
+  "/api/PowerBi/PowerBIKPIBranchOrderFillRate";
+export const GET_POWERBI_KPI_BRANCH_TRANSFERS = 
+  "/api/PowerBi/PowerBIKPIBranchTransfers";
 
 export const GET_POWERBI_MAVERICK_SPEND = 
   "/api/PowerBi/PowerBIKPIMaverickSpend";
