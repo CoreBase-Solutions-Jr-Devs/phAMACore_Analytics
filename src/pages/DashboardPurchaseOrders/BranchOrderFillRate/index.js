@@ -18,7 +18,7 @@ import {
  import { clearBranchOrderFillRateData } from "../../../slices/dashboardPurchase/BranchOrderFillRate/reducer";
 import usePurchaseOrders from "../../../Components/Hooks/usePurchaseOrders";
 
-const BranchOrderFillRate = () => {
+const BranchOrderFill = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics"
 
   const dispatch = useDispatch();
@@ -273,4 +273,4 @@ groupBy: "TOP_SHORTAGES",
   );
 };
 
-export default BranchOrderFillRate;
+export default BranchOrderFill;

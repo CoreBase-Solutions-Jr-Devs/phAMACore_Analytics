@@ -58,7 +58,7 @@ import UserProfile from "../pages/Authentication/user-profile";
 import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
 import CategoryPerformance from "../pages/DashboardSales/CategoryPerformance";
 import SalesSummary from "../pages/DashboardSales/SalesSummary";
-import BranchOrderFillRate from "../pages/DashboardPurchaseOrders/BranchOrderFillRate";
+import BranchOrderFill from "../pages/DashboardPurchaseOrders/BranchOrderFillRate";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardMyBusiness /> },
@@ -136,7 +136,7 @@ const authProtectedRoutes = [
   },
      {
     path: "/dashboard-purchase-orders/Branch-Order-Fill-Rate",
-    component: <BranchOrderFillRate />,
+    component: <BranchOrderFill />,
   },
   {
     path: "/dashboard-purchase-orders/branch/:branchId",
