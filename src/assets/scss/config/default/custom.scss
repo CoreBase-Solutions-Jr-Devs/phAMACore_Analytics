@@ -23,6 +23,16 @@ File: Custom Css File
     .navbar-nav .nav-link i {
         color: #000 !important;
     }
+
+    /* Flyout page title background when sidebar is collapsed (sm) */
+    &[data-sidebar-size="sm"] .navbar-menu .navbar-nav .nav-item:hover > a.menu-link {
+        background: #fff !important;
+        box-shadow: 0 2px 4px rgba(15, 34, 58, 0.12);
+
+        &:after {
+            color: #c58c4f !important;
+        }
+    }
 }
 
 [data-bs-theme="dark"] {
@@ -35,7 +45,8 @@ File: Custom Css File
         background-color: #212529 !important;
     }
 
-    /* Flyout submenu background when sidebar is collapsed (sm) */
+    /* Flyout page title & submenu background when sidebar is collapsed (sm) */
+    &[data-sidebar-size="sm"] .navbar-menu .navbar-nav .nav-item:hover > a.menu-link,
     &[data-sidebar-size="sm"] .navbar-menu .navbar-nav .nav-item:hover > .menu-dropdown {
         background: #212529 !important;
     }
