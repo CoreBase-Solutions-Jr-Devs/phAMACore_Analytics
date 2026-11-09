@@ -236,11 +236,11 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                             <table className="table table-borderless table-centered table-nowrap mb-0 w-100">
                                 <thead className="text-muted table-light sticky-top" style={{ zIndex: 1 }}>
                                     <tr>
-                                        <th>Order Voucher (LPO)</th>
+                                        <th>LPO</th>
                                         <th>Order Date</th>
                                         <th>Requesting Branch</th>
-                                        <th>Transfer Voucher</th>
-                                        <th>Receipt Voucher</th>
+                                        <th>BTR</th>
+                                        <th>BRN</th>
                                         <th className="text-end">Units Ordered</th>
                                         <th className="text-end">Units Dispatched</th>
                                         <th className="text-end">Units Received</th>
