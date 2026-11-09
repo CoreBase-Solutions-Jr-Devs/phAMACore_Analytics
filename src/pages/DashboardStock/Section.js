@@ -5,7 +5,7 @@ import { computeKPIs, getKPIMeta, getExpiryRows, getLookbackDays } from "../util
 import { resolveBranchName, cleanBranchName } from "../../helpers/branch_helper";
 import { formatAmount } from "../../helpers/format_helper";
 
-const Section = ({ rightClickBtn }) => {
+const Section = ({ rightClickBtn, onExportExcel, title = "KEY METRICS" }) => {
   const {
     batchExpiryNeo = [],
     totalStockValueByBranch = [],
@@ -172,7 +172,7 @@ const Section = ({ rightClickBtn }) => {
   return (
     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
       {/* Title */}
-      <h4 className="card-title mb-0">KEY METRICS</h4>
+      <h4 className="card-title mb-0">{title}</h4>
 
       {/* Center - Filter indicators */}
       <div className="d-flex align-items-center gap-2 flex-wrap text-muted fs-13">
@@ -201,7 +201,7 @@ const Section = ({ rightClickBtn }) => {
         <button
           type="button"
           className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
-          onClick={handleExportExcel}
+          onClick={onExportExcel || handleExportExcel}
           title="Export to Excel"
         >
           <i className="ri-file-excel-2-line align-bottom"></i>
