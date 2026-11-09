@@ -497,7 +497,7 @@ const BranchTransfersSection = () => {
     }, [branchTransfersSummary, allDrilldownRows, enrichedAgingRows, branchTransfersTopSkus]);
 
     // Syokimau Pull filtered datasets & metrics (Total Value, Total SKUs, Drill down to branches & days in stock)
-    const { syokimauAgingRows, syokimauDrilldownRows, syokimauInTransitRows, row28Metrics } = useMemo(() => {
+    const { syokimauAgingRows, syokimauDrilldownRows, syokimauInTransitRows, branchPullMetrics } = useMemo(() => {
         const filterFn = (srcCode, srcName, dstCode, dstName) => {
             if (syokimauDirection === "TO_SYOKIMAU") {
                 return isSyokimauBranch(dstCode, dstName);
@@ -545,7 +545,7 @@ const BranchTransfersSection = () => {
             syokimauAgingRows: sAging,
             syokimauDrilldownRows: sDrilldown,
             syokimauInTransitRows: sInTransit,
-            row28Metrics: {
+            branchPullMetrics: {
                 totalValue,
                 totalSkus: skuSet.size,
                 totalVouchers: docSet.size,
@@ -803,9 +803,9 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Total Value (At Cost)</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-primary">
-                                            KES {formatCompact(row28Metrics.totalValue)}
+                                            KES {formatCompact(branchPullMetrics.totalValue)}
                                             <small className="text-muted fw-normal fs-12 ms-1">
-                                                ({row28Metrics.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })})
+                                                ({branchPullMetrics.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })})
                                             </small>
                                         </h5>
                                     </div>
@@ -814,7 +814,7 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Total SKUs</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-info">
-                                            {row28Metrics.totalSkus.toLocaleString()} SKUs
+                                            {branchPullMetrics.totalSkus.toLocaleString()} SKUs
                                         </h5>
                                     </div>
                                 </Col>
@@ -822,7 +822,7 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Transfer Vouchers</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-success">
-                                            {row28Metrics.totalVouchers.toLocaleString()} Vouchers
+                                            {branchPullMetrics.totalVouchers.toLocaleString()} Vouchers
                                         </h5>
                                     </div>
                                 </Col>
@@ -830,7 +830,7 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Avg Days in Stock</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-warning">
-                                            {row28Metrics.avgDaysInStock.toLocaleString()} days
+                                            {branchPullMetrics.avgDaysInStock.toLocaleString()} days
                                         </h5>
                                     </div>
                                 </Col>
