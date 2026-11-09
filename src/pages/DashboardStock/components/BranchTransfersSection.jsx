@@ -344,7 +344,7 @@ const TransferAgingTable = ({
                                 <th className="text-end">Lines</th>
                                 <th className="text-end">Total Units</th>
                                 <th className="text-end">In-Transit Value (KES)</th>
-                                <th className="text-end">Days in Transit</th>
+                                <th className="text-end">TOT Days</th>
                                 <th className="text-center">Urgency</th>
                             </tr>
                         </thead>
@@ -609,7 +609,7 @@ const BranchTransfersSection = () => {
 
     return (
         <>
-            {/* ROW 27: BRANCH TRANSFERS */}
+            {/* BRANCH TRANSFERS */}
             <Row>
                 <Col xl={12}>
                     <Card id="branch-transfers-card">
@@ -745,7 +745,7 @@ const BranchTransfersSection = () => {
                 </Col>
             </Row>
 
-            {/* ROW 28: BRANCH PULL TO SYOKIMAU */}
+            {/* BRANCH PULL TO SYOKIMAU */}
             <Row>
                 <Col xl={12}>
                     <Card id="branch-pull-syokimau-card">
