@@ -240,7 +240,7 @@ const TransferAgingTable = ({
                                 <th>Destination Branch</th>
                                 <th>BTR</th>
                                 <th>BRN</th>
-                                <th className="text-end">Qty (Packs)</th>
+                                <th className="text-end">Qty (P/W)</th>
                                 <th className="text-end">Value (KES)</th>
                                 <th className="text-end">TOT Days</th>
                                 <th className="text-center">Status</th>
@@ -402,12 +402,12 @@ const TransferAgingTable = ({
 };
 
 const BranchTransfersSection = () => {
-    // Card 1 (Row 27): Inter-Branch Transfers
+    // Card 1: Inter-Branch Transfers
     const [transfersTab, setTransfersTab] = useState("DEST_STOCK_AGING");
     const [transfersSearch, setTransfersSearch] = useState("");
     const [transfersBranchFilter, setTransfersBranchFilter] = useState("");
 
-    // Card 2 (Row 28): Branch Pull to/from Syokimau
+    // Card 2: Branch Pull to/from Syokimau
     const [syokimauDirection, setSyokimauDirection] = useState("TO_SYOKIMAU"); // "TO_SYOKIMAU" (Dest=Syokimau) or "FROM_SYOKIMAU" (Source=Syokimau)
     const [syokimauTab, setSyokimauTab] = useState("DEST_STOCK_AGING");
     const [syokimauSearch, setSyokimauSearch] = useState("");
@@ -457,7 +457,7 @@ const BranchTransfersSection = () => {
         });
     }, [allAgingRows, allDrilldownRows]);
 
-    // Overall Branch Transfers (Row 27) metrics: Total Value, Total SKUs, Transfers Count, Avg Days in Stock
+    // Overall Branch Transfers metrics: Total Value, Total SKUs, Transfers Count, Avg Days in Stock
     const row27Metrics = useMemo(() => {
         const summary = (Array.isArray(branchTransfersSummary) ? branchTransfersSummary[0] : branchTransfersSummary) || {};
         const totalValueFromSummary = num(pick(summary, "total_transfer_value_cost", "total_receipt_value_cost"));
@@ -496,7 +496,7 @@ const BranchTransfersSection = () => {
         };
     }, [branchTransfersSummary, allDrilldownRows, enrichedAgingRows, branchTransfersTopSkus]);
 
-    // Syokimau Pull (Row 28) filtered datasets & metrics (Total Value, Total SKUs, Drill down to branches & days in stock)
+    // Syokimau Pull filtered datasets & metrics (Total Value, Total SKUs, Drill down to branches & days in stock)
     const { syokimauAgingRows, syokimauDrilldownRows, syokimauInTransitRows, row28Metrics } = useMemo(() => {
         const filterFn = (srcCode, srcName, dstCode, dstName) => {
             if (syokimauDirection === "TO_SYOKIMAU") {
@@ -852,7 +852,7 @@ const BranchTransfersSection = () => {
                                         onChange={(e) => setSyokimauBranchFilter(e.target.value)}
                                         aria-label="Filter Syokimau pull by branch"
                                     >
-                                        <option value="">All Branches</option>
+                                        <option value="">Branch</option>
                                         {availableBranches.map((b) => (
                                             <option key={b} value={b}>
                                                 {b}
