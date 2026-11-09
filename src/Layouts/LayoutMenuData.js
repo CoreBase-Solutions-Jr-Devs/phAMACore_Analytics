@@ -123,6 +123,12 @@ const Navdata = () => {
           link: "/dashboard-sales/Category-Performance",
           parentId: "sales",
         },
+             {
+          id: "Sales-Summary",
+          label: "Sales Summary",
+          link: `/dashboard-sales/Sales-Summary`,
+          parentId: "sales",
+        },
       ],
     },
     {
@@ -175,6 +181,12 @@ const Navdata = () => {
           id: "Category-Spend",
           label: "Category Spend",
           link: `/dashboard-purchase-orders/Category-Spend`,
+          parentId: "purchase-orders",
+        },
+             {
+          id: "Branch-Order-Fill-Rate",
+          label: "Branch Order Fill Rate",
+          link: `/dashboard-purchase-orders/Branch-Order-Fill-Rate`,
           parentId: "purchase-orders",
         },
       ],

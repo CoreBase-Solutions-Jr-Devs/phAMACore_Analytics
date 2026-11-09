@@ -69,6 +69,11 @@ const usePurchaseOrders = (
   LastYearDailySpendType = [],
   kpiOverdueAccounts = [],
 
+ KPIBranchOrderFillRateSummary = [],
+  KPIBranchOrderFillRateBranchOFR = [],
+ KPIBranchOrderFillRateOrderDrilldown = [],
+ KPIBranchOrderFillRateTopShortages = [],
+  
   filters = {}
 ) => {
 
@@ -100,19 +105,8 @@ const activeSuppliers = Number(
   KPISummary?.[0]?.unique_suppliers || 0
 );
 
-
-
-
-
   // ============================================================
   // AVERAGE LEAD TIME
-  //
-  // Lead time is calculated as:
-  //
-  // expected date - LPO date
-  //
-  // We calculate it once per LPO so duplicate rows
-  // belonging to the same LPO do not affect the average.
   // ============================================================
   const priceAlertSummary = KPIPriceAlertsSummary?.[0] || {};
 
@@ -591,6 +585,17 @@ const bestPricePerSupplier = bestPriceData
   // ============================================================
   // RETURN ALL CALCULATED VALUES
   // ============================================================
+const BranchOrderFillRateSummaryData =
+  KPIBranchOrderFillRateSummary?.[0] || {};
+
+const BranchOrderFillRateBranchOFRData =
+  KPIBranchOrderFillRateBranchOFR || [];
+
+const BranchOrderFillRateOrderDrilldownData =
+  KPIBranchOrderFillRateOrderDrilldown || [];
+
+const BranchOrderFillRateTopShortagesData =
+  KPIBranchOrderFillRateTopShortages || [];
   return {
  
     totalSpend,
@@ -615,6 +620,10 @@ const bestPricePerSupplier = bestPriceData
     // OverdueAccounts,
     spendByCategory,
       categoryTotals,
+      BranchOrderFillRateSummaryData,
+      BranchOrderFillRateTopShortagesData,
+      BranchOrderFillRateOrderDrilldownData,
+      BranchOrderFillRateBranchOFRData,
   };
 };
 

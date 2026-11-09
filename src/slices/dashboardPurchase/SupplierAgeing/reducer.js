@@ -228,8 +228,6 @@ const SupplierAgeingSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-  
-
  .addCase(getKPIOverdueAccounts.pending, (state) => {
         state.loading = true;
         state.error = null;

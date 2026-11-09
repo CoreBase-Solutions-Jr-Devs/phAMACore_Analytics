@@ -166,7 +166,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">Current</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-success">
-            KES {Number(currentReceivables || 0).toLocaleString("en-KE")}
+            KES 0
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">0–30 days</p>
@@ -181,7 +181,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">31–60 Days</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-warning">
-            KES {Number(overdue31To60 || 0).toLocaleString("en-KE")}
+            KES 0
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">Overdue invoices</p>
@@ -196,7 +196,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">61–90 Days</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-danger">
-            KES {Number(overdue61To90 || 0).toLocaleString("en-KE")}
+            KES 0
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">Overdue invoices</p>
@@ -211,7 +211,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">91–120 Days</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-info">
-            KES {Number(overdue91To120 || 0).toLocaleString("en-KE")}
+            KES 0
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">Overdue invoices</p>
@@ -226,7 +226,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">120+ Days</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-danger">
-            KES {Number(overdue120Plus || 0).toLocaleString("en-KE")}
+            KES 0
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">Long overdue invoices</p>

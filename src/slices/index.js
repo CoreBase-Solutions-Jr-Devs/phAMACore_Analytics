@@ -33,7 +33,8 @@ import SalesBreakdownReducer from "./dashboardSales/SalesBreakdown/reducer";
 import CategoryPerformanceReducer from "./dashboardSales/CategoryPerformance/reducer";
 import SupplierAgeingReducer from "./dashboardPurchase/SupplierAgeing/reducer";
 import CategorySpendReducer from "./dashboardPurchase/CategorySpend/reducer";
-
+import SalesSummaryReducer from "./dashboardSales/SalesSummary/reducer";
+import BranchOrderFillRateReducer from "./dashboardPurchase/BranchOrderFillRate/reducer"
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
     Login: LoginReducer,
@@ -56,6 +57,8 @@ const rootReducer = combineReducers({
     categoryPerformance:CategoryPerformanceReducer,
     supplierAgeing:SupplierAgeingReducer,
     categorySpend: CategorySpendReducer,
+    salesSummary: SalesSummaryReducer,
+    branchOrderFillRate: BranchOrderFillRateReducer,
 });
 
 export default rootReducer;

@@ -277,7 +277,7 @@ const tabCounts = useMemo(() => {
             insight={info.row.original.action_insight}
           >
             <span className="text-muted small">
-              {formatDate(info.getValue())}
+              {"-"}
             </span>
           </InsightCell>
         ),
@@ -291,7 +291,7 @@ const tabCounts = useMemo(() => {
 
           return (
             <Badge className={risk.className}  pill>
-              {risk.label}
+              { "-"}
             </Badge>
           );
         },
@@ -397,11 +397,11 @@ onExport={handleExportExcel}        />
                     >
                       {tab.label}
 
-     <Badge
+     {/* <Badge
 className={`ms-1 ${isActive ? "bg-white text-dark" : `text-white ${tab.badgeClass}`}`}
 >
   {tabCounts[tab.value]}
-</Badge>
+</Badge> */}
                     </NavLink>
                   </NavItem>
                 );
