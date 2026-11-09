@@ -6,15 +6,21 @@ import BreadCrumb from '../../Components/Common/BreadCrumb';
 import WidgetsOne from './WidgetsOne';
 import BarChartTwo from './Charts/Custom/BarChartTwo';
 import BarChartThree from './Charts/Custom/BarChartThree';
+import StockCoverageSection, {
+    ITEM_MOVEMENT_STATUS_FILTERS,
+    STOCK_COVERAGE_VIEW_MODES,
+} from './components/StockCoverageSection';
 
 import {
     fetchBatchExpiryNeo,
     fetchBranches,
     fetchKPICriticalStockouts,
     fetchKPIImbalances,
+    fetchKPIItemMovement,
     fetchKPISalesTransactions,
     fetchKPISlowMovingStock,
     fetchKPIStockHealth,
+    fetchKPIStockVsMovement,
     fetchKPITotalStockValueByBranch,
 } from '../../slices/dashboardStock/thunk';
 import { applyFilters, syncDraftFilters } from '../../slices/dashboardStock/reducer';
@@ -25,7 +31,12 @@ import FilterActions from './FilterActions';
 
 import { exportToExcel } from '../../helpers/export_helper';
 import CardExportButtons from '../../Components/Common/CardExportButtons';
-import { transformStockVsSalesVelocity, getPeriodDays } from './Charts/Custom/util/chartTransforms';
+import {
+    transformStockVsSalesVelocity,
+    transformStockVsMovement,
+    normalizeItemMovementRows,
+    getPeriodDays,
+} from './Charts/Custom/util/chartTransforms';
 import {
     getLookbackDays,
     CRITICAL_TOP_N,
@@ -36,6 +47,11 @@ import { addDaysApi, parseApiDate } from '../utils/dateHelper';
 
 const DashboardStock = () => {
     document.title = "Inventory/Stock Dashboard | phAMACore Analytics";
+
+    const [coverageViewMode, setCoverageViewMode] = useState("CHART");
+    const [coverageSearchTerm, setCoverageSearchTerm] = useState("");
+    const [coverageBranchFilter, setCoverageBranchFilter] = useState("");
+    const [coverageStatusFilter, setCoverageStatusFilter] = useState("ALL");
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -53,6 +69,8 @@ const DashboardStock = () => {
     const {
         branches = [],
         totalStockValueByBranch = [],
+        stockVsMovement = [],
+        itemMovement = [],
         kpiSalesTransactions = [],
         kpiSalesPeriodDays = 1,
         filters = {},
@@ -139,6 +157,8 @@ const DashboardStock = () => {
         };
 
         dispatch(fetchKPIStockHealth(health));
+        dispatch(fetchKPIStockVsMovement({ ...health, GroupBy: "STOCK_VS_MOVEMENT" }));
+        dispatch(fetchKPIItemMovement({ ...health, GroupBy: "ITEM_MOVEMENT", TopN: 0 }));
         dispatch(fetchKPICriticalStockouts({ ...health, GroupBy: "CRITICAL_STOCKOUTS", TopN: CRITICAL_TOP_N }));
         dispatch(fetchKPISlowMovingStock({ ...health, GroupBy: "SLOW_MOVERS", TopN: SLOW_MOVER_TOP_N }));
         dispatch(fetchKPIImbalances({ ...health, TopN: IMBALANCE_TOP_N }));
@@ -161,6 +181,33 @@ const DashboardStock = () => {
         return 1;
     }, [kpiSalesPeriodDays, activeFilters?.startDate, activeFilters?.endDate]);
 
+    const availableCoverageBranches = useMemo(() => {
+        const set = new Set();
+        (stockVsMovement || []).forEach((r) => {
+            const name = cleanBranchName(r.branch_name || r.branchName || "");
+            if (name) set.add(name);
+        });
+        (itemMovement || []).forEach((r) => {
+            const name = cleanBranchName(r.branch_name || r.branchName || "");
+            if (name) set.add(name);
+        });
+        return Array.from(set).sort((a, b) => a.localeCompare(b));
+    }, [stockVsMovement, itemMovement]);
+
+    useEffect(() => {
+        if (coverageBranchFilter && !availableCoverageBranches.includes(coverageBranchFilter)) {
+            setCoverageBranchFilter("");
+        }
+    }, [availableCoverageBranches, coverageBranchFilter]);
+
+    const handleSelectCoverageBranch = (branchInfo) => {
+        const bName = typeof branchInfo === "string" ? branchInfo : branchInfo?.branchName;
+        if (bName) {
+            setCoverageBranchFilter(bName);
+            setCoverageViewMode("ITEM_MOVEMENT");
+        }
+    };
+
     const handleExportStockValueByBranch = () => {
         const rows = (totalStockValueByBranch || []).map((item) => {
             const rawBranch = item.branch_name || item.branchName || `Branch ${item.branch_id ?? ""}`;
@@ -177,17 +224,61 @@ const DashboardStock = () => {
     };
 
     const handleExportStockVelocity = () => {
-        const velocityData = transformStockVsSalesVelocity(totalStockValueByBranch, kpiSalesTransactions, periodDays);
+        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+
+        if (coverageViewMode === "ITEM_MOVEMENT") {
+            const normalized = normalizeItemMovementRows(itemMovement);
+            const filtered = coverageBranchFilter
+                ? normalized.filter((r) => r.branchName.toLowerCase() === coverageBranchFilter.toLowerCase())
+                : normalized;
+
+            const rows = filtered.map((r) => ({
+                "Rank": r.rankPos,
+                "Branch": r.branchName,
+                "Item Code": r.itemCode,
+                "Product Name": r.itemName,
+                "Group": r.itemGroup,
+                "Pack Size": r.packQty,
+                "Pack Cost (KES)": r.packCost,
+                "Unit Cost (KES)": r.unitCost,
+                "Current Stock (Pcs)": r.currentStockQty,
+                "Current Stock (W/P)": r.stockWholesPieces,
+                "Stock at Cost (KES)": r.stockAtCost,
+                "30d Consumption (Pcs)": r.monthlyConsumptionQty,
+                "30d Consumption (W/P)": r.consumptionWholesPieces,
+                "30d Cost of Sales (KES)": r.monthlyCostOfSales,
+                "30d Net Sales (KES)": r.monthlyNetSales,
+                "Stock Cover (Months)": r.stockCoverMonths,
+                "Stock Cover (Days)": r.stockCoverDays,
+                "Movement Category": r.movementCategory,
+                "Health Status": r.stockHealthStatus,
+                "Action Insight": r.actionInsight,
+            }));
+            exportToExcel(rows, `Item_Stock_VS_Movement_${todayStr}`);
+            return;
+        }
+
+        const velocityData =
+            stockVsMovement && stockVsMovement.length > 0
+                ? transformStockVsMovement(stockVsMovement)
+                : transformStockVsSalesVelocity(totalStockValueByBranch, kpiSalesTransactions, periodDays);
+
         const rows = (velocityData.categories || []).map((branch, idx) => ({
             "Branch": branch,
-            "Stock Value (KES)": (velocityData.rawStock?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            "Stocked SKUs": velocityData.stockedSkus?.[idx] ?? "-",
+            "Total Stock Pieces": velocityData.totalStockPieces?.[idx] ?? "-",
+            "Stock at Cost (KES)": (velocityData.rawStock?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
             "Stock Value (M KES)": velocityData.stock?.[idx] ?? 0,
+            "30d Consumed Pieces": velocityData.monthlyConsumedPieces?.[idx] ?? "-",
+            "30d Cost of Sales (KES)": (velocityData.monthlyConsumption?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
             "Avg Daily Cost of Sales (KES)": (velocityData.rawDailySales?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
-            "Consumption per 30 Days (KES)": (velocityData.monthlyConsumption?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            "30d Net Sales (KES)": (velocityData.monthlyNetSales?.[idx] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            "Stock Cover (Months)": velocityData.stockCoverMonths?.[idx] ?? "-",
             "Days of Cover": velocityData.daysCover?.[idx] ?? "-",
+            "Health Status": velocityData.stockHealthStatus?.[idx] ?? "-",
+            "Action Insight": velocityData.actionInsights?.[idx] ?? "-",
         }));
-        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-        exportToExcel(rows, `Stock_VS_Sales_Velocity_${todayStr}`);
+        exportToExcel(rows, `Stock_VS_Cost_of_Sales_Coverage_${todayStr}`);
     };
 
     const handleApplyFilters = () => {
@@ -244,20 +335,101 @@ const DashboardStock = () => {
                             <Card className="flex-fill" id="stock-velocity-card">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                        <h4 className="card-title mb-0">
-                                            {isBranchView && branchDisplayName
-                                                ? `Stock VS Cost of Sales - ${branchDisplayName}`
-                                                : "Stock VS Cost of Sales - Branch Coverage"}
-                                        </h4>
-                                        <CardExportButtons
-                                            targetId="stock-velocity-card"
-                                            title="Stock VS Sales Velocity"
-                                            onExport={handleExportStockVelocity}
-                                        />
+                                        <div>
+                                            <h4 className="card-title mb-0">
+                                                {isBranchView && branchDisplayName
+                                                    ? `Stock VS Cost of Sales - ${branchDisplayName}`
+                                                    : "Stock VS Cost of Sales - Branch Coverage"}
+                                            </h4>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                                            <div className="btn-group btn-group-sm" role="group" aria-label="Stock coverage view mode">
+                                                {STOCK_COVERAGE_VIEW_MODES.map((m) => (
+                                                    <button
+                                                        key={m.key}
+                                                        type="button"
+                                                        className={`btn ${
+                                                            coverageViewMode === m.key
+                                                                ? "btn-primary"
+                                                                : "btn-outline-primary"
+                                                        }`}
+                                                        onClick={() => setCoverageViewMode(m.key)}
+                                                    >
+                                                        {m.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <CardExportButtons
+                                                targetId="stock-velocity-card"
+                                                title="Stock VS Cost of Sales - Branch Coverage"
+                                                onExport={handleExportStockVelocity}
+                                            />
+                                        </div>
                                     </div>
                                 </CardHeader>
                                 <CardBody>
-                                    <BarChartThree />
+                                    {coverageViewMode === "CHART" ? (
+                                        <BarChartThree onBranchSelect={handleSelectCoverageBranch} />
+                                    ) : (
+                                        <>
+                                            <Row className="mb-2 align-items-center g-2">
+                                                <Col sm={coverageViewMode === "ITEM_MOVEMENT" ? 5 : 12}>
+                                                    <input
+                                                        className="form-control form-control-sm"
+                                                        placeholder={
+                                                            coverageViewMode === "ITEM_MOVEMENT"
+                                                                ? "Search SKU, product, branch, or status..."
+                                                                : "Search branch or health status..."
+                                                        }
+                                                        value={coverageSearchTerm}
+                                                        onChange={(e) => setCoverageSearchTerm(e.target.value)}
+                                                    />
+                                                </Col>
+                                                {coverageViewMode === "ITEM_MOVEMENT" && (
+                                                    <>
+                                                        {!isBranchView && (
+                                                            <Col sm={3}>
+                                                                <select
+                                                                    className="form-select form-select-sm"
+                                                                    value={coverageBranchFilter}
+                                                                    onChange={(e) => setCoverageBranchFilter(e.target.value)}
+                                                                    aria-label="Filter items by branch"
+                                                                >
+                                                                    <option value="">All Branches</option>
+                                                                    {availableCoverageBranches.map((b) => (
+                                                                        <option key={b} value={b}>
+                                                                            {b}
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            </Col>
+                                                        )}
+                                                        <Col sm={isBranchView ? 7 : 4}>
+                                                            <select
+                                                                className="form-select form-select-sm"
+                                                                value={coverageStatusFilter}
+                                                                onChange={(e) => setCoverageStatusFilter(e.target.value)}
+                                                                aria-label="Filter items by movement status"
+                                                            >
+                                                                {ITEM_MOVEMENT_STATUS_FILTERS.map((s) => (
+                                                                    <option key={s.key} value={s.key}>
+                                                                        {s.label}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </Col>
+                                                    </>
+                                                )}
+                                            </Row>
+                                            <StockCoverageSection
+                                                viewMode={coverageViewMode}
+                                                searchTerm={coverageSearchTerm}
+                                                branchFilter={coverageBranchFilter}
+                                                statusFilter={coverageStatusFilter}
+                                                onSelectBranch={handleSelectCoverageBranch}
+                                            />
+                                        </>
+                                    )}
                                 </CardBody>
                             </Card>
                         </Col>

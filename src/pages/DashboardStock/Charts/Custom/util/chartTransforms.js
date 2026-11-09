@@ -12,6 +12,7 @@
  */
 
 import { cleanBranchName } from '../../../../../helpers/branch_helper';
+import { pick, num } from '../../../../utils/apiRow';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -307,4 +308,168 @@ export function transformStockVsSalesVelocity(stockRows = [], salesRows = [], pe
         monthlyConsumption: combinedList.map((item) => item.monthlyConsumption),
         daysCover: combinedList.map((item) => item.daysCover),
     };
+}
+
+const roundMillions = (valM) => {
+    if (!valM || valM <= 0) return 0;
+    if (valM >= 0.01) return Number(valM.toFixed(2));
+    if (valM >= 0.001) return Number(valM.toFixed(3));
+    if (valM >= 0.0001) return Number(valM.toFixed(4));
+    return Number(valM.toFixed(6));
+};
+
+/**
+ * Produces chart-ready data for the Stock VS Cost of Sales - Branch Coverage chart
+ * directly from PowerBIKPIStockHealth (GroupBy = STOCK_VS_MOVEMENT).
+ *
+ * @param {Array} movementRows  Rows from PowerBIKPIStockHealth (GroupBy = STOCK_VS_MOVEMENT)
+ * @returns {object}
+ */
+export function transformStockVsMovement(movementRows = []) {
+    const rows = Array.isArray(movementRows) ? movementRows.filter(Boolean) : [];
+    if (!rows.length) {
+        return {
+            categories: [],
+            branchIds: [],
+            stock: [],
+            sales: [],
+            monthlyCogsM: [],
+            rawStock: [],
+            rawDailySales: [],
+            monthlyConsumption: [],
+            monthlyNetSales: [],
+            totalStockPieces: [],
+            monthlyConsumedPieces: [],
+            stockedSkus: [],
+            totalCatalogSkus: [],
+            stockCoverMonths: [],
+            daysCover: [],
+            deadStockValue: [],
+            excessStockValue: [],
+            stockHealthStatus: [],
+            actionInsights: [],
+        };
+    }
+
+    const list = rows.map((row) => {
+        const branchId = pick(row, "branch_id", "branchCode", "bcode");
+        const rawName = pick(row, "branch_name", "branchName") || (branchId != null ? `Branch ${branchId}` : "Unknown");
+        const name = cleanBranchName(rawName);
+        const rawStock = num(pick(row, "stock_at_cost", "total_stock_value", "closing_value"));
+        const monthlyCogs = num(pick(row, "monthly_cost_of_sales", "net_cogs"));
+        const monthlyNetSales = num(pick(row, "monthly_net_sales", "net_sales"));
+        const rawDailySales = monthlyCogs / 30;
+        const stockM = rawStock / 1_000_000;
+        const salesM = rawDailySales / 1_000_000;
+        const monthlyCogsM = monthlyCogs / 1_000_000;
+        const coverDays = num(pick(row, "stock_cover_days", "days_of_inventory"));
+        const coverMonths = num(pick(row, "stock_cover_months"));
+
+        return {
+            branchId,
+            name,
+            rawStock,
+            monthlyCogs,
+            monthlyNetSales,
+            rawDailySales,
+            stockM,
+            salesM,
+            monthlyCogsM,
+            totalStockPieces: num(pick(row, "total_stock_pieces")),
+            monthlyConsumedPieces: num(pick(row, "monthly_consumed_pieces")),
+            stockedSkus: num(pick(row, "stocked_skus")),
+            totalCatalogSkus: num(pick(row, "total_catalog_skus")),
+            stockCoverMonths: coverMonths,
+            daysCover: coverDays > 0 ? coverDays : (rawDailySales > 0 ? Math.round((rawStock / rawDailySales) * 10) / 10 : (rawStock > 0 ? 9999 : 0)),
+            deadStockValue: num(pick(row, "dead_stock_value")),
+            excessStockValue: num(pick(row, "excess_stock_value")),
+            stockHealthStatus: String(pick(row, "stock_health_status") || "HEALTHY"),
+            actionInsight: String(pick(row, "action_insight") || ""),
+        };
+    });
+
+    list.sort((a, b) => b.rawStock - a.rawStock || b.monthlyCogs - a.monthlyCogs);
+
+    return {
+        categories: list.map((item) => item.name),
+        branchIds: list.map((item) => item.branchId),
+        stock: list.map((item) => roundMillions(item.stockM)),
+        sales: list.map((item) => roundMillions(item.salesM)),
+        monthlyCogsM: list.map((item) => roundMillions(item.monthlyCogsM)),
+        rawStock: list.map((item) => item.rawStock),
+        rawDailySales: list.map((item) => item.rawDailySales),
+        monthlyConsumption: list.map((item) => item.monthlyCogs),
+        monthlyNetSales: list.map((item) => item.monthlyNetSales),
+        totalStockPieces: list.map((item) => item.totalStockPieces),
+        monthlyConsumedPieces: list.map((item) => item.monthlyConsumedPieces),
+        stockedSkus: list.map((item) => item.stockedSkus),
+        totalCatalogSkus: list.map((item) => item.totalCatalogSkus),
+        stockCoverMonths: list.map((item) => item.stockCoverMonths),
+        daysCover: list.map((item) => item.daysCover),
+        deadStockValue: list.map((item) => item.deadStockValue),
+        excessStockValue: list.map((item) => item.excessStockValue),
+        stockHealthStatus: list.map((item) => item.stockHealthStatus),
+        actionInsights: list.map((item) => item.actionInsight),
+    };
+}
+
+/**
+ * Normalizes rows from PowerBIKPIStockHealth (GroupBy = ITEM_MOVEMENT).
+ */
+export function normalizeItemMovementRows(rows = []) {
+    return (Array.isArray(rows) ? rows : []).filter(Boolean).map((row, idx) => {
+        const branchId = pick(row, "branch_id", "branchCode", "bcode");
+        const branchName = cleanBranchName(
+            pick(row, "branch_name", "branchName") || (branchId != null ? `Branch ${branchId}` : "All Branches")
+        );
+        const itemCode = String(pick(row, "item_code", "itemCode") || "");
+        const itemName = String(pick(row, "item_name", "itemName") || itemCode || "Unknown Item");
+        const itemGroup = String(pick(row, "item_group", "itemGroup") || "Unassigned");
+        const itemSubgroup = String(pick(row, "item_subgroup", "itemSubgroup") || "");
+        const packQty = Math.max(num(pick(row, "pack_qty", "packQty")) || 1, 1);
+        const packCost = num(pick(row, "pack_cost", "packCost"));
+        const unitCost = num(pick(row, "unit_cost", "unitCost"));
+        const currentStockQty = num(pick(row, "current_stock_qty", "currentStockQty"));
+        const stockWholesPieces = String(pick(row, "stock_wholes_pieces", "stockWholesPieces") || `${currentStockQty}P`);
+        const stockAtCost = num(pick(row, "stock_at_cost", "stockAtCost"));
+        const monthlyConsumptionQty = num(pick(row, "monthly_consumption_qty", "monthlyConsumptionQty"));
+        const consumptionWholesPieces = String(
+            pick(row, "consumption_wholes_pieces", "consumptionWholesPieces") || `${monthlyConsumptionQty}P`
+        );
+        const monthlyCostOfSales = num(pick(row, "monthly_cost_of_sales", "monthlyCostOfSales"));
+        const monthlyNetSales = num(pick(row, "monthly_net_sales", "monthlyNetSales"));
+        const stockCoverMonths = num(pick(row, "stock_cover_months", "stockCoverMonths"));
+        const stockCoverDays = num(pick(row, "stock_cover_days", "stockCoverDays"));
+        const movementCategory = String(pick(row, "movement_category", "movementCategory") || "ACTIVE").toUpperCase();
+        const stockHealthStatus = String(pick(row, "stock_health_status", "stockHealthStatus") || "HEALTHY").toUpperCase();
+        const actionInsight = String(pick(row, "action_insight", "actionInsight") || "");
+        const rankPos = num(pick(row, "rank_pos")) || idx + 1;
+
+        return {
+            id: `${itemCode || idx}-${branchId ?? idx}-${idx}`,
+            rankPos,
+            branchId,
+            branchName,
+            itemCode,
+            itemName,
+            itemGroup,
+            itemSubgroup,
+            packQty,
+            packCost,
+            unitCost,
+            currentStockQty,
+            stockWholesPieces,
+            stockAtCost,
+            monthlyConsumptionQty,
+            consumptionWholesPieces,
+            monthlyCostOfSales,
+            dailyCostOfSales: monthlyCostOfSales / 30,
+            monthlyNetSales,
+            stockCoverMonths,
+            stockCoverDays,
+            movementCategory,
+            stockHealthStatus,
+            actionInsight,
+        };
+    });
 }

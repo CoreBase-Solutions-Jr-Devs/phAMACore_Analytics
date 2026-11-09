@@ -351,6 +351,80 @@ export const fetchKPIImbalances = createAsyncThunk(
   }
 );
 
+export const fetchKPIStockVsMovement = createAsyncThunk(
+  "stockInventory/fetchKPIStockVsMovement",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const {
+        clientid = 1,
+        branchcode = 0,
+        GroupBy = "STOCK_VS_MOVEMENT",
+        TopN = 0,
+        LookbackDays = 30,
+        AsOfDate = null,
+      } = params;
+
+      const payload = {
+        clientid,
+        branchcode: branchcode && Number(branchcode) > 0 ? Number(branchcode) : 0,
+        GroupBy,
+        TopN,
+        LookbackDays,
+      };
+      const formattedAsOf = formatAsOfDate(AsOfDate);
+      if (formattedAsOf) payload.AsOfDate = formattedAsOf;
+
+      const response = await getKPIStockHealthApi(payload);
+      return toList(response).filter((row) => row && (row.branch_id != null || row.branch_name));
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error.message ||
+        "Failed to fetch stock vs movement!"
+      );
+    }
+  }
+);
+
+export const fetchKPIItemMovement = createAsyncThunk(
+  "stockInventory/fetchKPIItemMovement",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const {
+        clientid = 1,
+        branchcode = 0,
+        GroupBy = "ITEM_MOVEMENT",
+        TopN = 0,
+        LookbackDays = 30,
+        AsOfDate = null,
+      } = params;
+
+      const payload = {
+        clientid,
+        branchcode: branchcode && Number(branchcode) > 0 ? Number(branchcode) : 0,
+        GroupBy,
+        TopN,
+        LookbackDays,
+      };
+      const formattedAsOf = formatAsOfDate(AsOfDate);
+      if (formattedAsOf) payload.AsOfDate = formattedAsOf;
+
+      const response = await getKPIStockHealthApi(payload);
+      return toList(response).filter(
+        (row) => row && (row.item_code || row.item_Code || row.item_name || row.item_Name)
+      );
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error.message ||
+        "Failed to fetch item movement!"
+      );
+    }
+  }
+);
+
 const calculatePeriodDays = (startDate, endDate) => {
   if (!startDate || !endDate) return 1;
   const parse = (str) => {

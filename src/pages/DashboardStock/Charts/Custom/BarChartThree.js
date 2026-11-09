@@ -2,18 +2,21 @@ import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import ReactApexChart from 'react-apexcharts';
 import { Spinner } from 'reactstrap';
-import { getPeriodDays, transformStockVsSalesVelocity } from './util/chartTransforms';
+import { getPeriodDays, transformStockVsMovement, transformStockVsSalesVelocity } from './util/chartTransforms';
 
 const BarChartThree = ({
     height = 420,
     categories: propCategories,
     stock: propStock,
     sales: propSales,
+    onBranchSelect,
 }) => {
     const {
+        stockVsMovement = [],
         totalStockValueByBranch = [],
         kpiSalesTransactions = [],
         kpiSalesPeriodDays = 1,
+        loadingStockVsMovement,
         loadingTotalStockValueByBranch,
         loadingKPISalesTransactions,
         filters = {},
@@ -45,6 +48,10 @@ const BarChartThree = ({
             };
         }
 
+        if (Array.isArray(stockVsMovement) && stockVsMovement.length > 0) {
+            return transformStockVsMovement(stockVsMovement);
+        }
+
         if (!totalStockValueByBranch.length && !kpiSalesTransactions.length) {
             return {
                 categories: [],
@@ -57,7 +64,7 @@ const BarChartThree = ({
         }
 
         return transformStockVsSalesVelocity(totalStockValueByBranch, kpiSalesTransactions, periodDays);
-    }, [propCategories, propStock, propSales, totalStockValueByBranch, kpiSalesTransactions, periodDays]);
+    }, [propCategories, propStock, propSales, stockVsMovement, totalStockValueByBranch, kpiSalesTransactions, periodDays]);
 
     const series = useMemo(() => [
         {
@@ -79,6 +86,19 @@ const BarChartThree = ({
             toolbar: {
                 show: false,
             },
+            events: onBranchSelect
+                ? {
+                      dataPointSelection: (_event, _chartContext, config) => {
+                          const idx = config?.dataPointIndex;
+                          if (idx !== undefined && idx >= 0 && chartData.categories?.[idx]) {
+                              onBranchSelect({
+                                  branchId: chartData.branchIds?.[idx],
+                                  branchName: chartData.categories[idx],
+                              });
+                          }
+                      },
+                  }
+                : undefined,
         },
 
         colors: ["#405189", "#0ab39c"],
@@ -130,7 +150,15 @@ const BarChartThree = ({
                     },
                 },
                 labels: {
-                    formatter: (val) => (val != null ? `${Number(val).toFixed(1)}M` : ""),
+                    formatter: (val) => {
+                        if (val == null) return "";
+                        const numVal = Number(val);
+                        if (numVal === 0) return "0";
+                        if (numVal >= 0.1) return `${numVal.toFixed(1)}M`;
+                        if (numVal >= 0.01) return `${numVal.toFixed(2)}M`;
+                        if (numVal >= 0.001) return `${numVal.toFixed(3)}M`;
+                        return `${numVal.toFixed(4)}M`;
+                    },
                 },
             },
             {
@@ -145,11 +173,11 @@ const BarChartThree = ({
                 labels: {
                     formatter: (val) => {
                         if (val == null) return "";
-                        const num = Number(val);
-                        if (num === 0) return "0";
-                        if (num >= 0.01) return `${num.toFixed(2)}M`;
-                        if (num >= 0.001) return `${num.toFixed(3)}M`;
-                        return `${num.toFixed(4)}M`;
+                        const numVal = Number(val);
+                        if (numVal === 0) return "0";
+                        if (numVal >= 0.01) return `${numVal.toFixed(2)}M`;
+                        if (numVal >= 0.001) return `${numVal.toFixed(3)}M`;
+                        return `${numVal.toFixed(4)}M`;
                     },
                 },
             },
@@ -171,11 +199,24 @@ const BarChartThree = ({
 
                     if (seriesIndex === 0) {
                         const raw = chartData.rawStock?.[dataIndex];
+                        const pieces = chartData.totalStockPieces?.[dataIndex];
+                        const skus = chartData.stockedSkus?.[dataIndex];
+                        const status = chartData.stockHealthStatus?.[dataIndex];
+                        const extra = [
+                            pieces !== undefined ? `${Number(pieces).toLocaleString()} pcs` : null,
+                            skus !== undefined ? `${Number(skus).toLocaleString()} SKUs` : null,
+                            status || null,
+                        ].filter(Boolean).join(" · ");
+
                         if (raw !== undefined) {
+                            let formattedVal = Number(val).toFixed(2);
+                            if (Number(val) > 0 && Number(val) < 0.01) {
+                                formattedVal = Number(val) < 0.0001 ? Number(val).toFixed(6) : Number(val).toFixed(4);
+                            }
                             return `KES ${raw.toLocaleString(undefined, {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                            })} (${Number(val).toFixed(2)}M)`;
+                            })} (${formattedVal}M)${extra ? ` [${extra}]` : ""}`;
                         }
                         return `${Number(val).toFixed(2)}M`;
                     }
@@ -183,13 +224,21 @@ const BarChartThree = ({
                     if (seriesIndex === 1) {
                         const raw = chartData.rawDailySales?.[dataIndex];
                         const days = chartData.daysCover?.[dataIndex];
+                        const months = chartData.stockCoverMonths?.[dataIndex];
                         const monthly = chartData.monthlyConsumption?.[dataIndex];
                         const monthlyInfo = monthly !== undefined
-                            ? ` · KES ${Math.round(monthly).toLocaleString()} per 30 days`
+                            ? ` · KES ${Math.round(monthly).toLocaleString()} / 30d COGS`
                             : "";
-                        const coverInfo = days !== undefined
-                            ? `${monthlyInfo} [${days > 365 ? ">1 year cover" : `${days} days cover`}]`
-                            : monthlyInfo;
+                        const coverLabel = days !== undefined
+                            ? days >= 9999
+                                ? "No recent sales (999+ days)"
+                                : months !== undefined && months < 999
+                                ? `${days}d (${months} mo cover)`
+                                : days > 365
+                                ? ">1 year cover"
+                                : `${days} days cover`
+                            : "";
+                        const coverInfo = coverLabel ? `${monthlyInfo} [${coverLabel}]` : monthlyInfo;
 
                         if (raw !== undefined) {
                             let formattedVal = Number(val).toFixed(2);
@@ -212,9 +261,22 @@ const BarChartThree = ({
         grid: {
             borderColor: "rgba(0,0,0,0.08)",
         },
-    }), [height, chartData.categories, chartData.rawStock, chartData.rawDailySales, chartData.monthlyConsumption, chartData.daysCover]);
+    }), [
+        height,
+        onBranchSelect,
+        chartData.categories,
+        chartData.branchIds,
+        chartData.rawStock,
+        chartData.rawDailySales,
+        chartData.monthlyConsumption,
+        chartData.daysCover,
+        chartData.stockCoverMonths,
+        chartData.totalStockPieces,
+        chartData.stockedSkus,
+        chartData.stockHealthStatus,
+    ]);
 
-    const isLoading = loadingTotalStockValueByBranch || loadingKPISalesTransactions;
+    const isLoading = loadingStockVsMovement || loadingTotalStockValueByBranch || loadingKPISalesTransactions;
 
     if (isLoading && !chartData.categories.length) {
         return (
@@ -223,7 +285,7 @@ const BarChartThree = ({
                 style={{ height: `${height}px` }}
             >
                 <Spinner color="primary" className="mb-3"> Loading... </Spinner>
-                <div className="text-muted fw-semibold">Loading stock vs sales velocity...</div>
+                <div className="text-muted fw-semibold">Loading stock vs cost of sales coverage...</div>
             </div>
         );
     }
@@ -235,8 +297,8 @@ const BarChartThree = ({
                 style={{ height: `${height}px` }}
             >
                 <i className="ri-bar-chart-line text-muted display-4 mb-2"></i>
-                <div className="text-muted fw-medium">No stock vs sales velocity data available</div>
-                <small className="text-muted">No branch transactions or stock recorded for the selected period.</small>
+                <div className="text-muted fw-medium">No stock vs cost of sales coverage data available</div>
+                <small className="text-muted">No branch stock or movement recorded for the selected period.</small>
             </div>
         );
     }
