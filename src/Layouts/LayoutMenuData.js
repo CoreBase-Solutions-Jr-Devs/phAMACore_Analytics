@@ -123,6 +123,12 @@ const Navdata = () => {
           link: "/dashboard-sales/Category-Performance",
           parentId: "sales",
         },
+             {
+          id: "Sales-Summary",
+          label: "Sales Summary",
+          link: `/dashboard-sales/Sales-Summary`,
+          parentId: "sales",
+        },
       ],
     },
     {
@@ -207,12 +213,24 @@ const Navdata = () => {
           link: "/dashboard-purchase-orders",
           parentId: "purchase-orders",
         },
-        // {
-        //   id: "branchview-purchase-orders",
-        //   label: "BranchView",
-        //   link: `/dashboard-purchase-orders/branch/${purchaseBranch}`,
-        //   parentId: "purchase-orders",
-        // },
+        {
+          id: "Supplier-Invoice-Ageing",
+          label: "Supplier Ageing",
+          link: `/dashboard-purchase-orders/Supplier-Ageing`,
+          parentId: "purchase-orders",
+        },
+          {
+          id: "Category-Spend",
+          label: "Category Spend",
+          link: `/dashboard-purchase-orders/Category-Spend`,
+          parentId: "purchase-orders",
+        },
+             {
+          id: "Branch-Order-Fill-Rate",
+          label: "Branch Order Fill Rate",
+          link: `/dashboard-purchase-orders/Branch-Order-Fill-Rate`,
+          parentId: "purchase-orders",
+        },
       ],
     },
   ];
