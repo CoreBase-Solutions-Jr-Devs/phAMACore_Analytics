@@ -201,9 +201,9 @@ const TransferAgingTable = ({
                                         </th>
                                         <td>{row.destBranchName}</td>
                                         <td>
-                                            <span className="fw-medium">{row.transferDoc}</span>
+                                            <span className="fw-medium">Rcpt: {row.receiptDoc} ({row.receiptDate})</span>
                                             <small className="text-muted d-block">
-                                                Rcpt: {row.receiptDoc} ({row.receiptDate})
+                                                {row.transferDoc}
                                             </small>
                                         </td>
                                         <td className="text-end fw-semibold">
@@ -238,11 +238,11 @@ const TransferAgingTable = ({
                                 <th>Product / Batch</th>
                                 <th>Source Branch</th>
                                 <th>Destination Branch</th>
-                                <th>Transfer Voucher</th>
-                                <th>Receipt Voucher</th>
+                                <th>BTR</th>
+                                <th>BRN</th>
                                 <th className="text-end">Qty (Packs)</th>
                                 <th className="text-end">Value (KES)</th>
-                                <th className="text-end">Transit Days</th>
+                                <th className="text-end">TOT Days</th>
                                 <th className="text-center">Status</th>
                             </tr>
                         </thead>
@@ -571,9 +571,9 @@ const BranchTransfersSection = () => {
             "Batch": r.batchNo,
             "Source Branch": r.sourceBranchName || "-",
             "Destination Branch": r.destBranchName,
-            "Transfer Voucher": r.transferDoc,
+            "BTR": r.transferDoc,
             "Transfer Date": r.transferDate,
-            "Receipt Voucher": r.receiptDoc,
+            "BRN": r.receiptDoc,
             "Receipt Date": r.receiptDate,
             "Transferred Units (Packs)": r.transferredUnits,
             "Transfer Value (KES)": r.transferredCost,
@@ -691,7 +691,7 @@ const BranchTransfersSection = () => {
                                         onChange={(e) => setTransfersBranchFilter(e.target.value)}
                                         aria-label="Filter transfers by branch"
                                     >
-                                        <option value="">All Branches</option>
+                                        <option value="">Branch</option>
                                         {availableBranches.map((b) => (
                                             <option key={b} value={b}>
                                                 {b}
@@ -702,8 +702,8 @@ const BranchTransfersSection = () => {
                                 <Col md="auto" className="ms-md-auto">
                                     <div className="btn-group btn-group-sm" role="group">
                                         {[
-                                            { key: "DEST_STOCK_AGING", label: "Branch Drill-Down & Days in Stock" },
                                             { key: "DRILLDOWN", label: "Transfer Vouchers" },
+                                            { key: "DEST_STOCK_AGING", label: "Branch Drill-Down & Days in Stock" },
                                             { key: "BRANCH_BALANCE", label: "Branch Balance Matrix" },
                                             { key: "IN_TRANSIT", label: `Transfer Queue (In-Transit: ${branchTransfersInTransit.length})` },
                                         ].map((tab) => (
