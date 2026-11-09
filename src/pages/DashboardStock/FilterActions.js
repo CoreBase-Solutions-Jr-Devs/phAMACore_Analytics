@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from "react";
 import { Offcanvas, OffcanvasHeader, OffcanvasBody } from "reactstrap";
 import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { setBranch, setDateRange, setStartDate, setEndDate, resetFilters } from "../../slices/dashboardStock/reducer";
 import { getCachedBranchesMap, cleanBranchName, saveActiveBranch } from "../../helpers/branch_helper";
@@ -18,6 +18,7 @@ const dateOptions = [
 const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const {
         branches: reduxBranches = [],
@@ -57,7 +58,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
     const handleReset = () => {
         saveActiveBranch("stock", 0);
         dispatch(resetFilters());
-        navigate("/dashboard-stock?branch=0", { replace: true });
+        navigate(`${location.pathname}?branch=0`, { replace: true });
     };
 
     const startPickerOptions = useMemo(

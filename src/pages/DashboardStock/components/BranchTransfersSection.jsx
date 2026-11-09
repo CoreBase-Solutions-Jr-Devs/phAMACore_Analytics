@@ -201,9 +201,9 @@ const TransferAgingTable = ({
                                         </th>
                                         <td>{row.destBranchName}</td>
                                         <td>
-                                            <span className="fw-medium">{row.transferDoc}</span>
+                                            <span className="fw-medium">Rcpt: {row.receiptDoc} ({row.receiptDate})</span>
                                             <small className="text-muted d-block">
-                                                Rcpt: {row.receiptDoc} ({row.receiptDate})
+                                                {row.transferDoc}
                                             </small>
                                         </td>
                                         <td className="text-end fw-semibold">
@@ -238,11 +238,11 @@ const TransferAgingTable = ({
                                 <th>Product / Batch</th>
                                 <th>Source Branch</th>
                                 <th>Destination Branch</th>
-                                <th>Transfer Voucher</th>
-                                <th>Receipt Voucher</th>
-                                <th className="text-end">Qty (Packs)</th>
+                                <th>BTR</th>
+                                <th>BRN</th>
+                                <th className="text-end">Qty (P/W)</th>
                                 <th className="text-end">Value (KES)</th>
-                                <th className="text-end">Transit Days</th>
+                                <th className="text-end">TOT Days</th>
                                 <th className="text-center">Status</th>
                             </tr>
                         </thead>
@@ -344,7 +344,7 @@ const TransferAgingTable = ({
                                 <th className="text-end">Lines</th>
                                 <th className="text-end">Total Units</th>
                                 <th className="text-end">In-Transit Value (KES)</th>
-                                <th className="text-end">Days in Transit</th>
+                                <th className="text-end">TOT Days</th>
                                 <th className="text-center">Urgency</th>
                             </tr>
                         </thead>
@@ -402,12 +402,12 @@ const TransferAgingTable = ({
 };
 
 const BranchTransfersSection = () => {
-    // Card 1 (Row 27): Inter-Branch Transfers
+    // Card 1: Inter-Branch Transfers
     const [transfersTab, setTransfersTab] = useState("DEST_STOCK_AGING");
     const [transfersSearch, setTransfersSearch] = useState("");
     const [transfersBranchFilter, setTransfersBranchFilter] = useState("");
 
-    // Card 2 (Row 28): Branch Pull to/from Syokimau
+    // Card 2: Branch Pull to/from Syokimau
     const [syokimauDirection, setSyokimauDirection] = useState("TO_SYOKIMAU"); // "TO_SYOKIMAU" (Dest=Syokimau) or "FROM_SYOKIMAU" (Source=Syokimau)
     const [syokimauTab, setSyokimauTab] = useState("DEST_STOCK_AGING");
     const [syokimauSearch, setSyokimauSearch] = useState("");
@@ -457,7 +457,7 @@ const BranchTransfersSection = () => {
         });
     }, [allAgingRows, allDrilldownRows]);
 
-    // Overall Branch Transfers (Row 27) metrics: Total Value, Total SKUs, Transfers Count, Avg Days in Stock
+    // Overall Branch Transfers metrics: Total Value, Total SKUs, Transfers Count, Avg Days in Stock
     const row27Metrics = useMemo(() => {
         const summary = (Array.isArray(branchTransfersSummary) ? branchTransfersSummary[0] : branchTransfersSummary) || {};
         const totalValueFromSummary = num(pick(summary, "total_transfer_value_cost", "total_receipt_value_cost"));
@@ -496,8 +496,8 @@ const BranchTransfersSection = () => {
         };
     }, [branchTransfersSummary, allDrilldownRows, enrichedAgingRows, branchTransfersTopSkus]);
 
-    // Syokimau Pull (Row 28) filtered datasets & metrics (Total Value, Total SKUs, Drill down to branches & days in stock)
-    const { syokimauAgingRows, syokimauDrilldownRows, syokimauInTransitRows, row28Metrics } = useMemo(() => {
+    // Syokimau Pull filtered datasets & metrics (Total Value, Total SKUs, Drill down to branches & days in stock)
+    const { syokimauAgingRows, syokimauDrilldownRows, syokimauInTransitRows, branchPullMetrics } = useMemo(() => {
         const filterFn = (srcCode, srcName, dstCode, dstName) => {
             if (syokimauDirection === "TO_SYOKIMAU") {
                 return isSyokimauBranch(dstCode, dstName);
@@ -545,7 +545,7 @@ const BranchTransfersSection = () => {
             syokimauAgingRows: sAging,
             syokimauDrilldownRows: sDrilldown,
             syokimauInTransitRows: sInTransit,
-            row28Metrics: {
+            branchPullMetrics: {
                 totalValue,
                 totalSkus: skuSet.size,
                 totalVouchers: docSet.size,
@@ -571,9 +571,9 @@ const BranchTransfersSection = () => {
             "Batch": r.batchNo,
             "Source Branch": r.sourceBranchName || "-",
             "Destination Branch": r.destBranchName,
-            "Transfer Voucher": r.transferDoc,
+            "BTR": r.transferDoc,
             "Transfer Date": r.transferDate,
-            "Receipt Voucher": r.receiptDoc,
+            "BRN": r.receiptDoc,
             "Receipt Date": r.receiptDate,
             "Transferred Units (Packs)": r.transferredUnits,
             "Transfer Value (KES)": r.transferredCost,
@@ -609,7 +609,7 @@ const BranchTransfersSection = () => {
 
     return (
         <>
-            {/* ROW 27: BRANCH TRANSFERS */}
+            {/* BRANCH TRANSFERS */}
             <Row>
                 <Col xl={12}>
                     <Card id="branch-transfers-card">
@@ -691,7 +691,7 @@ const BranchTransfersSection = () => {
                                         onChange={(e) => setTransfersBranchFilter(e.target.value)}
                                         aria-label="Filter transfers by branch"
                                     >
-                                        <option value="">All Branches</option>
+                                        <option value="">Branch</option>
                                         {availableBranches.map((b) => (
                                             <option key={b} value={b}>
                                                 {b}
@@ -702,8 +702,8 @@ const BranchTransfersSection = () => {
                                 <Col md="auto" className="ms-md-auto">
                                     <div className="btn-group btn-group-sm" role="group">
                                         {[
-                                            { key: "DEST_STOCK_AGING", label: "Branch Drill-Down & Days in Stock" },
                                             { key: "DRILLDOWN", label: "Transfer Vouchers" },
+                                            { key: "DEST_STOCK_AGING", label: "Branch Drill-Down & Days in Stock" },
                                             { key: "BRANCH_BALANCE", label: "Branch Balance Matrix" },
                                             { key: "IN_TRANSIT", label: `Transfer Queue (In-Transit: ${branchTransfersInTransit.length})` },
                                         ].map((tab) => (
@@ -745,7 +745,7 @@ const BranchTransfersSection = () => {
                 </Col>
             </Row>
 
-            {/* ROW 28: BRANCH PULL TO SYOKIMAU */}
+            {/* BRANCH PULL TO SYOKIMAU */}
             <Row>
                 <Col xl={12}>
                     <Card id="branch-pull-syokimau-card">
@@ -803,9 +803,9 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Total Value (At Cost)</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-primary">
-                                            KES {formatCompact(row28Metrics.totalValue)}
+                                            KES {formatCompact(branchPullMetrics.totalValue)}
                                             <small className="text-muted fw-normal fs-12 ms-1">
-                                                ({row28Metrics.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })})
+                                                ({branchPullMetrics.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })})
                                             </small>
                                         </h5>
                                     </div>
@@ -814,7 +814,7 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Total SKUs</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-info">
-                                            {row28Metrics.totalSkus.toLocaleString()} SKUs
+                                            {branchPullMetrics.totalSkus.toLocaleString()} SKUs
                                         </h5>
                                     </div>
                                 </Col>
@@ -822,7 +822,7 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Transfer Vouchers</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-success">
-                                            {row28Metrics.totalVouchers.toLocaleString()} Vouchers
+                                            {branchPullMetrics.totalVouchers.toLocaleString()} Vouchers
                                         </h5>
                                     </div>
                                 </Col>
@@ -830,7 +830,7 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Avg Days in Stock</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-warning">
-                                            {row28Metrics.avgDaysInStock.toLocaleString()} days
+                                            {branchPullMetrics.avgDaysInStock.toLocaleString()} days
                                         </h5>
                                     </div>
                                 </Col>
@@ -852,7 +852,7 @@ const BranchTransfersSection = () => {
                                         onChange={(e) => setSyokimauBranchFilter(e.target.value)}
                                         aria-label="Filter Syokimau pull by branch"
                                     >
-                                        <option value="">All Branches</option>
+                                        <option value="">Branch</option>
                                         {availableBranches.map((b) => (
                                             <option key={b} value={b}>
                                                 {b}

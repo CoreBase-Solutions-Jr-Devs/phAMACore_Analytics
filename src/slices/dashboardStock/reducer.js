@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIImbalances, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements, fetchKPISellThroughAnalysis, fetchKPIBranchOrderFillRate, fetchKPIBranchTransfers } from "./thunk";
+import { fetchBatchExpiry, fetchBatchExpiryNeo, fetchBranches, fetchDailyClosingStock, fetchKPICriticalStockouts, fetchKPIImbalances, fetchKPIItemMovement, fetchKPISalesTransactions, fetchKPISlowMovingStock, fetchKPIStockHealth, fetchKPIStockVsMovement, fetchKPITotalStockValueByBranch, fetchStockInventoryKPIs, fetchStockMovements, fetchKPISellThroughAnalysis, fetchKPIBranchOrderFillRate, fetchKPIBranchTransfers } from "./thunk";
 import { saveCachedBranches, cleanBranchName, getActiveBranch } from "../../helpers/branch_helper";
 import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
@@ -32,6 +32,8 @@ export const initialState = {
   criticalStockouts: [],
   slowMovingStock: [],
   imbalances: [],
+  stockVsMovement: [],
+  itemMovement: [],
   sellThroughAnalysis: [],
   sellThroughReceiptBatch: [],
   sellThroughSkuSummary: [],
@@ -62,6 +64,8 @@ export const initialState = {
   loadingStockHealth: false,
   loadingCriticalStockouts: false,
   loadingSlowMovingStock: false,
+  loadingStockVsMovement: false,
+  loadingItemMovement: false,
   loadingKPISalesTransactions: false,
   loadingSellThroughAnalysis: false,
   loadingBranchOrderFillRate: false,
@@ -75,6 +79,8 @@ export const initialState = {
   errorStockHealth: null,
   errorCriticalStockouts: null,
   errorSlowMovingStock: null,
+  errorStockVsMovement: null,
+  errorItemMovement: null,
   errorKPISalesTransactions: null,
   errorSellThroughAnalysis: null,
   errorBranchOrderFillRate: null,
@@ -447,6 +453,44 @@ const StockInventorySlice = createSlice({
           action.payload ||
           action.error?.message ||
           "Failed to fetch branch imbalances!";
+      });
+
+    builder
+      .addCase(fetchKPIStockVsMovement.pending, (state) => {
+        state.loadingStockVsMovement = true;
+        state.errorStockVsMovement = null;
+      })
+      .addCase(fetchKPIStockVsMovement.fulfilled, (state, action) => {
+        state.loadingStockVsMovement = false;
+        state.stockVsMovement = action.payload || [];
+      })
+      .addCase(fetchKPIStockVsMovement.rejected, (state, action) => {
+        state.loadingStockVsMovement = false;
+        state.stockVsMovement = [];
+        state.errorStockVsMovement =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch stock vs movement!";
+      });
+
+    builder
+      .addCase(fetchKPIItemMovement.pending, (state) => {
+        state.loadingItemMovement = true;
+        state.errorItemMovement = null;
+      })
+      .addCase(fetchKPIItemMovement.fulfilled, (state, action) => {
+        state.loadingItemMovement = false;
+        state.itemMovement = action.payload || [];
+      })
+      .addCase(fetchKPIItemMovement.rejected, (state, action) => {
+        state.loadingItemMovement = false;
+        state.itemMovement = [];
+        state.errorItemMovement =
+          action.payload?.message ||
+          action.payload ||
+          action.error?.message ||
+          "Failed to fetch item movement!";
       });
 
     builder

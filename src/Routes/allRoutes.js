@@ -4,6 +4,13 @@ import { Navigate } from "react-router-dom";
 //Dashboard
 import DashboardSales from "../pages/DashboardSales";
 import DashboardStock from "../pages/DashboardStock";
+import CriticalStockLevels from "../pages/DashboardStock/CriticalStockLevels";
+import ExpiryWatch from "../pages/DashboardStock/ExpiryWatch";
+import SlowMovingStockPage from "../pages/DashboardStock/SlowMovingStock";
+import InterBranchImbalances from "../pages/DashboardStock/InterBranchImbalances";
+import SellThroughAnalysis from "../pages/DashboardStock/SellThroughAnalysis";
+import BranchOrderFillRate from "../pages/DashboardStock/BranchOrderFillRate";
+import BranchTransfers from "../pages/DashboardStock/BranchTransfers";
 import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
 import DashboardMyBusiness from "../pages/DashboardMyBusiness";
 import MarginAnalysis from "../pages/DashboardSales/MarginAnalysis";
@@ -75,6 +82,34 @@ const authProtectedRoutes = [
   },
   { path: "/dashboard-sales/branch/:branchId", component: <DashboardSales /> },
   { path: "/dashboard-stock", component: <DashboardStock /> },
+  {
+    path: "/dashboard-stock/Critical-Stock-Levels",
+    component: <CriticalStockLevels />,
+  },
+  {
+    path: "/dashboard-stock/Expiry-Watch",
+    component: <ExpiryWatch />,
+  },
+  {
+    path: "/dashboard-stock/Slow-Moving-Stock",
+    component: <SlowMovingStockPage />,
+  },
+  {
+    path: "/dashboard-stock/Inter-Branch-Imbalances",
+    component: <InterBranchImbalances />,
+  },
+  {
+    path: "/dashboard-stock/Sell-Through-Analysis",
+    component: <SellThroughAnalysis />,
+  },
+  {
+    path: "/dashboard-stock/Branch-Order-Fill-Rate",
+    component: <BranchOrderFillRate />,
+  },
+  {
+    path: "/dashboard-stock/Branch-Transfers",
+    component: <BranchTransfers />,
+  },
   { path: "/dashboard-stock/branch/:branchId", component: <DashboardStock /> },
   {
     path: "/dashboard-purchase-orders",

@@ -144,6 +144,48 @@ const Navdata = () => {
           link: "/dashboard-stock",
           parentId: "stock",
         },
+        {
+          id: "critical-stock-levels",
+          label: "Critical Stock Levels",
+          link: "/dashboard-stock/Critical-Stock-Levels",
+          parentId: "stock",
+        },
+        {
+          id: "expiry-watch",
+          label: "Expiry Watch",
+          link: "/dashboard-stock/Expiry-Watch",
+          parentId: "stock",
+        },
+        {
+          id: "slow-moving-stock",
+          label: "Slow Moving Stock",
+          link: "/dashboard-stock/Slow-Moving-Stock",
+          parentId: "stock",
+        },
+        {
+          id: "inter-branch-imbalances",
+          label: "Inter-Branch Imbalances",
+          link: "/dashboard-stock/Inter-Branch-Imbalances",
+          parentId: "stock",
+        },
+        {
+          id: "sell-through-analysis",
+          label: "Sell-Through Analysis",
+          link: "/dashboard-stock/Sell-Through-Analysis",
+          parentId: "stock",
+        },
+        {
+          id: "branch-order-fill-rate",
+          label: "Branch Order Fill Rate",
+          link: "/dashboard-stock/Branch-Order-Fill-Rate",
+          parentId: "stock",
+        },
+        {
+          id: "branch-transfers",
+          label: "Branch Transfers",
+          link: "/dashboard-stock/Branch-Transfers",
+          parentId: "stock",
+        },
       ],
     },
     {

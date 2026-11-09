@@ -5,10 +5,11 @@ import { computeKPIs, getKPIMeta, getExpiryRows, getLookbackDays } from "../util
 import { resolveBranchName, cleanBranchName } from "../../helpers/branch_helper";
 import { formatAmount } from "../../helpers/format_helper";
 
-const Section = ({ rightClickBtn }) => {
+const Section = ({ rightClickBtn, onExportExcel, title = "KEY METRICS" }) => {
   const {
     batchExpiryNeo = [],
     totalStockValueByBranch = [],
+    stockVsMovement = [],
     stockHealth = [],
     criticalStockouts = [],
     slowMovingStock = [],
@@ -113,6 +114,18 @@ const Section = ({ rightClickBtn }) => {
       ),
     }));
 
+    // 5. Stock VS Cost of Sales - Branch Coverage
+    const branchCoverageRows = (stockVsMovement || []).map((item) => ({
+      Branch: cleanBranchName(item.branch_name || item.branchName || `Branch ${item.branch_id || ""}`),
+      StockedSKUs: Number(item.stocked_skus || 0).toLocaleString(),
+      TotalPieces: Number(item.total_stock_pieces || 0).toLocaleString(),
+      StockAtCost: formatAmount(item.stock_at_cost),
+      MonthlyCOGS: formatAmount(item.monthly_cost_of_sales),
+      DailyCOGS: formatAmount(Number(item.monthly_cost_of_sales || 0) / 30),
+      CoverDays: Number(item.stock_cover_days || 0) >= 999 ? "999+ days" : `${Number(item.stock_cover_days || 0)} days`,
+      HealthStatus: item.stock_health_status || "HEALTHY",
+    }));
+
     const sections = [
       {
         title: "Key Metrics Summary",
@@ -120,6 +133,14 @@ const Section = ({ rightClickBtn }) => {
         data: kpiSummaryRows,
       },
     ];
+
+    if (branchCoverageRows.length > 0) {
+      sections.push({
+        title: "Stock VS Cost of Sales - Branch Coverage",
+        headers: ["Branch", "StockedSKUs", "TotalPieces", "StockAtCost", "MonthlyCOGS", "DailyCOGS", "CoverDays", "HealthStatus"],
+        data: branchCoverageRows,
+      });
+    }
 
     if (expiredRows.length > 0) {
       sections.push({
@@ -172,7 +193,7 @@ const Section = ({ rightClickBtn }) => {
   return (
     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
       {/* Title */}
-      <h4 className="card-title mb-0">KEY METRICS</h4>
+      <h4 className="card-title mb-0">{title}</h4>
 
       {/* Center - Filter indicators */}
       <div className="d-flex align-items-center gap-2 flex-wrap text-muted fs-13">
@@ -201,7 +222,7 @@ const Section = ({ rightClickBtn }) => {
         <button
           type="button"
           className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
-          onClick={handleExportExcel}
+          onClick={onExportExcel || handleExportExcel}
           title="Export to Excel"
         >
           <i className="ri-file-excel-2-line align-bottom"></i>

@@ -613,6 +613,8 @@
                         >a.menu-link {
                             position: relative;
                             width: calc(200px + var(--#{$prefix}vertical-menu-width-sm));
+                            background: var(--#{$prefix}vertical-menu-bg);
+                            box-shadow: $vertical-menu-dropdown-box-shadow;
                             transition: none;
 
                             .icon-dual {
