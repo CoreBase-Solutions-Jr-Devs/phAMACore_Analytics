@@ -334,7 +334,7 @@ const DashboardStock = () => {
 
                     <Row className="align-items-stretch">
                         <Col lg={12} className="d-flex">
-                            <Card className="flex-fill" id="stock-velocity-card">
+                            <Card className="flex-fill mb-2" id="stock-velocity-card">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <div>

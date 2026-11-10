@@ -96,7 +96,7 @@ const ImbalanceAlertList = ({
         <div style={{ position: "relative" }}>
             <div
                 className="table-responsive"
-                style={{ maxHeight: "400px", overflowY: "auto" }}
+                style={{ maxHeight: "max(400px, calc(100vh - 360px))", overflowY: "auto" }}
                 onMouseLeave={handleMouseLeave}
             >
                 <table className="table table-borderless table-centered mb-0 w-100">

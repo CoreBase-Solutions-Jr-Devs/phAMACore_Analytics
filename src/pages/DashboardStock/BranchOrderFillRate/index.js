@@ -127,7 +127,7 @@ const BranchOrderFillRate = () => {
 
                     <Row>
                         <Col xl={12}>
-                            <Card id="branch-ofr-card">
+                            <Card id="branch-ofr-card" className="mb-2">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <div>
