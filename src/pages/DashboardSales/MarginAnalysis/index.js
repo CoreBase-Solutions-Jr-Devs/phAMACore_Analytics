@@ -55,26 +55,27 @@ const {
   [], // 8. salesComparativeMTD
   [], // 9. salesMonthly
   [], // 10. salesDaily
-  [], // 11. salesSubgroup — missing in your current call
-  [], // 12. monthlySales
-  [], // 13. monthToDateSales
-  [], // 14. lastYearMonthToDateSales
-  [], // 15. lastYearMonthlySales
-  marginAnalysisBand,       // 16
-  marginAnalysisDrilldown,  // 17
-  marginAnalysisSKU,        // 18
-  [], // 19. customerMemberAnalysisSummary
-  [], // 20. customerMemberAnalysisBranch
-  [], // 21. customerMemberAnalysisCohort
-  [], // 22. julySalesTarget
-  [], // 23. augustSalesTarget
-  [], // 24. septemberSalesTarget
-  [], // 25. octoberSalesTarget
-  [], // 26. salesTarget
-  [], // 27. salesTargetSummary
-  [], // 28. salesTargetBranch
-  [], // 29. salesTargetMONTHLY_PIVOT
-  filters, // 30. filters
+  [], // 11. salesPeriodicBreakdown <-- ADD THIS
+  [], // 12. salesSubgroup
+  [], // 13. monthlySales
+  [], // 14. monthToDateSales
+  [], // 15. lastYearMonthToDateSales
+  [], // 16. lastYearMonthlySales
+  marginAnalysisBand,      // 17. marginAnalysisBand
+  marginAnalysisDrilldown, // 18. marginAnalysisDrilldown
+  marginAnalysisSKU,       // 19. marginAnalysisSku
+  [], // 20. customerMemberAnalysisSummary
+  [], // 21. customerMemberAnalysisBranch
+  [], // 22. customerMemberAnalysisCohort
+  [], // 23. julySalesTarget
+  [], // 24. augustSalesTarget
+  [], // 25. septemberSalesTarget
+  [], // 26. octoberSalesTarget
+  [], // 27. salesTarget
+  [], // 28. salesTargetSummary
+  [], // 29. salesTargetBranch
+  [], // 30. salesTargetMONTHLY_PIVOT
+  filters, // 31. filters
 );
 
 

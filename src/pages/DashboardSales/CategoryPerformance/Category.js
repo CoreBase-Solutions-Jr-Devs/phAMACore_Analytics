@@ -105,7 +105,7 @@ const handleExportExcel = () => {
           </div>
 
           <div className="d-flex align-items-center gap-2 no-print">
-            <button
+            {/* <button
               type="button"
               className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
               onClick={handleExportExcel}
@@ -113,9 +113,9 @@ const handleExportExcel = () => {
             >
               <i className="ri-file-excel-2-line align-bottom"></i>
               <span>Export Excel</span>
-            </button>
+            </button> */}
 
-            <button
+            {/* <button
               type="button"
               className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
               onClick={handlePrint}
@@ -123,7 +123,7 @@ const handleExportExcel = () => {
             >
               <i className="ri-printer-line align-bottom"></i>
               <span>Print</span>
-            </button>
+            </button> */}
 
             <button
               type="button"

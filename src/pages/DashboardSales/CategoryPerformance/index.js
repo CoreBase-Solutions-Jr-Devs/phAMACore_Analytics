@@ -36,13 +36,12 @@ const [selectedBranchName, setSelectedBranchName] =
     loading,
     error,
   } = useSelector((state) => state.categoryPerformance);
-  const {
- 
-    categoryPerformance,
-    categoryTotals,
-     categoryAvgOrderValue,
-    categoryGrossMargin,
-  } = useSalesAnalytics(
+const {
+  categoryPerformance,
+  categoryTotals,
+  categoryAvgOrderValue,
+  categoryGrossMargin,
+} = useSalesAnalytics(
   [], // 1. sales
   [], // 2. kpiOverdueAccounts
   [], // 3. salesType
@@ -53,26 +52,27 @@ const [selectedBranchName, setSelectedBranchName] =
   [], // 8. salesComparativeMTD
   [], // 9. salesMonthly
   [], // 10. salesDaily
-    salesSubgroup ,
-  [], // 12. monthlySales
-  [], // 13. monthToDateSales
-  [], // 14. lastYearMonthToDateSales
-  [], // 15. lastYearMonthlySales
- [], //  marginAnalysisBand      
-   [], // marginAnalysisDrilldown 
-  [], //  marginAnalysisSKU        
-  [], // 19. customerMemberAnalysisSummary
-  [], // 20. customerMemberAnalysisBranch
-  [], // 21. customerMemberAnalysisCohort
-  [], // 22. julySalesTarget
-  [], // 23. augustSalesTarget
-  [], // 24. septemberSalesTarget
-  [], // 25. octoberSalesTarget
-  [], // 26. salesTarget
-  [], // 27. salesTargetSummary
-  [], // 28. salesTargetBranch
-  [], // 29. salesTargetMONTHLY_PIVOT
-  filters, // 30. filters
+  [], // 11. salesPeriodicBreakdown - INSERTED
+  salesSubgroup, // 12. salesSubgroup
+  [], // 13. monthlySales
+  [], // 14. monthToDateSales
+  [], // 15. lastYearMonthToDateSales
+  [], // 16. lastYearMonthlySales
+  [], // 17. marginAnalysisBand
+  [], // 18. marginAnalysisDrilldown
+  [], // 19. marginAnalysisSku
+  [], // 20. customerMemberAnalysisSummary
+  [], // 21. customerMemberAnalysisBranch
+  [], // 22. customerMemberAnalysisCohort
+  [], // 23. julySalesTarget
+  [], // 24. augustSalesTarget
+  [], // 25. septemberSalesTarget
+  [], // 26. octoberSalesTarget
+  [], // 27. salesTarget
+  [], // 28. salesTargetSummary
+  [], // 29. salesTargetBranch
+  [], // 30. salesTargetMONTHLY_PIVOT
+  filters // 31. filters
 );
 
   useEffect(() => {

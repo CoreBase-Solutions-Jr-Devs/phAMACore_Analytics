@@ -225,12 +225,12 @@ const Navdata = () => {
           link: `/dashboard-purchase-orders/Category-Spend`,
           parentId: "purchase-orders",
         },
-             {
-          id: "Branch-Order-Fill-Rate",
-          label: "Branch Order Fill Rate",
-          link: `/dashboard-purchase-orders/Branch-Order-Fill-Rate`,
-          parentId: "purchase-orders",
-        },
+        //      {
+        //   id: "Branch-Order-Fill-Rate",
+        //   label: "Branch Order Fill Rate",
+        //   link: `/dashboard-purchase-orders/Branch-Order-Fill-Rate`,
+        //   parentId: "purchase-orders",
+        // },
       ],
     },
   ];

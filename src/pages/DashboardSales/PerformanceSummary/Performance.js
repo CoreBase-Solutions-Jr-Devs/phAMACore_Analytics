@@ -122,7 +122,7 @@ const Performance = ({
           </div>
 
           <div className="d-flex align-items-center gap-2 no-print">
-            <button
+            {/* <button
               type="button"
               className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
               onClick={handleExportExcel}
@@ -130,9 +130,9 @@ const Performance = ({
             >
               <i className="ri-file-excel-2-line align-bottom"></i>
               <span>Export Excel</span>
-            </button>
+            </button> */}
 
-            <button
+            {/* <button
               type="button"
               className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
               onClick={handlePrint}
@@ -140,7 +140,7 @@ const Performance = ({
             >
               <i className="ri-printer-line align-bottom"></i>
               <span>Print</span>
-            </button>
+            </button> */}
 
             <button
               type="button"
@@ -246,7 +246,9 @@ const Performance = ({
                     </h3>
                   </div>
 
-                  <p className="mb-0 text-muted mt-auto">Average customer spend</p>
+                  <p className="mb-0 text-muted mt-auto">
+                    Average customer spend
+                  </p>
                 </CardBody>
               </Card>
               <UncontrolledTooltip placement="top" target="netSalesInsight">
@@ -264,9 +266,7 @@ const Performance = ({
                     </h3>
                   </div>
 
-                  <p className="mb-0 text-muted mt-auto">
-                  Purchase Activity
-                  </p>
+                  <p className="mb-0 text-muted mt-auto">Purchase Activity</p>
                 </CardBody>
               </Card>
               <UncontrolledTooltip placement="top" target="netSalesInsight">
