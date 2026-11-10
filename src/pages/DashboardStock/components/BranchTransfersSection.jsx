@@ -840,7 +840,7 @@ const BranchTransfersSection = () => {
                                 <Col md={4}>
                                     <input
                                         className="form-control form-control-sm"
-                                        placeholder="Search Main pull SKU, batch, or branch..."
+                                        placeholder="Search Main Branch pull SKU, batch, or branch..."
                                         value={syokimauSearch}
                                         onChange={(e) => setSyokimauSearch(e.target.value)}
                                     />
