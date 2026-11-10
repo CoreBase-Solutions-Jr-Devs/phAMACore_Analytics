@@ -11,6 +11,7 @@ const useSalesAnalytics = (
   salesComparativeMTD = [],
   salesMonthly = [],
   salesDaily = [],
+  salesPeriodicBreakdown = [],
   salesSubgroup = [],
   monthlySales = [],
   monthToDateSales = [],
@@ -235,57 +236,53 @@ const useSalesAnalytics = (
   const monthlyChart = useMemo(() => {
     const data = salesComparativeMTD || [];
 
-  return {
-    categories: data.map((item) => item.month_name),
+    return {
+      categories: data.map((item) => item.month_name),
 
-    series: [
-      {
-        name: "2026",
-        data: data.map((item) => Number(item.current_year_sales || 0)),
-      },
-      {
-        name: "2025",
-        data: data.map((item) => Number(item.prior_year_sales || 0)),
-      },
-    ],
+      series: [
+        {
+          name: "2026",
+          data: data.map((item) => Number(item.current_year_sales || 0)),
+        },
+        {
+          name: "2025",
+          data: data.map((item) => Number(item.prior_year_sales || 0)),
+        },
+      ],
 
-    salesVariance: data.map((item) =>
-      Number(item.sales_variance || 0)
-    ),
+      salesVariance: data.map((item) => Number(item.sales_variance || 0)),
 
-    salesGrowth: data.map((item) => Number(item.growth_perc) || 0),
-
-  };
-}, [salesComparativeMTD]);
+      salesGrowth: data.map((item) => Number(item.growth_perc) || 0),
+    };
+  }, [salesComparativeMTD]);
 
   /* -------------------------------------------------------
    * Month-to-Date Revenue Chart
    * ------------------------------------------------------*/
 
-const monthToDateChart = useMemo(() => {
-  const data = salesComparativeYTD || [];
+  const monthToDateChart = useMemo(() => {
+    const data = salesComparativeYTD || [];
 
-  return {
-    categories: data.map((item) => item.day_no),
+    return {
+      categories: data.map((item) => item.day_no),
 
-    series: [
-      {
-        name: String(data[0]?.curr_date?.slice(0, 4) ?? ""),
-        data: data.map((item) => Number(item.current_year_sales) || 0),
-      },
-      {
-        name: String(data[0]?.prior_date?.slice(0, 4) ?? ""),
-        data: data.map((item) => Number(item.prior_year_sales) || 0),
-      },
-    ],
+      series: [
+        {
+          name: String(data[0]?.curr_date?.slice(0, 4) ?? ""),
+          data: data.map((item) => Number(item.current_year_sales) || 0),
+        },
+        {
+          name: String(data[0]?.prior_date?.slice(0, 4) ?? ""),
+          data: data.map((item) => Number(item.prior_year_sales) || 0),
+        },
+      ],
 
-    salesVariance: data.map((item) => Number(item.sales_variance) || 0),
-    salesGrowth: data.map((item) => Number(item.growth_perc) || 0),
-    grossProfit: data.map((item) => Number(item.current_year_gp) || 0),
-    CostOfGoods: data.map((item) => Number(item.current_year_cogs) || 0),
-  };
-}, [salesComparativeYTD]);
-
+      salesVariance: data.map((item) => Number(item.sales_variance) || 0),
+      salesGrowth: data.map((item) => Number(item.growth_perc) || 0),
+      grossProfit: data.map((item) => Number(item.current_year_gp) || 0),
+      CostOfGoods: data.map((item) => Number(item.current_year_cogs) || 0),
+    };
+  }, [salesComparativeYTD]);
 
   const topProductsData = sales.reduce((acc, item) => {
     const name = item.item_Name || "UNKNOWN PRODUCT";
@@ -536,6 +533,37 @@ const monthToDateChart = useMemo(() => {
       ? categoryTotals.total_sales_incl / categoryTotals.transaction_count
       : 0;
 
+  const salesPeriodicBreakdownData = salesPeriodicBreakdown || [];
+
+  const monthlyData = salesPeriodicBreakdownData.filter(
+    (item) => item.period_type === "MONTH",
+  );
+
+  const bestMonth =
+    monthlyData.length > 0 &&
+    monthlyData.some((item) => Number(item.total_sales_incl) > 0)
+      ? monthlyData.reduce((best, current) =>
+          Number(current.total_sales_incl || 0) >
+          Number(best.total_sales_incl || 0)
+            ? current
+            : best,
+        )
+      : null;
+
+  const bestMonthName = bestMonth?.period || "N/A";
+  const bestMonthSales = Number(bestMonth?.total_sales_incl || 0);
+
+  const ytdData = salesPeriodicBreakdownData.find(
+    (item) => item.period?.toUpperCase() === "YTD",
+  );
+
+  const totalSalesIncl = Number(ytdData?.total_sales_incl || 0);
+  const netSales = Number(ytdData?.total_sales_excl || 0);
+  const totalTax = Number(ytdData?.total_tax || 0);
+  const clientsServed = Number(ytdData?.clients_served || 0);
+  const averageMargin = Number(ytdData?.gross_margin_perc || 0);
+  const averageBasket = Number(ytdData?.avg_basket_value || 0);
+
   return {
     formatAmount,
     totalRevenue,
@@ -619,6 +647,15 @@ const monthToDateChart = useMemo(() => {
     categoryTotals,
     categoryAvgOrderValue,
     categoryGrossMargin,
+    salesPeriodicBreakdownData,
+    totalSalesIncl,
+    netSales,
+    totalTax,
+    clientsServed,
+    averageMargin,
+    averageBasket,
+    bestMonthName,
+    bestMonthSales,
     // netSales,
     // targetSales,
     // achievementPct,

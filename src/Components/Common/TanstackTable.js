@@ -191,21 +191,28 @@ const TanstackTable = ({
                     const sticky = header.column.columnDef.meta?.sticky;
 
                     const stickyStyle =
-                      sticky === "group"
-                        ? {
-                            left: 0,
-                            minWidth: "140px",
-                            width: "140px",
-                            maxWidth: "140px",
-                          }
-                        : sticky === "subgroup"
-                          ? {
-                              left: "140px",
-                              minWidth: "150px",
-                              width: "150px",
-                              maxWidth: "150px",
-                            }
-                          : {};
+  sticky === "period"
+    ? {
+        left: 0,
+        minWidth: "110px",
+        width: "110px",
+        maxWidth: "110px",
+      }
+    : sticky === "group"
+      ? {
+          left: 0,
+          minWidth: "140px",
+          width: "140px",
+          maxWidth: "140px",
+        }
+      : sticky === "subgroup"
+        ? {
+            left: "140px",
+            minWidth: "150px",
+            width: "150px",
+            maxWidth: "150px",
+          }
+        : {};
 
                     return (
                       <th
@@ -287,10 +294,11 @@ const TanstackTable = ({
                           ? {
                               position: "sticky",
                               left:
-                                cell.column.columnDef.meta.sticky === "group"
-                                  ? 0
-                                  : "170px",
-                              zIndex: 2,
+        cell.column.columnDef.meta.sticky === "period" ||
+        cell.column.columnDef.meta.sticky === "group"
+          ? 0
+          : "140px",
+      zIndex: 2,
                               
                               backgroundColor: "var(--vz-card-bg, #fff)",
                               boxShadow: "2px 0 3px -3px rgba(0,0,0,0.35)",

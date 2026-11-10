@@ -30,6 +30,7 @@ const initialState = {
   salesComparativeMTD: [],
   salesMonthly: [],
   salesDaily: [],
+ salesPeriodicBreakdown: [],
 
   loading: false,
   error: null,
@@ -308,6 +309,10 @@ const powerBISlice = createSlice({
           case "DAILY":
             state.salesDaily = result;
             break;
+
+            //  case "PERIODIC_BREAKDOWN":
+            // state.salesPeriodicBreakdown = result;
+            // break;
 
           default:
             break;
