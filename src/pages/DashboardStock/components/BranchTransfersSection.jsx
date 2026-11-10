@@ -746,7 +746,7 @@ const BranchTransfersSection = () => {
             </Row>
 
             {/* BRANCH PULL TO SYOKIMAU */}
-            <Row>
+            {/* <Row>
                 <Col xl={12}>
                     <Card id="branch-pull-syokimau-card">
                         <CardHeader>
@@ -894,7 +894,7 @@ const BranchTransfersSection = () => {
                         </CardBody>
                     </Card>
                 </Col>
-            </Row>
+            </Row> */}
         </>
     );
 };
