@@ -156,3 +156,6 @@ export const getKPIBranchOrderFillRate = (params) =>
 
 export const getKPIBranchTransfers = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_KPI_BRANCH_TRANSFERS, { params });
+
+export const getKPISupplierOrderFillRate = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_KPI_SUPPLIER_ORDER_FILL_RATE, { params });

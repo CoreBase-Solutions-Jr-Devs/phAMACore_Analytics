@@ -83,25 +83,27 @@ const {
   [], // salesComparativeMTD
   [], // salesMonthly
   [], // salesDaily
-    [], //  salesSubgroup 
+  [], // salesPeriodicBreakdown - MISSING ARGUMENT
+  [], // salesSubgroup
   [], // monthlySales
   [], // monthToDateSales
   [], // lastYearMonthToDateSales
   [], // lastYearMonthlySales
-
   [], // marginAnalysisBand
   [], // marginAnalysisDrilldown
   [], // marginAnalysisSku
-
-  customerMemberAnalysisSummary,
-  customerMemberAnalysisBranch,
-  customerMemberAnalysisCohort,
-
+  customerMemberAnalysisSummary, // customerMemberAnalysisSummary
+  customerMemberAnalysisBranch, // customerMemberAnalysisBranch
+  customerMemberAnalysisCohort, // customerMemberAnalysisCohort
+  [], // julySalesTarget
+  [], // augustSalesTarget
+  [], // septemberSalesTarget
+  [], // octoberSalesTarget - MISSING ARGUMENT
   [], // salesTarget
   [], // salesTargetSummary
   [], // salesTargetBranch
-
-  filters
+  [], // salesTargetMONTHLY_PIVOT
+  filters // filters
 );
 
 

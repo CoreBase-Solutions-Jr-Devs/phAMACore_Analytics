@@ -26,18 +26,18 @@ const MONTHS = [
   { key: "dec", label: "Dec", monthNo: 12 },
 ];
 
-const BRANCHES = [
-  { branchID: 1, branchName: "Syokimau" },
-  { branchID: 2, branchName: "Tassia" },
-  { branchID: 3, branchName: "Machakos" },
-  { branchID: 4, branchName: "Mtwapa" },
-  { branchID: 5, branchName: "Kasarani" },
-  { branchID: 6, branchName: "Eldoret" },
-  { branchID: 7, branchName: "Busia" },
-  { branchID: 8, branchName: "Msa GPO" },
-  { branchID: 9, branchName: "Kitale" },
-  { branchID: 10, branchName: "Kisii" },
-];
+// const BRANCHES = [
+//   { branchID: 1, branchName: "Syokimau" },
+//   { branchID: 2, branchName: "Tassia" },
+//   { branchID: 3, branchName: "Machakos" },
+//   { branchID: 4, branchName: "Mtwapa" },
+//   { branchID: 5, branchName: "Kasarani" },
+//   { branchID: 6, branchName: "Eldoret" },
+//   { branchID: 7, branchName: "Busia" },
+//   { branchID: 8, branchName: "Msa GPO" },
+//   { branchID: 9, branchName: "Kitale" },
+//   { branchID: 10, branchName: "Kisii" },
+// ];
 
 const formatAmount = (value) =>
   Number(value ?? 0).toLocaleString("en-KE",);
@@ -95,56 +95,69 @@ const BranchTarget = ({
   const sourceData = Array.isArray(data) ? data : [];
 
   // Transform API records into one row per branch.
-  const branchData = useMemo(() => {
-    return BRANCHES.map((branch) => {
-      const row = { ...branch };
+  
+const branchData = useMemo(() => {
+  const branches = new Map();
 
+  sourceData.forEach((item) => {
+    const branchID = Number(item.branchID);
+
+    // Create the branch only once.
+    if (!branches.has(branchID)) {
+      const row = {
+        branchID,
+        branchName: getBranchName(
+          item.branchName,
+          `Branch ${branchID}`
+        ),
+      };
+
+      // Initialize all monthly values.
       MONTHS.forEach(({ key }) => {
         row[`${key}Sales`] = 0;
         row[`${key}Target`] = 0;
         row[`${key}Variance`] = 0;
         row[`${key}Achievement`] = 0;
-      row[`${key}ActionInsight`] = "";
+        row[`${key}ActionInsight`] = "";
       });
 
-      sourceData
-        .filter(
-          (item) => Number(item.branchID) === branch.branchID
-        )
-        .forEach((item) => {
-          const month = MONTHS.find(
-            (entry) => entry.monthNo === Number(item.monthNo)
-          );
+      branches.set(branchID, row);
+    }
 
-          if (!month) return;
+    const row = branches.get(branchID);
 
-          row.branchName = getBranchName(
-            item.branchName,
-            branch.branchName
-          );
+    // Populate the corresponding month.
+    const month = MONTHS.find(
+      (entry) => entry.monthNo === Number(item.monthNo)
+    );
 
-          row[`${month.key}Sales`] = Number(
-            item.actualSalesExcl ?? 0
-          );
+    if (!month) return;
 
-          row[`${month.key}Target`] = Number(
-            item.targetSales ?? 0
-          );
+    row[`${month.key}Sales`] = Number(
+      item.actualSalesExcl ?? 0
+    );
 
-          row[`${month.key}Variance`] = Number(
-            item.variance ?? 0
-          );
+    row[`${month.key}Target`] = Number(
+      item.targetSales ?? 0
+    );
 
-          row[`${month.key}Achievement`] = Number(
-            item.achievementPct ?? 0
-          );
+    row[`${month.key}Variance`] = Number(
+      item.variance ?? 0
+    );
 
-          row[`${month.key}ActionInsight`] = item.action_insight ?? "";
-        });
+    row[`${month.key}Achievement`] = Number(
+      item.achievementPct ?? 0
+    );
 
-      return row;
-    });
-  }, [sourceData]);
+    row[`${month.key}ActionInsight`] =
+      item.action_insight ?? "";
+  });
+
+  return Array.from(branches.values()).sort(
+    (a, b) => a.branchName.localeCompare(b.branchName)
+  );
+}, [sourceData]);
+
 
 
   const columns = useMemo(() => {

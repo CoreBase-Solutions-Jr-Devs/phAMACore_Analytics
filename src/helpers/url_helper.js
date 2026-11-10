@@ -55,6 +55,8 @@ export const GET_POWERBI_KPI_SELL_THROUGH_ANALYSIS =
   "/api/PowerBi/PowerBIKPISellThroughAnalysis";
 export const GET_POWERBI_KPI_BRANCH_ORDER_FILL_RATE = 
   "/api/PowerBi/PowerBIKPIBranchOrderFillRate";
+  export const GET_POWERBI_KPI_SUPPLIER_ORDER_FILL_RATE = 
+  "/api/PowerBi/PowerBIKPISupplierOrderFillRate";
 export const GET_POWERBI_KPI_BRANCH_TRANSFERS = 
   "/api/PowerBi/PowerBIKPIBranchTransfers";
 

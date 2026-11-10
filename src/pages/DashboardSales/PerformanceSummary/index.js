@@ -90,22 +90,23 @@ const [selectedBranchName, setSelectedBranchName] =
   [], // 8. salesComparativeMTD
   [], // 9. salesMonthly
   [], // 10. salesDaily
-  [], // 11. salesSubgroup
-  [], // 12. monthlySales
-  [], // 13. monthToDateSales
+   [], // 11. salesPeriodicBreakdown  <-- MISSING
+  [], // 12. salesSubgroup
+  [], // 13. monthlySales
+  [], // 14. monthToDateSales
   [], // 14. lastYearMonthToDateSales
-  [], // 15. lastYearMonthlySales
-  [], // 16. marginAnalysisBand
-  [], // 17. marginAnalysisDrilldown
-  [], // 18. marginAnalysisSku
-  [], // 19. customerMemberAnalysisSummary
-  [], // 20. customerMemberAnalysisBranch
-  [], // 21. customerMemberAnalysisCohort
-  [], // 22. julySalesTarget
-  [], // 23. augustSalesTarget
-  [], // 24. septemberSalesTarget
-  [], // 25. octoberSalesTarget
-  [], // 26. salesTarget
+  [], // 16. lastYearMonthlySales
+  [], // 17. marginAnalysisBand
+  [], // 18. marginAnalysisDrilldown
+  [], // 19. marginAnalysisSku
+  [], // 20. customerMemberAnalysisSummary
+  [], // 21. customerMemberAnalysisBranch
+  [], // 22. customerMemberAnalysisCohort
+  [], // 23. julySalesTarget
+  [], // 24. augustSalesTarget
+  [], // 25. septemberSalesTarget
+  [], // 26. octoberSalesTarget
+  [], // 27. salesTarget
   salesTargetSummary,      
   salesTargetBranch,        
   salesTargetMONTHLY_PIVOT, 

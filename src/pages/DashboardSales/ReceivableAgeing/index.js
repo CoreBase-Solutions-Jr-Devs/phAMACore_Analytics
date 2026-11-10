@@ -110,10 +110,11 @@ const ReceivablesAgeing = ({
                         </p>
                       </div>
                       <h6 className="mb-0 fw-semibold text-success">
-                        KES{" "}
-                        {Number(currentReceivables ?? 0).toLocaleString(
+                        {" "}
+                        {/* {Number(currentReceivables ?? 0).toLocaleString(
                           "en-KE",
-                        )}
+                        )} */}
+                        0
                       </h6>
                     </CardBody>
                   </Card>
@@ -129,7 +130,8 @@ const ReceivablesAgeing = ({
                         </p>
                       </div>
                       <h6 className="mb-0 fw-semibold text-warning">
-                        KES {Number(overdue31To60 ?? 0).toLocaleString("en-KE")}
+                        {/* KES {Number(overdue31To60 ?? 0).toLocaleString("en-KE")} */}
+                        0
                       </h6>
                     </CardBody>
                   </Card>
@@ -145,7 +147,7 @@ const ReceivablesAgeing = ({
                         </p>
                       </div>
                       <h6 className="mb-0 fw-semibold text-danger">
-                        KES {Number(overdue61To90 ?? 0).toLocaleString("en-KE")}
+                        0
                       </h6>
                     </CardBody>
                   </Card>
@@ -161,8 +163,9 @@ const ReceivablesAgeing = ({
                         </p>
                       </div>
                       <h6 className="mb-0 fw-semibold text-info">
-                        KES{" "}
-                        {Number(overdue91To120 ?? 0).toLocaleString("en-KE")}
+                       {" "}
+                        {/* {Number(overdue91To120 ?? 0).toLocaleString("en-KE")} */}
+                        0
                       </h6>
                     </CardBody>
                   </Card>
@@ -178,8 +181,9 @@ const ReceivablesAgeing = ({
                         </p>
                       </div>
                       <h6 className="mb-0 fw-semibold text-danger">
-                        KES{" "}
-                        {Number(overdue120Plus ?? 0).toLocaleString("en-KE")}
+                        {" "}
+                        {/* {Number(overdue120Plus ?? 0).toLocaleString("en-KE")} */}
+                        0
                       </h6>
                     </CardBody>
                   </Card>

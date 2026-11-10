@@ -101,13 +101,12 @@ const Breakdown = ({
   return (
     <Card className="card-height-100" id="sales-top-customers-card">
       <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-2 gap-2">
-        <div>
-          <h4 className="card-title mb-1">Sales Channel Performance</h4>
-          <p className="text-muted mb-0 fs-6">
-            Overview of sales, profitability, and transaction activity across
-            channels
-          </p>
-        </div>
+    <div>
+  <h4 className="card-title mb-1">Sales by Channel</h4>
+  <p className="text-muted mb-0 fs-6">
+    Compare sales, gross profit and transactions across cash, insurance, other accounts and returns.
+  </p>
+</div>
 
         <CardExportButtons
           targetId="sales-channel-breakdown-card"

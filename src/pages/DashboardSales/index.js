@@ -8,7 +8,7 @@ import BreadCrumb from "../../Components/Common/BreadCrumb";
 import BranchPerformance from "./BranchPerfomance";
 import TopProducts from "./TopProducts";
 import BottomProducts from "./BottomProducts";
-import SalesmanRevenue from "./SalesmanRevenue";
+import SalesRevenueAnalysis from "./SalesmanRevenue";
 import ReceivablesAgeing from "../DashboardSales/ReceivableAgeing/index";
 import TopCustomers from "./TopCustomers";
 import YearToDateSales from "./YearToDateSales";
@@ -65,48 +65,69 @@ const DashboardSales = () => {
   // const branchCode = branchId ?? null;
   // const isBranchView = !!branchCode;
 
-  const {
-    formatAmount,
-    totalRevenue,
-    revenueChange,
-    lastYearRevenue,
-    cashSales,
-    salesInvoices,
-    cashInvoicesPercentage,
-    salesInvoicesPercentage,
-    cashSalesPercentage,
-    creditNotesPercentage,
-    // creditInvoicesPercentage,
-    cashInvoices,
-    ordersReceived,
-    branchData,
-    branchChartSeries,
-    branchCategories,
-    currentReceivables,
-    overdue31To60,
-    overdue61To90,
-    overdue91To120,
-    overdue120Plus,
-    topDebtors,
-    creditNotes,
-    overdueDebtorsCount,
-    bottomProducts,
-    salesmanData,
-    customerData,
-    topProducts,
-    monthlyChart,
-    monthToDateChart,
-  } = useSalesAnalytics(
-    sales,
-    kpiOverdueAccounts,
-    salesType,
-    salesBranch,
-    salesBranch_Type,
-    [], // salesChannel,
-    salesComparativeMTD,
-    salesComparativeYTD,
-    filters,
-  );
+const {
+  formatAmount,
+  totalRevenue,
+  revenueChange,
+  lastYearRevenue,
+  cashSales,
+  salesInvoices,
+  cashInvoicesPercentage,
+  salesInvoicesPercentage,
+  cashSalesPercentage,
+  creditNotesPercentage,
+  cashInvoices,
+  ordersReceived,
+  branchData,
+  branchChartSeries,
+  branchCategories,
+  currentReceivables,
+  overdue31To60,
+  overdue61To90,
+  overdue91To120,
+  overdue120Plus,
+  topDebtors,
+  creditNotes,
+  overdueDebtorsCount,
+  bottomProducts,
+  salesmanData,
+  customerData,
+  topProducts,
+  monthlyChart,
+  monthToDateChart,
+} = useSalesAnalytics(
+  sales,                    // 1. sales
+  kpiOverdueAccounts,       // 2. kpiOverdueAccounts
+  salesType,                // 3. salesType
+  salesBranch,              // 4. salesBranch
+  salesBranch_Type,         // 5. salesBranch_Type
+  [],                       // 6. salesChannel
+  salesComparativeYTD,      // 7. salesComparativeYTD
+  salesComparativeMTD,      // 8. salesComparativeMTD
+  [],                       // 9. salesMonthly
+  [],                       // 10. salesDaily
+  [],                       // 11. salesPeriodicBreakdown
+  [],                       // 12. salesSubgroup
+  [],                       // 13. monthlySales
+  [],                       // 14. monthToDateSales
+  [],                       // 15. lastYearMonthToDateSales
+  [],                       // 16. lastYearMonthlySales
+  [],                       // 17. marginAnalysisBand
+  [],                       // 18. marginAnalysisDrilldown
+  [],                       // 19. marginAnalysisSku
+  [],                       // 20. customerMemberAnalysisSummary
+  [],                       // 21. customerMemberAnalysisBranch
+  [],                       // 22. customerMemberAnalysisCohort
+  [],                       // 23. julySalesTarget
+  [],                       // 24. augustSalesTarget
+  [],                       // 25. septemberSalesTarget
+  [],                       // 26. octoberSalesTarget
+  [],                       // 27. salesTarget
+  [],                       // 28. salesTargetSummary
+  [],                       // 29. salesTargetBranch
+  [],                       // 30. salesTargetMONTHLY_PIVOT
+  filters                   // 31. filters
+);
 
   // const {
   //   currentYearStart,
@@ -370,7 +391,7 @@ const DashboardSales = () => {
         </Row>
 
         <Row>
-          <Col xl={6}>
+          {/* <Col xl={6}>
             <SalesmanRevenue
               sales={sales}
               data={salesmanData}
@@ -378,11 +399,12 @@ const DashboardSales = () => {
               error={error}
               loading={loading}
             />
-          </Col>
-          <Col xl={6}>
-            <TopCustomers
+          </Col> */}
+          <Col xl={12}>
+            <SalesRevenueAnalysis
               sales={sales}
-              data={customerData}
+              customerData={customerData}
+              salesmanData={salesmanData}
               formatAmount={formatAmount}
               error={error}
               loading={loading}

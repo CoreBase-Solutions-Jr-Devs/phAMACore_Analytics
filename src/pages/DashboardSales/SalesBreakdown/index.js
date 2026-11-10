@@ -38,90 +38,45 @@ const [selectedBranchName, setSelectedBranchName] =
   
   } = useSelector((state) => state.powerbi);
 
-  const {
-    // totalActiveMembers,
-    // newMembersOnboarded,
-    // returningMembers,
-    // newMemberTransactions,
-    // newMemberSales,
-    // newMemberABV,
-    // repeatMemberTransactions,
-    // repeatMemberSales,
-    // repeatMemberABV,
-    // totalStoreTransactions,
-    // totalStoreSales,
-    // overallAverageBasketValue,
-    // memberTransactionShare,
-    // memberActionInsight,
-    // newCohortMemberCount,
-    // newCohortTransactions,
-    // newCohortSalesExcl,
-    // newCohortSalesIncl,
-    // newCohortABV,
-    // newCohortSalesContribution,
-    // repeatCohortMemberCount,
-    // repeatCohortTransactions,
-    // repeatCohortSalesExcl,
-    // repeatCohortSalesIncl,
-    // repeatCohortABV,
-    // repeatCohortSalesContribution,
-    // nonMemberCount,
-    // nonMemberTransactions,
-    // nonMemberSalesExcl,
-    // nonMemberSalesIncl,
-    // nonMemberABV,
-    // nonMemberSalesContribution,
-    // performanceSummary,
-    // netSales,
-    // targetSales,
-    // achievementPct,
-    // grossProfit,
-    // grossMarginPct,
-    // averageBasketValue,
-    // transactionCount,
-    // totalBranches,
-    // targetVariance,
-    // targetActionInsight,
-    CASH,
-    INSURANCE,
-    OTHER_ACCOUNT,
-    RETURN,
-    TOTAL,
-  } = useSalesAnalytics(
-    [], // sales
-    [], // kpiOverdueAccounts
-    [], // salesType
-    [], // salesBranch
-    [], // salesBranch_Type
-    salesChannel,
-    [], // salesComparativeYTD
-    [], // salesComparativeMTD
-    [], // salesMonthly
-    [], // salesDaily
-    [], // monthlySales
-    [], // monthToDateSales
-    [], // lastYearMonthToDateSales
-    [], // lastYearMonthlySales
-
-    [], // marginAnalysisBand
-    [], // marginAnalysisDrilldown
-    [], // marginAnalysisSku
-
-    [], //  customerMemberAnalysisSummary,
-    [], //  customerMemberAnalysisBranch,
-    [], // customerMemberAnalysisCohort
-
-    [], // julySalesTarget
-    [], // augustSalesTarget
-    [], // septemberSalesTarget
-    [], // octoberSalesTarget
-
-    [], // salesTarget
-    [], // salesTargetSummary
-    [], // salesTargetBranch
-
-    filters,
-  );
+const {
+  CASH,
+  INSURANCE,
+  OTHER_ACCOUNT,
+  RETURN,
+  TOTAL,
+} = useSalesAnalytics(
+  [], // 1. sales
+  [], // 2. kpiOverdueAccounts
+  [], // 3. salesType
+  salesBranch, // 4. salesBranch
+  [], // 5. salesBranch_Type
+  salesChannel, // 6. salesChannel
+  [], // 7. salesComparativeYTD
+  [], // 8. salesComparativeMTD
+  [], // 9. salesMonthly
+  [], // 10. salesDaily
+  [], // 11. salesPeriodicBreakdown  <-- ADD THIS
+  [], // 12. salesSubgroup
+  [], // 13. monthlySales
+  [], // 14. monthToDateSales
+  [], // 15. lastYearMonthToDateSales
+  [], // 16. lastYearMonthlySales
+  [], // 17. marginAnalysisBand
+  [], // 18. marginAnalysisDrilldown
+  [], // 19. marginAnalysisSku
+  [], // 20. customerMemberAnalysisSummary
+  [], // 21. customerMemberAnalysisBranch
+  [], // 22. customerMemberAnalysisCohort
+  [], // 23. julySalesTarget
+  [], // 24. augustSalesTarget
+  [], // 25. septemberSalesTarget
+  [], // 26. octoberSalesTarget
+  [], // 27. salesTarget
+  [], // 28. salesTargetSummary
+  [], // 29. salesTargetBranch
+  [], // 30. salesTargetMONTHLY_PIVOT
+  filters, // 31. filters
+);
 
 useEffect(() => {
   const params = {
