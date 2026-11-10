@@ -43,8 +43,10 @@ const Section = ({ rightClickBtn, onExportExcel, title = "KEY METRICS" }) => {
   // Stock figures are live: show when the valuation was taken
   const stockAsOf = useMemo(() => {
     const raw = totalStockValueByBranch?.[0]?.as_of_date;
-    const date = raw ? new Date(raw) : null;
-    return date && !isNaN(date.getTime()) ? date.toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" }) : "";
+    if (!raw) return null;
+    const date = new Date(raw);
+    date.setDate(date.getDate() - 1);
+    return date.toLocaleDateString("en-GB");
   }, [totalStockValueByBranch]);
 
   const handleExportExcel = () => {
