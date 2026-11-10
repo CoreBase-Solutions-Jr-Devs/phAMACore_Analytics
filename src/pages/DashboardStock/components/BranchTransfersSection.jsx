@@ -169,7 +169,7 @@ const TransferAgingTable = ({
                 role="region"
                 aria-label="Branch transfers table"
                 className="table-responsive"
-                style={{ maxHeight: "400px", overflowY: "auto" }}
+                style={{ maxHeight: "max(400px, calc(100vh - 410px))", overflowY: "auto" }}
             >
                 {activeTab === "DEST_STOCK_AGING" && (
                     <table className="table table-borderless table-centered table-nowrap mb-0 w-100">
@@ -612,7 +612,7 @@ const BranchTransfersSection = () => {
             {/* BRANCH TRANSFERS */}
             <Row>
                 <Col xl={12}>
-                    <Card id="branch-transfers-card">
+                    <Card id="branch-transfers-card" className="mb-2">
                         <CardHeader>
                             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                 <div>
@@ -746,7 +746,7 @@ const BranchTransfersSection = () => {
             </Row>
 
             {/* BRANCH PULL TO SYOKIMAU */}
-            <Row>
+            {/* <Row>
                 <Col xl={12}>
                     <Card id="branch-pull-syokimau-card">
                         <CardHeader>
@@ -894,7 +894,7 @@ const BranchTransfersSection = () => {
                         </CardBody>
                     </Card>
                 </Col>
-            </Row>
+            </Row> */}
         </>
     );
 };

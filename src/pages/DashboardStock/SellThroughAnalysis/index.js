@@ -149,7 +149,7 @@ const SellThroughAnalysis = () => {
 
                     <Row>
                         <Col xl={12}>
-                            <Card id="sell-through-analysis-card">
+                            <Card id="sell-through-analysis-card" className="mb-2">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <div>

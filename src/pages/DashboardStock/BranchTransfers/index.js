@@ -156,7 +156,7 @@ const BranchTransfers = () => {
                     />
 
                     <Section
-                        title="BRANCH TRANSFERS & SYOKIMAU PULL"
+                        title="BRANCH TRANSFERS"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportBranchTransfers}
                     />

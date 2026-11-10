@@ -317,7 +317,7 @@ const SellThroughSection = ({
                 role="region"
                 aria-label="Time taken to sell stock table"
                 className="table-responsive"
-                style={{ maxHeight: "420px", overflowY: "auto" }}
+                style={{ maxHeight: "max(420px, calc(100vh - 350px))", overflowY: "auto" }}
                 onMouseLeave={() => setHoverInfo(null)}
             >
                 <table className="table table-borderless table-centered table-nowrap mb-0 w-100">

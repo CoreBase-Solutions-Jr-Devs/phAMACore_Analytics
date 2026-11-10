@@ -177,7 +177,7 @@ const InterBranchImbalances = () => {
 
                     <Row>
                         <Col xl={12}>
-                            <Card id="imbalance-alerts-card">
+                            <Card id="imbalance-alerts-card" className="mb-2">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <h4 className="card-title mb-0">INTER-BRANCH TRANSFER SUGGESTIONS</h4>

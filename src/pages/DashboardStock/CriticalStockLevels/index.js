@@ -134,7 +134,7 @@ const CriticalStockLevels = () => {
 
                     <Row>
                         <Col xl={12}>
-                            <Card id="critical-stock-card">
+                            <Card id="critical-stock-card" className="mb-2">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <div>
