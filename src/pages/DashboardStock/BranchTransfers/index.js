@@ -156,7 +156,7 @@ const BranchTransfers = () => {
                     />
 
                     <Section
-                        title="BRANCH TRANSFERS"
+                        title="BRANCH TRANSFERS & PULL TO MAIN BRANCH"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportBranchTransfers}
                     />

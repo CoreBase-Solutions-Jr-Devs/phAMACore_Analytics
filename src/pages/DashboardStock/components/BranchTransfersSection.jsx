@@ -745,18 +745,18 @@ const BranchTransfersSection = () => {
                 </Col>
             </Row>
 
-            {/* BRANCH PULL TO SYOKIMAU */}
-            {/* <Row>
+            {/* BRANCH PULL TO MAIN BRANCH */}
+            <Row>
                 <Col xl={12}>
                     <Card id="branch-pull-syokimau-card">
                         <CardHeader>
                             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                 <div>
                                     <h4 className="card-title mb-1">
-                                        BRANCH PULL TO SYOKIMAU — VALUE, SKUS &amp; DAYS IN STOCK
+                                        BRANCH PULL TO MAIN BRANCH — VALUE, SKUS &amp; DAYS IN STOCK
                                     </h4>
                                     <p className="text-muted mb-0 small">
-                                        Stock pulled between retail branches and Syokimau Central Hub, with branch drill-down and days held in stock
+                                        Stock pulled between retail branches and Main Branch, with branch drill-down and days held in stock
                                     </p>
                                 </div>
                                 <div className="d-flex align-items-center gap-2 flex-wrap">
@@ -768,7 +768,7 @@ const BranchTransfersSection = () => {
                                             }`}
                                             onClick={() => setSyokimauDirection("TO_SYOKIMAU")}
                                         >
-                                            Pulled to Syokimau (Inbound)
+                                            Pulled to Main (Inbound)
                                         </button>
                                         <button
                                             type="button"
@@ -777,7 +777,7 @@ const BranchTransfersSection = () => {
                                             }`}
                                             onClick={() => setSyokimauDirection("FROM_SYOKIMAU")}
                                         >
-                                            Pulled from Syokimau (Dispatched to Branches)
+                                            Pulled from Main (Dispatched to Branches)
                                         </button>
                                         <button
                                             type="button"
@@ -786,7 +786,7 @@ const BranchTransfersSection = () => {
                                             }`}
                                             onClick={() => setSyokimauDirection("ALL_SYOKIMAU")}
                                         >
-                                            All Syokimau Movements
+                                            All Movements in Main Branch
                                         </button>
                                     </div>
                                     <CardExportButtons
@@ -840,7 +840,7 @@ const BranchTransfersSection = () => {
                                 <Col md={4}>
                                     <input
                                         className="form-control form-control-sm"
-                                        placeholder="Search Syokimau pull SKU, batch, or branch..."
+                                        placeholder="Search Main pull SKU, batch, or branch..."
                                         value={syokimauSearch}
                                         onChange={(e) => setSyokimauSearch(e.target.value)}
                                     />
@@ -894,7 +894,7 @@ const BranchTransfersSection = () => {
                         </CardBody>
                     </Card>
                 </Col>
-            </Row> */}
+            </Row>
         </>
     );
 };
