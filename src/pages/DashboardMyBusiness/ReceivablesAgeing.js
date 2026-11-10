@@ -38,11 +38,11 @@ const COLUMNS = [
   { key: "customer", label: "Customer" },
   { key: "category", label: "Category" },
   { key: "balance", label: "Balance (KES)", sortable: true },
-  { key: "overdue", label: "Overdue (KES)", sortable: true },
-  { key: "maxDays", label: "Days Overdue", sortable: true },
+  // { key: "overdue", label: "Overdue (KES)", sortable: true },
+  // { key: "maxDays", label: "Days Overdue", sortable: true },
   { key: "lastPayment", label: "Last Payment" },
-  { key: "status", label: "Ageing" },
-  { key: "risk", label: "Risk" },
+  // { key: "status", label: "Ageing" },
+  // { key: "risk", label: "Risk" },
 ];
 
 const ReceivablesAgeing = () => {
@@ -315,19 +315,19 @@ const ReceivablesAgeing = () => {
                           <i className="ri-error-warning-line text-danger ms-1" />
                         )}
                       </td>
-                      <td className={item.overdue > 0 ? "text-danger fw-medium" : "text-muted"}>
+                      {/* <td className={item.overdue > 0 ? "text-danger fw-medium" : "text-muted"}>
                         {item.overdue == null ? "-" : formatCompact(item.overdue)}
                       </td>
-                      <td>{item.maxDays == null ? "-" : item.maxDays}</td>
+                      <td>{item.maxDays == null ? "-" : item.maxDays}</td> */}
                       <td className="text-muted fs-12">{item.lastPayment}</td>
-                      <td>
+                      {/* <td>
                         <span className={`badge bg-${item.color}-subtle text-${item.color}`}>{item.status}</span>
                       </td>
                       <td>
                         <span className={`badge bg-${item.riskColor}-subtle text-${item.riskColor}`}>
                           {item.risk}
                         </span>
-                      </td>
+                      </td> */}
                     </tr>
                   );
                 })
