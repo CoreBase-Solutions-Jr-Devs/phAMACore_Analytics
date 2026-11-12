@@ -702,7 +702,7 @@ const BranchTransfersSection = () => {
                                 <Col md="auto" className="ms-md-auto">
                                     <div className="btn-group btn-group-sm" role="group">
                                         {[
-                                            { key: "DRILLDOWN", label: "Transfer Vouchers" },
+                                            { key: "DRILLDOWN", label: "Branch Transfers" },
                                             { key: "DEST_STOCK_AGING", label: "Branch Drill-Down & Days in Stock" },
                                             { key: "BRANCH_BALANCE", label: "Branch Balance Matrix" },
                                             { key: "IN_TRANSIT", label: `Transfer Queue (In-Transit: ${branchTransfersInTransit.length})` },
@@ -820,9 +820,9 @@ const BranchTransfersSection = () => {
                                 </Col>
                                 <Col xl={3} md={6} sm={6}>
                                     <div className="p-2 border rounded bg-light-subtle h-100">
-                                        <small className="text-muted d-block">Transfer Vouchers</small>
+                                        <small className="text-muted d-block">Branch Transfers</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-success">
-                                            {branchPullMetrics.totalVouchers.toLocaleString()} Vouchers
+                                            {branchPullMetrics.totalVouchers.toLocaleString()} Transfers
                                         </h5>
                                     </div>
                                 </Col>
