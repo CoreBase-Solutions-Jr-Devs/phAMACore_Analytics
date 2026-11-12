@@ -43,7 +43,9 @@ export const normalizeSellThroughBatchRows = (rows = []) =>
         const batchNo = String(pick(row, "batch_number", "batchNumber") || "-");
         const expiryDate = pick(row, "expiry_date", "expiryDate");
 
-        const qtyReceivedWp = num(pick(row, "qty_received_wp", "qtyReceivedWp", "qty_received_pcs"));
+        // Commented out fallback to qty_received_pcs which altered the displayed WP value
+        // const qtyReceivedWp = num(pick(row, "qty_received_wp", "qtyReceivedWp", "qty_received_pcs"));
+        const qtyReceivedWp = num(pick(row, "qty_received_wp", "qtyReceivedWp"));
         const qtyReceivedPcs = num(pick(row, "qty_received_pcs", "qtyReceivedPcs"));
         const qtySoldWp = num(
             pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp", "allocated_retail_sold_pcs")
@@ -116,7 +118,10 @@ export const normalizeSellThroughSkuRows = (rows = []) =>
         const receiptDoc = String(pick(row, "last_receipt_doc_number") || "-");
         const receiptDate = pick(row, "last_receipt_date");
 
-        const qtyReceivedWp = num(pick(row, "last_receipt_qty_wp", "last_receipt_qty_pcs"));
+        // Commented out fallback to last_receipt_qty_pcs which altered the displayed WP value
+        // const qtyReceivedWp = num(pick(row, "last_receipt_qty_wp", "last_receipt_qty_pcs"));
+        const qtyReceivedWp = num(pick(row, "last_receipt_qty_wp", "lastReceiptQtyWp"));
+        const qtyReceivedPcs = num(pick(row, "last_receipt_qty_pcs", "lastReceiptQtyPcs"));
         const qtySoldWp = num(pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp"));
         const currentBranchStockWp = num(pick(row, "current_stock_on_hand_wp", "current_stock_whole_packs"));
         const wholePacks = num(pick(row, "current_stock_whole_packs"));
@@ -147,6 +152,7 @@ export const normalizeSellThroughSkuRows = (rows = []) =>
             receiptDoc,
             receiptDateFormatted: formatDateShort(receiptDate),
             qtyReceivedWp,
+            qtyReceivedPcs,
             qtySoldWp,
             batchRemainingWp: currentBranchStockWp,
             currentBranchStockWp,
@@ -326,7 +332,7 @@ const SellThroughSection = ({
                             {renderSortableHeader("itemName", "Product / Pack Size")}
                             <th scope="col">Branch</th>
                             <th scope="col">Receipt Date &amp; Source</th>
-                            {renderSortableHeader("qtyReceivedWp", "Qty Received (Packs)", "text-end")}
+                            {renderSortableHeader("qtyReceivedWp", "Qty Received (WP / Pcs)", "text-end")}
                             {renderSortableHeader("qtySoldWp", "Sold Since Receipt", "text-end")}
                             {renderSortableHeader("currentBranchStockWp", "Current Balance", "text-end")}
                             {renderSortableHeader("daysHeld", "Days Held", "text-end")}
@@ -384,8 +390,14 @@ const SellThroughSection = ({
                                             {item.receiptDoc}
                                         </small>
                                     </td>
-                                    <td className="text-end fw-semibold">
-                                        {item.qtyReceivedWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                    <td className="text-end">
+                                        <div className="fw-semibold">
+                                            {item.qtyReceivedWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                            <span className="text-muted fw-normal ms-1 fs-11">WP</span>
+                                        </div>
+                                        <small className="text-muted d-block fw-normal">
+                                            {item.qtyReceivedPcs.toLocaleString(undefined, { maximumFractionDigits: 2 })} pcs
+                                        </small>
                                     </td>
                                     <td className="text-end text-success fw-medium">
                                         {item.qtySoldWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
@@ -460,6 +472,9 @@ const SellThroughSection = ({
                             </div>
                             <div>
                                 <strong>Batch:</strong> {selectedBatch.batchNo}
+                            </div>
+                            <div>
+                                <strong>Qty Received:</strong> {selectedBatch.qtyReceivedWp.toLocaleString(undefined, { maximumFractionDigits: 2 })} WP ({selectedBatch.qtyReceivedPcs.toLocaleString(undefined, { maximumFractionDigits: 2 })} pcs)
                             </div>
                             <div>
                                 <strong>Days Held:</strong> {selectedBatch.daysHeld} days
