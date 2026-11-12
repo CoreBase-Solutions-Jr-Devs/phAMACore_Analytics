@@ -447,7 +447,7 @@ const SellThroughSection = ({
 
             <Modal isOpen={Boolean(selectedLot)} toggle={() => setSelectedLot(null)} size="lg" centered>
                 <ModalHeader toggle={() => setSelectedLot(null)}>
-                    Physical Lot Depletion Lineage — {selectedLot?.itemName} ({selectedLot?.itemCode})
+                    Physical Batch Depletion — {selectedLot?.itemName} ({selectedLot?.itemCode})
                 </ModalHeader>
                 <ModalBody>
                     {selectedLot && (
@@ -456,7 +456,7 @@ const SellThroughSection = ({
                                 <strong>Branch:</strong> {selectedLot.branchName}
                             </div>
                             <div>
-                                <strong>Receipt Voucher:</strong> {selectedLot.receiptDoc} ({selectedLot.receiptDateFormatted})
+                                <strong>Document Number:</strong> {selectedLot.receiptDoc} ({selectedLot.receiptDateFormatted})
                             </div>
                             <div>
                                 <strong>Batch:</strong> {selectedLot.batchNo}
