@@ -27,6 +27,14 @@ const formatDateShort = (val) => {
     return d.toLocaleDateString("en-GB");
 };
 
+// Returns raw WP string (e.g. "4W 0P", "1W") from API without running num() which would strip letters and alter the value
+const asWpString = (val) => {
+    if (val === null || val === undefined || val === "") return "-";
+    if (typeof val === "string") return val.trim();
+    if (typeof val === "number") return val.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    return String(val);
+};
+
 export const normalizeSellThroughBatchRows = (rows = []) =>
     (Array.isArray(rows) ? rows : []).map((row, idx) => {
         const itemCode = String(pick(row, "item_code", "itemCode") || "");
@@ -43,16 +51,21 @@ export const normalizeSellThroughBatchRows = (rows = []) =>
         const batchNo = String(pick(row, "batch_number", "batchNumber") || "-");
         const expiryDate = pick(row, "expiry_date", "expiryDate");
 
-        // Commented out fallback to qty_received_pcs which altered the displayed WP value
-        // const qtyReceivedWp = num(pick(row, "qty_received_wp", "qtyReceivedWp", "qty_received_pcs"));
-        const qtyReceivedWp = num(pick(row, "qty_received_wp", "qtyReceivedWp"));
+        // Preserve actual WP string (e.g. "4W 0P") from API response instead of parsing with num() which turns it into 40
+        const qtyReceivedWp = asWpString(pick(row, "qty_received_wp", "qtyReceivedWp"));
         const qtyReceivedPcs = num(pick(row, "qty_received_pcs", "qtyReceivedPcs"));
-        const qtySoldWp = num(
-            pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp", "allocated_retail_sold_pcs")
+        const qtySoldWp = asWpString(
+            pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp")
         );
-        const qtyTransferredWp = num(pick(row, "allocated_transferred_wp", "allocated_transferred_pcs"));
-        const batchRemainingWp = num(pick(row, "batch_balance_remaining_wp", "batch_balance_remaining_pcs"));
-        const currentBranchStockWp = num(pick(row, "current_branch_stock_wp", "current_branch_stock_pcs"));
+        const qtySoldPcs = num(
+            pick(row, "allocated_retail_sold_pcs", "allocated_consumed_pcs")
+        );
+        const qtyTransferredWp = asWpString(pick(row, "allocated_transferred_wp"));
+        const qtyTransferredPcs = num(pick(row, "allocated_transferred_pcs"));
+        const batchRemainingWp = asWpString(pick(row, "batch_balance_remaining_wp"));
+        const batchRemainingPcs = num(pick(row, "batch_balance_remaining_pcs"));
+        const currentBranchStockWp = asWpString(pick(row, "current_branch_stock_wp"));
+        const currentBranchStockPcs = num(pick(row, "current_branch_stock_pcs"));
         const receiptTotalCost = num(pick(row, "receipt_total_cost", "batch_remaining_value_cost"));
         const remainingCost = num(pick(row, "batch_remaining_value_cost"));
 
@@ -90,9 +103,13 @@ export const normalizeSellThroughBatchRows = (rows = []) =>
             qtyReceivedWp,
             qtyReceivedPcs,
             qtySoldWp,
+            qtySoldPcs,
             qtyTransferredWp,
+            qtyTransferredPcs,
             batchRemainingWp,
+            batchRemainingPcs,
             currentBranchStockWp,
+            currentBranchStockPcs,
             receiptTotalCost,
             remainingCost,
             daysHeld,
@@ -118,12 +135,13 @@ export const normalizeSellThroughSkuRows = (rows = []) =>
         const receiptDoc = String(pick(row, "last_receipt_doc_number") || "-");
         const receiptDate = pick(row, "last_receipt_date");
 
-        // Commented out fallback to last_receipt_qty_pcs which altered the displayed WP value
-        // const qtyReceivedWp = num(pick(row, "last_receipt_qty_wp", "last_receipt_qty_pcs"));
-        const qtyReceivedWp = num(pick(row, "last_receipt_qty_wp", "lastReceiptQtyWp"));
+        // Preserve actual WP string (e.g. "1W", "132W") from API response without mangling with num()
+        const qtyReceivedWp = asWpString(pick(row, "last_receipt_qty_wp", "lastReceiptQtyWp"));
         const qtyReceivedPcs = num(pick(row, "last_receipt_qty_pcs", "lastReceiptQtyPcs"));
-        const qtySoldWp = num(pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp"));
-        const currentBranchStockWp = num(pick(row, "current_stock_on_hand_wp", "current_stock_whole_packs"));
+        const qtySoldWp = asWpString(pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp"));
+        const qtySoldPcs = num(pick(row, "allocated_retail_sold_pcs", "allocated_consumed_pcs"));
+        const currentBranchStockWp = asWpString(pick(row, "current_stock_on_hand_wp", "current_stock_whole_packs"));
+        const currentBranchStockPcs = num(pick(row, "current_stock_on_hand_pcs"));
         const wholePacks = num(pick(row, "current_stock_whole_packs"));
         const loosePieces = num(pick(row, "current_stock_loose_pieces"));
         const currentStockValue = num(pick(row, "current_stock_value"));
@@ -154,8 +172,11 @@ export const normalizeSellThroughSkuRows = (rows = []) =>
             qtyReceivedWp,
             qtyReceivedPcs,
             qtySoldWp,
+            qtySoldPcs,
             batchRemainingWp: currentBranchStockWp,
+            batchRemainingPcs: currentBranchStockPcs,
             currentBranchStockWp,
+            currentBranchStockPcs,
             wholePacks,
             loosePieces,
             remainingCost: currentStockValue,
@@ -252,6 +273,21 @@ const SellThroughSection = ({
         return [...searched].sort((a, b) => {
             if (sortField === "itemName") {
                 return sortDesc ? b.itemName.localeCompare(a.itemName) : a.itemName.localeCompare(b.itemName);
+            }
+            if (sortField === "qtyReceivedWp") {
+                const av = a.qtyReceivedPcs ?? -1;
+                const bv = b.qtyReceivedPcs ?? -1;
+                return sortDesc ? bv - av : av - bv;
+            }
+            if (sortField === "qtySoldWp") {
+                const av = a.qtySoldPcs ?? -1;
+                const bv = b.qtySoldPcs ?? -1;
+                return sortDesc ? bv - av : av - bv;
+            }
+            if (sortField === "currentBranchStockWp") {
+                const av = a.currentBranchStockPcs ?? -1;
+                const bv = b.currentBranchStockPcs ?? -1;
+                return sortDesc ? bv - av : av - bv;
             }
             const av = a[sortField] ?? -1;
             const bv = b[sortField] ?? -1;
@@ -392,21 +428,20 @@ const SellThroughSection = ({
                                     </td>
                                     <td className="text-end">
                                         <div className="fw-semibold">
-                                            {item.qtyReceivedWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                            <span className="text-muted fw-normal ms-1 fs-11">WP</span>
+                                            {item.qtyReceivedWp}
                                         </div>
                                         <small className="text-muted d-block fw-normal">
-                                            {item.qtyReceivedPcs.toLocaleString(undefined, { maximumFractionDigits: 2 })} pcs
+                                            {item.qtyReceivedPcs.toLocaleString()} pcs
                                         </small>
                                     </td>
                                     <td className="text-end text-success fw-medium">
-                                        {item.qtySoldWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                        {item.qtySoldWp}
                                     </td>
                                     <td className="text-end fw-semibold">
-                                        {item.currentBranchStockWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                        {viewMode === "RECEIPT_BATCH" && (
+                                        {item.currentBranchStockWp}
+                                        {viewMode === "RECEIPT_BATCH" && item.batchRemainingWp && item.batchRemainingWp !== "-" && (
                                             <small className="text-muted d-block fw-normal">
-                                                Batch bal: {item.batchRemainingWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                Batch bal: {item.batchRemainingWp}
                                             </small>
                                         )}
                                     </td>
@@ -474,13 +509,13 @@ const SellThroughSection = ({
                                 <strong>Batch:</strong> {selectedBatch.batchNo}
                             </div>
                             <div>
-                                <strong>Qty Received:</strong> {selectedBatch.qtyReceivedWp.toLocaleString(undefined, { maximumFractionDigits: 2 })} WP ({selectedBatch.qtyReceivedPcs.toLocaleString(undefined, { maximumFractionDigits: 2 })} pcs)
+                                <strong>Qty Received:</strong> {selectedBatch.qtyReceivedWp} ({selectedBatch.qtyReceivedPcs.toLocaleString()} pcs)
                             </div>
                             <div>
                                 <strong>Days Held:</strong> {selectedBatch.daysHeld} days
                             </div>
                             <div>
-                                <strong>Batch Balance:</strong> {selectedBatch.batchRemainingWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                <strong>Batch Balance:</strong> {selectedBatch.batchRemainingWp}
                             </div>
                         </div>
                     )}
@@ -510,9 +545,11 @@ const SellThroughSection = ({
                                             <td>{formatDateShort(pick(d, "outflow_date"))}</td>
                                             <td>{pick(d, "outflow_type") || "-"}</td>
                                             <td className="text-end">
-                                                {num(pick(d, "allocated_consumed_wp", "allocated_consumed_pcs")).toLocaleString(
-                                                    undefined,
-                                                    { maximumFractionDigits: 2 }
+                                                {num(pick(d, "allocated_consumed_pcs")).toLocaleString()} pcs
+                                                {pick(d, "allocated_consumed_wp") && (
+                                                    <small className="text-muted d-block fw-normal">
+                                                        {String(pick(d, "allocated_consumed_wp"))}
+                                                    </small>
                                                 )}
                                             </td>
                                             <td className="text-end">
