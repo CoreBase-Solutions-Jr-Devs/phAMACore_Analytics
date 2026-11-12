@@ -185,7 +185,7 @@ const SellThroughSection = ({
     const [pageIndex, setPageIndex] = useState(0);
     const [sortField, setSortField] = useState("daysHeld");
     const [sortDesc, setSortDesc] = useState(true);
-    const [selectedLot, setSelectedLot] = useState(null);
+    const [selectedBatch, setSelectedBatch] = useState(null);
 
     const {
         sellThroughReceiptBatch = [],
@@ -209,7 +209,7 @@ const SellThroughSection = ({
     };
 
     const handleOpenDrilldown = (item) => {
-        setSelectedLot(item);
+        setSelectedBatch(item);
         dispatch(
             fetchKPISellThroughAnalysis({
                 clientid: 1,
@@ -394,7 +394,7 @@ const SellThroughSection = ({
                                         {item.currentBranchStockWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                         {viewMode === "RECEIPT_BATCH" && (
                                             <small className="text-muted d-block fw-normal">
-                                                Lot bal: {item.batchRemainingWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                Batch bal: {item.batchRemainingWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                             </small>
                                         )}
                                     </td>
@@ -445,24 +445,27 @@ const SellThroughSection = ({
                 onPageChange={setPageIndex}
             />
 
-            <Modal isOpen={Boolean(selectedLot)} toggle={() => setSelectedLot(null)} size="lg" centered>
-                <ModalHeader toggle={() => setSelectedLot(null)}>
-                    Physical Batch Depletion — {selectedLot?.itemName} ({selectedLot?.itemCode})
+            <Modal isOpen={Boolean(selectedBatch)} toggle={() => setSelectedBatch(null)} size="lg" centered>
+                <ModalHeader toggle={() => setSelectedBatch(null)}>
+                    Physical Batch Depletion — {selectedBatch?.itemName} ({selectedBatch?.itemCode})
                 </ModalHeader>
                 <ModalBody>
-                    {selectedLot && (
+                    {selectedBatch && (
                         <div className="mb-3 p-2 bg-light rounded small d-flex flex-wrap gap-3">
                             <div>
-                                <strong>Branch:</strong> {selectedLot.branchName}
+                                <strong>Branch:</strong> {selectedBatch.branchName}
                             </div>
                             <div>
-                                <strong>Document Number:</strong> {selectedLot.receiptDoc} ({selectedLot.receiptDateFormatted})
+                                <strong>Document Number:</strong> {selectedBatch.receiptDoc} ({selectedBatch.receiptDateFormatted})
                             </div>
                             <div>
-                                <strong>Batch:</strong> {selectedLot.batchNo}
+                                <strong>Batch:</strong> {selectedBatch.batchNo}
                             </div>
                             <div>
-                                <strong>Days Held:</strong> {selectedLot.daysHeld} days
+                                <strong>Days Held:</strong> {selectedBatch.daysHeld} days
+                            </div>
+                            <div>
+                                <strong>Batch Balance:</strong> {selectedBatch.batchRemainingWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                             </div>
                         </div>
                     )}
@@ -473,7 +476,7 @@ const SellThroughSection = ({
                                     <th>Outflow Voucher</th>
                                     <th>Outflow Date</th>
                                     <th>Type</th>
-                                    <th className="text-end">Consumed (Packs)</th>
+                                    <th className="text-end">Consumed (Pieces)</th>
                                     <th className="text-end">Running Depletion %</th>
                                     <th className="text-end">Days to Outflow</th>
                                 </tr>
@@ -482,7 +485,7 @@ const SellThroughSection = ({
                                 {(sellThroughDepletionDrillDown || []).length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="text-center text-muted py-3">
-                                            {selectedLot?.clearingSummary || "No outflow transactions recorded for this lot yet."}
+                                            {selectedBatch?.clearingSummary || "No outflow transactions recorded for this lot yet."}
                                         </td>
                                     </tr>
                                 ) : (
