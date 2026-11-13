@@ -183,9 +183,12 @@ const columns = [
   return (
     <Card className="card-height-100" id="purchases-top-suppliers-card">
       <CardHeader className="card-header align-items-center d-flex justify-content-between flex-wrap gap-2">
-        <h4 className="card-title mb-0 flex-grow-1">
-          Spend by Supplier
-        </h4>
+        <div>
+    <h4 className="card-title mb-0">Spend by Supplier</h4>
+    <p className="text-muted mb-0">
+      Analyse supplier purchase spend, returns, invoice volumes and contribution to total purchasing.
+    </p>
+  </div>
 
         <CardExportButtons
           targetId="purchases-top-suppliers-card"

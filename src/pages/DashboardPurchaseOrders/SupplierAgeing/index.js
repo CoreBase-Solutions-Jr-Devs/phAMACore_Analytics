@@ -71,8 +71,6 @@ const {
   [], // KPIPriceAlertsItems
   [], // KPIPriceAlertsHistory
 
-  [], // BestPricePerSupplier
-
   [], // KPILeadTime
   [], // KPILeadTimeSummary
   [], // KPILeadTimeSupplier

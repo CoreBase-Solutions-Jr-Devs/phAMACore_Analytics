@@ -214,7 +214,8 @@ const handleMarginBandSelect = (band) => {
         <Row>
           <Col xl={12}>
        <Drilldown
-  data={marginDrilldown}
+  marginDrilldownData={marginDrilldown}
+    marginAnalysisSKUData={marginAnalysisSKU}
   activeBand={selectedMarginBand}
   onBandChange={handleMarginBandSelect}
   loading={loading}

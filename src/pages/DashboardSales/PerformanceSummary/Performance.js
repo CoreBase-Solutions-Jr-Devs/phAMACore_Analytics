@@ -175,12 +175,12 @@ const Performance = ({
                   <div>
                     <p className="font-medium mb-0">Net Sales</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-secondary">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-secondary">
                       KES{" "}
                       {Number(
                         performanceSummary?.actualSalesExcl ?? 0,
                       ).toLocaleString("en-KE")}
-                    </h3>
+                    </h5>
                   </div>
 
                   <p className="mb-0 text-muted  ">
@@ -214,17 +214,22 @@ const Performance = ({
                   <div>
                     <p className="font-medium mb-0">Gross Profit</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-warning">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                       KES{" "}
                       {Number(
                         performanceSummary?.grossProfit ?? 0,
                       ).toLocaleString("en-KE")}
-                    </h3>
+                    </h5>
                   </div>
 
                   <p className="mb-0 text-muted mt-auto">
-                    {Number(performanceSummary?.grossMarginPct ?? 0).toFixed(1)}
-                    % of total sales
+                    Gross margin pct:
+                     <span className="fw-semibold ms-1">
+                                         {Number(performanceSummary?.grossMarginPct ?? 0).toFixed(1)}%
+
+                     
+                    </span>
+                  
                   </p>
                 </CardBody>
               </Card>
@@ -238,12 +243,12 @@ const Performance = ({
                   <div>
                     <p className="font-medium mb-0">Avg Basket Value</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-success">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-success">
                       KES{" "}
                       {Number(
                         performanceSummary?.avgBasketValue ?? 0,
                       ).toLocaleString("en-KE")}
-                    </h3>
+                    </h5>
                   </div>
 
                   <p className="mb-0 text-muted mt-auto">
@@ -261,9 +266,9 @@ const Performance = ({
                   <div>
                     <p className="font-medium mb-0">Transactions</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-danger">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-danger">
                       {Number(performanceSummary?.totalTransactions ?? 0)}
-                    </h3>
+                    </h5>
                   </div>
 
                   <p className="mb-0 text-muted mt-auto">Purchase Activity</p>

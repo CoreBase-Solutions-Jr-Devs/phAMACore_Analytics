@@ -26,7 +26,7 @@ import {
     getKPILeadTime,
     getGoodsReceived,
     getLastYearGoodsReceived,
-     getBestPricePerSupplier,
+    //  getBestPricePerSupplier,
 } from "../../slices/dashboardPurchase/thunk";
 import FilterActions from "../../Components/Common/FilterActions";
 import {
@@ -40,7 +40,7 @@ getKPIOverdueAccounts
 } from "../../slices/dashboardSales/thunk";
  import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
 import usePurchaseOrders from "../../Components/Hooks/usePurchaseOrders";
-import BestPrices from "./BestPrices";
+// import BestPrices from "./BestPrices";
 import {
   getDateRanges,
   getPreviousYearDate,
@@ -122,7 +122,7 @@ const {
   KPIPriceAlertsItems = [],
   KPIPriceAlertsHistory = [],
 
-  BestPricePerSupplier = [],
+  // BestPricePerSupplier = [],
 
   KPILeadTime = [],
   KPILeadTimeSummary = [],
@@ -192,7 +192,7 @@ loading,
     overdue91To120,
     overdue120Plus,
     overdueSupplierAccounts,
-    bestPricePerSupplier,
+    // bestPricePerSupplier,
   } = usePurchaseOrders(
     
   PurchaseOrders,
@@ -217,7 +217,7 @@ loading,
   KPIPriceAlertsItems,
   KPIPriceAlertsHistory,
 
-  BestPricePerSupplier,
+  // BestPricePerSupplier,
 
   KPILeadTime,
   KPILeadTimeSummary,
@@ -306,19 +306,19 @@ useEffect(() => {
   //   })
   // );
 
-  dispatch(
-  getBestPricePerSupplier({
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    itemCode: "",
-    supplierCode: "",
-    groupBy: "ITEM_MATRIX",
-    includeZeroPrice: false,
-    topN: 0,
-  })
-);
+//   dispatch(
+//   getBestPricePerSupplier({
+//     clientid: 1,
+//     startDate: filters.startDate,
+//     endDate: filters.endDate,
+//     branchcode: filters.branch,
+//     itemCode: "",
+//     supplierCode: "",
+//     groupBy: "ITEM_MATRIX",
+//     includeZeroPrice: false,
+//     topN: 0,
+//   })
+// );
 
 dispatch(
   getGoodsReceived({
@@ -521,19 +521,19 @@ dispatchGroupByRequests(
   },
   PRICE_ALERTS_GROUP_BYS
 );
-  dispatch(
-  getBestPricePerSupplier({
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    itemCode: "",
-    supplierCode: "",
-    groupBy: "ITEM_MATRIX",
-    includeZeroPrice: false,
-    topN: 0,
-  })
-);
+//   dispatch(
+//   getBestPricePerSupplier({
+//     clientid: 1,
+//     startDate: filters.startDate,
+//     endDate: filters.endDate,
+//     branchcode: filters.branch,
+//     itemCode: "",
+//     supplierCode: "",
+//     groupBy: "ITEM_MATRIX",
+//     includeZeroPrice: false,
+//     topN: 0,
+//   })
+// );
 
 dispatchGroupByRequests(
   getKPIMaverickSpend,

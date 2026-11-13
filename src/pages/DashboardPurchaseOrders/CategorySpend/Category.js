@@ -111,7 +111,7 @@ const Category = ({
           </div>
 
           <div className="d-flex align-items-center gap-2 no-print">
-            <button
+            {/* <button
               type="button"
               className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
               onClick={handleExportExcel}
@@ -129,7 +129,7 @@ const Category = ({
             >
               <i className="ri-printer-line align-bottom"></i>
               <span>Print</span>
-            </button>
+            </button> */}
 
             <button
               type="button"
@@ -168,9 +168,9 @@ const Category = ({
                       Gross Purchases
                     </p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-secondary">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-secondary">
                       KES {formatAmount(categoryTotals.grossPurchases)}
-                    </h3>
+                    </h5>
 
                     <p className="mb-0 text-muted mt-auto">
                       Including Tax
@@ -189,9 +189,9 @@ const Category = ({
                       Purchase Returns
                     </p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-warning">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                       KES {formatAmount(categoryTotals.purchaseReturns)}
-                    </h3>
+                    </h5>
 
                     <p className="mb-0 text-muted mt-auto">
                       Excluding Tax
@@ -210,9 +210,9 @@ const Category = ({
                       Net Purchases
                     </p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-success">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-success">
                       KES {formatAmount(categoryTotals.netPurchasesIncl)}
-                    </h3>
+                    </h5>
 
                     <p className="mb-0 text-muted mt-auto">
                       Including Tax
@@ -231,9 +231,9 @@ const Category = ({
                       Unique Items
                     </p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-danger">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-danger">
                       {Number(categoryTotals.uniqueItems).toLocaleString("en-KE")}
-                    </h3>
+                    </h5>
 
                     <p className="mb-0 text-muted mt-auto">
                       Distinct purchased items

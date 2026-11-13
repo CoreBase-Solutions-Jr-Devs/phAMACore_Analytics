@@ -372,7 +372,7 @@ const {
             />
           </Col>
         </Row>
-        <Row>
+        {/* <Row>
           <Col>
             <ReceivablesAgeing
               kpiOverdueAccounts={kpiOverdueAccounts}
@@ -388,7 +388,7 @@ const {
               loading={loading}
             />
           </Col>
-        </Row>
+        </Row> */}
 
         <Row>
           {/* <Col xl={6}>

@@ -225,12 +225,24 @@ const Navdata = () => {
           link: `/dashboard-purchase-orders/Category-Spend`,
           parentId: "purchase-orders",
         },
-        //      {
-        //   id: "Branch-Order-Fill-Rate",
-        //   label: "Branch Order Fill Rate",
-        //   link: `/dashboard-purchase-orders/Branch-Order-Fill-Rate`,
-        //   parentId: "purchase-orders",
-        // },
+             {
+          id: "Supplier-Order-Fill-Rate",
+          label: "Supplier Order Fill Rate",
+          link: `/dashboard-purchase-orders/Supplier-Order-Fill-Rate`,
+          parentId: "purchase-orders",
+        },
+            {
+          id: "Supplier-Returns",
+          label: "Supplier Returns",
+          link: `/dashboard-purchase-orders/Supplier-Returns`,
+          parentId: "purchase-orders",
+        },
+            {
+          id: "Consolidated-LPO-Review",
+          label: "Consolidated Review",
+          link: `/dashboard-purchase-orders/Consolidated-LPO-Review`,
+          parentId: "purchase-orders",
+        },
       ],
     },
   ];

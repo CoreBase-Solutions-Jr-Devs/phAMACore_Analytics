@@ -175,12 +175,12 @@ const Bands = ({
                   </span> */}
                   </div>
 
-                  <h3 className="mt-2 ff-secondary fw-semibold text-secondary">
+                  <h5 className="mt-2 ff-secondary fw-semibold text-secondary">
                     KES{" "}
                     {Number(marginBand25.sales_value_kes || 0).toLocaleString(
                       "en-KE",
                     )}
-                  </h3>
+                  </h5>
                 </div>
 
                 <p className="mb-0 text-muted mt-auto">
@@ -207,12 +207,12 @@ const Bands = ({
                     <i className="ri-arrow-right-circle-line fs-3 text-warning"></i>
                   </span> */}
                   </div>
-                  <h3 className="mt-2 ff-secondary fw-semibold text-warning">
+                  <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                     KES{" "}
                     {Number(
                       marginBand25To30.sales_value_kes || 0,
                     ).toLocaleString("en-KE")}
-                  </h3>
+                  </h5>
                 </div>
 
                 <p className="mb-0 text-muted mt-auto">
@@ -238,12 +238,12 @@ const Bands = ({
                     <i className="ri-arrow-right-circle-line fs-3 text-danger"></i>
                   </span> */}
                   </div>
-                  <h3 className="mt-2 ff-secondary fw-semibold text-danger">
+                  <h5 className="mt-2 ff-secondary fw-semibold text-danger">
                     KES{" "}
                     {Number(
                       marginBand30To45.sales_value_kes || 0,
                     ).toLocaleString("en-KE")}
-                  </h3>
+                  </h5>
                 </div>
 
                 <p className="mb-0 text-muted mt-auto">
@@ -269,12 +269,12 @@ const Bands = ({
                     <i className="ri-arrow-right-circle-line fs-3 text-success"></i>
                   </span> */}
                   </div>
-                  <h3 className="mt-2 ff-secondary fw-semibold text-success">
+                  <h5 className="mt-2 ff-secondary fw-semibold text-success">
                     KES{" "}
                     {Number(
                       marginBandAbove45.sales_value_kes || 0,
                     ).toLocaleString("en-KE")}
-                  </h3>
+                  </h5>
                 </div>
 
                 <p className="mb-0 text-muted mt-auto">

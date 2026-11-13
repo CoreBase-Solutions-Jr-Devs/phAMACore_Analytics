@@ -158,11 +158,11 @@ const handleExportExcel = () => {
                   <div>
                     <p className="font-medium mb-0">Net Sales</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-secondary">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-secondary">
                      KES {Number(
                         categoryPerformance?.total_sales_excl ?? 0,
                       ).toLocaleString("en-KE")}
-                    </h3>
+                    </h5>
                     <p className="mb-0 text-muted mt-auto ">Excluding Tax </p>
                   </div>
                 </CardBody>
@@ -175,11 +175,11 @@ const handleExportExcel = () => {
                   <div>
                     <p className="font-medium mb-0">gross Profit</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-warning">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                        KES {Number(
                         categoryPerformance?.gross_profit ?? 0,
                       ).toLocaleString("en-KE")}
-                    </h3>
+                    </h5>
                     <p className="mb-0 text-muted mt-auto ">
                    
              
@@ -199,9 +199,9 @@ const handleExportExcel = () => {
                   <div>
                     <p className="font-medium mb-0">Active Items</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-success">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-success">
                      {Number(categoryPerformance?.active_items_count ?? 0)}
-                    </h3>
+                    </h5>
                                         <p className="mb-0 text-muted mt-auto ">Available for sale</p>
 
                   </div>
@@ -215,9 +215,9 @@ const handleExportExcel = () => {
                   <div>
                     <p className="font-medium mb-0">Units Sold</p>
 
-                    <h3 className="mt-2 ff-secondary fw-semibold text-danger">
+                    <h5 className="mt-2 ff-secondary fw-semibold text-danger">
                       {Number(categoryPerformance?.total_units_sold ?? 0)}
-                    </h3>
+                    </h5>
                           <p className="mb-0 text-muted mt-auto ">Sales volume </p>
 
               

@@ -12,7 +12,7 @@ import {
   getKPIPriceAlerts as getKPIPriceAlertsApi,
   getKPILeadTime as getKPILeadTimeApi,
   getGoodsReceived as getGoodsReceivedApi,
-  getBestPricePerSupplier as getBestPricePerSupplierApi,
+  // getBestPricePerSupplier as getBestPricePerSupplierApi,
   getLastYearGoodsReceived as getLastYearGoodsReceivedApi,
  
 } from "../../helpers/fakebackend_helper";
@@ -183,20 +183,20 @@ export const getKPIMaverickSpend = createAsyncThunk(
   },
 );
 
-export const getBestPricePerSupplier = createAsyncThunk(
-  "powerbi/getBestPricePerSupplier",
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await getBestPricePerSupplierApi(params);
+// export const getBestPricePerSupplier = createAsyncThunk(
+//   "powerbi/getBestPricePerSupplier",
+//   async (params, { rejectWithValue }) => {
+//     try {
+//       const response = await getBestPricePerSupplierApi(params);
 
-      return response.data || response;
-    } catch (error) {
-      toast.error("Failed to fetch best price per supplier", {
-        autoClose: 3000,
-      });
+//       return response.data || response;
+//     } catch (error) {
+//       toast.error("Failed to fetch best price per supplier", {
+//         autoClose: 3000,
+//       });
 
-      return rejectWithValue(error.message);
-    }
-  },
-);
+//       return rejectWithValue(error.message);
+//     }
+//   },
+// );
 

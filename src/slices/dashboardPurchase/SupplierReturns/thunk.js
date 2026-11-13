@@ -2,14 +2,14 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 import {
-  getKPIBranchOrderFillRate as getKPIBranchOrderFillRateApi,
+  getKPISupplierReturns as getKPISupplierReturnsApi,
 } from "../../../helpers/fakebackend_helper";
 
-export const getKPIBranchOrderFillRate = createAsyncThunk(
-  "powerbi/getKPIBranchOrderFillRate",
+export const getKPISupplierReturns = createAsyncThunk(
+  "powerbi/getKPISupplierReturns",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await getKPIBranchOrderFillRateApi(params);
+      const response = await getKPISupplierReturnsApi(params);
 
       return response.data || response;
     } catch (error) {

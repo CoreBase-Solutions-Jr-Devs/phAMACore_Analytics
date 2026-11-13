@@ -12,7 +12,7 @@ import {
   getKPILeadTime,
   getGoodsReceived,
   getLastYearGoodsReceived,
-  getBestPricePerSupplier,
+  // getBestPricePerSupplier,
 } from "./thunk";
 
 import { getKPIOverdueAccounts } from "../dashboardSales/thunk";
@@ -53,7 +53,7 @@ const initialState = {
   KPILeadTimeBranch: [],
   GoodsReceived: [],
   LastYearGoodsReceived: [],
-  BestPricePerSupplier: [],
+  // BestPricePerSupplier: [],
   ActualSpend: [],
   ActualSpendSummary: [],
   ActualSpendCategory: [],
@@ -817,27 +817,27 @@ const PurchaseOrdersSlice = createSlice({
       // BEST PRICE PER SUPPLIER
       // ------------------------------------------
 
-      .addCase(getBestPricePerSupplier.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // .addCase(getBestPricePerSupplier.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
 
-      .addCase(getBestPricePerSupplier.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
+      // .addCase(getBestPricePerSupplier.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   state.error = null;
 
-        state.BestPricePerSupplier =
-          action.payload?.result || action.payload || [];
-      })
+      //   state.BestPricePerSupplier =
+      //     action.payload?.result || action.payload || [];
+      // })
 
-      .addCase(getBestPricePerSupplier.rejected, (state, action) => {
-        state.loading = false;
-        state.error =
-          action.payload?.message ||
-          action.payload ||
-          action.error.message ||
-          "Error loading best price per supplier";
-      })
+      // .addCase(getBestPricePerSupplier.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error =
+      //     action.payload?.message ||
+      //     action.payload ||
+      //     action.error.message ||
+      //     "Error loading best price per supplier";
+      // })
 
       // ------------------------------------------
       // KPI OVERDUE ACCOUNTS

@@ -43,6 +43,7 @@ const Products = ({
       {
         header: "Group",
         accessorKey: "group_name",
+        enableSorting: true,
         size: GROUP_WIDTH,
         meta: {
           sticky: "group",
@@ -60,6 +61,7 @@ const Products = ({
       {
         header: "Subgroup Name",
         accessorKey: "subgroup_name",
+        enableSorting: true,
         size: SUBGROUP_WIDTH,
         meta: {
           sticky: "subgroup",
@@ -93,6 +95,7 @@ const Products = ({
       {
         header: "Active Items",
         accessorKey: "active_items_count",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-info fw-semibold">
             {formatNumber(getValue())}
@@ -102,6 +105,7 @@ const Products = ({
       {
         header: "Transactions",
         accessorKey: "transaction_count",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-primary fw-semibold">
             {formatNumber(getValue())}
@@ -111,6 +115,7 @@ const Products = ({
       {
         header: "Line Items",
         accessorKey: "total_line_items",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-body">{formatNumber(getValue())}</span>
         ),
@@ -118,6 +123,7 @@ const Products = ({
       {
         header: "Unique Clients",
         accessorKey: "unique_clients",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-success fw-semibold">
             {formatNumber(getValue())}
@@ -127,6 +133,7 @@ const Products = ({
       {
         header: "Units Sold",
         accessorKey: "total_units_sold",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-info fw-semibold">
             {formatNumber(getValue())}
@@ -136,6 +143,7 @@ const Products = ({
       {
         header: "Total Sales (Excl.)",
         accessorKey: "total_sales_excl",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-primary fw-semibold">
             {formatAmount(getValue())}
@@ -145,6 +153,7 @@ const Products = ({
       {
         header: "Tax",
         accessorKey: "total_tax",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-muted">{formatAmount(getValue())}</span>
         ),
@@ -152,6 +161,7 @@ const Products = ({
       {
         header: "Total Sales (Incl.)",
         accessorKey: "total_sales_incl",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-primary fw-bold">
             {formatAmount(getValue())}
@@ -161,6 +171,7 @@ const Products = ({
       {
         header: "Total COGS",
         accessorKey: "total_cogs",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-danger">{formatAmount(getValue())}</span>
         ),
@@ -168,6 +179,7 @@ const Products = ({
       {
         header: "Gross Profit",
         accessorKey: "gross_profit",
+        enableSorting: true,
         cell: ({ getValue }) => {
           const profit = Number(getValue() ?? 0);
 
@@ -185,6 +197,7 @@ const Products = ({
       {
         header: "Gross Margin (%)",
         accessorKey: "gross_margin_perc",
+        enableSorting: true,
         cell: ({ getValue }) => {
           const percentage = getValue();
           const value =
@@ -202,6 +215,7 @@ const Products = ({
       {
         header: "Avg Order Value",
         accessorKey: "avg_order_value",
+        enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-body fw-semibold">
             {formatAmount(getValue())}
@@ -211,6 +225,7 @@ const Products = ({
       {
         header: "Sales Share (%)",
         accessorKey: "sales_share_perc",
+        enableSorting: true,
         cell: ({ getValue }) => {
           const percentage = getValue();
           const value =
