@@ -5,13 +5,13 @@ import TablePagination from "../../../Components/Common/TablePagination";
 import { fetchKPIBranchOrderFillRate } from "../../../slices/dashboardStock/thunk";
 import { cleanBranchName } from "../../../helpers/branch_helper";
 import { pick, num } from "../../utils/apiRow";
-import { formatCompact } from "../../utils/formatHelper";
+import { formatNumber } from "../../utils/formatHelper";
 
 const MAX_ROWS = 50;
 
 export const OFR_TABS = [
     { key: "BRANCH_OFR", label: "By Branch" },
-    { key: "ORDER_DRILLDOWN", label: "LPO Voucher Drill-Down" },
+    { key: "ORDER_DRILLDOWN", label: "Branch Order Drill-Down" },
     { key: "TOP_SHORTAGES", label: "Top Main Branch Shortages" },
 ];
 
@@ -32,7 +32,7 @@ export const extractOfrSummary = (summaryRows = [], branchRows = []) => {
     const qtyFillRate = num(pick(first, "quantity_fill_rate_perc", "qty_fill_rate_perc", "qty_fill_rate"));
     const receiptFidelity = num(pick(first, "receipt_fidelity_perc", "receipt_fidelity"));
     const backorderExposure =
-        num(pick(first, "backorder_exposure_kes", "backorder_value_kes", "backorder_value", "unfulfilled_value")) ||
+        num(pick(first, "backorder_exposure_kes", "backorder_value_kes", "backorder_value", "unfulfilled_value", "total_backorder_value_cost")) ||
         branchRows.reduce((s, r) => s + num(pick(r, "backorder_exposure_kes", "backorder_value", "unfulfilled_value")), 0);
     const actionInsight = String(pick(first, "action_insight") || "");
 
@@ -124,7 +124,7 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
         { label: "Line Fill Rate", value: `${summary.lineFillRate.toFixed(1)}%`, color: "info" },
         { label: "Quantity Fill Rate", value: `${summary.qtyFillRate.toFixed(1)}%`, color: "primary" },
         { label: "Receipt Fidelity", value: `${summary.receiptFidelity.toFixed(1)}%`, color: "success" },
-        { label: "Backorder Exposure", value: `KES ${formatCompact(summary.backorderExposure)}`, color: "danger" },
+        { label: "Backorder Exposure (KES)", value: formatNumber(summary.backorderExposure, 0), color: "danger" },
     ];
 
     return (

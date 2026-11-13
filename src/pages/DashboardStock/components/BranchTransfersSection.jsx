@@ -17,10 +17,10 @@ const formatDateShort = (val) => {
     return d.toLocaleDateString("en-GB");
 };
 
-const isSyokimauBranch = (code, name) => {
+const isMainBranch = (code) => {
     const c = String(code || "").trim().toUpperCase();
-    const n = String(name || "").trim().toUpperCase();
-    return c === "1" || c === "BR001" || n.includes("SYOKIMAU");
+    // const n = String(name || "").trim().toUpperCase();
+    return c === "1" || c === "BR001";
 };
 
 export const normalizeDestStockAging = (rows = []) =>
@@ -403,15 +403,15 @@ const TransferAgingTable = ({
 
 const BranchTransfersSection = () => {
     // Card 1: Inter-Branch Transfers
-    const [transfersTab, setTransfersTab] = useState("DEST_STOCK_AGING");
+    const [transfersTab, setTransfersTab] = useState("DRILLDOWN");
     const [transfersSearch, setTransfersSearch] = useState("");
     const [transfersBranchFilter, setTransfersBranchFilter] = useState("");
 
-    // Card 2: Branch Pull to/from Syokimau
-    const [syokimauDirection, setSyokimauDirection] = useState("TO_SYOKIMAU"); // "TO_SYOKIMAU" (Dest=Syokimau) or "FROM_SYOKIMAU" (Source=Syokimau)
-    const [syokimauTab, setSyokimauTab] = useState("DEST_STOCK_AGING");
-    const [syokimauSearch, setSyokimauSearch] = useState("");
-    const [syokimauBranchFilter, setSyokimauBranchFilter] = useState("");
+    // Card 2: Branch Pull to/from Main
+    const [mainDirection, setMainDirection] = useState("TO_MAIN"); // "TO_MAIN" (Dest=Main) or "FROM_MAIN" (Source=Main)
+    const [mainTab, setMainTab] = useState("DEST_STOCK_AGING");
+    const [mainSearch, setMainSearch] = useState("");
+    const [mainBranchFilter, setMainBranchFilter] = useState("");
 
     const {
         branchTransfersSummary = [],
@@ -496,25 +496,25 @@ const BranchTransfersSection = () => {
         };
     }, [branchTransfersSummary, allDrilldownRows, enrichedAgingRows, branchTransfersTopSkus]);
 
-    // Syokimau Pull filtered datasets & metrics (Total Value, Total SKUs, Drill down to branches & days in stock)
-    const { syokimauAgingRows, syokimauDrilldownRows, syokimauInTransitRows, branchPullMetrics } = useMemo(() => {
+    // Main Branch Pull filtered datasets & metrics (Total Value, Total SKUs, Drill down to branches & days in stock)
+    const { mainAgingRows, mainDrilldownRows, mainInTransitRows, branchPullMetrics } = useMemo(() => {
         const filterFn = (srcCode, srcName, dstCode, dstName) => {
-            if (syokimauDirection === "TO_SYOKIMAU") {
-                return isSyokimauBranch(dstCode, dstName);
+            if (mainDirection === "TO_MAIN") {
+                return isMainBranch(dstCode, dstName);
             }
-            if (syokimauDirection === "FROM_SYOKIMAU") {
-                return isSyokimauBranch(srcCode, srcName);
+            if (mainDirection === "FROM_MAIN") {
+                return isMainBranch(srcCode, srcName);
             }
-            return isSyokimauBranch(srcCode, srcName) || isSyokimauBranch(dstCode, dstName);
+            return isMainBranch(srcCode, srcName) || isMainBranch(dstCode, dstName);
         };
 
-        const sDrilldown = allDrilldownRows.filter((r) =>
+        const mDrilldown = allDrilldownRows.filter((r) =>
             filterFn(r.sourceBranchCode, r.sourceBranchName, r.destBranchCode, r.destBranchName)
         );
-        const sAging = enrichedAgingRows.filter((r) =>
+        const mAging = enrichedAgingRows.filter((r) =>
             filterFn(r.sourceBranchCode, r.sourceBranchName, r.destBranchCode, r.destBranchName)
         );
-        const sInTransit = (Array.isArray(branchTransfersInTransit) ? branchTransfersInTransit : []).filter((r) =>
+        const mInTransit = (Array.isArray(branchTransfersInTransit) ? branchTransfersInTransit : []).filter((r) =>
             filterFn(
                 pick(r, "source_branch_code"),
                 pick(r, "source_branch_name"),
@@ -523,28 +523,28 @@ const BranchTransfersSection = () => {
             )
         );
 
-        const activeSource = sDrilldown.length > 0 ? sDrilldown : sAging;
-        const totalValue = sDrilldown.length > 0
-            ? sDrilldown.reduce((s, r) => s + r.totalCost, 0)
-            : sAging.reduce((s, r) => s + r.transferredCost, 0);
+        const activeSource = mDrilldown.length > 0 ? mDrilldown : mAging;
+        const totalValue = mDrilldown.length > 0
+            ? mDrilldown.reduce((s, r) => s + r.totalCost, 0)
+            : mAging.reduce((s, r) => s + r.transferredCost, 0);
 
         const skuSet = new Set();
         activeSource.forEach((r) => r.itemCode && skuSet.add(r.itemCode));
-        sAging.forEach((r) => r.itemCode && skuSet.add(r.itemCode));
+        mAging.forEach((r) => r.itemCode && skuSet.add(r.itemCode));
 
         const docSet = new Set();
-        sDrilldown.forEach((r) => r.transferDoc && docSet.add(r.transferDoc));
-        sAging.forEach((r) => r.transferDoc && docSet.add(r.transferDoc));
+        mDrilldown.forEach((r) => r.transferDoc && docSet.add(r.transferDoc));
+        mAging.forEach((r) => r.transferDoc && docSet.add(r.transferDoc));
 
         const avgDaysInStock =
-            sAging.length > 0
-                ? Math.round(sAging.reduce((s, r) => s + r.daysInStock, 0) / sAging.length)
+            mAging.length > 0
+                ? Math.round(mAging.reduce((s, r) => s + r.daysInStock, 0) / mAging.length)
                 : 0;
 
         return {
-            syokimauAgingRows: sAging,
-            syokimauDrilldownRows: sDrilldown,
-            syokimauInTransitRows: sInTransit,
+            mainAgingRows: mAging,
+            mainDrilldownRows: mDrilldown,
+            mainInTransitRows: mInTransit,
             branchPullMetrics: {
                 totalValue,
                 totalSkus: skuSet.size,
@@ -552,7 +552,7 @@ const BranchTransfersSection = () => {
                 avgDaysInStock,
             },
         };
-    }, [allDrilldownRows, enrichedAgingRows, branchTransfersInTransit, syokimauDirection]);
+    }, [allDrilldownRows, enrichedAgingRows, branchTransfersInTransit, mainDirection]);
 
     const availableBranches = useMemo(() => {
         const set = new Set();
@@ -586,8 +586,8 @@ const BranchTransfersSection = () => {
         exportToExcel(rows, `Branch_Transfers_${todayStr}`);
     };
 
-    const handleExportSyokimauPull = () => {
-        const source = syokimauAgingRows.length > 0 ? syokimauAgingRows : syokimauDrilldownRows;
+    const handleExportMainPull = () => {
+        const source = mainAgingRows.length > 0 ? mainAgingRows : mainDrilldownRows;
         const rows = source.map((r) => ({
             "Product": r.itemName,
             "Item Code": r.itemCode,
@@ -604,7 +604,7 @@ const BranchTransfersSection = () => {
             "Days in Stock": r.daysInStock ?? r.transitDays ?? 0,
         }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-        exportToExcel(rows, `Branch_Pull_Syokimau_${todayStr}`);
+        exportToExcel(rows, `Branch_Pull_Main_${todayStr}`);
     };
 
     return (
@@ -748,7 +748,7 @@ const BranchTransfersSection = () => {
             {/* BRANCH PULL TO MAIN BRANCH */}
             <Row>
                 <Col xl={12}>
-                    <Card id="branch-pull-syokimau-card">
+                    <Card id="branch-pull-main-card">
                         <CardHeader>
                             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                 <div>
@@ -760,39 +760,39 @@ const BranchTransfersSection = () => {
                                     </p>
                                 </div>
                                 <div className="d-flex align-items-center gap-2 flex-wrap">
-                                    <div className="btn-group btn-group-sm" role="group" aria-label="Syokimau pull direction">
+                                    <div className="btn-group btn-group-sm" role="group" aria-label="Main pull direction">
                                         <button
                                             type="button"
                                             className={`btn ${
-                                                syokimauDirection === "TO_SYOKIMAU" ? "btn-primary" : "btn-outline-primary"
+                                                mainDirection === "TO_MAIN" ? "btn-primary" : "btn-outline-primary"
                                             }`}
-                                            onClick={() => setSyokimauDirection("TO_SYOKIMAU")}
+                                            onClick={() => setMainDirection("TO_MAIN")}
                                         >
                                             Pulled to Main (Inbound)
                                         </button>
                                         <button
                                             type="button"
                                             className={`btn ${
-                                                syokimauDirection === "FROM_SYOKIMAU" ? "btn-primary" : "btn-outline-primary"
+                                                mainDirection === "FROM_MAIN" ? "btn-primary" : "btn-outline-primary"
                                             }`}
-                                            onClick={() => setSyokimauDirection("FROM_SYOKIMAU")}
+                                            onClick={() => setMainDirection("FROM_MAIN")}
                                         >
                                             Pulled from Main (Dispatched to Branches)
                                         </button>
                                         <button
                                             type="button"
                                             className={`btn ${
-                                                syokimauDirection === "ALL_SYOKIMAU" ? "btn-primary" : "btn-outline-primary"
+                                                mainDirection === "ALL_MAIN" ? "btn-primary" : "btn-outline-primary"
                                             }`}
-                                            onClick={() => setSyokimauDirection("ALL_SYOKIMAU")}
+                                            onClick={() => setMainDirection("ALL_MAIN")}
                                         >
                                             All Movements in Main Branch
                                         </button>
                                     </div>
                                     <CardExportButtons
-                                        targetId="branch-pull-syokimau-card"
-                                        title="Branch Pull to Syokimau"
-                                        onExport={handleExportSyokimauPull}
+                                        targetId="branch-pull-main-card"
+                                        title="Branch Pull to Main Branch"
+                                        onExport={handleExportMainPull}
                                     />
                                 </div>
                             </div>
@@ -841,16 +841,16 @@ const BranchTransfersSection = () => {
                                     <input
                                         className="form-control form-control-sm"
                                         placeholder="Search Main Branch pull SKU, batch, or branch..."
-                                        value={syokimauSearch}
-                                        onChange={(e) => setSyokimauSearch(e.target.value)}
+                                        value={mainSearch}
+                                        onChange={(e) => setMainSearch(e.target.value)}
                                     />
                                 </Col>
                                 <Col md="auto">
                                     <select
                                         className="form-select form-select-sm"
-                                        value={syokimauBranchFilter}
-                                        onChange={(e) => setSyokimauBranchFilter(e.target.value)}
-                                        aria-label="Filter Syokimau pull by branch"
+                                        value={mainBranchFilter}
+                                        onChange={(e) => setMainBranchFilter(e.target.value)}
+                                        aria-label="Filter Main Pull by branch"
                                     >
                                         <option value="">Branch</option>
                                         {availableBranches.map((b) => (
@@ -864,16 +864,16 @@ const BranchTransfersSection = () => {
                                     <div className="btn-group btn-group-sm" role="group">
                                         {[
                                             { key: "DEST_STOCK_AGING", label: "Branch Drill-Down & Days in Stock" },
-                                            { key: "DRILLDOWN", label: "Voucher Line Items" },
-                                            { key: "IN_TRANSIT", label: `In-Transit (${syokimauInTransitRows.length})` },
+                                            { key: "DRILLDOWN", label: "Branch Transfers" },
+                                            { key: "IN_TRANSIT", label: `In-Transit (${mainInTransitRows.length})` },
                                         ].map((tab) => (
                                             <button
                                                 key={tab.key}
                                                 type="button"
                                                 className={`btn ${
-                                                    syokimauTab === tab.key ? "btn-caramel" : "btn-outline-caramel"
+                                                    mainTab === tab.key ? "btn-caramel" : "btn-outline-caramel"
                                                 }`}
-                                                onClick={() => setSyokimauTab(tab.key)}
+                                                onClick={() => setMainTab(tab.key)}
                                             >
                                                 {tab.label}
                                             </button>
@@ -883,13 +883,13 @@ const BranchTransfersSection = () => {
                             </Row>
 
                             <TransferAgingTable
-                                agingRows={syokimauAgingRows}
-                                drilldownRows={syokimauDrilldownRows}
-                                inTransitRows={syokimauInTransitRows}
+                                agingRows={mainAgingRows}
+                                drilldownRows={mainDrilldownRows}
+                                inTransitRows={mainInTransitRows}
                                 branchBalanceRows={[]}
-                                activeTab={syokimauTab}
-                                searchTerm={syokimauSearch}
-                                branchFilter={syokimauBranchFilter}
+                                activeTab={mainTab}
+                                searchTerm={mainSearch}
+                                branchFilter={mainBranchFilter}
                             />
                         </CardBody>
                     </Card>
