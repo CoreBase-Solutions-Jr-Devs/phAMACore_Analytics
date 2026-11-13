@@ -1,15 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getKPIBranchOrderFillRate } from "./thunk";
+import { getKPIBestPricePerSupplier } from "./thunk";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
-  KPIBranchOrderFillRate: [],
- KPIBranchOrderFillRateSummary: [],
-  KPIBranchOrderFillRateBranchOFR: [],
- KPIBranchOrderFillRateOrderDrilldown: [],
- KPIBranchOrderFillRateTopShortages: [],
-
+  // KPISupplierReturns: [],
+ KPIBestPricePerSupplierItemMatrix: [],
+  KPIBestPricePerSupplierSupplierScorecard: [],
+ KPIBestPricePerSupplierBestPriceCatalog: [],
+ KPIBestPricePerSupplierProposedHistorical: [],
+// KPISupplierReturnsSKU: [],
+// KPISupplierReturnsReason: [],
   loading: false,
   error: null,
   filters: {
@@ -23,8 +24,8 @@ const initialState = {
     // topN: 0,
   },
 };
-const BranchOrderFillRateSlice = createSlice({
-  name: "branchOrderFillRate",
+const BestPricePerSupplierSlice = createSlice({
+  name: "bestPricePerSupplier",
 
   initialState,
 
@@ -224,7 +225,7 @@ const BranchOrderFillRateSlice = createSlice({
       state.filters.topN = action.payload;
     },
 
-    clearBranchOrderFillRateData: () => initialState,
+    clearBestPricePerSupplierData: () => initialState,
   },
 
   extraReducers: (builder) => {
@@ -235,12 +236,12 @@ const BranchOrderFillRateSlice = createSlice({
       // KPI PURCHASES
       // ------------------------------------------
 
-      .addCase(getKPIBranchOrderFillRate.pending, (state) => {
+      .addCase(getKPIBestPricePerSupplier.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
 
-      .addCase(getKPIBranchOrderFillRate.fulfilled, (state, action) => {
+      .addCase(getKPIBestPricePerSupplier.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
 
@@ -248,33 +249,34 @@ const BranchOrderFillRateSlice = createSlice({
 
         const result = action.payload?.result || action.payload || [];
 
-        state.KPIBranchOrderFillRate = result;
+        state.KPIBestPricePerSupplier = result;
 
         switch (groupBy) {
-                 case "SUMMARY":
-            state.KPIBranchOrderFillRateSummary = result;
+                 case "ITEM_MATRIX":
+            state.KPIBestPricePerSupplierItemMatrix = result;
             break;
-             case "BRANCH_OFR":
-            state.KPIBranchOrderFillRateBranchOFR = result;
+             case "SUPPLIER_SCORECARD":
+            state.KPIBestPricePerSupplierSupplierScorecard = result;
             break;
-                         case "ORDER_DRILLDOWN":
-            state.KPIBranchOrderFillRateOrderDrilldown = result;
+                         case "BEST_PRICE_CATALOG":
+            state.KPIBestPricePerSupplierBestPriceCatalog = result;
             break;
-                         case "TOP_SHORTAGES":
-            state.KPIBranchOrderFillRateTopShortages = result;
+                         case "PROPOSED_VS_HISTORICAL":
+            state.KPIBestPricePerSupplierProposedHistorical = result;
             break;
+                  
           default:
             break;
         }
       })
 
-      .addCase(getKPIBranchOrderFillRate.rejected, (state, action) => {
+      .addCase(KPIBestPricePerSupplier.rejected, (state, action) => {
         state.loading = false;
         state.error =
           action.payload?.message ||
           action.payload ||
           action.error.message ||
-          "Error loading KPI purchases";
+          "Error loading KPI Returns";
       })
 
 ;
@@ -288,7 +290,7 @@ export const {
   setEndDate,
   setGroupBy,
   setTopN,
-  clearBranchOrderFillRateData,
-} = BranchOrderFillRateSlice.actions;
+  clearBestPricePerSupplierData,
+} = BestPricePerSupplierSlice.actions;
 
-export default BranchOrderFillRateSlice.reducer;
+export default BestPricePerSupplierSlice.reducer;

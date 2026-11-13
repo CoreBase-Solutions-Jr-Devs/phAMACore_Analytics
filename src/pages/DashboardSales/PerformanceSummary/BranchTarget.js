@@ -190,7 +190,10 @@ const branchData = useMemo(() => {
       id={`insight-${row.original.branchID}-${month.key}-sales`}
       insight={row.original[`${month.key}ActionInsight`]}
     >
-      {formatAmount(getValue())}
+      <div className="text-caramel fw-semibold">
+{formatAmount(getValue())}
+      </div>
+      
     </InsightCell>
   ),
   meta: {
@@ -207,7 +210,9 @@ const branchData = useMemo(() => {
       id={`insight-${row.original.branchID}-${month.key}-target`}
       insight={row.original[`${month.key}ActionInsight`]}
     >
+       <div className="fw-semibold">
       {formatAmount(getValue())}
+       </div>
     </InsightCell>
   ),
   meta: { tdClassName: "text-end" },

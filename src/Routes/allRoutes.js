@@ -20,6 +20,10 @@ import PerformanceSummary from "../pages/DashboardSales/PerformanceSummary";
 import SalesBreakdown from "../pages/DashboardSales/SalesBreakdown";
 import SupplierAgeing from "../pages/DashboardPurchaseOrders/SupplierAgeing";
 import CategorySpend from "../pages/DashboardPurchaseOrders/CategorySpend";
+import SupplierReturns from "../pages/DashboardPurchaseOrders/SupplierReturns";
+import SupplierOrderFill from "../pages/DashboardPurchaseOrders/SupplierOrderFillRate";
+import ConsolidatedLPOReview from "../pages/DashboardPurchaseOrders/ConsolidatedLPOReview";
+
 //login
 import Login from "../pages/Authentication/Login";
 import ForgetPasswordPage from "../pages/Authentication/ForgetPassword";
@@ -58,7 +62,6 @@ import UserProfile from "../pages/Authentication/user-profile";
 import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
 import CategoryPerformance from "../pages/DashboardSales/CategoryPerformance";
 import SalesSummary from "../pages/DashboardSales/SalesSummary";
-import BranchOrderFill from "../pages/DashboardPurchaseOrders/BranchOrderFillRate";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardMyBusiness /> },
@@ -135,8 +138,16 @@ const authProtectedRoutes = [
     component: <CategorySpend />,
   },
      {
-    path: "/dashboard-purchase-orders/Branch-Order-Fill-Rate",
-    component: <BranchOrderFill />,
+    path: "/dashboard-purchase-orders/Supplier-Order-Fill-Rate",
+    component: <SupplierOrderFill />,
+  },
+   {
+    path: "/dashboard-purchase-orders/Supplier-Returns",
+    component: <SupplierReturns />,
+  },
+     {
+    path: "/dashboard-purchase-orders/Consolidated-LPO-Review",
+    component: <ConsolidatedLPOReview />,
   },
   {
     path: "/dashboard-purchase-orders/branch/:branchId",

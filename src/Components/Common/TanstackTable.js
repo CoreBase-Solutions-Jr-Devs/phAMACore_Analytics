@@ -75,6 +75,7 @@ const TanstackTable = ({
   tableStyle = {},
   searchContainerClass = "mb-3",
   toolbarContent = null,
+    tableTabs = null,
   searchInputWidth = "100%",
   SearchPlaceholder = "Search...",
   showPagination = true,
@@ -140,34 +141,46 @@ const TanstackTable = ({
 
   return (
     <Fragment>
-      {(isGlobalFilter || toolbarContent) && (
-        <Row className={`align-items-center g-3 ${searchContainerClass}`}>
-          {isGlobalFilter && (
-            <Col xs={12} md={toolbarContent ? 5 : 12}>
-              <div className="search-box">
-                <DebouncedInput
-                  value={globalFilter}
-                  onChange={setGlobalFilter}
-                  placeholder={SearchPlaceholder}
-                  aria-label="Search table"
-                  style={{ width: searchInputWidth, maxWidth: "100%" }}
-                />
-                <i className="bx bx-search-alt search-icon" />
-              </div>
-            </Col>
-          )}
-
-          {toolbarContent && (
-            <Col
-              xs={12}
-              md={isGlobalFilter ? 7 : 12}
-              className="d-flex justify-content-md-end flex-wrap"
-            >
-              {toolbarContent}
-            </Col>
-          )}
-        </Row>
+   {(isGlobalFilter || toolbarContent || tableTabs) && (
+  <div className={searchContainerClass}>
+    {/* SEARCH + MAIN TABLE TABS */}
+    <Row className="align-items-center g-3">
+      {isGlobalFilter && (
+        <Col xs={12} md={tableTabs ? 6 : toolbarContent ? 5 : 12}>
+          <div className="search-box">
+            <DebouncedInput
+              value={globalFilter}
+              onChange={setGlobalFilter}
+              placeholder={SearchPlaceholder}
+              aria-label="Search table"
+              style={{ width: searchInputWidth, maxWidth: "100%" }}
+            />
+            <i className="bx bx-search-alt search-icon" />
+          </div>
+        </Col>
       )}
+
+      {tableTabs && (
+        <Col
+          xs={12}
+          md={isGlobalFilter ? 6 : 12}
+          className="d-flex justify-content-md-end flex-wrap"
+        >
+          {tableTabs}
+        </Col>
+      )}
+    </Row>
+
+    {/* SECOND ROW: ADDITIONAL FILTERS */}
+    {toolbarContent && (
+      <Row className="mt-4">
+        <Col xs={12}>
+          {toolbarContent}
+        </Col>
+      </Row>
+    )}
+  </div>
+)}
 
       <div
         className={`table-responsive ${divClass}`}

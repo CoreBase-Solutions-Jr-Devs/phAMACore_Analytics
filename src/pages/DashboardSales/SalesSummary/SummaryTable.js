@@ -53,10 +53,10 @@ const columns = [
         boxShadow: "2px 0 3px -3px rgba(0,0,0,0.35)",
       },
     },
-    cell: ({ getValue }) => <span className="fw-semibold">{getValue()}</span>,
+    cell: ({ getValue }) => <span className="fw-medium">{getValue()}</span>,
   },
   {
-    header: "Cash Sales",
+    header: "CashSales",
     accessorKey: "cash_sales_incl",
     enableSorting: true,
     sortingFn: numericSort,
@@ -65,8 +65,17 @@ const columns = [
     ),
   },
   {
-    header: "Cash Invoices",
+    header: "CashInvoices",
     accessorKey: "cash_invoices_incl",
+    enableSorting: true,
+    sortingFn: numericSort,
+    cell: ({ getValue }) => (
+      <span className="fw-medium">{formatAmount(getValue())}</span>
+    ),
+  },
+  {
+    header: "InsuranceSales",
+    accessorKey: "insurance_sales_incl",
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
@@ -74,41 +83,32 @@ const columns = [
     ),
   },
   {
-    header: "Insurance Sales",
-    accessorKey: "insurance_sales_incl",
-    enableSorting: true,
-    sortingFn: numericSort,
-    cell: ({ getValue }) => (
-      <span className="text-success fw-medium">{formatAmount(getValue())}</span>
-    ),
-  },
-  {
-    header: "Glovo Sales",
+    header: "GlovoSales",
     accessorKey: "glovo_sales_incl",
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="text-warning fw-medium">{formatAmount(getValue())}</span>
+      <span className="fw-medium">{formatAmount(getValue())}</span>
     ),
   },
   {
-    header: "Other Sales",
+    header: "OtherSales",
     accessorKey: "other_sales_incl",
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="text-secondary fw-medium">
+      <span className="fw-medium text-warning">
         {formatAmount(getValue())}
       </span>
     ),
   },
   {
-    header: "Credit Notes",
+    header: "CreditNotes",
     accessorKey: "credit_notes_incl",
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="text-danger fw-medium">{formatAmount(getValue())}</span>
+      <span className=" fw-medium">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -117,7 +117,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-semibold ">{formatAmount(getValue())}</span>
+      <span className="fw-semibold text-success">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -126,7 +126,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-semibold">{formatAmount(getValue())}</span>
+      <span className="fw-semibold text-secondary">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -135,7 +135,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-semibold ">{formatAmount(getValue())}</span>
+      <span className="fw-semibold text-danger">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -144,7 +144,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-medium">
+      <span >
         {Number(getValue() || 0).toLocaleString("en-GB")}
       </span>
     ),
@@ -166,7 +166,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-medium ">{formatAmount(getValue())}</span>
+      <span >{formatAmount(getValue())}</span>
     ),
   },
 ];

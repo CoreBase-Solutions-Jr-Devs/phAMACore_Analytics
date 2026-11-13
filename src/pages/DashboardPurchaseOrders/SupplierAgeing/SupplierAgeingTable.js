@@ -331,12 +331,15 @@ const handleExportExcel = () => {
   return (
     <Card id="receivables-ageing-details" className="shadow-sm">
       <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-0 gap-2">
-        <div>
-          <h5 className="card-title mb-1">Supplier Ageing Details</h5>
-          <p className="text-muted mb-0">
-            Supplier balances grouped by ageing categories
-          </p>
-        </div>
+ <div>
+  <h5 className="card-title mb-1">
+    Supplier Outstanding Balances & Ageing Analysis
+  </h5>
+  <p className="text-muted mb-0">
+    Analyse outstanding supplier balances across ageing periods, overdue
+    amounts and identify payment priorities.
+  </p>
+</div>
 
         <CardExportButtons
                           title="Receivables Ageing Details"
@@ -367,7 +370,7 @@ onExport={handleExportExcel}        />
           showPagination={true}
           showPageSize={true}
           emptyMessage="No receivables ageing records available."
-          toolbarContent={
+          tableTabs={
             <Nav
               pills
               className="nav-tabs-custom flex-wrap gap-1"

@@ -27,7 +27,9 @@ export * from "./dashboardSales/MarginAnalysis/thunk";
 export * from "./dashboardSales/SalesTarget/thunk";
 // Purchases Dashboard
 export * from "./dashboardPurchase/thunk";
-export * from "./dashboardPurchase/BranchOrderFillRate/thunk";
+export * from "./dashboardPurchase/SupplierOrderFillRate/thunk";
+export * from "./dashboardPurchase/SupplierReturns/thunk";
+export * from "./dashboardPurchase/ConsolidatedLPOReview/thunk";
 // Stock/Inventory
 export * from "./dashboardStock/thunk";
 

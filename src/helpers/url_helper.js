@@ -55,8 +55,6 @@ export const GET_POWERBI_KPI_SELL_THROUGH_ANALYSIS =
   "/api/PowerBi/PowerBIKPISellThroughAnalysis";
 export const GET_POWERBI_KPI_BRANCH_ORDER_FILL_RATE = 
   "/api/PowerBi/PowerBIKPIBranchOrderFillRate";
-  export const GET_POWERBI_KPI_SUPPLIER_ORDER_FILL_RATE = 
-  "/api/PowerBi/PowerBIKPISupplierOrderFillRate";
 export const GET_POWERBI_KPI_BRANCH_TRANSFERS = 
   "/api/PowerBi/PowerBIKPIBranchTransfers";
 
@@ -71,8 +69,8 @@ export const GET_POWERBI_MAVERICK_SPEND =
 
    export const GET_POWERBI_CASHBOOK_SUMMARY = 
   "/api/PowerBi/PowerBICashbookSummary";
-   export const GET_POWERBI_BEST_PRICE= 
-  "/api/PowerBi/PowerBIKPIBestPricePerSupplier";
+  //  export const GET_POWERBI_BEST_PRICE= 
+  // "/api/PowerBi/PowerBIKPIBestPricePerSupplier";
 //PROFILE
 export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
 export const POST_EDIT_PROFILE = "/user";
@@ -85,3 +83,15 @@ export const GET_POWERBI_CUSTOMER_MEMBER_ANALYSIS = "/api/PowerBI/PowerBIKPICust
 export const GET_POWERBI_SALES_TARGET = "/api/PowerBI/PowerBIKPISalesTargets";
 
 export const GET_POWERBI_INVENTORY_PROFIT_SUMMARY = "/api/PowerBI/PowerBIKPIInventoryProfitSummary";
+
+export const GET_POWERBI_KPI_SUPPLIER_ORDER_FILL_RATE = 
+  "/api/PowerBi/PowerBIKPISupplierOrderFillRate";
+
+ export const GET_POWERBI_SUPPLIER_RETURNS = 
+  "/api/PowerBi/PowerBIKPISupplierReturns";
+
+   export const GET_POWERBI_CONSOLIDATED_LPO_REVIEW = 
+  "/api/PowerBi/PowerBIKPIConsolidatedLPOReview";
+
+  export const GET_POWERBI_BEST_PRICE_PER_SUPPLIER = 
+  "/api/PowerBi/PowerBIKPIBestPricePerSupplier";

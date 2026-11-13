@@ -34,7 +34,10 @@ import CategoryPerformanceReducer from "./dashboardSales/CategoryPerformance/red
 import SupplierAgeingReducer from "./dashboardPurchase/SupplierAgeing/reducer";
 import CategorySpendReducer from "./dashboardPurchase/CategorySpend/reducer";
 import SalesSummaryReducer from "./dashboardSales/SalesSummary/reducer";
-import BranchOrderFillRateReducer from "./dashboardPurchase/BranchOrderFillRate/reducer"
+import SupplierOrderFillRateReducer from "./dashboardPurchase/SupplierOrderFillRate/reducer";
+import SupplierReturnsReducer from "./dashboardPurchase/SupplierReturns/reducer";
+import ConsolidatedLPOReview from "./dashboardPurchase/ConsolidatedLPOReview/reducer";
+
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
     Login: LoginReducer,
@@ -58,7 +61,9 @@ const rootReducer = combineReducers({
     supplierAgeing:SupplierAgeingReducer,
     categorySpend: CategorySpendReducer,
     salesSummary: SalesSummaryReducer,
-    branchOrderFillRate: BranchOrderFillRateReducer,
+    supplierOrderFillRate: SupplierOrderFillRateReducer,
+    supplierReturns: SupplierReturnsReducer,
+    consolidatedLPOReview: ConsolidatedLPOReview,
 });
 
 export default rootReducer;

@@ -82,24 +82,48 @@ const FilterActions = ({
 
   return (
     <React.Fragment>
-      <div
-        className={
-          rightColumn
-            ? "layout-rightside-col d-block"
-            : "layout-rightside-col d-none"
-        }
+  <div
         id="layout-rightside-coll"
+        style={{
+          display: rightColumn ? "block" : "none",
+          position: "fixed",
+          inset: 0,
+          zIndex: 1055,
+        }}
       >
-        <div className="overlay" onClick={hideRightColumn}></div>
+        {/* Overlay */}
+        <div
+          onClick={hideRightColumn}
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+          }}
+        />
 
-        <div className="layout-rightside h-100">
-          <Card className="h-100 card-animate">
+        {/* Filter Drawer */}
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            right: 0,
+            width: "350px",
+            maxWidth: "90vw",
+            height: "100vh",
+            zIndex: 1056,
+          }}
+        >
+          <Card
+            className="h-100 border-0 rounded-0"
+            style={{ overflowY: "auto" }}
+          >
             <CardHeader className="py-2">
               <h4 className="card-title mb-0">Filter Actions</h4>
             </CardHeader>
 
-            <CardBody className="d-flex flex-column h-100">
+            <CardBody className="d-flex flex-column">
               <div className="containerFluid">
+
                 {/* Date Range */}
                 <div className="row mb-3 align-items-center">
                   <label className="col-4 col-form-label">

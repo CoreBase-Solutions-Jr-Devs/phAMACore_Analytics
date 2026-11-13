@@ -36,26 +36,27 @@ const getBadgeColor = (percentage) => {
 
 const SpendTable = ({ data = [], error, loading }) => {
   const columns = [
-    {
-      header: "Rank",
-      accessorKey: "rank_pos",
-        meta: {
-        sticky: "group",
-        thStyle: {
-          width: `${RANK_WIDTH}px`,
-          minWidth: `${RANK_WIDTH}px`,
-          maxWidth: `${RANK_WIDTH}px`,
-        },
-        tdStyle: {
-          width: `${RANK_WIDTH}px`,
-          minWidth: `${RANK_WIDTH}px`,
-          maxWidth: `${RANK_WIDTH}px`,
-        },
-      },
-    },
+    // {
+    //   header: "Rank",
+    //   accessorKey: "rank_pos",
+    //     meta: {
+    //     sticky: "group",
+    //     thStyle: {
+    //       width: `${RANK_WIDTH}px`,
+    //       minWidth: `${RANK_WIDTH}px`,
+    //       maxWidth: `${RANK_WIDTH}px`,
+    //     },
+    //     tdStyle: {
+    //       width: `${RANK_WIDTH}px`,
+    //       minWidth: `${RANK_WIDTH}px`,
+    //       maxWidth: `${RANK_WIDTH}px`,
+    //     },
+    //   },
+    // },
     {
       header: "Item Group",
       accessorKey: "item_group",
+      enableSorting: true,
       meta: {
         sticky: "group",
         thStyle: {
@@ -78,6 +79,7 @@ const SpendTable = ({ data = [], error, loading }) => {
     {
       header: "Subgroup",
       accessorKey: "item_subgroup",
+      enableSorting: true,
       meta: {
         sticky: "subgroup",
         thStyle: {
@@ -95,6 +97,7 @@ const SpendTable = ({ data = [], error, loading }) => {
     {
       header: "NetPurch(Incl.)",
       accessorKey: "net_purchases_incl",
+      enableSorting: true,
       cell: ({ getValue }) => (
         <span className="fw-semibold text-caramel">
           {formatAmount(getValue())}
@@ -104,6 +107,7 @@ const SpendTable = ({ data = [], error, loading }) => {
     {
       header: "GrossPurch(Excl.)",
       accessorKey: "gross_purchases_excl",
+      enableSorting: true,
       cell: ({ getValue }) => (
         <span className="text-success fw-semibold">
           {formatAmount(getValue())}
@@ -113,6 +117,7 @@ const SpendTable = ({ data = [], error, loading }) => {
     {
       header: "NetPurch(Excl.)",
       accessorKey: "net_purchases_excl",
+      enableSorting: true,
       cell: ({ getValue }) => (
         <span className="fw-semibold text-secondary">
           {formatAmount(getValue())}
@@ -122,6 +127,7 @@ const SpendTable = ({ data = [], error, loading }) => {
     {
       header: "Returns (Excl.)",
       accessorKey: "purchase_returns_excl",
+      enableSorting: true,
       cell: ({ getValue }) => (
         <span className="text-danger">
           {formatAmount(getValue())}
@@ -131,11 +137,13 @@ const SpendTable = ({ data = [], error, loading }) => {
     {
       header: "Tax",
       accessorKey: "total_tax",
+      enableSorting: true,
       cell: ({ getValue }) => formatAmount(getValue()),
     },
     {
       header: "Spend Share",
       accessorKey: "spend_share_perc",
+      enableSorting: true,
       cell: ({ getValue }) => {
         const value = getValue();
 
@@ -149,14 +157,17 @@ const SpendTable = ({ data = [], error, loading }) => {
     {
       header: "Unique Items",
       accessorKey: "unique_items",
+      enableSorting: true,
     },
     {
       header: "Line Items",
       accessorKey: "total_line_items",
+      enableSorting: true,
     },
     {
       header: "Net Units",
       accessorKey: "net_units_received",
+      enableSorting: true,
       cell: ({ getValue }) =>
         Number(getValue() ?? 0).toLocaleString("en-KE"),
     },
@@ -196,7 +207,7 @@ const SpendTable = ({ data = [], error, loading }) => {
           Spend by Category
         </h4>
  <p className="text-muted mb-0">
-Overview of purchasing spend, returns, and net expenditure by product category."         </p>
+Overview of purchasing spend, returns, and net expenditure by product category.        </p>
 </div>
         <CardExportButtons
           targetId="purchases-category-spend-card"

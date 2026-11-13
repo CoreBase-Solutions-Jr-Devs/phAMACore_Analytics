@@ -205,9 +205,9 @@ const handlePrint = () => {
                 <div>
                   <p className="font-medium mb-0">Total Members</p>
 
-                  <h3 className="mt-2 ff-secondary fw-semibold text-secondary">
+                  <h5 className="mt-2 ff-secondary fw-semibold text-secondary">
                     {Number(totalActiveMembers || 0)}
-                  </h3>
+                  </h5>
                 </div>
 
                 <p className="mb-0 text-muted mt-auto ">
@@ -229,9 +229,9 @@ const handlePrint = () => {
                 <div>
                   <p className="font-medium mb-0">New Members</p>
 
-                  <h3 className="mt-2 ff-secondary fw-semibold text-warning">
+                  <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                     {Number(newMembersOnboarded || 0)}
-                  </h3>
+                  </h5>
                 </div>
 
                 <p className="mb-0 text-muted mt-auto">
@@ -249,9 +249,9 @@ const handlePrint = () => {
                 <div>
                   <p className="font-medium mb-0">Returning Members</p>
 
-                  <h3 className="mt-2 ff-secondary fw-semibold text-danger">
+                  <h5 className="mt-2 ff-secondary fw-semibold text-danger">
                     {Number(returningMembers || 0)}
-                  </h3>
+                  </h5>
                 </div>
 
                 <p className="mb-0 text-muted mt-auto">

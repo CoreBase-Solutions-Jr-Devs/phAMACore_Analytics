@@ -121,8 +121,8 @@ export const getGoodsReceived = (params) =>
 export const getLastYearGoodsReceived = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_GOODS_RECEIVED, { params });
 
-export const getBestPricePerSupplier = (params) =>
-  PowerBIAPI.get(url.GET_POWERBI_BEST_PRICE, { params });
+// export const getBestPricePerSupplier = (params) =>
+//   PowerBIAPI.get(url.GET_POWERBI_BEST_PRICE, { params });
 
 export const getMarginAnalysis = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_MARGIN_ANALYSIS, { params });
@@ -159,3 +159,12 @@ export const getKPIBranchTransfers = (params) =>
 
 export const getKPISupplierOrderFillRate = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_KPI_SUPPLIER_ORDER_FILL_RATE, { params });
+
+export const getKPISupplierReturns = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_SUPPLIER_RETURNS, { params });
+
+export const getKPIConsolidatedLPOReview = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_CONSOLIDATED_LPO_REVIEW, { params });
+
+export const getKPIBestPricePerSupplier = (params) => 
+  PowerBIAPI.get(url.GET_POWERBI_BEST_PRICE_PER_SUPPLIER, { params });
