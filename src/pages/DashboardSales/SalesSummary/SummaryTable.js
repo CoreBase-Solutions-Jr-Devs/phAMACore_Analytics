@@ -206,7 +206,7 @@ const SummaryTable = ({
     <React.Fragment>
       <Card id="sales-periodic-breakdown-card" className="card-animate w-100">
         {" "}
-        <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-0 gap-2">
+        <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
           {" "}
           <div>
             <h5 className="card-title mb-1">Sales Breakdown by Period</h5>
@@ -227,6 +227,7 @@ const SummaryTable = ({
           <TanstackTable
             columns={columns}
             data={salesPeriodicBreakdownData}
+            
             isGlobalFilter={true}
             isColumnFilter={false}
             searchInputWidth="450px"

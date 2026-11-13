@@ -330,7 +330,7 @@ const handleExportExcel = () => {
 
   return (
     <Card id="receivables-ageing-details" className="shadow-sm">
-      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-0 gap-2">
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
  <div>
   <h5 className="card-title mb-1">
     Supplier Outstanding Balances & Ageing Analysis
