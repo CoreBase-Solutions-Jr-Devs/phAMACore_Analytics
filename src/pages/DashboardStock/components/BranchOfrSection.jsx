@@ -242,15 +242,18 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                         <th>BTR</th>
                                         <th>BRN</th>
                                         <th className="text-end">Units Ordered</th>
+                                        <th className="text-end">Unit Value (KES)</th>
                                         <th className="text-end">Units Dispatched</th>
                                         <th className="text-end">Units Received</th>
+                                        <th className="text-end">Unfulfilled Units</th>
+                                        <th className="text-end">Unfulfilled Value (KES)</th>
                                         <th className="text-end">Turnaround</th>
                                         <th className="text-center">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {pageRows.map((row, i) => {
-                                        const orderDoc = pick(row, "order_doc_number", "order_voucher", "lpo_number", "doc_num") || "-";
+                                        const orderDoc = pick(row, "order_number") || "-";
                                         const orderDate = formatDateShort(pick(row, "order_date", "doc_date"));
                                         const branch = cleanBranchName(
                                             pick(row, "dest_branch_name", "branch_name") || "-"
@@ -258,8 +261,11 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                         const transferDoc = pick(row, "transfer_doc_number", "transfer_voucher") || "-";
                                         const receiptDoc = pick(row, "receipt_doc_number", "receipt_voucher") || "-";
                                         const uOrdered = num(pick(row, "units_ordered", "ordered_units", "qty_ordered"));
+                                        const uCost = num(pick(row, "ordered_value_cost"));
                                         const uDispatched = num(pick(row, "units_dispatched", "dispatched_units", "qty_dispatched"));
                                         const uReceived = num(pick(row, "units_received", "received_units", "qty_received"));
+                                        const unfUnits = num(pick(row, "unfulfilled_units"));
+                                        const unfCost = num(pick(row, "unfulfilled_value_cost"));
                                         const turnaround = pick(row, "turnaround_days", "transit_days");
                                         const status = String(pick(row, "order_status", "fulfillment_status", "status") || "PENDING").toUpperCase();
                                         const tone = status.includes("FULFILLED") && !status.includes("UN")
@@ -276,8 +282,11 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                                 <td>{transferDoc}</td>
                                                 <td>{receiptDoc}</td>
                                                 <td className="text-end">{uOrdered.toLocaleString()}</td>
+                                                <td className="text-end">{uCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                                 <td className="text-end">{uDispatched.toLocaleString()}</td>
                                                 <td className="text-end fw-semibold">{uReceived.toLocaleString()}</td>
+                                                <td className="text-end text-danger fw-semibold">{unfUnits.toLocaleString()}</td>
+                                                <td className="text-end text-danger fw-semibold">{unfCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                                 <td className="text-end">
                                                     {turnaround !== null && turnaround !== undefined ? `${num(turnaround)}d` : "-"}
                                                 </td>
