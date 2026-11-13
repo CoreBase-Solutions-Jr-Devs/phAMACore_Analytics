@@ -182,7 +182,13 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                         <th className="text-end">Line Fill Rate %</th>
                                         <th className="text-end">Qty Fill Rate %</th>
                                         <th className="text-end">Units Ordered</th>
-                                        <th className="text-end">Units Fulfilled</th>
+                                        <th className="text-end">Ordered Value Cost (KES)</th>
+                                        <th className="text-end">Unfulfilled Units</th>
+                                        <th className="text-end">Unfulfilled Value Cost (KES)</th>
+                                        <th className="text-end">Dispatched Value Cost (KES)</th>
+                                        <th className="text-end">Dispatched Units</th>
+                                        <th className="text-end">Received Value Cost (KES)</th>
+                                        <th className="text-end">Received Units</th>
                                         <th className="text-end">Backorder Value (KES)</th>
                                         <th>Operational Insight</th>
                                     </tr>
@@ -192,14 +198,18 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                         const branch = cleanBranchName(
                                             pick(row, "dest_branch_name", "branch_name", "branchName") || "-"
                                         );
-                                        const ofr = num(pick(row, "order_fill_rate_perc", "order_fill_rate", "ofr_perc"));
-                                        const lfr = num(pick(row, "line_fill_rate_perc", "line_fill_rate"));
-                                        const qfr = num(pick(row, "quantity_fill_rate_perc", "qty_fill_rate_perc", "qty_fill_rate"));
-                                        const orders = num(pick(row, "total_orders", "orders_count"));
-                                        const orderedUnits = num(pick(row, "units_ordered", "total_units_ordered", "ordered_qty"));
-                                        const fulfilledUnits = num(
-                                            pick(row, "units_received", "units_dispatched", "units_fulfilled", "fulfilled_qty")
-                                        );
+                                        const ofr = num(pick(row, "order_fill_rate_perc"));
+                                        const lfr = num(pick(row, "line_fill_rate_perc"));
+                                        const qfr = num(pick(row, "quantity_fill_rate_perc"));
+                                        const orders = num(pick(row, "orders_count"));
+                                        const orderedUnits = num(pick(row, "ordered_units"));
+                                        const orderedValueCost = num(pick(row, "ordered_value_cost"));
+                                        const dispatchedUnits = num(pick(row, "dispatched_units"));
+                                        const dispatchedValueCost = num(pick(row, "dispatched_value_cost"));
+                                        const receivedUnits = num(pick(row, "received_units"));
+                                        const receivedValueCost = num(pick(row, "received_value_cost"));
+                                        const unFulfilledUnits = num(pick(row, "unfulfilled_units"));
+                                        const unFulfilledValueCost = num(pick(row, "unfulfilled_value_cost"));
                                         const backorderVal = num(
                                             pick(row, "backorder_exposure_kes", "backorder_value_kes", "backorder_value", "unfulfilled_value")
                                         );
@@ -218,7 +228,13 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                                 <td className="text-end">{lfr.toFixed(1)}%</td>
                                                 <td className="text-end fw-semibold">{qfr.toFixed(1)}%</td>
                                                 <td className="text-end">{orderedUnits.toLocaleString()}</td>
-                                                <td className="text-end text-success">{fulfilledUnits.toLocaleString()}</td>
+                                                <td className="text-end">{orderedValueCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="text-end text-danger fw-medium">{unFulfilledUnits.toLocaleString()}</td>
+                                                <td className="text-end text-danger fw-medium">{unFulfilledValueCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="text-end text-info">{dispatchedUnits.toLocaleString()}</td>
+                                                <td className="text-end text-info">{dispatchedValueCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="text-end text-success">{receivedUnits.toLocaleString()}</td>
+                                                <td className="text-end text-success">{receivedValueCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                                 <td className="text-end text-danger fw-medium">
                                                     KES {backorderVal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
@@ -238,15 +254,19 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                     <tr>
                                         <th>LPO</th>
                                         <th>Order Date</th>
+                                        <th>Transfer Date</th>
+                                        <th>Supplying Branch</th>
                                         <th>Requesting Branch</th>
                                         <th>BTR</th>
                                         <th>BRN</th>
                                         <th className="text-end">Units Ordered</th>
                                         <th className="text-end">Unit Value (KES)</th>
-                                        <th className="text-end">Units Dispatched</th>
-                                        <th className="text-end">Units Received</th>
                                         <th className="text-end">Unfulfilled Units</th>
                                         <th className="text-end">Unfulfilled Value (KES)</th>
+                                        <th className="text-end">Units Dispatched</th>
+                                        <th className="text-end">Dispatched Value (KES)</th>
+                                        <th className="text-end">Units Received</th>
+                                        <th className="text-end">Received Value (KES)</th>
                                         <th className="text-end">Turnaround</th>
                                         <th className="text-center">Status</th>
                                     </tr>
@@ -254,20 +274,24 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                 <tbody>
                                     {pageRows.map((row, i) => {
                                         const orderDoc = pick(row, "order_number") || "-";
-                                        const orderDate = formatDateShort(pick(row, "order_date", "doc_date"));
+                                        const orderDate = formatDateShort(pick(row, "order_date"));
+                                        const transferDate = formatDateShort(pick(row, "transfer_date"));
+                                        const supplyBranch = cleanBranchName(pick(row, "source_branch_name") || "-");
                                         const branch = cleanBranchName(
                                             pick(row, "dest_branch_name", "branch_name") || "-"
                                         );
-                                        const transferDoc = pick(row, "transfer_doc_number", "transfer_voucher") || "-";
-                                        const receiptDoc = pick(row, "receipt_doc_number", "receipt_voucher") || "-";
-                                        const uOrdered = num(pick(row, "units_ordered", "ordered_units", "qty_ordered"));
+                                        const transferDoc = pick(row, "transfer_doc_number") || "-";
+                                        const receiptDoc = pick(row, "receipt_doc_number") || "-";
+                                        const uOrdered = num(pick(row, "ordered_units"));
                                         const uCost = num(pick(row, "ordered_value_cost"));
-                                        const uDispatched = num(pick(row, "units_dispatched", "dispatched_units", "qty_dispatched"));
-                                        const uReceived = num(pick(row, "units_received", "received_units", "qty_received"));
+                                        const uDispatched = num(pick(row, "dispatched_units"));
+                                        const uDispatchedCost = num(pick(row, "dispatched_value_cost"));
+                                        const uReceived = num(pick(row, "received_units"));
+                                        const uReceivedCost = num(pick(row, "received_value_cost"));
                                         const unfUnits = num(pick(row, "unfulfilled_units"));
                                         const unfCost = num(pick(row, "unfulfilled_value_cost"));
                                         const turnaround = pick(row, "turnaround_days", "transit_days");
-                                        const status = String(pick(row, "order_status", "fulfillment_status", "status") || "PENDING").toUpperCase();
+                                        const status = String(pick(row, "order_fulfillment_status") || "PENDING").toUpperCase();
                                         const tone = status.includes("FULFILLED") && !status.includes("UN")
                                             ? "success"
                                             : status.includes("PARTIAL")
@@ -278,15 +302,19 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                             <tr key={i}>
                                                 <th scope="row" className="fw-medium">{orderDoc}</th>
                                                 <td>{orderDate}</td>
+                                                <td>{transferDate}</td>
+                                                <td>{supplyBranch}</td>
                                                 <td>{branch}</td>
                                                 <td>{transferDoc}</td>
                                                 <td>{receiptDoc}</td>
                                                 <td className="text-end">{uOrdered.toLocaleString()}</td>
                                                 <td className="text-end">{uCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
-                                                <td className="text-end">{uDispatched.toLocaleString()}</td>
-                                                <td className="text-end fw-semibold">{uReceived.toLocaleString()}</td>
                                                 <td className="text-end text-danger fw-semibold">{unfUnits.toLocaleString()}</td>
                                                 <td className="text-end text-danger fw-semibold">{unfCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="text-end text-info">{uDispatched.toLocaleString()}</td>
+                                                <td className="text-end text-info">{uDispatchedCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="text-end text-success fw-semibold">{uReceived.toLocaleString()}</td>
+                                                <td className="text-end text-success fw-semibold">{uReceivedCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                                 <td className="text-end">
                                                     {turnaround !== null && turnaround !== undefined ? `${num(turnaround)}d` : "-"}
                                                 </td>
