@@ -526,7 +526,7 @@ const SellThroughSection = ({
                                     <th>Outflow Voucher</th>
                                     <th>Outflow Date</th>
                                     <th>Type</th>
-                                    <th className="text-end">Consumed (Pieces)</th>
+                                    <th className="text-end">Consumed</th>
                                     <th className="text-end">Running Depletion %</th>
                                     <th className="text-end">Days to Outflow</th>
                                 </tr>
