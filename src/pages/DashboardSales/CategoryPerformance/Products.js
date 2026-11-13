@@ -272,7 +272,7 @@ const Products = ({
 
   return (
     <Card id="product-performance-card" className="card-animate w-100">
-      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-0 gap-2">
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
         <div>
           <h4 className="card-title mb-1">Product Performance</h4>
 

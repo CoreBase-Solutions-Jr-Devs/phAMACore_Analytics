@@ -275,12 +275,11 @@ const SalesRevenueAnalysis = ({
 
   return (
     <Card className="card-height-100" id="sales-revenue-tabs-card">
-      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap gap-2 pb-0">
      <div>
-    <h4 className="card-title mb-1">Sales Revenue by Salesperson and Customer</h4>
+    <h4 className="card-title mb-0">Sales Revenue by Salesperson and Customer</h4>
     <p className="text-muted mb-0 fs-6">
-      Invoice-level sales, quantity and gross profit by item. Switch tabs to view by salesperson or customer.
-    </p>
+ Track sales revenue, quantities and gross profit across salespeople and customers.    </p>
 </div>
         <CardExportButtons
           targetId="sales-revenue-tabs-card"
@@ -289,11 +288,11 @@ const SalesRevenueAnalysis = ({
         />
       </CardHeader>
 
-      <CardBody>
+      <CardBody  className="mb-0">
         <TanstackTable
           columns={currentTable.columns}
           data={currentTable.data}
-          toolbarContent={toolbarContent}
+          tableTabs={toolbarContent}
           loading={loading}
           error={error}
           isGlobalFilter={true}

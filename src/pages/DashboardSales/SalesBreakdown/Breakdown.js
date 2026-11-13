@@ -100,7 +100,7 @@ const Breakdown = ({
 
   return (
     <Card className="card-height-100" id="sales-top-customers-card">
-      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-2 gap-2">
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap  pb-1 gap-2">
     <div>
   <h4 className="card-title mb-1">Sales by Channel</h4>
   <p className="text-muted mb-0 fs-6">

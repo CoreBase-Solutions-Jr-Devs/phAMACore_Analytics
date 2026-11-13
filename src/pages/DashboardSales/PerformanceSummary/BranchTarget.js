@@ -376,13 +376,14 @@ const branchData = useMemo(() => {
       id="branch-target-performance-card"
       className="card-height-100"
     >
-      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-0 gap-2">
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
         <div>
           <h4 className="card-title mb-1">
             Branch Sales &amp; Target Performance
           </h4>
           <p className="text-muted mb-0">
-            Monthly sales, targets, and percentage variance across branches
+            
+            Compare monthly sales revenue against assigned targets across branches.
           </p>
         </div>
 
