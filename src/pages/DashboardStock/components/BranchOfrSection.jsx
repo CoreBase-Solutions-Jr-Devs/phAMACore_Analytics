@@ -346,15 +346,12 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                     {pageRows.map((row, i) => {
                                         const itemCode = pick(row, "item_code", "itemCode") || "";
                                         const itemName = pick(row, "item_name", "itemName") || itemCode || "Unknown SKU";
-                                        const count = num(pick(row, "shortage_orders_count", "shortage_count", "orders_affected"));
-                                        const lostUnits = num(
-                                            pick(row, "lost_fulfillment_units", "unfulfilled_units", "shortage_units")
-                                        );
-                                        const lostVal = num(
-                                            pick(row, "lost_fulfillment_value", "unfulfilled_value_kes", "backorder_exposure_kes", "shortage_value")
-                                        );
-                                        const branchCount = num(pick(row, "affected_branches_count", "branches_count"));
-                                        const branchList = pick(row, "affected_branches_list", "affected_branches", "branches_list") || "-";
+                                        const count = num(pick(row, "orders_affected_count"));
+                                        const lostUnits = num(pick(row, "total_unfulfilled_units"));
+                                        const lostWP = row?.total_unfulfilled_wp;
+                                        const lostVal = num(pick(row, "total_shortage_value_cost"));
+                                        const branchCount = num(pick(row, "affected_branches_count"));
+                                        const branchList = pick(row, "affected_branches_list") || "-";
 
                                         return (
                                             <tr key={i}>
@@ -363,14 +360,16 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                                     {itemCode && <small className="text-muted d-block fw-normal">{itemCode}</small>}
                                                 </th>
                                                 <td className="text-end">{count.toLocaleString()}</td>
-                                                <td className="text-end text-danger fw-semibold">{lostUnits.toLocaleString()}</td>
                                                 <td className="text-end text-danger fw-semibold">
-                                                    KES {lostVal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    {lostUnits.toLocaleString()}
+                                                    {lostWP ? (<small className="text-muted d-block fw-normal">
+                                                                    {lostWP.toLocaleString()}
+                                                                </small>) 
+                                                            : null}
                                                 </td>
+                                                <td className="text-end text-danger fw-semibold">{lostVal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                                 <td className="text-end">{branchCount.toLocaleString()}</td>
-                                                <td className="text-muted small text-wrap" style={{ maxWidth: "300px" }}>
-                                                    {branchList}
-                                                </td>
+                                                <td className="text-muted small text-wrap" style={{ maxWidth: "300px" }}>{branchList}</td>
                                             </tr>
                                         );
                                     })}
