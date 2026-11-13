@@ -12,7 +12,7 @@ const MAX_ROWS = 50;
 export const OFR_TABS = [
     { key: "BRANCH_OFR", label: "By Branch" },
     { key: "ORDER_DRILLDOWN", label: "LPO Voucher Drill-Down" },
-    { key: "TOP_SHORTAGES", label: "Top Syokimau Shortages" },
+    { key: "TOP_SHORTAGES", label: "Top Main Branch Shortages" },
 ];
 
 const formatDateShort = (val) => {

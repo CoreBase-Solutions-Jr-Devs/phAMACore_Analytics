@@ -132,10 +132,10 @@ const BranchOrderFillRate = () => {
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <div>
                                             <h4 className="card-title mb-1">
-                                                BRANCH ORDER FILL RATE (OFR) — LPOS TO SYOKIMAU CENTRAL HUB
+                                                BRANCH ORDER FILL RATE (OFR) — LPOS TO MAIN HUB
                                             </h4>
                                             <p className="text-muted mb-0 small">
-                                                Fulfillment fidelity for internal branch LPOs raised to Syokimau (Orders vs Dispatches vs Branch Receipts)
+                                                Fulfillment fidelity for internal branch LPOs raised to MAIN BRANCH (Orders vs Dispatches vs Branch Receipts)
                                             </p>
                                         </div>
                                         <CardExportButtons

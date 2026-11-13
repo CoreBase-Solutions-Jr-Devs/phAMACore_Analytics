@@ -528,8 +528,14 @@ export const fetchKPISellThroughAnalysis = createAsyncThunk(
         TopN,
       };
 
-      if (startDate) payload.StartDate = startDate;
-      if (endDate) payload.EndDate = endDate;
+      const normalizeApiDate = (d) => {
+        if (!d || typeof d !== "string") return d;
+        const match = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        return match ? `${match[2]}/${match[3]}/${match[1]}` : d;
+      };
+
+      if (startDate) payload.StartDate = normalizeApiDate(startDate);
+      if (endDate) payload.EndDate = normalizeApiDate(endDate);
       if (resolvedBranch) payload.BranchCode = resolvedBranch;
       if (ItemCode) payload.ItemCode = ItemCode;
 
@@ -572,8 +578,14 @@ export const fetchKPIBranchOrderFillRate = createAsyncThunk(
         clientid, Status, GroupBy, TopN,
       };
 
-      if (startDate) payload.StartDate = startDate;
-      if (endDate) payload.EndDate = endDate;
+      const normalizeApiDate = (d) => {
+        if (!d || typeof d !== "string") return d;
+        const match = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        return match ? `${match[2]}/${match[3]}/${match[1]}` : d;
+      };
+
+      if (startDate) payload.StartDate = normalizeApiDate(startDate);
+      if (endDate) payload.EndDate = normalizeApiDate(endDate);
       if (resolvedDestBranch) payload.DestBranchCode = resolvedDestBranch;
       if (SourceBranchCode) payload.SourceBranchCode = SourceBranchCode;
       if (ItemCode) payload.ItemCode = ItemCode;
@@ -617,8 +629,14 @@ export const fetchKPIBranchTransfers = createAsyncThunk(
         clientid, Status, GroupBy, TopN,
       };
 
-      if (startDate) payload.StartDate = startDate;
-      if (endDate) payload.EndDate = endDate;
+      const normalizeApiDate = (d) => {
+        if (!d || typeof d !== "string") return d;
+        const match = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        return match ? `${match[2]}/${match[3]}/${match[1]}` : d;
+      };
+
+      if (startDate) payload.StartDate = normalizeApiDate(startDate);
+      if (endDate) payload.EndDate = normalizeApiDate(endDate);
       if (resolvedDestBranch) payload.DestBranchCode = resolvedDestBranch;
       if (SourceBranchCode) payload.SourceBranchCode = SourceBranchCode;
       if (ItemCode) payload.ItemCode = ItemCode;

@@ -27,6 +27,14 @@ const formatDateShort = (val) => {
     return d.toLocaleDateString("en-GB");
 };
 
+// Returns raw WP string (e.g. "4W 0P", "1W") from API without running num() which would strip letters and alter the value
+const asWpString = (val) => {
+    if (val === null || val === undefined || val === "") return "-";
+    if (typeof val === "string") return val.trim();
+    if (typeof val === "number") return val.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    return String(val);
+};
+
 export const normalizeSellThroughBatchRows = (rows = []) =>
     (Array.isArray(rows) ? rows : []).map((row, idx) => {
         const itemCode = String(pick(row, "item_code", "itemCode") || "");
@@ -43,14 +51,21 @@ export const normalizeSellThroughBatchRows = (rows = []) =>
         const batchNo = String(pick(row, "batch_number", "batchNumber") || "-");
         const expiryDate = pick(row, "expiry_date", "expiryDate");
 
-        const qtyReceivedWp = num(pick(row, "qty_received_wp", "qtyReceivedWp", "qty_received_pcs"));
+        // Preserve actual WP string (e.g. "4W 0P") from API response instead of parsing with num() which turns it into 40
+        const qtyReceivedWp = asWpString(pick(row, "qty_received_wp", "qtyReceivedWp"));
         const qtyReceivedPcs = num(pick(row, "qty_received_pcs", "qtyReceivedPcs"));
-        const qtySoldWp = num(
-            pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp", "allocated_retail_sold_pcs")
+        const qtySoldWp = asWpString(
+            pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp")
         );
-        const qtyTransferredWp = num(pick(row, "allocated_transferred_wp", "allocated_transferred_pcs"));
-        const batchRemainingWp = num(pick(row, "batch_balance_remaining_wp", "batch_balance_remaining_pcs"));
-        const currentBranchStockWp = num(pick(row, "current_branch_stock_wp", "current_branch_stock_pcs"));
+        const qtySoldPcs = num(
+            pick(row, "allocated_retail_sold_pcs", "allocated_consumed_pcs")
+        );
+        const qtyTransferredWp = asWpString(pick(row, "allocated_transferred_wp"));
+        const qtyTransferredPcs = num(pick(row, "allocated_transferred_pcs"));
+        const batchRemainingWp = asWpString(pick(row, "batch_balance_remaining_wp"));
+        const batchRemainingPcs = num(pick(row, "batch_balance_remaining_pcs"));
+        const currentBranchStockWp = asWpString(pick(row, "current_branch_stock_wp"));
+        const currentBranchStockPcs = num(pick(row, "current_branch_stock_pcs"));
         const receiptTotalCost = num(pick(row, "receipt_total_cost", "batch_remaining_value_cost"));
         const remainingCost = num(pick(row, "batch_remaining_value_cost"));
 
@@ -88,9 +103,13 @@ export const normalizeSellThroughBatchRows = (rows = []) =>
             qtyReceivedWp,
             qtyReceivedPcs,
             qtySoldWp,
+            qtySoldPcs,
             qtyTransferredWp,
+            qtyTransferredPcs,
             batchRemainingWp,
+            batchRemainingPcs,
             currentBranchStockWp,
+            currentBranchStockPcs,
             receiptTotalCost,
             remainingCost,
             daysHeld,
@@ -116,9 +135,13 @@ export const normalizeSellThroughSkuRows = (rows = []) =>
         const receiptDoc = String(pick(row, "last_receipt_doc_number") || "-");
         const receiptDate = pick(row, "last_receipt_date");
 
-        const qtyReceivedWp = num(pick(row, "last_receipt_qty_wp", "last_receipt_qty_pcs"));
-        const qtySoldWp = num(pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp"));
-        const currentBranchStockWp = num(pick(row, "current_stock_on_hand_wp", "current_stock_whole_packs"));
+        // Preserve actual WP string (e.g. "1W", "132W") from API response without mangling with num()
+        const qtyReceivedWp = asWpString(pick(row, "last_receipt_qty_wp", "lastReceiptQtyWp"));
+        const qtyReceivedPcs = num(pick(row, "last_receipt_qty_pcs", "lastReceiptQtyPcs"));
+        const qtySoldWp = asWpString(pick(row, "allocated_retail_sold_wp", "allocated_consumed_wp"));
+        const qtySoldPcs = num(pick(row, "allocated_retail_sold_pcs", "allocated_consumed_pcs"));
+        const currentBranchStockWp = asWpString(pick(row, "current_stock_on_hand_wp", "current_stock_whole_packs"));
+        const currentBranchStockPcs = num(pick(row, "current_stock_on_hand_pcs"));
         const wholePacks = num(pick(row, "current_stock_whole_packs"));
         const loosePieces = num(pick(row, "current_stock_loose_pieces"));
         const currentStockValue = num(pick(row, "current_stock_value"));
@@ -147,9 +170,13 @@ export const normalizeSellThroughSkuRows = (rows = []) =>
             receiptDoc,
             receiptDateFormatted: formatDateShort(receiptDate),
             qtyReceivedWp,
+            qtyReceivedPcs,
             qtySoldWp,
+            qtySoldPcs,
             batchRemainingWp: currentBranchStockWp,
+            batchRemainingPcs: currentBranchStockPcs,
             currentBranchStockWp,
+            currentBranchStockPcs,
             wholePacks,
             loosePieces,
             remainingCost: currentStockValue,
@@ -185,7 +212,7 @@ const SellThroughSection = ({
     const [pageIndex, setPageIndex] = useState(0);
     const [sortField, setSortField] = useState("daysHeld");
     const [sortDesc, setSortDesc] = useState(true);
-    const [selectedLot, setSelectedLot] = useState(null);
+    const [selectedBatch, setSelectedBatch] = useState(null);
 
     const {
         sellThroughReceiptBatch = [],
@@ -209,7 +236,7 @@ const SellThroughSection = ({
     };
 
     const handleOpenDrilldown = (item) => {
-        setSelectedLot(item);
+        setSelectedBatch(item);
         dispatch(
             fetchKPISellThroughAnalysis({
                 clientid: 1,
@@ -246,6 +273,21 @@ const SellThroughSection = ({
         return [...searched].sort((a, b) => {
             if (sortField === "itemName") {
                 return sortDesc ? b.itemName.localeCompare(a.itemName) : a.itemName.localeCompare(b.itemName);
+            }
+            if (sortField === "qtyReceivedWp") {
+                const av = a.qtyReceivedPcs ?? -1;
+                const bv = b.qtyReceivedPcs ?? -1;
+                return sortDesc ? bv - av : av - bv;
+            }
+            if (sortField === "qtySoldWp") {
+                const av = a.qtySoldPcs ?? -1;
+                const bv = b.qtySoldPcs ?? -1;
+                return sortDesc ? bv - av : av - bv;
+            }
+            if (sortField === "currentBranchStockWp") {
+                const av = a.currentBranchStockPcs ?? -1;
+                const bv = b.currentBranchStockPcs ?? -1;
+                return sortDesc ? bv - av : av - bv;
             }
             const av = a[sortField] ?? -1;
             const bv = b[sortField] ?? -1;
@@ -326,7 +368,7 @@ const SellThroughSection = ({
                             {renderSortableHeader("itemName", "Product / Pack Size")}
                             <th scope="col">Branch</th>
                             <th scope="col">Receipt Date &amp; Source</th>
-                            {renderSortableHeader("qtyReceivedWp", "Qty Received (Packs)", "text-end")}
+                            {renderSortableHeader("qtyReceivedWp", "Qty Received (WP / Pcs)", "text-end")}
                             {renderSortableHeader("qtySoldWp", "Sold Since Receipt", "text-end")}
                             {renderSortableHeader("currentBranchStockWp", "Current Balance", "text-end")}
                             {renderSortableHeader("daysHeld", "Days Held", "text-end")}
@@ -384,17 +426,22 @@ const SellThroughSection = ({
                                             {item.receiptDoc}
                                         </small>
                                     </td>
-                                    <td className="text-end fw-semibold">
-                                        {item.qtyReceivedWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                    <td className="text-end">
+                                        <div className="fw-semibold">
+                                            {item.qtyReceivedWp}
+                                        </div>
+                                        <small className="text-muted d-block fw-normal">
+                                            {item.qtyReceivedPcs.toLocaleString()} pcs
+                                        </small>
                                     </td>
                                     <td className="text-end text-success fw-medium">
-                                        {item.qtySoldWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                        {item.qtySoldWp}
                                     </td>
                                     <td className="text-end fw-semibold">
-                                        {item.currentBranchStockWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                        {viewMode === "RECEIPT_BATCH" && (
+                                        {item.currentBranchStockWp}
+                                        {viewMode === "RECEIPT_BATCH" && item.batchRemainingWp && item.batchRemainingWp !== "-" && (
                                             <small className="text-muted d-block fw-normal">
-                                                Lot bal: {item.batchRemainingWp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                Batch bal: {item.batchRemainingWp}
                                             </small>
                                         )}
                                     </td>
@@ -445,24 +492,30 @@ const SellThroughSection = ({
                 onPageChange={setPageIndex}
             />
 
-            <Modal isOpen={Boolean(selectedLot)} toggle={() => setSelectedLot(null)} size="lg" centered>
-                <ModalHeader toggle={() => setSelectedLot(null)}>
-                    Physical Lot Depletion Lineage — {selectedLot?.itemName} ({selectedLot?.itemCode})
+            <Modal isOpen={Boolean(selectedBatch)} toggle={() => setSelectedBatch(null)} size="lg" centered>
+                <ModalHeader toggle={() => setSelectedBatch(null)}>
+                    Physical Batch Depletion — {selectedBatch?.itemName} ({selectedBatch?.itemCode})
                 </ModalHeader>
                 <ModalBody>
-                    {selectedLot && (
+                    {selectedBatch && (
                         <div className="mb-3 p-2 bg-light rounded small d-flex flex-wrap gap-3">
                             <div>
-                                <strong>Branch:</strong> {selectedLot.branchName}
+                                <strong>Branch:</strong> {selectedBatch.branchName}
                             </div>
                             <div>
-                                <strong>Receipt Voucher:</strong> {selectedLot.receiptDoc} ({selectedLot.receiptDateFormatted})
+                                <strong>Document Number:</strong> {selectedBatch.receiptDoc} ({selectedBatch.receiptDateFormatted})
                             </div>
                             <div>
-                                <strong>Batch:</strong> {selectedLot.batchNo}
+                                <strong>Batch:</strong> {selectedBatch.batchNo}
                             </div>
                             <div>
-                                <strong>Days Held:</strong> {selectedLot.daysHeld} days
+                                <strong>Qty Received:</strong> {selectedBatch.qtyReceivedWp} ({selectedBatch.qtyReceivedPcs.toLocaleString()} pcs)
+                            </div>
+                            <div>
+                                <strong>Days Held:</strong> {selectedBatch.daysHeld} days
+                            </div>
+                            <div>
+                                <strong>Batch Balance:</strong> {selectedBatch.batchRemainingWp}
                             </div>
                         </div>
                     )}
@@ -473,7 +526,7 @@ const SellThroughSection = ({
                                     <th>Outflow Voucher</th>
                                     <th>Outflow Date</th>
                                     <th>Type</th>
-                                    <th className="text-end">Consumed (Packs)</th>
+                                    <th className="text-end">Consumed</th>
                                     <th className="text-end">Running Depletion %</th>
                                     <th className="text-end">Days to Outflow</th>
                                 </tr>
@@ -482,7 +535,7 @@ const SellThroughSection = ({
                                 {(sellThroughDepletionDrillDown || []).length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="text-center text-muted py-3">
-                                            {selectedLot?.clearingSummary || "No outflow transactions recorded for this lot yet."}
+                                            {selectedBatch?.clearingSummary || "No outflow transactions recorded for this lot yet."}
                                         </td>
                                     </tr>
                                 ) : (
@@ -492,9 +545,11 @@ const SellThroughSection = ({
                                             <td>{formatDateShort(pick(d, "outflow_date"))}</td>
                                             <td>{pick(d, "outflow_type") || "-"}</td>
                                             <td className="text-end">
-                                                {num(pick(d, "allocated_consumed_wp", "allocated_consumed_pcs")).toLocaleString(
-                                                    undefined,
-                                                    { maximumFractionDigits: 2 }
+                                                {num(pick(d, "allocated_consumed_pcs")).toLocaleString()} pcs
+                                                {pick(d, "allocated_consumed_wp") && (
+                                                    <small className="text-muted d-block fw-normal">
+                                                        {String(pick(d, "allocated_consumed_wp"))}
+                                                    </small>
                                                 )}
                                             </td>
                                             <td className="text-end">
