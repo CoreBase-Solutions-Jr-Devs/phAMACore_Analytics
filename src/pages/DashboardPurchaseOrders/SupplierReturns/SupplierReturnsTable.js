@@ -923,9 +923,9 @@ const handleExportExcel = () => {
   className="card-height-100"
   id="branch-order-fill-rate-card"
 >
-  <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-0 gap-2">
+  <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
 <div>
-  <h4 className="card-title mb-0">Supplier Returns Performance</h4>
+  <h4 className="card-title mb-1">Supplier Returns Performance</h4>
 <p className="text-muted mb-0">
   Monitor returned items, debit notes and return values across branches.
 </p>

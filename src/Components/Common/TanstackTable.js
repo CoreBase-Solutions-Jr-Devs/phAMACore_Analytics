@@ -294,39 +294,58 @@ const TanstackTable = ({
                 </td>
               </tr>
             ) : getRowModel().rows.length > 0 ? (
-              getRowModel().rows.map((row) => (
-                <tr key={row.id}>
+             getRowModel().rows.map((row) => {
+  const isYTD = row.original?.period_type === "YTD";
+
+  return (
+    <tr
+      key={row.id}
+      className={isYTD ? "fw-bold" : ""}
+      style={
+        isYTD
+          ? { backgroundColor: "#f3f6f9" }
+          : undefined
+      }
+    >
                   {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className={cell.column.columnDef.meta?.tdClassName ?? ""}
-                      style={{
-                          fontSize: "12px",
-                        ...cell.column.columnDef.meta?.tdStyle,
-                        ...(cell.column.columnDef.meta?.sticky
-                          ? {
-                              position: "sticky",
-                              left:
-        cell.column.columnDef.meta.sticky === "period" ||
-        cell.column.columnDef.meta.sticky === "group"
-          ? 0
-          : "140px",
-      zIndex: 2,
-                              
-                              backgroundColor: "var(--vz-card-bg, #fff)",
-                              boxShadow: "2px 0 3px -3px rgba(0,0,0,0.35)",
-                            }
-                          : {}),
-                      }}
-                    >
+    <td
+  key={cell.id}
+  className={cell.column.columnDef.meta?.tdClassName ?? ""}
+  style={{
+    fontSize: "12px",
+    ...(isYTD
+      ? {
+          backgroundColor: "#f3f6f9",
+          fontWeight: 700,
+        }
+      : {}),
+    ...cell.column.columnDef.meta?.tdStyle,
+    ...(cell.column.columnDef.meta?.sticky
+      ? {
+          position: "sticky",
+          left:
+            cell.column.columnDef.meta.sticky === "period" ||
+            cell.column.columnDef.meta.sticky === "group"
+              ? 0
+              : "140px",
+          zIndex: 2,
+          backgroundColor: isYTD
+            ? "#f3f6f9"
+            : "var(--vz-card-bg, #fff)",
+          boxShadow: "2px 0 3px -3px rgba(0,0,0,0.35)",
+        }
+      : {}),
+  }}
+>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
                       )}
                     </td>
                   ))}
-                </tr>
-              ))
+             </tr>
+);
+})
             ) : (
               <tr>
                 <td

@@ -201,9 +201,9 @@ const SpendTable = ({ data = [], error, loading }) => {
       className="card-height-100"
       id="purchases-category-spend-card"
     >
-       <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-0 gap-2">
+       <CardHeader className="d-flex justify-content-between align-items-center flex-wrap0 pb-1 gap-2">
               <div>
-                <h4 className="card-title mb-0 ">
+                <h4 className="card-title mb-1 ">
           Spend by Category
         </h4>
  <p className="text-muted mb-0">
