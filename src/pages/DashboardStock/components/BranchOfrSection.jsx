@@ -255,8 +255,8 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
                                         <th>LPO</th>
                                         <th>Order Date</th>
                                         <th>Transfer Date</th>
-                                        <th>Supplying Branch</th>
-                                        <th>Requesting Branch</th>
+                                        <th>Source Branch</th>
+                                        <th>Destination Branch</th>
                                         <th>BTR</th>
                                         <th>BRN</th>
                                         <th className="text-end">Units Ordered</th>

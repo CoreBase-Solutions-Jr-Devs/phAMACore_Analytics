@@ -337,7 +337,7 @@ const TransferAgingTable = ({
                     <table className="table table-borderless table-centered table-nowrap mb-0 w-100">
                         <thead className="text-muted table-light sticky-top" style={{ zIndex: 1 }}>
                             <tr>
-                                <th>Transfer Voucher</th>
+                                <th>Transfer Document</th>
                                 <th>Dispatch Date</th>
                                 <th>Source Branch</th>
                                 <th>Destination Branch</th>
@@ -548,7 +548,7 @@ const BranchTransfersSection = () => {
             branchPullMetrics: {
                 totalValue,
                 totalSkus: skuSet.size,
-                totalVouchers: docSet.size,
+                totalDocs: docSet.size,
                 avgDaysInStock,
             },
         };
@@ -594,9 +594,9 @@ const BranchTransfersSection = () => {
             "Batch": r.batchNo,
             "Source Branch": r.sourceBranchName || "-",
             "Destination Branch": r.destBranchName,
-            "Transfer Voucher": r.transferDoc,
+            "Transfer Document": r.transferDoc,
             "Transfer Date": r.transferDate,
-            "Receipt Voucher": r.receiptDoc,
+            "Receipt Document": r.receiptDoc,
             "Receipt Date": r.receiptDate,
             "Quantity (Packs)": r.transferredUnits ?? r.quantityPw ?? 0,
             "Value (KES)": r.transferredCost ?? r.totalCost ?? 0,
@@ -649,7 +649,7 @@ const BranchTransfersSection = () => {
                                         <h5 className="mb-0 mt-1 fw-semibold text-info">
                                             {row27Metrics.totalSkus.toLocaleString()} SKUs
                                             <small className="text-muted fw-normal fs-12 ms-1">
-                                                · {row27Metrics.totalTransfers.toLocaleString()} vouchers
+                                                · {row27Metrics.totalTransfers.toLocaleString()} transfers
                                             </small>
                                         </h5>
                                     </div>
@@ -679,7 +679,7 @@ const BranchTransfersSection = () => {
                                 <Col md={4}>
                                     <input
                                         className="form-control form-control-sm"
-                                        placeholder="Search SKU, batch, voucher, or branch..."
+                                        placeholder="Search SKU, batch, BTR, or branch..."
                                         value={transfersSearch}
                                         onChange={(e) => setTransfersSearch(e.target.value)}
                                     />
@@ -822,7 +822,7 @@ const BranchTransfersSection = () => {
                                     <div className="p-2 border rounded bg-light-subtle h-100">
                                         <small className="text-muted d-block">Branch Transfers</small>
                                         <h5 className="mb-0 mt-1 fw-semibold text-success">
-                                            {branchPullMetrics.totalVouchers.toLocaleString()} Transfers
+                                            {branchPullMetrics.totalDocs.toLocaleString()} Transfers
                                         </h5>
                                     </div>
                                 </Col>

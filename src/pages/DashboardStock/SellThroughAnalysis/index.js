@@ -107,7 +107,7 @@ const SellThroughAnalysis = () => {
             "Pack Size": r.packQty,
             "Branch": r.branchName,
             "Receipt Type": r.receiptType,
-            "Receipt Voucher": r.receiptDoc,
+            "Receipt Note": r.receiptDoc,
             "Receipt Date": r.receiptDateFormatted,
             "Batch": r.batchNo || "-",
             "Qty Received (WP)": r.qtyReceivedWp,
@@ -191,7 +191,7 @@ const SellThroughAnalysis = () => {
                                         <Col md={5}>
                                             <input
                                                 className="form-control form-control-sm"
-                                                placeholder="Search product, SKU, batch, receipt voucher, or branch..."
+                                                placeholder="Search product, SKU, batch, receipt note, or branch..."
                                                 value={sellThroughSearchTerm}
                                                 onChange={(e) => setSellThroughSearchTerm(e.target.value)}
                                             />

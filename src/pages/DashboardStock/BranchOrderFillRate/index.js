@@ -150,7 +150,7 @@ const BranchOrderFillRate = () => {
                                         <Col md={5}>
                                             <input
                                                 className="form-control form-control-sm"
-                                                placeholder="Search branch, LPO voucher, or shortage SKU..."
+                                                placeholder="Search branch, LPO document, or shortage SKU..."
                                                 value={ofrSearchTerm}
                                                 onChange={(e) => setOfrSearchTerm(e.target.value)}
                                             />
