@@ -121,6 +121,7 @@ const BranchOrderFillRate = () => {
 
                     <Section
                         title="BRANCH ORDER FILL RATE (OFR)"
+                        pageLabel="Branch Order Fill Rate"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportBranchOfr}
                     />

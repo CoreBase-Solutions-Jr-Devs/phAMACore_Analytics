@@ -7,6 +7,7 @@ import useStickyState from "../../hooks/useStickyState";
  */
 const DashboardSectionHeader = ({
   title = "KEY METRICS",
+  pageLabel = "",
   isBranchView = false,
   branchDisplayName = "",
   startDate = "",
@@ -61,6 +62,12 @@ const DashboardSectionHeader = ({
       >
         <div className="sticky-filter-bar d-flex align-items-center justify-content-between flex-wrap gap-2">
           <div className="d-flex align-items-center gap-2 flex-wrap text-muted fs-13">
+            {pageLabel && (
+              <>
+                <span className="fw-semibold text-dark">{pageLabel}</span>
+                <span className="mx-1 text-muted">|</span>
+              </>
+            )}
             {isBranchView && branchDisplayName && (
               <>
                 <span>Branch:</span>

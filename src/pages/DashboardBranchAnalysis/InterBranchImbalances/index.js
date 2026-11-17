@@ -171,6 +171,7 @@ const InterBranchImbalances = () => {
 
                     <Section
                         title="INTER-BRANCH TRANSFER SUGGESTIONS"
+                        pageLabel="Inter-Branch Imbalances"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportImbalanceAlerts}
                     />

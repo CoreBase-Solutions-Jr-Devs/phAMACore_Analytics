@@ -5,7 +5,7 @@ import { getCachedBranchName } from "../../helpers/branch_helper";
 import { formatAmount } from "../../helpers/format_helper";
 import DashboardSectionHeader from "../../Components/Common/DashboardSectionHeader";
 
-const Section = ({ rightClickBtn, kpiData = {} }) => {
+const Section = ({ rightClickBtn, kpiData = {}, pageLabel = "My Business" }) => {
   const appliedFilters = useSelector(
     (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
   );
@@ -63,6 +63,7 @@ const Section = ({ rightClickBtn, kpiData = {} }) => {
   return (
     <DashboardSectionHeader
       title="KEY METRICS"
+      pageLabel={pageLabel}
       isBranchView={isBranchView}
       branchDisplayName={branchDisplayName}
       startDate={startDate}
