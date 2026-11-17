@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { exportDashboardReportToExcel, triggerPrint } from "../../helpers/export_helper";
 import { getCachedBranchName } from "../../helpers/branch_helper";
 import { formatAmount } from "../../helpers/format_helper";
+import DashboardSectionHeader from "../../Components/Common/DashboardSectionHeader";
 
 const Section = ({ rightClickBtn, kpiData = {} }) => {
   const appliedFilters = useSelector(
@@ -59,61 +60,17 @@ const Section = ({ rightClickBtn, kpiData = {} }) => {
     triggerPrint();
   };
 
-  const formatDisplay = (date) => date || "";
-
   return (
-    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      {/* Title */}
-      <h4 className="card-title mb-0">KEY METRICS</h4>
-
-      {/* Center - Filter indicators */}
-      <div className="d-flex align-items-center gap-2 flex-wrap text-muted fs-13">
-        {isBranchView && (
-          <>
-            <span>Branch:</span>
-            <strong className="text-primary">{branchDisplayName}</strong>
-            <span className="mx-1 text-muted">|</span>
-          </>
-        )}
-        <span>Filtered From:</span>
-        <strong className="text-dark">{formatDisplay(startDate)}</strong>
-        <span>to</span>
-        <strong className="text-dark">{formatDisplay(endDate)}</strong>
-      </div>
-
-      {/* Right - Action Buttons */}
-      <div className="d-flex align-items-center gap-2 no-print">
-        <button
-          type="button"
-          className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
-          onClick={handleExportExcel}
-          title="Export to Excel"
-        >
-          <i className="ri-file-excel-2-line align-bottom"></i>
-          <span>Export Excel</span>
-        </button>
-
-        <button
-          type="button"
-          className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
-          onClick={handlePrint}
-          title="Print Dashboard"
-        >
-          <i className="ri-printer-line align-bottom"></i>
-          <span>Print</span>
-        </button>
-
-        <button
-          type="button"
-          className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-          onClick={rightClickBtn}
-          title="Filter by Branch & Date Range"
-        >
-          <i className="ri-filter-fill align-bottom"></i>
-          <span>Filter</span>
-        </button>
-      </div>
-    </div>
+    <DashboardSectionHeader
+      title="KEY METRICS"
+      isBranchView={isBranchView}
+      branchDisplayName={branchDisplayName}
+      startDate={startDate}
+      endDate={endDate}
+      onExportExcel={handleExportExcel}
+      onPrint={handlePrint}
+      onFilterClick={rightClickBtn}
+    />
   );
 };
 
