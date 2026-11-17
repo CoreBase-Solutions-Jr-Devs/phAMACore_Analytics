@@ -3,12 +3,12 @@ import { Container } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import Section from "../Section";
-import FilterActions from "../FilterActions";
+import Section from "../../DashboardStock/Section";
+import FilterActions from "../../DashboardStock/FilterActions";
 import BranchTransfersSection, {
     normalizeDestStockAging,
     normalizeDrilldownRows,
-} from "../components/BranchTransfersSection";
+} from "../../DashboardStock/components/BranchTransfersSection";
 import { exportToExcel } from "../../../helpers/export_helper";
 import {
     fetchBranches,
@@ -151,7 +151,7 @@ const BranchTransfers = () => {
                 <Container fluid>
                     <BreadCrumb
                         title="Branch Transfers"
-                        pageTitle="Inventory/Stock"
+                        pageTitle="Branch Analysis"
                         subtitle={isBranchView ? branchDisplayName : "All Branches"}
                     />
 

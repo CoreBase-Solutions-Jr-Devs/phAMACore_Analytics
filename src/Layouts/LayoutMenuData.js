@@ -20,6 +20,7 @@ const Navdata = () => {
   const [isDashboard, setIsDashboard] = useState(false);
   const [isSales, setIsSales] = useState(false);
   const [isStock, setIsStock] = useState(false);
+  const [isBranchAnalysis, setIsBranchAnalysis] = useState(false);
   const [isPurchaseOrders, setIsPurchaseOrders] = useState(false);
   const [isMyBusiness, setIsMyBusiness] = useState(false);
   const [iscurrentState, setIscurrentState] = useState("Dashboard");
@@ -50,7 +51,8 @@ const Navdata = () => {
     if (iscurrentState !== "Dashboard") setIsDashboard(false);
     if (iscurrentState !== "Purchase-Orders") setIsPurchaseOrders(false);
     if (iscurrentState !== "Stock") setIsStock(false);
-    if (iscurrentState !== "MyBusiness") setIsMyBusiness(false); // Fixed bug here
+    if (iscurrentState !== "Branch-Analysis") setIsBranchAnalysis(false);
+    if (iscurrentState !== "MyBusiness") setIsMyBusiness(false);
   }, [iscurrentState]);
 
   const menuItems = [
@@ -123,7 +125,7 @@ const Navdata = () => {
           link: "/dashboard-sales/Category-Performance",
           parentId: "sales",
         },
-             {
+        {
           id: "Sales-Summary",
           label: "Sales Summary",
           link: `/dashboard-sales/Sales-Summary`,
@@ -147,50 +149,73 @@ const Navdata = () => {
         {
           id: "dashboard-stock",
           label: "Dashboard",
+          icon: "ri-dashboard-2-line",
           link: "/dashboard-stock",
           parentId: "stock",
         },
         {
           id: "critical-stock-levels",
           label: "Critical Stock Levels",
+          icon: "ri-alarm-warning-line",
           link: "/dashboard-stock/Critical-Stock-Levels",
           parentId: "stock",
         },
         {
           id: "expiry-watch",
           label: "Expiry Watch",
+          icon: "ri-timer-flash-line",
           link: "/dashboard-stock/Expiry-Watch",
           parentId: "stock",
         },
         {
           id: "slow-moving-stock",
           label: "Slow Moving Stock",
+          icon: "ri-zzz-line",
           link: "/dashboard-stock/Slow-Moving-Stock",
           parentId: "stock",
         },
+      ],
+    },
+    {
+      id: "branch-analysis",
+      label: "Branch Analysis",
+      icon: "ri-git-branch-line",
+      link: "/#",
+      stateVariables: isBranchAnalysis,
+      click: function (e) {
+        e.preventDefault();
+        setIsBranchAnalysis(!isBranchAnalysis);
+        setIscurrentState("Branch-Analysis");
+        updateIconSidebar(e);
+      },
+      subItems: [
         {
           id: "inter-branch-imbalances",
           label: "Inter-Branch Imbalances",
-          link: "/dashboard-stock/Inter-Branch-Imbalances",
-          parentId: "stock",
+          icon: "ri-scales-3-line",
+          link: "/branch-analysis/Inter-Branch-Imbalances",
+          parentId: "branch-analysis",
         },
         {
           id: "sell-through-analysis",
           label: "Sell-Through Analysis",
-          link: "/dashboard-stock/Sell-Through-Analysis",
-          parentId: "stock",
+          icon: "ri-timer-line",
+          link: "/branch-analysis/Sell-Through-Analysis",
+          parentId: "branch-analysis",
         },
         {
           id: "branch-order-fill-rate",
           label: "Branch Order Fill Rate",
-          link: "/dashboard-stock/Branch-Order-Fill-Rate",
-          parentId: "stock",
+          icon: "ri-bar-chart-grouped-line",
+          link: "/branch-analysis/Branch-Order-Fill-Rate",
+          parentId: "branch-analysis",
         },
         {
           id: "branch-transfers",
           label: "Branch Transfers",
-          link: "/dashboard-stock/Branch-Transfers",
-          parentId: "stock",
+          icon: "ri-route-line",
+          link: "/branch-analysis/Branch-Transfers",
+          parentId: "branch-analysis",
         },
       ],
     },
@@ -225,7 +250,7 @@ const Navdata = () => {
           link: `/dashboard-purchase-orders/Category-Spend`,
           parentId: "purchase-orders",
         },
-             {
+        {
           id: "Supplier-Order-Fill-Rate",
           label: "Supplier Order Fill Rate",
           link: `/dashboard-purchase-orders/Supplier-Order-Fill-Rate`,

@@ -3,9 +3,9 @@ import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import Section from "../Section";
-import FilterActions from "../FilterActions";
-import ImbalanceAlerts from "../components/ImbalanceAlerts";
+import Section from "../../DashboardStock/Section";
+import FilterActions from "../../DashboardStock/FilterActions";
+import ImbalanceAlerts from "../../DashboardStock/components/ImbalanceAlerts";
 import CardExportButtons from "../../../Components/Common/CardExportButtons";
 import { exportToExcel } from "../../../helpers/export_helper";
 import {
@@ -165,7 +165,7 @@ const InterBranchImbalances = () => {
                 <Container fluid>
                     <BreadCrumb
                         title="Inter-Branch Imbalances"
-                        pageTitle="Inventory/Stock"
+                        pageTitle="Branch Analysis"
                         subtitle={isBranchView ? branchDisplayName : "All Branches"}
                     />
 

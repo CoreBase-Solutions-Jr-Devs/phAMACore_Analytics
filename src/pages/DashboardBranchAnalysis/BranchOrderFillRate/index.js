@@ -3,29 +3,23 @@ import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import Section from "../Section";
-import FilterActions from "../FilterActions";
-import SellThroughSection, {
-    RECEIPT_TYPE_FILTERS,
-    SELL_THROUGH_VIEW_MODES,
-    normalizeSellThroughBatchRows,
-    normalizeSellThroughSkuRows,
-} from "../components/SellThroughSection";
+import Section from "../../DashboardStock/Section";
+import FilterActions from "../../DashboardStock/FilterActions";
+import BranchOfrSection, { OFR_TABS } from "../../DashboardStock/components/BranchOfrSection";
 import CardExportButtons from "../../../Components/Common/CardExportButtons";
 import { exportToExcel } from "../../../helpers/export_helper";
 import {
     fetchBranches,
-    fetchKPISellThroughAnalysis,
+    fetchKPIBranchOrderFillRate,
 } from "../../../slices/dashboardStock/thunk";
 import { applyFilters, syncDraftFilters } from "../../../slices/dashboardStock/reducer";
 import { resolveBranchName, saveActiveBranch, getActiveBranch, cleanBranchName } from "../../../helpers/branch_helper";
 
-const SellThroughAnalysis = () => {
-    document.title = "Sell-Through Analysis | phAMACore Analytics";
+const BranchOrderFillRate = () => {
+    document.title = "Branch Order Fill Rate | phAMACore Analytics";
 
-    const [sellThroughViewMode, setSellThroughViewMode] = useState("RECEIPT_BATCH");
-    const [sellThroughReceiptType, setSellThroughReceiptType] = useState("ALL");
-    const [sellThroughSearchTerm, setSellThroughSearchTerm] = useState("");
+    const [ofrActiveTab, setOfrActiveTab] = useState("BRANCH_OFR");
+    const [ofrSearchTerm, setOfrSearchTerm] = useState("");
 
     const dispatch = useDispatch();
     const { branchId } = useParams();
@@ -41,8 +35,9 @@ const SellThroughAnalysis = () => {
 
     const {
         branches = [],
-        sellThroughReceiptBatch = [],
-        sellThroughSkuSummary = [],
+        branchOrderFillRateByBranch = [],
+        branchOrderFillRateDrilldown = [],
+        branchOrderFillRateTopShortages = [],
         filters = {},
         appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
@@ -92,36 +87,18 @@ const SellThroughAnalysis = () => {
             TopN: 500,
         };
 
-        dispatch(fetchKPISellThroughAnalysis({ ...periodParams, GroupBy: "RECEIPT_BATCH" }));
-        dispatch(fetchKPISellThroughAnalysis({ ...periodParams, GroupBy: "SKU_SUMMARY" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "SUMMARY" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "BRANCH_OFR" }));
+        dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "TOP_SHORTAGES" }));
     }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate]);
 
-    const handleExportSellThrough = () => {
-        const source =
-            sellThroughViewMode === "SKU_SUMMARY"
-                ? normalizeSellThroughSkuRows(sellThroughSkuSummary)
-                : normalizeSellThroughBatchRows(sellThroughReceiptBatch);
-        const rows = source.map((r) => ({
-            "Product": r.itemName,
-            "Item Code": r.itemCode,
-            "Pack Size": r.packQty,
-            "Branch": r.branchName,
-            "Receipt Type": r.receiptType,
-            "Receipt Note": r.receiptDoc,
-            "Receipt Date": r.receiptDateFormatted,
-            "Batch": r.batchNo || "-",
-            "Qty Received (WP)": r.qtyReceivedWp,
-            "Qty Received (Pieces)": r.qtyReceivedPcs,
-            "Qty Sold Since Receipt (WP)": r.qtySoldWp,
-            "Current Balance (WP)": r.currentBranchStockWp,
-            "Days Held": r.daysHeld,
-            "Actual Sell-Through Days": r.actualSellThroughDays ?? "In progress",
-            "Estimated Stock Cover Days": r.estimatedCoverDays ?? "-",
-            "Status": r.batchStatus,
-            "Action Insight": r.actionInsight || "-",
-        }));
+    const handleExportBranchOfr = () => {
+        let source = branchOrderFillRateByBranch;
+        if (ofrActiveTab === "ORDER_DRILLDOWN") source = branchOrderFillRateDrilldown;
+        else if (ofrActiveTab === "TOP_SHORTAGES") source = branchOrderFillRateTopShortages;
+        const rows = (Array.isArray(source) ? source : []).map((r) => ({ ...r }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-        exportToExcel(rows, `Sell_Through_Analysis_${todayStr}`);
+        exportToExcel(rows, `Branch_Order_Fill_Rate_${ofrActiveTab}_${todayStr}`);
     };
 
     const handleApplyFilters = () => {
@@ -137,53 +114,35 @@ const SellThroughAnalysis = () => {
             <div className="page-content">
                 <Container fluid>
                     <BreadCrumb
-                        title="Sell-Through Analysis"
-                        pageTitle="Inventory/Stock"
+                        title="Branch Order Fill Rate"
+                        pageTitle="Branch Analysis"
                         subtitle={isBranchView ? branchDisplayName : "All Branches"}
                     />
 
                     <Section
-                        title="SELL-THROUGH ANALYSIS"
+                        title="BRANCH ORDER FILL RATE (OFR)"
                         rightClickBtn={toggleRightColumn}
-                        onExportExcel={handleExportSellThrough}
+                        onExportExcel={handleExportBranchOfr}
                     />
 
                     <Row>
                         <Col xl={12}>
-                            <Card id="sell-through-analysis-card" className="mb-2">
+                            <Card id="branch-ofr-card" className="mb-2">
                                 <CardHeader>
                                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <div>
                                             <h4 className="card-title mb-1">
-                                                TIME TAKEN TO SELL STOCK — SELL-THROUGH &amp; BATCH DEPLETION
+                                                BRANCH ORDER FILL RATE (OFR) — LPOS TO MAIN HUB
                                             </h4>
                                             <p className="text-muted mb-0 small">
-                                                Purchase &amp; transfer receipt dates, quantity received vs sold, current balance, days held, and actual sell-through time vs estimated stock cover
+                                                Fulfillment fidelity for internal branch LPOs raised to MAIN BRANCH (Orders vs Dispatches vs Branch Receipts)
                                             </p>
                                         </div>
-                                        <div className="d-flex align-items-center gap-2 flex-wrap">
-                                            <div className="btn-group btn-group-sm" role="group" aria-label="Sell-through view mode">
-                                                {SELL_THROUGH_VIEW_MODES.map((m) => (
-                                                    <button
-                                                        key={m.key}
-                                                        type="button"
-                                                        className={`btn ${
-                                                            sellThroughViewMode === m.key
-                                                                ? "btn-primary"
-                                                                : "btn-outline-primary"
-                                                        }`}
-                                                        onClick={() => setSellThroughViewMode(m.key)}
-                                                    >
-                                                        {m.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            <CardExportButtons
-                                                targetId="sell-through-analysis-card"
-                                                title="Time Taken to Sell Stock"
-                                                onExport={handleExportSellThrough}
-                                            />
-                                        </div>
+                                        <CardExportButtons
+                                            targetId="branch-ofr-card"
+                                            title="Branch Order Fill Rate"
+                                            onExport={handleExportBranchOfr}
+                                        />
                                     </div>
                                 </CardHeader>
                                 <CardBody>
@@ -191,23 +150,23 @@ const SellThroughAnalysis = () => {
                                         <Col md={5}>
                                             <input
                                                 className="form-control form-control-sm"
-                                                placeholder="Search product, SKU, batch, receipt note, or branch..."
-                                                value={sellThroughSearchTerm}
-                                                onChange={(e) => setSellThroughSearchTerm(e.target.value)}
+                                                placeholder="Search branch, LPO document, or shortage SKU..."
+                                                value={ofrSearchTerm}
+                                                onChange={(e) => setOfrSearchTerm(e.target.value)}
                                             />
                                         </Col>
                                         <Col md="auto" className="ms-md-auto">
-                                            <div className="btn-group btn-group-sm" role="group" aria-label="Filter by receipt type">
-                                                {RECEIPT_TYPE_FILTERS.map((t) => (
+                                            <div className="btn-group btn-group-sm" role="group" aria-label="OFR view tabs">
+                                                {OFR_TABS.map((t) => (
                                                     <button
                                                         key={t.key}
                                                         type="button"
                                                         className={`btn ${
-                                                            sellThroughReceiptType === t.key
+                                                            ofrActiveTab === t.key
                                                                 ? "btn-caramel"
                                                                 : "btn-outline-caramel"
                                                         }`}
-                                                        onClick={() => setSellThroughReceiptType(t.key)}
+                                                        onClick={() => setOfrActiveTab(t.key)}
                                                     >
                                                         {t.label}
                                                     </button>
@@ -215,10 +174,9 @@ const SellThroughAnalysis = () => {
                                             </div>
                                         </Col>
                                     </Row>
-                                    <SellThroughSection
-                                        viewMode={sellThroughViewMode}
-                                        receiptTypeFilter={sellThroughReceiptType}
-                                        searchTerm={sellThroughSearchTerm}
+                                    <BranchOfrSection
+                                        activeTab={ofrActiveTab}
+                                        searchTerm={ofrSearchTerm}
                                     />
                                 </CardBody>
                             </Card>
@@ -235,4 +193,4 @@ const SellThroughAnalysis = () => {
     );
 };
 
-export default SellThroughAnalysis;
+export default BranchOrderFillRate;
