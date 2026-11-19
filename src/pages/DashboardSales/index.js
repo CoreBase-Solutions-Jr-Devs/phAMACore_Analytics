@@ -331,7 +331,7 @@ const {
       <Container fluid>
         <BreadCrumb
           title="Sales"
-          pageTitle="Dashboards"
+          pageTitle="Dashboard"
           subtitle={selectedBranchName}
         />
 

@@ -156,8 +156,8 @@ const handleApplyFilters = () => {
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="Purchases"
-            pageTitle="Dashboards"
+            title="CategorySpend"
+            pageTitle="Purchases"
                 subtitle= {selectedBranchName}
 
           />

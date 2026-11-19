@@ -204,8 +204,8 @@ const BranchOrderFill = () => {
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="Purchases"
-            pageTitle="Dashboards"
+            title="SupplierOrderFillRate"
+            pageTitle="Purchases"
             subtitle={selectedBranchName}
           />
           <Row>

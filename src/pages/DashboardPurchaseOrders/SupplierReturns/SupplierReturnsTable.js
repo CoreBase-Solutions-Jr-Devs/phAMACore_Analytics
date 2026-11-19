@@ -88,7 +88,7 @@ const SupplierReturnsTabs = [
     badgeClass: "bg-info",
   },
   {
-    label: "SKU",
+    label: "SKUAnalysis",
     value: "sku",
     className: "bg-danger-subtle text-danger",
     activeClass: "bg-danger text-white",
@@ -165,7 +165,7 @@ const supplierColumns = useMemo(
         ),
     },
     {
-      header: "DebitNotes",
+      header: "GoodsReturned",
       accessorKey: "debit_notes_count",
       cell: ({ getValue, row }) =>
         renderInsightCell(
@@ -276,7 +276,7 @@ const drilldownColumns = useMemo(
         ),
     },
     {
-      header: "DebitNote",
+      header: "GoodsReturned",
       accessorKey: "debit_note_number",
  
       cell: ({ getValue, row }) =>
@@ -293,9 +293,9 @@ const drilldownColumns = useMemo(
       accessorKey: "return_date",
       cell: ({ getValue, row }) =>
         renderInsightCell(
-          <span className="text-muted">
-{formatDate(getValue())}
-          </span>,
+        
+formatDate(getValue()),
+         
           
           row,
           "drilldown-return-date"
@@ -454,7 +454,7 @@ const branchColumns = useMemo(
         ),
     },
     {
-      header: "DebitNotes",
+      header: "GoodsReturned",
       accessorKey: "debit_notes_count",
       cell: ({ getValue, row }) =>
         renderInsightCell(
@@ -560,7 +560,7 @@ const reasonColumns = useMemo(
         ),
     },
     {
-      header: "DebitNotes",
+      header: "GoodsReturned",
       accessorKey: "debit_notes_count",
       cell: ({ getValue, row }) =>
         renderInsightCell(
@@ -640,7 +640,6 @@ formatNumber(getValue()),
   []
 );
 
-
 const skuColumns = useMemo(
   () => [
     {
@@ -687,7 +686,7 @@ const skuColumns = useMemo(
         ),
     },
     {
-      header: "DebitNotes",
+      header: "GoodsReturned",
       accessorKey: "debit_notes_count",
       cell: ({ getValue, row }) =>
         renderInsightCell(
@@ -837,8 +836,8 @@ const handleExportExcel = () => {
       return {
         "Supplier ID": item.supplier_id,
         "Supplier Name": item.supplier_name,
-        "Debit Notes": item.debit_notes_count,
-        "Returned Lines": item.returned_line_items,
+        "Goods Returned": item.debit_notes_count,
+        // "Returned Lines": item.returned_line_items,
         "Distinct SKUs": item.distinct_skus_returned,
         "Units Returned": item.total_units_returned,
         "Return Value (KES)": item.total_return_value_exc,
@@ -873,8 +872,8 @@ const handleExportExcel = () => {
       return {
         "Branch ID": item.branch_id,
         "Branch Name": item.branch_name,
-        "Debit Notes": item.debit_notes_count,
-        "Returned Lines": item.returned_line_items,
+        "Goods Returned": item.debit_notes_count,
+        // "Returned Lines": item.returned_line_items,
         "Distinct SKUs": item.distinct_skus_returned,
         "Units Returned": item.total_units_returned,
         "Return Value (KES)": item.total_return_value_exc,
@@ -887,7 +886,7 @@ const handleExportExcel = () => {
       return {
         "Return Reason": item.return_reason,
         "Debit Notes": item.debit_notes_count,
-        "Returned Lines": item.returned_line_items,
+        "Goods Returned": item.returned_line_items,
         "Units Returned": item.total_units_returned,
         "Return Value (KES)": item.total_return_value_exc,
         "Value Share (%)": item.reason_value_share_perc,
@@ -900,7 +899,7 @@ const handleExportExcel = () => {
       "Item Name": item.item_name,
       "Pack Size": item.pack_size,
       "Suppliers Count": item.suppliers_count,
-      "Debit Notes": item.debit_notes_count,
+      "Goods Returned": item.debit_notes_count,
       "Units Returned": item.total_units_returned,
       "Quantity Returned (W/P)": item.qty_returned_wp,
       "Return Value (KES)": item.total_return_value_exc,
@@ -954,6 +953,7 @@ const handleExportExcel = () => {
       isGlobalFilter={true}
       SearchPlaceholder={currentTable.placeholder}
       customPageSize={10}
+       searchInputWidth="450px"
       pageSizeOptions={[5, 10, 20, 30, 50]}
       loading={loading}
       error={error}

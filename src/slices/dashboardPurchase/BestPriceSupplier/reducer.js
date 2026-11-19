@@ -4,7 +4,7 @@ import { getKPIBestPricePerSupplier } from "./thunk";
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
-  // KPISupplierReturns: [],
+  KPISupplierPerReturns: [],
  KPIBestPricePerSupplierItemMatrix: [],
   KPIBestPricePerSupplierSupplierScorecard: [],
  KPIBestPricePerSupplierBestPriceCatalog: [],
@@ -229,9 +229,7 @@ const BestPricePerSupplierSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder
-
-  
+    builder  
       // ------------------------------------------
       // KPI PURCHASES
       // ------------------------------------------
@@ -270,7 +268,7 @@ const BestPricePerSupplierSlice = createSlice({
         }
       })
 
-      .addCase(KPIBestPricePerSupplier.rejected, (state, action) => {
+      .addCase(getKPIBestPricePerSupplier.rejected, (state, action) => {
         state.loading = false;
         state.error =
           action.payload?.message ||

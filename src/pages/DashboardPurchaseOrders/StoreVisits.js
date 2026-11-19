@@ -87,7 +87,7 @@ const StoreVisits = ({ data = {}, error, loading }) => {
         borderRadius: "2px",
       }}
     />
-    <span className="text-muted">Revenue</span>
+    <span className="text-muted">Spend</span>
   </div>
 
   <div className="d-flex align-items-center gap-2">
@@ -102,7 +102,7 @@ const StoreVisits = ({ data = {}, error, loading }) => {
         strokeDasharray="3 4"
       />
     </svg>
-    <span className="text-muted">Revenue Trend</span>
+    <span className="text-muted">Spend Trend</span>
   </div>
 </div>
               <StoreVisitsCharts

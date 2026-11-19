@@ -37,6 +37,7 @@ import SalesSummaryReducer from "./dashboardSales/SalesSummary/reducer";
 import SupplierOrderFillRateReducer from "./dashboardPurchase/SupplierOrderFillRate/reducer";
 import SupplierReturnsReducer from "./dashboardPurchase/SupplierReturns/reducer";
 import ConsolidatedLPOReview from "./dashboardPurchase/ConsolidatedLPOReview/reducer";
+import BestPricePerSupplier from "./dashboardPurchase/BestPriceSupplier/reducer"
 
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
@@ -64,6 +65,7 @@ const rootReducer = combineReducers({
     supplierOrderFillRate: SupplierOrderFillRateReducer,
     supplierReturns: SupplierReturnsReducer,
     consolidatedLPOReview: ConsolidatedLPOReview,
+    bestPricePerSupplier: BestPricePerSupplier,
 });
 
 export default rootReducer;

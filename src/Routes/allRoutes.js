@@ -62,6 +62,7 @@ import UserProfile from "../pages/Authentication/user-profile";
 import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
 import CategoryPerformance from "../pages/DashboardSales/CategoryPerformance";
 import SalesSummary from "../pages/DashboardSales/SalesSummary";
+import BestPriceSupplier from "../pages/DashboardPurchaseOrders/BestPriceSupplier";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardMyBusiness /> },
@@ -80,15 +81,15 @@ const authProtectedRoutes = [
   },
   {
     path: "/dashboard-sales/Sales-Breakdown",
-    component: <SalesBreakdown/>,
+    component: <SalesBreakdown />,
   },
-    {
+  {
     path: "/dashboard-sales/Category-Performance",
-    component: <CategoryPerformance/>,
+    component: <CategoryPerformance />,
   },
-     {
+  {
     path: "/dashboard-sales/Sales-Summary",
-    component: <SalesSummary/>,
+    component: <SalesSummary />,
   },
   { path: "/dashboard-sales/branch/:branchId", component: <DashboardSales /> },
   { path: "/dashboard-stock", component: <DashboardStock /> },
@@ -153,21 +154,25 @@ const authProtectedRoutes = [
     path: "/dashboard-purchase-orders/Supplier-Ageing",
     component: <SupplierAgeing />,
   },
-   {
+  {
     path: "/dashboard-purchase-orders/Category-Spend",
     component: <CategorySpend />,
   },
-     {
+  {
     path: "/dashboard-purchase-orders/Supplier-Order-Fill-Rate",
     component: <SupplierOrderFill />,
   },
-   {
+  {
     path: "/dashboard-purchase-orders/Supplier-Returns",
     component: <SupplierReturns />,
   },
-     {
+  {
     path: "/dashboard-purchase-orders/Consolidated-LPO-Review",
     component: <ConsolidatedLPOReview />,
+  },
+  {
+    path: "/dashboard-purchase-orders/Best-Price-Supplier",
+    component: <BestPriceSupplier />,
   },
   {
     path: "/dashboard-purchase-orders/branch/:branchId",

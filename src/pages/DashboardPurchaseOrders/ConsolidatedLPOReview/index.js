@@ -228,20 +228,14 @@ const {
       }),
     );
   };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (salesBranch || []).find(
-  //         (m) => Number(m.branch_ID) === Number(filters.branch),
-  //       )?.branch_name || "";
 
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="Purchases"
-            pageTitle="Dashboards"
+            title="Consolidated-LPO-Review"
+            pageTitle="Purchases"
             subtitle={selectedBranchName}
           />
           <Row>

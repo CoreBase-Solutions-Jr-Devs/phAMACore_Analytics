@@ -30,6 +30,8 @@ export * from "./dashboardPurchase/thunk";
 export * from "./dashboardPurchase/SupplierOrderFillRate/thunk";
 export * from "./dashboardPurchase/SupplierReturns/thunk";
 export * from "./dashboardPurchase/ConsolidatedLPOReview/thunk";
+export * from "./dashboardPurchase/BestPriceSupplier/thunk";
+
 // Stock/Inventory
 export * from "./dashboardStock/thunk";
 

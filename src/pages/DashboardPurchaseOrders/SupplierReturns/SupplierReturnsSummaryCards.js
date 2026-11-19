@@ -227,21 +227,21 @@ const summary = SupplierReturnsSummaryData || {};
      
     >
       <CardBody className="p-1 d-flex flex-column">
-        <p className="font-medium mb-0">Debit Notes</p>
+        <p className="font-medium mb-0">Goods Returned</p>
 
         <h5 className="mt-1 ff-secondary fw-semibold text-primary">
           {summary.total_debit_notes_count ?? 0}
         </h5>
 
       <div className="mb-0 mt-auto">
-  <p className="text-muted mb-0">
+  {/* <p className="text-muted mb-0">
     Line items: <span className="fw-semibold">{summary.total_line_items_returned ?? 0}</span>
-  </p>
+  </p> */}
 
   <p className="text-muted mb-0">
     Distinct SKUs:{" "}
     <span className="fw-semibold">
-      {formatPercent(summary.distinct_skus_returned)}
+      {summary.distinct_skus_returned}
     </span>
   </p>
 </div>
@@ -297,7 +297,7 @@ const summary = SupplierReturnsSummaryData || {};
       
     >
       <CardBody className="p-1 d-flex flex-column">
-        <p className="font-medium mb-0">Supplier Return Rate</p>
+        <p className="font-medium mb-0">Return Rate</p>
 
         <h5 className="mt-1 ff-secondary fw-semibold text-danger">
           {formatPercent(summary.supplier_return_rate_perc ?? 0)}

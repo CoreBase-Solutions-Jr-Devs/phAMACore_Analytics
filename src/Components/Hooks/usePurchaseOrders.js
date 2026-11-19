@@ -114,10 +114,8 @@ const usePurchaseOrders = (
     return value % 1 === 0 ? value.toFixed(0) : value.toFixed(2);
   };
 
-  const totalSpend = Number(KPISummary?.[0]?.gross_purchases_excl || 0);
-
-  const activeSuppliers = Number(KPISummary?.[0]?.unique_suppliers || 0);
-
+const purchaseSummary = KPISummary?.[0] || {};
+const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
   // ============================================================
   // AVERAGE LEAD TIME
   // ============================================================
@@ -130,8 +128,8 @@ const usePurchaseOrders = (
   const maverickSpend = Number(maverickSpendSummary.maverick_off_po_spend || 0);
 
   const maverickSpendPercentage =
-    totalSpend > 0 ? (maverickSpend / totalSpend) * 100 : 0;
-
+  Number(maverickSpendSummary.maverick_spend_perc || 0);
+    
   const leadTimeSummary = KPILeadTimeSummary?.[0] || {};
 
   const avgLeadTime = Number(leadTimeSummary.avg_lead_time_days || 0);
@@ -247,104 +245,77 @@ const usePurchaseOrders = (
 
   // ============================================================
   // YEAR-TO-DATE ACTUAL SPEND CHART
-  //
-  // Creates monthly spend from January
-  // up to the current month.
+
   // ============================================================
-  const actualSpendChart = useMemo(() => {
-    const now = new Date();
 
-    const currentYear = now.getFullYear();
-    const lastYear = currentYear - 1;
+const actualSpendChart = useMemo(() => {
+  const now = new Date();
 
-    // Use selected end date if available
-    let endDate = now;
+  const currentYear = now.getFullYear();
+  const lastYear = currentYear - 1;
 
-    if (filters?.endDate) {
-      const [day, month, year] = filters.endDate.split("/").map(Number);
-      endDate = new Date(year, month - 1, day);
-    }
+  const months = Array.from({ length: 12 }, (_, i) =>
+    new Date(2000, i, 1).toLocaleString("en-US", {
+      month: "short",
+    })
+  );
 
-    // const endMonth = endDate.getMonth() + 1;
+  const currentYearMap = Object.fromEntries(
+    months.map((month) => [month, 0])
+  );
 
-    // January → selected month
-    const months = Array.from({ length: 12 }, (_, i) =>
-      new Date(2000, i, 1).toLocaleString("en-US", {
-        month: "short",
-      }),
-    );
+  const lastYearMap = Object.fromEntries(
+    months.map((month) => [month, 0])
+  );
 
-    const currentYearMap = Object.fromEntries(
-      months.map((month) => [month, 0]),
-    );
+  // Current year Goods Received
+  (GoodsReceived || []).forEach((item) => {
+    if (!item?.invoice_Date) return;
 
-    const lastYearMap = Object.fromEntries(months.map((month) => [month, 0]));
+    const invoiceDate = new Date(item.invoice_Date);
 
-    // =========================
-    // CURRENT YEAR
-    // =========================
+    if (invoiceDate.getFullYear() !== currentYear) return;
 
-    (ActualSpendMonthly || []).forEach((item) => {
-      if (!item?.year || !item?.month) return;
+    const month = months[invoiceDate.getMonth()];
 
-      if (Number(item.year) !== currentYear) return;
+    const spend = Number(item.total_grn_value || 0);
 
-      const monthIndex = Number(item.month) - 1;
+    currentYearMap[month] += spend;
+  });
 
-      const month = new Date(2000, monthIndex, 1).toLocaleString("en-US", {
-        month: "short",
-      });
+  // Last year Goods Received
+  (LastYearGoodsReceived || []).forEach((item) => {
+    if (!item?.invoice_Date) return;
 
-      const spend = Number(item.net_purchases_incl || 0);
+    const invoiceDate = new Date(item.invoice_Date);
 
-      if (currentYearMap[month] !== undefined) {
-        currentYearMap[month] += spend;
-      }
-    });
+    if (invoiceDate.getFullYear() !== lastYear) return;
 
-    // =========================
-    // LAST YEAR
-    // =========================
+    const month = months[invoiceDate.getMonth()];
 
-    (LastYearActualSpendMonthly || []).forEach((item) => {
-      if (!item?.year || !item?.month) return;
+    const spend = Number(item.total_grn_value || 0);
 
-      if (Number(item.year) !== lastYear) return;
+    lastYearMap[month] += spend;
+  });
 
-      const monthIndex = Number(item.month) - 1;
-
-      const month = new Date(2000, monthIndex, 1).toLocaleString("en-US", {
-        month: "short",
-      });
-
-      const spend = Number(item.net_purchases_incl || 0);
-
-      if (lastYearMap[month] !== undefined) {
-        lastYearMap[month] += spend;
-      }
-    });
-
-    console.log("ActualSpendMonthly:", ActualSpendMonthly);
-    console.log("LastYearActualSpendMonthly:", LastYearActualSpendMonthly);
-
-    console.log("Current Year Map:", currentYearMap);
-    console.log("Last Year Map:", lastYearMap);
-
-    return {
-      categories: months,
-
-      series: [
-        {
-          name: `${currentYear}`,
-          data: months.map((month) => Number(currentYearMap[month] || 0)),
-        },
-        {
-          name: `${lastYear}`,
-          data: months.map((month) => Number(lastYearMap[month] || 0)),
-        },
-      ],
-    };
-  }, [ActualSpendMonthly, LastYearActualSpendMonthly, filters]);
+  return {
+    categories: months,
+    series: [
+      {
+        name: `${currentYear}`,
+        data: months.map((month) =>
+          Number(currentYearMap[month].toFixed(2))
+        ),
+      },
+      {
+        name: `${lastYear}`,
+        data: months.map((month) =>
+          Number(lastYearMap[month].toFixed(2))
+        ),
+      },
+    ],
+  };
+}, [GoodsReceived, LastYearGoodsReceived]);
 
   // ============================================================
   // MONTH-TO-DATE SPEND CHART
@@ -603,15 +574,16 @@ const BestPricePerSupplierBestPriceCatalogData =
 
 const BestPricePerSupplierProposedHistoricalData =
   KPIBestPricePerSupplierProposedHistorical || [];
+
+
   return {
-    totalSpend,
-    activeSuppliers,
-    avgLeadTime,
+ purchaseSummary,
+    leadTimeSummary,
     spendBySupplier,
     branchData,
-    priceAlerts,
+    priceAlertSummary,
     maverickSpendPercentage,
-    maverickSpend,
+    maverickSpendSummary,
     actualSpendChart,
     overdueSupplierAccounts,
     monthToDateChart,

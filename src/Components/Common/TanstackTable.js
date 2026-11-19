@@ -75,7 +75,7 @@ const TanstackTable = ({
   tableStyle = {},
   searchContainerClass = "mb-3",
   toolbarContent = null,
-    tableTabs = null,
+  tableTabs = null,
   searchInputWidth = "100%",
   SearchPlaceholder = "Search...",
   showPagination = true,
@@ -83,9 +83,19 @@ const TanstackTable = ({
   loading = false,
   error = null,
   emptyMessage = "No records found.",
+
+  // External search support
+  globalFilter: externalGlobalFilter,
+  onGlobalFilterChange: externalOnGlobalFilterChange,
 }) => {
   const [columnFilters, setColumnFilters] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [internalGlobalFilter, setInternalGlobalFilter] = useState("");
+
+  // Use external search if provided; otherwise use internal search
+  const globalFilter = externalGlobalFilter ?? internalGlobalFilter;
+
+  const setGlobalFilter =
+    externalOnGlobalFilterChange ?? setInternalGlobalFilter;
 
   const fuzzyFilter = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
@@ -129,59 +139,55 @@ const TanstackTable = ({
     setPageSize(Number(customPageSize) || 10);
   }, [customPageSize, setPageSize]);
 
-  // Reset to the first page when filters change.
+  // Reset to first page when filters change
   useEffect(() => {
     setPageIndex(0);
   }, [globalFilter, columnFilters, setPageIndex]);
 
   const { pageIndex, pageSize } = getState().pagination;
+
   const totalResults = table.getFilteredRowModel().rows.length;
-  const startResult = totalResults === 0 ? 0 : pageIndex * pageSize + 1;
+
+  const startResult =
+    totalResults === 0 ? 0 : pageIndex * pageSize + 1;
+
   const endResult = Math.min((pageIndex + 1) * pageSize, totalResults);
 
   return (
     <Fragment>
-   {(isGlobalFilter || toolbarContent || tableTabs) && (
+ {(isGlobalFilter || toolbarContent || tableTabs) && (
   <div className={searchContainerClass}>
-    {/* SEARCH + MAIN TABLE TABS */}
-    <Row className="align-items-center g-3">
+    <Row className="align-items-center g-2 flex-nowrap">
+      {/* SEARCH - LEFT */}
       {isGlobalFilter && (
-        <Col xs={12} md={tableTabs ? 6 : toolbarContent ? 5 : 12}>
+        <Col xs="auto">
           <div className="search-box">
             <DebouncedInput
               value={globalFilter}
               onChange={setGlobalFilter}
               placeholder={SearchPlaceholder}
               aria-label="Search table"
-              style={{ width: searchInputWidth, maxWidth: "100%" }}
+              style={{ width: searchInputWidth }}
             />
             <i className="bx bx-search-alt search-icon" />
           </div>
         </Col>
       )}
 
-      {tableTabs && (
-        <Col
-          xs={12}
-          md={isGlobalFilter ? 6 : 12}
-          className="d-flex justify-content-md-end flex-wrap"
-        >
-          {tableTabs}
+      {/* FILTER + TABS - RIGHT */}
+      {(tableTabs || toolbarContent) && (
+        <Col xs="auto" className="ms-auto">
+          <div className="d-flex align-items-center gap-2 flex-nowrap">
+            {tableTabs}
+            {toolbarContent}
+          </div>
         </Col>
       )}
     </Row>
-
-    {/* SECOND ROW: ADDITIONAL FILTERS */}
-    {toolbarContent && (
-      <Row className="mt-4">
-        <Col xs={12}>
-          {toolbarContent}
-        </Col>
-      </Row>
-    )}
   </div>
 )}
 
+      {/* TABLE */}
       <div
         className={`table-responsive ${divClass}`}
         style={{
@@ -189,13 +195,14 @@ const TanstackTable = ({
           ...containerStyle,
         }}
       >
-<Table
-  className={tableClass}
-  style={{
-    ...tableStyle,
-    fontSize: "12px",
-  }}
->          <thead className={theadClass}>
+        <Table
+          className={tableClass}
+          style={{
+            ...tableStyle,
+            fontSize: "12px",
+          }}
+        >
+          <thead className={theadClass}>
             {customHeader ??
               getHeaderGroups().map((headerGroup) => (
                 <tr className={trClass} key={headerGroup.id}>
@@ -204,28 +211,28 @@ const TanstackTable = ({
                     const sticky = header.column.columnDef.meta?.sticky;
 
                     const stickyStyle =
-  sticky === "period"
-    ? {
-        left: 0,
-        minWidth: "110px",
-        width: "110px",
-        maxWidth: "110px",
-      }
-    : sticky === "group"
-      ? {
-          left: 0,
-          minWidth: "140px",
-          width: "140px",
-          maxWidth: "140px",
-        }
-      : sticky === "subgroup"
-        ? {
-            left: "140px",
-            minWidth: "150px",
-            width: "150px",
-            maxWidth: "150px",
-          }
-        : {};
+                      sticky === "period"
+                        ? {
+                            left: 0,
+                            minWidth: "110px",
+                            width: "110px",
+                            maxWidth: "110px",
+                          }
+                        : sticky === "group"
+                          ? {
+                              left: 0,
+                              minWidth: "140px",
+                              width: "140px",
+                              maxWidth: "140px",
+                            }
+                          : sticky === "subgroup"
+                            ? {
+                                left: "140px",
+                                minWidth: "150px",
+                                width: "150px",
+                                maxWidth: "150px",
+                              }
+                            : {};
 
                     return (
                       <th
@@ -237,14 +244,10 @@ const TanstackTable = ({
                             : undefined
                         }
                         style={{
-                            // fontSize: "14px",
-                             // fontWeight: 600,
                           cursor: header.column.getCanSort()
                             ? "pointer"
                             : "default",
                           whiteSpace: "nowrap",
-                         
-   
                           position: sticky ? "sticky" : undefined,
                           ...stickyStyle,
                           zIndex: sticky ? 5 : undefined,
@@ -257,16 +260,19 @@ const TanstackTable = ({
                           ? null
                           : flexRender(
                               header.column.columnDef.header,
-                              header.getContext(),
+                              header.getContext()
                             )}
 
                         {{ asc: " ↑", desc: " ↓" }[sorted] ?? null}
 
-                        {isColumnFilter && header.column.getCanFilter() && (
-                          <div onClick={(event) => event.stopPropagation()}>
-                            <ColumnFilter column={header.column} />
-                          </div>
-                        )}
+                        {isColumnFilter &&
+                          header.column.getCanFilter() && (
+                            <div
+                              onClick={(event) => event.stopPropagation()}
+                            >
+                              <ColumnFilter column={header.column} />
+                            </div>
+                          )}
                       </th>
                     );
                   })}
@@ -274,6 +280,7 @@ const TanstackTable = ({
               ))}
           </thead>
 
+          {/* TABLE BODY */}
           <tbody>
             {loading ? (
               <tr>
@@ -294,58 +301,63 @@ const TanstackTable = ({
                 </td>
               </tr>
             ) : getRowModel().rows.length > 0 ? (
-             getRowModel().rows.map((row) => {
-  const isYTD = row.original?.period_type === "YTD";
+              getRowModel().rows.map((row) => {
+                const isYTD = row.original?.period_type === "YTD";
 
-  return (
-    <tr
-      key={row.id}
-      className={isYTD ? "fw-bold" : ""}
-      style={
-        isYTD
-          ? { backgroundColor: "#f3f6f9" }
-          : undefined
-      }
-    >
-                  {row.getVisibleCells().map((cell) => (
-    <td
-  key={cell.id}
-  className={cell.column.columnDef.meta?.tdClassName ?? ""}
-  style={{
-    fontSize: "12px",
-    ...(isYTD
-      ? {
-          backgroundColor: "#f3f6f9",
-          fontWeight: 700,
-        }
-      : {}),
-    ...cell.column.columnDef.meta?.tdStyle,
-    ...(cell.column.columnDef.meta?.sticky
-      ? {
-          position: "sticky",
-          left:
-            cell.column.columnDef.meta.sticky === "period" ||
-            cell.column.columnDef.meta.sticky === "group"
-              ? 0
-              : "140px",
-          zIndex: 2,
-          backgroundColor: isYTD
-            ? "#f3f6f9"
-            : "var(--vz-card-bg, #fff)",
-          boxShadow: "2px 0 3px -3px rgba(0,0,0,0.35)",
-        }
-      : {}),
-  }}
->
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </td>
-                  ))}
-             </tr>
-);
-})
+                return (
+                  <tr
+                    key={row.id}
+                    className={isYTD ? "fw-bold" : ""}
+                    style={
+                      isYTD
+                        ? { backgroundColor: "#f3f6f9" }
+                        : undefined
+                    }
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className={
+                          cell.column.columnDef.meta?.tdClassName ?? ""
+                        }
+                        style={{
+                          fontSize: "12px",
+                          ...(isYTD
+                            ? {
+                                backgroundColor: "#f3f6f9",
+                                fontWeight: 700,
+                              }
+                            : {}),
+                          ...cell.column.columnDef.meta?.tdStyle,
+                          ...(cell.column.columnDef.meta?.sticky
+                            ? {
+                                position: "sticky",
+                                left:
+                                  cell.column.columnDef.meta.sticky ===
+                                    "period" ||
+                                  cell.column.columnDef.meta.sticky ===
+                                    "group"
+                                    ? 0
+                                    : "140px",
+                                zIndex: 2,
+                                backgroundColor: isYTD
+                                  ? "#f3f6f9"
+                                  : "var(--vz-card-bg, #fff)",
+                                boxShadow:
+                                  "2px 0 3px -3px rgba(0,0,0,0.35)",
+                              }
+                            : {}),
+                        }}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td
@@ -360,6 +372,7 @@ const TanstackTable = ({
         </Table>
       </div>
 
+      {/* PAGINATION + RESULT COUNT */}
       <Row className="align-items-center mt-3 g-3">
         <Col sm>
           <div className="text-muted">
@@ -387,7 +400,9 @@ const TanstackTable = ({
                 className="form-select form-select-sm"
                 style={{ width: "85px" }}
                 value={pageSize}
-                onChange={(event) => setPageSize(Number(event.target.value))}
+                onChange={(event) =>
+                  setPageSize(Number(event.target.value))
+                }
               >
                 {pageSizeOptions.map((size) => (
                   <option key={size} value={size}>
@@ -402,16 +417,21 @@ const TanstackTable = ({
         {showPagination && (
           <Col sm="auto">
             <ul className="pagination pagination-separated pagination-md justify-content-center mb-0">
+              {/* PREVIOUS */}
               <li
                 className={
-                  !getCanPreviousPage() ? "page-item disabled" : "page-item"
+                  !getCanPreviousPage()
+                    ? "page-item disabled"
+                    : "page-item"
                 }
               >
                 <Link
                   to="#"
                   className="page-link"
                   style={{
-                    color: getCanPreviousPage() ? "#c68e54" : undefined,
+                    color: getCanPreviousPage()
+                      ? "#c68e54"
+                      : undefined,
                   }}
                   onClick={(event) => {
                     event.preventDefault();
@@ -422,12 +442,16 @@ const TanstackTable = ({
                 </Link>
               </li>
 
+              {/* PAGE NUMBERS */}
               {getPageOptions()
                 .filter(
                   (page) =>
                     page >= Math.max(0, pageIndex - 1) &&
                     page <=
-                      Math.min(getPageOptions().length - 1, pageIndex + 1),
+                      Math.min(
+                        getPageOptions().length - 1,
+                        pageIndex + 1
+                      )
                 )
                 .map((page) => {
                   const isActive = pageIndex === page;
@@ -436,7 +460,9 @@ const TanstackTable = ({
                     <li className="page-item" key={page}>
                       <Link
                         to="#"
-                        className={isActive ? "page-link active" : "page-link"}
+                        className={
+                          isActive ? "page-link active" : "page-link"
+                        }
                         style={
                           isActive
                             ? {
@@ -459,16 +485,21 @@ const TanstackTable = ({
                   );
                 })}
 
+              {/* NEXT */}
               <li
                 className={
-                  !getCanNextPage() ? "page-item disabled" : "page-item"
+                  !getCanNextPage()
+                    ? "page-item disabled"
+                    : "page-item"
                 }
               >
                 <Link
                   to="#"
                   className="page-link"
                   style={{
-                    color: getCanNextPage() ? "#c68e54" : undefined,
+                    color: getCanNextPage()
+                      ? "#c68e54"
+                      : undefined,
                   }}
                   onClick={(event) => {
                     event.preventDefault();

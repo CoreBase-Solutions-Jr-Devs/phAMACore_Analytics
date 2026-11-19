@@ -189,7 +189,7 @@ const handleMarginBandSelect = (band) => {
       <Container fluid>
         <BreadCrumb
           title="Margin Analysis"
-          pageTitle="Dashboards"
+          pageTitle="Sales"
           subtitle={selectedBranchName}
         />
 
