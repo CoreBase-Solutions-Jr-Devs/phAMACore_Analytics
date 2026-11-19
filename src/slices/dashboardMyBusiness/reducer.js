@@ -58,7 +58,8 @@ export const computeDateRangeValues = (type, currentStart = "", currentEnd = "")
       return { startDate: formatDMY(start), endDate: formatDMY(now) };
     }
 
-    case "Month To Yesterday":{
+    case "Month To Yesterday":
+    case "Month to Yesterday":{
       const now = new Date();
       const start = new Date(now.getFullYear(), now.getMonth(), 1);
       const yesterday = new Date();
