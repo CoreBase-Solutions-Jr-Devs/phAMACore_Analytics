@@ -203,7 +203,7 @@ const [selectedBranchName, setSelectedBranchName] =
       <Container fluid>
         <BreadCrumb
           title="Performance Summary"
-          pageTitle="Dashboards"
+          pageTitle="Sales"
           subtitle={selectedBranchName}
         />
 

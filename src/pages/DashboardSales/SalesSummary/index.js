@@ -125,7 +125,7 @@ useEffect(() => {
       <Container fluid>
         <BreadCrumb
           title="Sales Breakdown"
-          pageTitle="Dashboards"
+          pageTitle="Sales"
           subtitle={selectedBranchName}
         />
         <Row>

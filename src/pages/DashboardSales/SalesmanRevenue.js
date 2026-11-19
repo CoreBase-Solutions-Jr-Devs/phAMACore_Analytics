@@ -275,9 +275,9 @@ const SalesRevenueAnalysis = ({
 
   return (
     <Card className="card-height-100" id="sales-revenue-tabs-card">
-      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap gap-2 pb-0">
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap gap-2 pb-1">
      <div>
-    <h4 className="card-title mb-0">Sales Revenue by Salesperson and Customer</h4>
+    <h4 className="card-title mb-1">Sales Revenue by Salesperson and Customer</h4>
     <p className="text-muted mb-0 fs-6">
  Track sales revenue, quantities and gross profit across salespeople and customers.    </p>
 </div>
