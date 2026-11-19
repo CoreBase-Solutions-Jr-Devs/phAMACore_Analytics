@@ -3,12 +3,12 @@ import { Container } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import Section from "../Section";
-import FilterActions from "../FilterActions";
+import Section from "../../DashboardStock/Section";
+import FilterActions from "../../DashboardStock/FilterActions";
 import BranchTransfersSection, {
     normalizeDestStockAging,
     normalizeDrilldownRows,
-} from "../components/BranchTransfersSection";
+} from "../../DashboardStock/components/BranchTransfersSection";
 import { exportToExcel } from "../../../helpers/export_helper";
 import {
     fetchBranches,
@@ -122,9 +122,9 @@ const BranchTransfers = () => {
             "Batch": r.batchNo,
             "Source Branch": r.sourceBranchName || "-",
             "Destination Branch": r.destBranchName,
-            "Transfer Voucher": r.transferDoc,
+            "Transfer Document": r.transferDoc,
             "Transfer Date": r.transferDate,
-            "Receipt Voucher": r.receiptDoc,
+            "Receipt Document": r.receiptDoc,
             "Receipt Date": r.receiptDate,
             "Transferred Units (Packs)": r.transferredUnits,
             "Transfer Value (KES)": r.transferredCost,
@@ -151,12 +151,13 @@ const BranchTransfers = () => {
                 <Container fluid>
                     <BreadCrumb
                         title="Branch Transfers"
-                        pageTitle="Inventory/Stock"
+                        pageTitle="Branch Analysis"
                         subtitle={isBranchView ? branchDisplayName : "All Branches"}
                     />
 
                     <Section
                         title="BRANCH TRANSFERS & PULL TO MAIN BRANCH"
+                        pageLabel="Branch Transfers"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportBranchTransfers}
                     />

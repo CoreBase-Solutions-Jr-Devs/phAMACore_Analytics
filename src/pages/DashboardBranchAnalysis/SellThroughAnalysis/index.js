@@ -3,14 +3,14 @@ import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import Section from "../Section";
-import FilterActions from "../FilterActions";
+import Section from "../../DashboardStock/Section";
+import FilterActions from "../../DashboardStock/FilterActions";
 import SellThroughSection, {
     RECEIPT_TYPE_FILTERS,
     SELL_THROUGH_VIEW_MODES,
     normalizeSellThroughBatchRows,
     normalizeSellThroughSkuRows,
-} from "../components/SellThroughSection";
+} from "../../DashboardStock/components/SellThroughSection";
 import CardExportButtons from "../../../Components/Common/CardExportButtons";
 import { exportToExcel } from "../../../helpers/export_helper";
 import {
@@ -107,7 +107,7 @@ const SellThroughAnalysis = () => {
             "Pack Size": r.packQty,
             "Branch": r.branchName,
             "Receipt Type": r.receiptType,
-            "Receipt Voucher": r.receiptDoc,
+            "Receipt Note": r.receiptDoc,
             "Receipt Date": r.receiptDateFormatted,
             "Batch": r.batchNo || "-",
             "Qty Received (WP)": r.qtyReceivedWp,
@@ -138,12 +138,13 @@ const SellThroughAnalysis = () => {
                 <Container fluid>
                     <BreadCrumb
                         title="Sell-Through Analysis"
-                        pageTitle="Inventory/Stock"
+                        pageTitle="Branch Analysis"
                         subtitle={isBranchView ? branchDisplayName : "All Branches"}
                     />
 
                     <Section
                         title="SELL-THROUGH ANALYSIS"
+                        pageLabel="Sell-Through Analysis"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportSellThrough}
                     />
@@ -191,7 +192,7 @@ const SellThroughAnalysis = () => {
                                         <Col md={5}>
                                             <input
                                                 className="form-control form-control-sm"
-                                                placeholder="Search product, SKU, batch, receipt voucher, or branch..."
+                                                placeholder="Search product, SKU, batch, receipt note, or branch..."
                                                 value={sellThroughSearchTerm}
                                                 onChange={(e) => setSellThroughSearchTerm(e.target.value)}
                                             />

@@ -3,9 +3,9 @@ import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import Section from "../Section";
-import FilterActions from "../FilterActions";
-import BranchOfrSection, { OFR_TABS } from "../components/BranchOfrSection";
+import Section from "../../DashboardStock/Section";
+import FilterActions from "../../DashboardStock/FilterActions";
+import BranchOfrSection, { OFR_TABS } from "../../DashboardStock/components/BranchOfrSection";
 import CardExportButtons from "../../../Components/Common/CardExportButtons";
 import { exportToExcel } from "../../../helpers/export_helper";
 import {
@@ -115,12 +115,13 @@ const BranchOrderFillRate = () => {
                 <Container fluid>
                     <BreadCrumb
                         title="Branch Order Fill Rate"
-                        pageTitle="Inventory/Stock"
+                        pageTitle="Branch Analysis"
                         subtitle={isBranchView ? branchDisplayName : "All Branches"}
                     />
 
                     <Section
                         title="BRANCH ORDER FILL RATE (OFR)"
+                        pageLabel="Branch Order Fill Rate"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportBranchOfr}
                     />
@@ -150,7 +151,7 @@ const BranchOrderFillRate = () => {
                                         <Col md={5}>
                                             <input
                                                 className="form-control form-control-sm"
-                                                placeholder="Search branch, LPO voucher, or shortage SKU..."
+                                                placeholder="Search branch, LPO document, or shortage SKU..."
                                                 value={ofrSearchTerm}
                                                 onChange={(e) => setOfrSearchTerm(e.target.value)}
                                             />

@@ -149,6 +149,7 @@ const SlowMovingStockPage = () => {
 
                     <Section
                         title="SLOW MOVING STOCK"
+                        pageLabel="Slow Moving Stock"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportSlowMovingStock}
                     />

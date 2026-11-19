@@ -523,8 +523,8 @@ const SellThroughSection = ({
                         <table className="table table-sm table-bordered table-nowrap mb-0">
                             <thead className="table-light">
                                 <tr>
-                                    <th>Outflow Voucher</th>
-                                    <th>Outflow Date</th>
+                                    <th>Transaction Reference</th>
+                                    <th>Document Date</th>
                                     <th>Type</th>
                                     <th className="text-end">Consumed</th>
                                     <th className="text-end">Running Depletion %</th>

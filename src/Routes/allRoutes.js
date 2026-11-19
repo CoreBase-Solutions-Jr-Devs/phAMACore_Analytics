@@ -7,10 +7,10 @@ import DashboardStock from "../pages/DashboardStock";
 import CriticalStockLevels from "../pages/DashboardStock/CriticalStockLevels";
 import ExpiryWatch from "../pages/DashboardStock/ExpiryWatch";
 import SlowMovingStockPage from "../pages/DashboardStock/SlowMovingStock";
-import InterBranchImbalances from "../pages/DashboardStock/InterBranchImbalances";
-import SellThroughAnalysis from "../pages/DashboardStock/SellThroughAnalysis";
-import BranchOrderFillRate from "../pages/DashboardStock/BranchOrderFillRate";
-import BranchTransfers from "../pages/DashboardStock/BranchTransfers";
+import InterBranchImbalances from "../pages/DashboardBranchAnalysis/InterBranchImbalances";
+import SellThroughAnalysis from "../pages/DashboardBranchAnalysis/SellThroughAnalysis";
+import BranchOrderFillRate from "../pages/DashboardBranchAnalysis/BranchOrderFillRate";
+import BranchTransfers from "../pages/DashboardBranchAnalysis/BranchTransfers";
 import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
 import DashboardMyBusiness from "../pages/DashboardMyBusiness";
 import MarginAnalysis from "../pages/DashboardSales/MarginAnalysis";
@@ -107,21 +107,41 @@ const authProtectedRoutes = [
   },
   {
     path: "/dashboard-stock/Inter-Branch-Imbalances",
-    component: <InterBranchImbalances />,
+    component: <Navigate to="/branch-analysis/Inter-Branch-Imbalances" replace />,
   },
   {
     path: "/dashboard-stock/Sell-Through-Analysis",
-    component: <SellThroughAnalysis />,
+    component: <Navigate to="/branch-analysis/Sell-Through-Analysis" replace />,
   },
   {
     path: "/dashboard-stock/Branch-Order-Fill-Rate",
-    component: <BranchOrderFillRate />,
+    component: <Navigate to="/branch-analysis/Branch-Order-Fill-Rate" replace />,
   },
   {
     path: "/dashboard-stock/Branch-Transfers",
-    component: <BranchTransfers />,
+    component: <Navigate to="/branch-analysis/Branch-Transfers" replace />,
   },
   { path: "/dashboard-stock/branch/:branchId", component: <DashboardStock /> },
+  {
+    path: "/branch-analysis",
+    component: <Navigate to="/branch-analysis/Inter-Branch-Imbalances" replace />,
+  },
+  {
+    path: "/branch-analysis/Inter-Branch-Imbalances",
+    component: <InterBranchImbalances />,
+  },
+  {
+    path: "/branch-analysis/Sell-Through-Analysis",
+    component: <SellThroughAnalysis />,
+  },
+  {
+    path: "/branch-analysis/Branch-Order-Fill-Rate",
+    component: <BranchOrderFillRate />,
+  },
+  {
+    path: "/branch-analysis/Branch-Transfers",
+    component: <BranchTransfers />,
+  },
   {
     path: "/dashboard-purchase-orders",
     component: <DashboardPurchaseOrders />,

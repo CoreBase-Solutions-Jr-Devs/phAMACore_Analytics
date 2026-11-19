@@ -128,6 +128,7 @@ const CriticalStockLevels = () => {
 
                     <Section
                         title="CRITICAL STOCK LEVELS"
+                        pageLabel="Critical Stock Levels"
                         rightClickBtn={toggleRightColumn}
                         onExportExcel={handleExportCriticalStock}
                     />
