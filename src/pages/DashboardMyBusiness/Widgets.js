@@ -404,6 +404,8 @@ function Widgets({ onKpiComputed }) {
                         Mode: "SUMMARY",
                         AccountType: "CUSTOMER",
                         branchcode: appliedFilters?.branch ?? 0,
+                        DateFrom: appliedFilters?.startDate,
+                        DateTo: appliedFilters?.endDate,
                         IncludeZeroBal: false,
                     })
                 );
@@ -427,6 +429,8 @@ function Widgets({ onKpiComputed }) {
                         Mode: "SUMMARY",
                         AccountType: "SUPPLIER",
                         branchcode: appliedFilters?.branch ?? 0,
+                        DateFrom: appliedFilters?.startDate,
+                        DateTo: appliedFilters?.endDate,
                         IncludeZeroBal: false,
                     })
                 );
@@ -452,7 +456,7 @@ function Widgets({ onKpiComputed }) {
         };
 
         fetchAccountBalances();
-    }, [dispatch, appliedFilters?.branch]);
+    }, [dispatch, appliedFilters?.branch, appliedFilters?.startDate, appliedFilters?.endDate]);
 
 
     const salesValue = useMemo(() => {
