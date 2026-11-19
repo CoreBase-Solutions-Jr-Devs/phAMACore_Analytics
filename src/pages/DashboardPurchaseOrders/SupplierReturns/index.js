@@ -241,8 +241,8 @@ SupplierReturnsReasonData,
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="Purchases"
-            pageTitle="Dashboards"
+            title="Supplier Returns"
+            pageTitle="Purchases"
             subtitle={selectedBranchName}
           />
           <Row>

@@ -46,6 +46,7 @@ import {
   getPreviousYearDate,
   getPeriod,
 } from "../../helpers/date_helper";
+import { getKPIConsolidatedLPOReview} from "../../slices/dashboardPurchase/ConsolidatedLPOReview/thunk";
 
 const KPI_GROUP_BYS = [
   "SUMMARY",
@@ -171,12 +172,19 @@ loading,
 } = useSelector((state) => state.PurchaseOrders);
 
   const {
+ KPIConsolidatedLPOReviewConsolidatedList = [],
+  KPIConsolidatedLPOReviewSummary = [],
+  KPIConsolidatedLPOReviewSupplier = [],
+  KPIConsolidatedLPOReviewBranch = [],
+  KPIConsolidatedLPOReviewDrilldown = [],
+  } = useSelector((state) => state.consolidatedLPOReview);
+
+  const {
     formatAmount,
-    totalSpend,
-    activeSuppliers,
-    avgLeadTime,
-      priceAlerts,
-  maverickSpend,
+   purchaseSummary,
+    leadTimeSummary,
+      priceAlertSummary,
+  maverickSpendSummary,
   maverickSpendPercentage,
   spendBySupplier,
     topSuppliers,
@@ -192,7 +200,8 @@ loading,
     overdue91To120,
     overdue120Plus,
     overdueSupplierAccounts,
-    // bestPricePerSupplier,
+     ConsolidatedLPOReviewSummaryData,
+  
   } = usePurchaseOrders(
     
   PurchaseOrders,
@@ -261,7 +270,31 @@ loading,
   LastYearDailySpendMonthly,
   LastYearDailySpendType,
 
-  kpiOverdueAccounts,
+     kpiOverdueAccounts,
+
+   [], //KPISupplierOrderFillRateSummary,
+   [], //KPISupplierOrderFillRateSupplierOFR,
+   [], //KPISupplierOrderFillRateOrderDrilldown,
+   [], //KPISupplierOrderFillRateBranch,
+
+   [], //KPISupplierReturnsSummary,
+   [], //KPISupplierReturnsSupplier,
+   [], //KPISupplierReturnsDrilldown,
+   [], //KPISupplierReturnsBranch,
+   [], //KPISupplierReturnsSKU,
+   [], //KPISupplierReturnsReason,
+
+   [], //KPIConsolidatedLPOReviewConsolidatedList,
+  KPIConsolidatedLPOReviewSummary,
+   [], //KPIConsolidatedLPOReviewSupplier,
+   [], //KPIConsolidatedLPOReviewBranch,
+   [], //KPIConsolidatedLPOReviewDrilldown,
+
+   [], //KPIBestPricePerSupplierItemMatrix,
+   [], //KPIBestPricePerSupplierSupplierScorecard,
+   [], //KPIBestPricePerSupplierBestPriceCatalog,
+   [], //KPIBestPricePerSupplierProposedHistorical,
+
   filters
 );
 
@@ -320,6 +353,18 @@ useEffect(() => {
 //   })
 // );
 
+    dispatch(
+      getKPIConsolidatedLPOReview({
+          clientid: 1,
+      branchcode: filters.branch,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      TopN: 0,
+      status: "All",
+        groupBy: "SUMMARY",
+      }),
+    );
+
 dispatch(
   getGoodsReceived({
    
@@ -340,27 +385,27 @@ dispatch(
   })
 );
 
-  dispatchGroupByRequests(
-    getActualSpend,
-    {
-      clientid: 1,
-      startDate: dates.currentYearStart,
-      endDate: dates.today,
-    branchcode: filters.branch,
-    },
-    ACTUAL_SPEND_GROUP_BYS
-  );
+//   dispatchGroupByRequests(
+//     getActualSpend,
+//     {
+//       clientid: 1,
+//       startDate: dates.currentYearStart,
+//       endDate: dates.today,
+//     branchcode: filters.branch,
+//     },
+//     ACTUAL_SPEND_GROUP_BYS
+//   );
 
-  dispatchGroupByRequests(
-    getLastYearActualSpend,
-    {
-      clientid: 1,
-      startDate: dates.lastYearStart,
-      endDate: dates.lastYearToday,
-    branchcode: filters.branch,
-    },
-ACTUAL_SPEND_GROUP_BYS
-  );
+//   dispatchGroupByRequests(
+//     getLastYearActualSpend,
+//     {
+//       clientid: 1,
+//       startDate: dates.lastYearStart,
+//       endDate: dates.lastYearToday,
+//     branchcode: filters.branch,
+//     },
+// ACTUAL_SPEND_GROUP_BYS
+//   );
 
   dispatchGroupByRequests(
     getKPIPurchases,
@@ -467,6 +512,18 @@ const handleApplyFilters = () => {
 //   })
 // );
 
+    dispatch(
+      getKPIConsolidatedLPOReview({
+            clientid: 1,
+      branchcode: filters.branch,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      TopN: 0,
+      status: "All",
+        groupBy: "SUMMARY",
+      }),
+    );
+
   dispatchGroupByRequests(
     getKPIPurchases,
     {
@@ -560,7 +617,7 @@ dispatchGroupByRequests(
         <Container fluid>
           <BreadCrumb
             title="Purchases"
-            pageTitle="Dashboards"
+            pageTitle="Dashboard"
                 subtitle= {selectedBranchName}
 
           />
@@ -571,11 +628,11 @@ dispatchGroupByRequests(
                   <Widget
                     rightClickBtn={toggleRightColumn}
                     formatAmount={formatAmount}
-                    totalSpend={totalSpend}
-                    activeSuppliers={activeSuppliers}
-                    avgLeadTime={avgLeadTime}
-                    priceAlerts={priceAlerts}
-                    maverickSpend={maverickSpend}
+                    purchaseSummary={purchaseSummary}
+                 ConsolidatedLPOReviewSummaryData={ConsolidatedLPOReviewSummaryData}
+                    leadTimeSummary={leadTimeSummary}
+                    priceAlertSummary={priceAlertSummary}
+                    maverickSpendSummary={maverickSpendSummary}
                     maverickSpendPercentage={maverickSpendPercentage}
                                   selectedBranchName={selectedBranchName}
 
