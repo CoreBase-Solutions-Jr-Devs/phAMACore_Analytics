@@ -102,53 +102,39 @@ const Widgets = ({
 
   return (
     <React.Fragment>
-      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-        <h4 className="card-title mb-0">KEY METRICS</h4>
-
-        <div className="d-flex align-items-center gap-2 ">
-          <span>Filtered From:</span>
-          <strong>{startDate}</strong> to <strong>{endDate}</strong>
-        </div>
-
-        <div className="d-flex align-items-center gap-2 ">
-          <span>Selected Branch:</span>
-          <strong>{selectedBranchName}</strong>
-        </div>
-
-        <div className="d-flex align-items-center gap-2 no-print">
-          {/* <button
-                  type="button"
-                  className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
-                  onClick={handleExportExcel}
-                  title="Export Key Metrics to Excel"
-                >
-                  <i className="ri-file-excel-2-line align-bottom"></i>
-                  <span>Export Excel</span>
-                </button>
-
-            <button
-                  type="button"
-                  className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
-                  onClick={handlePrint}
-                  title="Print Dashboard"
-                >
-                  <i className="ri-printer-line align-bottom"></i>
-                  <span>Print</span>
-                </button> */}
-
-          <button
-            type="button"
-            className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-            onClick={rightClickBtn}
-          >
-            <i className="ri-filter-fill"></i>
-            Filter
-          </button>
-        </div>
+ {/* <div
+      className="d-flex align-items-center justify-content-center flex-wrap gap-4 bg-body p-2"
+      style={{
+        position: "sticky",
+        top: "0px",
+        zIndex: 1030,
+        width: "100%",
+      }}
+    >
+      <div className="d-flex align-items-center gap-2">
+        <span>Filtered From:</span>
+        <strong>{startDate}</strong> to <strong>{endDate}</strong>
       </div>
 
+      <div className="d-flex align-items-center gap-2">
+        <span>Selected Branch:</span>
+        <strong>{selectedBranchName}</strong>
+      </div>
+
+      <div className="d-flex align-items-center gap-2 no-print">
+        <button
+          type="button"
+          className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+          onClick={rightClickBtn}
+        >
+          <i className="ri-filter-fill"></i>
+          Filter
+        </button>
+      </div>
+    </div> */}
+
       <Row
-        className="g-2 mb-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6"
+        className="g-2 mb-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 mt-0"
         id="purchases-kpi-widgets"
       >
         <Col className="d-flex">

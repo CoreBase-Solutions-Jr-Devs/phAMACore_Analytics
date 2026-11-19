@@ -116,50 +116,7 @@ const summary = SupplierReturnsSummaryData || {};
   return (
     <div>
       <React.Fragment>
-        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
-          <h4 className="card-title mb-0">KEY METRICS</h4>
-
-          <div className="d-flex align-items-center gap-2">
-            <span>Filtered From:</span>
-            <strong>{startDate}</strong> to <strong>{endDate}</strong>
-          </div>
-
-          <div className="d-flex align-items-center gap-2">
-            <span>Selected Branch:</span>
-            <strong>{selectedBranchName || "All Branches"}</strong>
-          </div>
-
-          <div className="d-flex align-items-center gap-2 no-print">
-            {/* <button
-              type="button"
-              className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
-              onClick={handleExportExcel}
-              title="Export Key Metrics to Excel"
-            >
-              <i className="ri-file-excel-2-line align-bottom"></i>
-              <span>Export Excel</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
-              onClick={handlePrint}
-              title="Print Dashboard"
-            >
-              <i className="ri-printer-line align-bottom"></i>
-              <span>Print</span>
-            </button> */}
-
-            <button
-              type="button"
-              className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-              onClick={rightClickBtn}
-            >
-              <i className="ri-filter-fill"></i>
-              Filter
-            </button>
-          </div>
-        </div>
+        
 
         {loading ? (
           <div className="text-center py-5">

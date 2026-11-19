@@ -129,34 +129,6 @@ const supplierScorecardSummary = useMemo(() => {
   
       <React.Fragment>
         {/* Page Header */}
-        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-          <h4 className="card-title mb-0">
-            KEY METRICS
-          </h4>
-
-          <div className="d-flex align-items-center gap-2">
-            <span>Filtered From:</span>
-            <strong>{startDate || "-"}</strong>
-            to
-            <strong>{endDate || "-"}</strong>
-          </div>
-
-          <div className="d-flex align-items-center gap-2">
-            <span>Selected Branch:</span>
-            <strong>{selectedBranchName || "All Branches"}</strong>
-          </div>
-
-          <div className="d-flex align-items-center gap-2 no-print">
-            <button
-              type="button"
-              className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-              onClick={rightClickBtn}
-            >
-              <i className="ri-filter-fill"></i>
-              Filter
-            </button>
-          </div>
-        </div>
 
         {loading ? (
           <div className="text-center py-5">

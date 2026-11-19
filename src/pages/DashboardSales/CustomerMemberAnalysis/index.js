@@ -22,6 +22,7 @@ const CustomerMemberAnalysis = () => {
   const dispatch = useDispatch();
 
   const [rightColumn, setRightColumn] = useState(false);
+const [isSticky, setIsSticky] = useState(false);
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
 
@@ -145,6 +146,15 @@ const {
         };
       }, [dispatch]);
 
+      useEffect(() => {
+        const handleScroll = () => {
+          setIsSticky(window.scrollY > 50);
+        };
+      
+        window.addEventListener("scroll", handleScroll);
+      
+        return () => window.removeEventListener("scroll", handleScroll);
+      }, []);
   const handleApplyFilters = () => {
    
      const params = {
@@ -197,7 +207,58 @@ const {
                subtitle={ selectedBranchName
           }
         />
+<div
+  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+}`}
+  style={{
+    position: "sticky",
+    top: "70px",
+    zIndex: 1030,
+    width: "100%",
+    marginTop: "-15px",
+    // backgroundColor: "#",
+  }}
+>
+    <div className="d-flex align-items-center flex-wrap gap-2">
 
+  <div className="d-flex align-items-center gap-1">
+    <span>Filtered From:</span>
+    <strong>{filters?.startDate || ""}</strong> to{" "}
+<strong>{filters?.endDate || ""}</strong>
+  </div>
+
+<div
+  style={{
+    borderLeft: "2px solid #ced4da",
+    height: "12px",
+    margin: "0 4px",
+  }}
+/>
+
+  <div className="d-flex align-items-center gap-1">
+    <span>Selected Branch:</span>
+    <strong>{selectedBranchName}</strong>
+  </div>
+<div
+  style={{
+    borderLeft: "2px solid #ced4da",
+    height: "12px",
+    margin: "0 4px",
+  }}
+/>
+  <div className="d-flex align-items-center gap-1 no-print">
+    <button
+      type="button"
+      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+      onClick={toggleRightColumn}
+    >
+      <i className="ri-filter-fill"></i>
+      Filter
+    </button>
+  </div>
+  </div>
+</div> 
         <Row>
           <Col xl={12}>
             <Customer

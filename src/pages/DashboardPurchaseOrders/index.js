@@ -89,6 +89,7 @@ const DashboardPurchaseOrders = () => {
   const navigate = useNavigate();
 
   const [rightColumn, setRightColumn] = useState(false);
+const [isSticky, setIsSticky] = useState(false);
 
   const toggleRightColumn = () => {
     setRightColumn(!rightColumn);
@@ -480,7 +481,15 @@ dispatchGroupByRequests(
       dispatch(clearPurchaseOrdersData());
     };
   }, [dispatch]);
+useEffect(() => {
+  const handleScroll = () => {
+    setIsSticky(window.scrollY > 50);
+  };
 
+  window.addEventListener("scroll", handleScroll);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
 const handleApplyFilters = () => {
   // dispatch(
   //   getPurchaseOrders({
@@ -604,12 +613,6 @@ dispatchGroupByRequests(
   MAVERICK_SPEND_GROUP_BYS
 );
 };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (salesBranch || []).find(
-  //         (m) => Number(m.branch_ID) === Number(filters.branch),
-  //       )?.branch_name || "";
         
   return (
     <React.Fragment>
@@ -620,12 +623,62 @@ dispatchGroupByRequests(
             pageTitle="Dashboard"
                 subtitle= {selectedBranchName}
 
-          />
-          <Row>
-            <Col>
-              <div className="h-100">
+          /> 
+<div
+  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+}`}
+  style={{
+    position: "sticky",
+    top: "70px",
+    zIndex: 1030,
+    width: "100%",
+    marginTop: "-15px",
+    // backgroundColor: "#",
+  }}
+>
+    <div className="d-flex align-items-center flex-wrap gap-2">
+
+  <div className="d-flex align-items-center gap-1">
+    <span>Filtered From:</span>
+    <strong>{filters?.startDate || ""}</strong> to{" "}
+<strong>{filters?.endDate || ""}</strong>
+  </div>
+
+<div
+  style={{
+    borderLeft: "2px solid #ced4da",
+    height: "12px",
+    margin: "0 4px",
+  }}
+/>
+
+  <div className="d-flex align-items-center gap-1">
+    <span>Selected Branch:</span>
+    <strong>{selectedBranchName}</strong>
+  </div>
+<div
+  style={{
+    borderLeft: "2px solid #ced4da",
+    height: "12px",
+    margin: "0 4px",
+  }}
+/>
+  <div className="d-flex align-items-center gap-1 no-print">
+    <button
+      type="button"
+      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+      onClick={toggleRightColumn}
+    >
+      <i className="ri-filter-fill"></i>
+      Filter
+    </button>
+  </div>
+  </div>
+</div>                  
                 <Row>
-                  <Widget
+                    <Col xl={12}>
+                     <Widget
                     rightClickBtn={toggleRightColumn}
                     formatAmount={formatAmount}
                     purchaseSummary={purchaseSummary}
@@ -639,65 +692,26 @@ dispatchGroupByRequests(
                     error={error}
                     loading={loading}
                   />
+                    </Col>                 
                 </Row>
                 <Row>
-                  <Col xl={12}>
-                    {/* {isBranchView ? (
-                      <SalesByLocations
-                        data={spendByCategory}
-                        totalSpend={totalSpend}
-                        error={error}
-                        loading={loading}
-                      />
-                    ) : ( */}
+                  <Col xl={12}>            
                       <StoreVisits
                         data={branchData}
                         error={error}
                         loading={loading}
                       />
-                    {/* )} */}
                   </Col>
-
-                  {/* <Col xl={6}>
-                      <SalesByLocations
-                        data={spendByCategory}
-                        totalSpend={totalSpend}
-                        error={error}
-                        loading={loading}
-                      />
-                  </Col> */}
+                  </Row>
                   <Row>
                       <Col xl={12}>
                       <SupplierSpend
-                        supplierData={spendBySupplier}
-                       
+                        supplierData={spendBySupplier}                      
                         loading={loading}
                         error={error}
                       />
-                    </Col>
-                  
-                 
-                    
-                  </Row>
-                  <Row>
-                  
-                   
-                    {/* <Col xl={12}>
-                      <RecentOrders
-                        formatAmount={formatAmount}
-                        overdueSupplierAccounts={overdueSupplierAccounts}
-                        currentReceivables={currentReceivables}
-                        overdue31To60={overdue31To60}
-                        overdue61To90={overdue61To90}
-                        overdue91To120={overdue91To120}
-                        overdue120Plus={overdue120Plus}
-                        error={error}
-                        loading={loading}
-                      />
-                    </Col> */}
-                  </Row>
-                </Row>
-
+                    </Col>                                                       
+                  </Row>                                  
                 <Row>
                   <Col xl={6}>
                     <YearToDatePurchases
@@ -712,11 +726,7 @@ dispatchGroupByRequests(
                       series={monthToDateChart.series}
                       formatAmount={formatAmount}
                     />
-                  </Col>
-                </Row>
-              </div>
-            </Col>
-        
+                  </Col>                        
           <FilterActions
                   branch={filters.branch}
                     dateRange={filters.dateRange}
@@ -740,7 +750,7 @@ dispatchGroupByRequests(
             rightColumn={rightColumn}
             hideRightColumn={toggleRightColumn}
           />
-          </Row>
+                </Row>        
         </Container>
       </div>
     </React.Fragment>

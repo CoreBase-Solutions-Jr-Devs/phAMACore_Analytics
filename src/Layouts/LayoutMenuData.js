@@ -284,6 +284,7 @@ const Navdata = () => {
              {
           id: "Best-Price-Per-Supplier",
           label: "Best Price Supplier",
+           icon: "ri-price-tag-3-line",
           link: `/dashboard-purchase-orders/Best-Price-Supplier`,
           parentId: "purchase-orders",
         },
