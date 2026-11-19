@@ -144,7 +144,15 @@ const SupplierOrder = ({
             </button>
           </div>
         </div>
-
+ {summary.action_insight && (
+          <Row className="mt-1">
+            <Col xs="12">
+              <div className="alert alert-info mb-0 py-1 w-100">
+                {summary.action_insight}
+              </div>
+            </Col>
+          </Row>
+        )}
         {loading ? (
           <div className="text-center py-5">
             <div
@@ -158,6 +166,7 @@ const SupplierOrder = ({
             <p className="text-danger mb-0">{error}</p>
           </div>
         ) : (
+          
           <Row className="g-2 mb-0 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6">
             {/* 1. POs Issued */}
             <Col className="d-flex">
@@ -173,16 +182,17 @@ const SupplierOrder = ({
                     {summary.total_pos_issued ?? 0}
                   </h5>
                   <div className="mb-0 mt-auto">
-                    <p className="text-muted mb-0">
-                      Active supp:{" "}
+                 
+                       <p className="text-muted mb-0">
+                      Fulfilled POs:{" "}
                       <span className="fw-semibold">
-                        {summary.active_suppliers_count ?? 0}
+                        {summary.fulfilled_pos_count ?? 0}
                       </span>
                     </p>
                     <p className="text-muted mb-0">
-                      Outstanding:{" "}
+                      Partial POs:{" "}
                       <span className="fw-semibold">
-                        {summary.outstanding_pos_count ?? 0}
+                        {summary.partial_pos_count ?? 0}
                       </span>
                     </p>
                   </div>
@@ -211,15 +221,15 @@ const SupplierOrder = ({
 
                   <div className="mb-0 mt-auto">
                     <p className="text-muted mb-0">
-                      Fulfilled:{" "}
+                      Suppliers:{" "}
                       <span className="fw-semibold">
-                        {summary.fulfilled_pos_count ?? 0}
+                        {summary.active_suppliers_count ?? 0}
                       </span>
                     </p>
                     <p className="text-muted mb-0">
-                      Partial:{" "}
+                      Pending POs:{" "}
                       <span className="fw-semibold">
-                        {summary.partial_pos_count ?? 0}
+                        {summary.outstanding_pos_count ?? 0}
                       </span>
                     </p>
                   </div>
@@ -301,13 +311,13 @@ const SupplierOrder = ({
                     <p className="text-muted mb-0">
                       Min Days:{" "}
                       <span className="fw-semibold">
-                        KES {formatAmount(summary.min_delivery_lead_days)}
+                      {summary.min_delivery_lead_days}
                       </span>
                     </p>
                     <p className="text-muted mb-0">
                       Max Days:{" "}
                       <span className="fw-semibold">
-                        KES {formatAmount(summary.max_delivery_lead_days)}
+                      {summary.max_delivery_lead_days}
                       </span>
                     </p>
                     {/* <p className="text-muted mb-0">
@@ -338,9 +348,9 @@ On_Time Del:  <span className="fw-semibold">KES {formatPercent(summary.on_time_d
 
                   <div className="mb-0 mt-auto">
                     <p className="text-muted mb-0">
-                      On_Time Del:{" "}
+                      On_Time Delivery:{" "}
                       <span className="fw-semibold">
-                        KES {formatPercent(summary.on_time_delivery_rate_perc)}
+                        {formatPercent(summary.on_time_delivery_rate_perc)}
                       </span>
                     </p>
                   </div>
@@ -349,15 +359,7 @@ On_Time Del:  <span className="fw-semibold">KES {formatPercent(summary.on_time_d
             </Col>
           </Row>
         )}
-        {summary.action_insight && (
-          <Row className="mt-1">
-            <Col xs="12">
-              <div className="alert alert-info mb-0 py-1 w-100">
-                {summary.action_insight}
-              </div>
-            </Col>
-          </Row>
-        )}
+       
       </React.Fragment>
     </div>
   );

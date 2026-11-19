@@ -243,6 +243,12 @@ const Navdata = () => {
           link: `/dashboard-purchase-orders/Consolidated-LPO-Review`,
           parentId: "purchase-orders",
         },
+             {
+          id: "Best-Price-Per-Supplier",
+          label: "Best Price Supplier",
+          link: `/dashboard-purchase-orders/Best-Price-Supplier`,
+          parentId: "purchase-orders",
+        },
       ],
     },
   ];
