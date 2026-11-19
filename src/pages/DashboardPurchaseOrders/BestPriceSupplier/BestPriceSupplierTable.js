@@ -1,1204 +1,1076 @@
-// import React, { useMemo, useState } from "react";
-// import { Nav, NavItem, NavLink, Card, CardBody, CardHeader, Alert, UncontrolledTooltip, Badge, } from "reactstrap";
-// import { exportToExcel } from "../../../helpers/export_helper";
-// import CardExportButtons from "../../../Components/Common/CardExportButtons";
-// import TanstackTable from "../../../Components/Common/TanstackTable";
 
-// const formatNumber = (value) =>
-//   Number(value ?? 0).toLocaleString("en-KE");
+import React, { useMemo, useState } from "react";
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Nav,
+  NavItem,
+  NavLink,
+  Badge,
+  Alert,
+  UncontrolledTooltip,
+} from "reactstrap";
 
-// const formatAmount = (value) =>
-//   Number(value ?? 0).toLocaleString("en-KE", {
-//     minimumFractionDigits: 2,
-//     maximumFractionDigits: 2,
-//   });
+import TanstackTable from "../../../Components/Common/TanstackTable";
+import { exportToExcel } from "../../../helpers/export_helper";
+import CardExportButtons from "../../../Components/Common/CardExportButtons";
+const formatNumber = (value) =>
+  Number(value ?? 0).toLocaleString("en-KE");
 
-// const formatPercent = (value) =>
-//   `${Number(value ?? 0).toFixed(2)}%`;
+const formatAmount = (value) =>
+  Number(value ?? 0).toLocaleString("en-KE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
-// const formatDate = (value) => {
-//   if (!value) return "-";
+const formatPercent = (value) =>
+  `${Number(value ?? 0).toFixed(2)}%`;
 
-//   return new Date(value).toLocaleDateString("en-GB");
-// };
+const formatDate = (value) => {
+  if (!value) return "-";
 
-// const getBadgeColor = (percentage) => {
-//   if (percentage == null || Number.isNaN(Number(percentage))) {
-//     return "bg-warning-subtle text-warning";
-//   }
+  return new Date(value).toLocaleDateString("en-GB");
+};
 
-//   if (percentage < 10) {
-//     return "bg-danger-subtle text-danger-emphasis";
-//   }
+const getBadgeColor = (percentage) => {
+  if (percentage == null || Number.isNaN(Number(percentage))) {
+    return "bg-warning-subtle text-warning";
+  }
 
-//   if (percentage < 50) {
-//     return "bg-primary-subtle text-primary-emphasis";
-//   }
+  if (percentage < 10) {
+    return "bg-danger-subtle text-danger-emphasis";
+  }
 
-//   return "bg-success-subtle text-success";
-// };
+  if (percentage < 50) {
+    return "bg-primary-subtle text-primary-emphasis";
+  }
 
-// const getStatusBadge = (status) => {
-//   const normalized = String(status || "").toUpperCase();
-
-//   const styles = {
-//     FULFILLED: "bg-success-subtle text-success",
-//     PARTIAL: "bg-warning-subtle text-warning",
-//     UNFULFILLED: "bg-danger-subtle text-danger",
-//     OUTSTANDING: "bg-danger-subtle text-danger",
-//     OVER_FULFILLED: "bg-info-subtle text-info",
-//   };
-
-//   return (
-//     <Badge
-//       className={`${styles[normalized] || "bg-secondary-subtle text-secondary"} px-2 py-1 rounded-pill`}
-//     >
-//       {status || "Unknown"}
-//     </Badge>
-//   );
-// };
-
-// const ConsolidatedLPOReviewTabs = [
-//   {
-//     label: "LPO Summary",
-//     value: "ConsolidatedList",
-//     className: "bg-primary-subtle text-primary",
-//     activeClass: "bg-primary text-white",
-//     badgeClass: "bg-primary",
-//   },
-//   {
-//     label: "Supplier Analysis",
-//     value: "supplier",
-//     className: "bg-success-subtle text-success",
-//     activeClass: "bg-success text-white",
-//     badgeClass: "bg-success",
-//   },
-//   {
-//     label: "Branch Analysis",
-//     value: "branch",
-//     className: "bg-warning-subtle text-warning",
-//     activeClass: "bg-warning text-dark",
-//     badgeClass: "bg-warning",
-//   },
-//   {
-//     label: "Item Drilldown",
-//     value: "drilldown",
-//     className: "bg-info-subtle text-info",
-//     activeClass: "bg-info text-white",
-//     badgeClass: "bg-info",
-//   },
-// ];
-
-// const ConsolidatedLPOReviewTable = ({
-//   ConsolidatedLPOReviewConsolidatedList,
-//  ConsolidatedLPOReviewDrilldown,
-//  ConsolidatedLPOReviewBranch,
-// ConsolidatedLPOReviewSupplier,
-// // SupplierReturnsReason,
-//   loading = false,
-//   error = null,
-// }) => {
-//   const [activeTab, setActiveTab] = useState("branch");
-
-// const tabCounts = useMemo(
-//   () => ({
-//     supplier: ConsolidatedLPOReviewSupplier.length,
-//     drilldown: ConsolidatedLPOReviewDrilldown.length,
-//     branch: ConsolidatedLPOReviewBranch.length,
-//     ConsolidatedList: ConsolidatedLPOReviewConsolidatedList.length,
-//     // sku: SupplierReturnsSKU.length,
-//   }),
-//   [
-//    ConsolidatedLPOReviewSupplier,
-// //  SupplierReturnsDrilldown,
-//  ConsolidatedLPOReviewDrilldown,
-// ConsolidatedLPOReviewBranch,
-// ConsolidatedLPOReviewConsolidatedList,
-//   ]
-// );
-
-// const renderInsightCell = (content, row, prefix) => {
-//   const tooltipId = `${prefix}-${row.index}`;
-
-//   return (
-//     <>
-//       <div
-//         id={tooltipId}
-//         className="w-100 h-100"
-//         style={{ cursor: "default" }}
-//       >
-//         {content}
-//       </div>
-
-//       <UncontrolledTooltip target={tooltipId} placement="top">
-//         {row.original.action_insight || "No insight available"}
-//       </UncontrolledTooltip>
-//     </>
-//   );
-// };
- 
-// const supplierColumns = useMemo(
-//   () => [
-//     {
-//       header: "Supplier",
-//       accessorKey: "supplier_name",
-//       meta: { sticky: "group" },
-//       cell: ({ row }) =>
-//         renderInsightCell(
-//           <div className="d-flex flex-column">
-//             <span className="fw-semibold text-dark">
-//               {row.original.supplier_name || "-"}
-//             </span>
-//             <small className="text-muted">
-//               {row.original.supplier_id || "-"}
-//             </small>
-//           </div>,
-//           row,
-//           "supplier-name"
-//         ),
-//     },
-//     {
-//       header: "LPOs",
-//       accessorKey: "lpo_count",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "supplier-lpo-count"
-//         ),
-//     },
-//     {
-//       header: "Unique SKUs",
-//       accessorKey: "unique_skus_count",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "supplier-unique-skus"
-//         ),
-//     },
-//     {
-//       header: "Total Value (KES)",
-//       accessorKey: "total_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <span className="fw-semibold text-caramel">
-//             {formatAmount(getValue())}
-//           </span>,
-//           row,
-//           "supplier-total-value"
-//         ),
-//     },
-//     {
-//       header: "Class A SKUs",
-//       accessorKey: "class_a_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "supplier-class-a-skus"
-//         ),
-//     },
-//     {
-//       header: "Class A Value (KES)",
-//       accessorKey: "class_a_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "supplier-class-a-value"
-//         ),
-//     },
-//     {
-//       header: "Class B SKUs",
-//       accessorKey: "class_b_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "supplier-class-b-skus"
-//         ),
-//     },
-//     {
-//       header: "Class B Value (KES)",
-//       accessorKey: "class_b_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "supplier-class-b-value"
-//         ),
-//     },
-//     {
-//       header: "Class C SKUs",
-//       accessorKey: "class_c_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "supplier-class-c-skus"
-//         ),
-//     },
-//     {
-//       header: "Class C Value (KES)",
-//       accessorKey: "class_c_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "supplier-class-c-value"
-//         ),
-//     },
-//     {
-//       header: "Class C Share (%)",
-//       accessorKey: "class_c_value_share_perc",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {formatPercent(getValue())}
-//           </Badge>,
-//           row,
-//           "supplier-class-c-share"
-//         ),
-//     },
-//     {
-//       header: "Insight",
-//       accessorKey: "action_insight",
-//       enableSorting: false,
-//       cell: ({ row }) =>
-//         renderInsightCell(
-//           <span className="text-primary">
-//             <i className="ri-information-line me-1"></i>
-//             View Insight
-//           </span>,
-//           row,
-//           "supplier-lpo-insight"
-//         ),
-//     },
-//   ],
-//   []
-// );
-
-// const drilldownColumns = useMemo(
-//   () => [
-//     {
-//       header: "LPO",
-//       accessorKey: "lpo_number",
-//       meta: { sticky: "group" },
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <span className="fw-semibold text-dark">
-//             {getValue() || "-"}
-//           </span>,
-//           row,
-//           "drilldown-lpo-number"
-//         ),
-//     },
-//     {
-//       header: "LPODate",
-//       accessorKey: "lpo_date",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatDate(getValue()),
-//           row,
-//           "drilldown-lpo-date"
-//         ),
-//     },
-//     {
-//       header: "Supplier",
-//       accessorKey: "supplier_name",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <div className="d-flex flex-column">
-//             <span className="fw-semibold text-dark">
-//               {getValue() || "-"}
-//             </span>
-//             <small className="text-muted">
-//               {row.original.supplier_id || "-"}
-//             </small>
-//           </div>,
-//           row,
-//           "drilldown-supplier"
-//         ),
-//     },
-//     {
-//       header: "Branch",
-//       accessorKey: "branch_name",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           getValue()?.replace(/^AXCESS PHARMACY\s*-\s*/i, "") || "-",
-//           row,
-//           "drilldown-branch"
-//         ),
-//     },
-//     {
-//       header: "Item",
-//       accessorKey: "item_name",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <div className="d-flex flex-column">
-//             <span className="fw-semibold text-dark">
-//               {getValue() || "-"}
-//             </span>
-//             <small className="text-muted">
-//               {row.original.item_code || "-"}
-//             </small>
-//           </div>,
-//           row,
-//           "drilldown-item"
-//         ),
-//     },
-//     {
-//       header: "PackSize",
-//       accessorKey: "pack_size",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "drilldown-pack-size"
-//         ),
-//     },
-//     {
-//       header: "PackQty",
-//       accessorKey: "pack_quantity",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "drilldown-pack-quantity"
-//         ),
-//     },
-//     {
-//       header: "PieceQty",
-//       accessorKey: "piece_quantity",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "drilldown-piece-quantity"
-//         ),
-//     },
-//     {
-//       header: "OrderedQty(W/P)",
-//       accessorKey: "ordered_qty_wp",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <span className="fw-semibold text-caramel">
-//             {getValue() || "-"}
-//           </span>,
-//           row,
-//           "drilldown-ordered-quantity"
-//         ),
-//     },
-//     {
-//       header: "PackPrice(KES)",
-//       accessorKey: "pack_price",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "drilldown-pack-price"
-//         ),
-//     },
-//     {
-//       header: "UnitCost(KES)",
-//       accessorKey: "unit_cost",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "drilldown-unit-cost"
-//         ),
-//     },
-//     {
-//       header: "TotalCost(KES)",
-//       accessorKey: "line_total_cost",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <span className="fw-semibold text-caramel">
-//             {formatAmount(getValue())}
-//           </span>,
-//           row,
-//           "drilldown-total-cost"
-//         ),
-//     },
-//     {
-//       header: "ABCClass",
-//       accessorKey: "abc_class",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {getValue()?.replace("_", " ") || "-"}
-//           </Badge>,
-//           row,
-//           "drilldown-abc-class"
-//         ),
-//     },
-//     {
-//       header: "Status",
-//       accessorKey: "lpo_status",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {getValue() || "-"}
-//           </Badge>,
-//           row,
-//           "drilldown-lpo-status"
-//         ),
-//     },
-//     {
-//       header: "RaisedBy",
-//       accessorKey: "raised_by",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           getValue() || "-",
-//           row,
-//           "drilldown-raised-by"
-//         ),
-//     },
-//     {
-//       header: "Insight",
-//       accessorKey: "action_insight",
-//       enableSorting: false,
-//       cell: ({ row }) =>
-//         renderInsightCell(
-//           <span className="text-primary">
-//             <i className="ri-information-line me-1"></i>
-//             View Insight
-//           </span>,
-//           row,
-//           "drilldown-lpo-insight"
-//         ),
-//     },
-//   ],
-//   []
-// );
-
-// const branchColumns = useMemo(
-//   () => [
-//     {
-//       header: "Branch",
-//       accessorKey: "branch_name",
-//       meta: { sticky: "group" },
-//       cell: ({ row }) =>
-//         renderInsightCell(
-//           <div >
-//             <span className="fw-semibold text-dark">
-//               {row.original.branch_name?.replace(
-//                 /^AXCESS PHARMACY\s*-\s*/i,
-//                 ""
-//               ) || "-"}
-//             </span>
-//             {/* <small className="text-muted">
-//               {row.original.branch_id ?? "-"}
-//             </small> */}
-//           </div>,
-//           row,
-//           "branch-name"
-//         ),
-//     },
-//     {
-//       header: "LPOs",
-//       accessorKey: "lpo_count",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "branch-lpo-count"
-//         ),
-//     },
-//     {
-//       header: "Unique SKUs",
-//       accessorKey: "unique_skus_count",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "branch-unique-skus"
-//         ),
-//     },
-//     {
-//       header: "Total Value (KES)",
-//       accessorKey: "total_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <span className="fw-semibold text-caramel">
-//             {formatAmount(getValue())}
-//           </span>,
-//           row,
-//           "branch-total-value"
-//         ),
-//     },
-//     {
-//       header: "Class A SKUs",
-//       accessorKey: "class_a_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "branch-class-a-skus"
-//         ),
-//     },
-//     {
-//       header: "Class A Value (KES)",
-//       accessorKey: "class_a_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "branch-class-a-value"
-//         ),
-//     },
-//     {
-//       header: "Class B SKUs",
-//       accessorKey: "class_b_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "branch-class-b-skus"
-//         ),
-//     },
-//     {
-//       header: "Class B Value (KES)",
-//       accessorKey: "class_b_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "branch-class-b-value"
-//         ),
-//     },
-//     {
-//       header: "Class C SKUs",
-//       accessorKey: "class_c_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "branch-class-c-skus"
-//         ),
-//     },
-//     {
-//       header: "Class C Value (KES)",
-//       accessorKey: "class_c_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "branch-class-c-value"
-//         ),
-//     },
-//     {
-//       header: "Class C Share(%)",
-//       accessorKey: "class_c_value_share_perc",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {formatPercent(getValue())}
-//           </Badge>,
-//           row,
-//           "branch-class-c-share"
-//         ),
-//     },
-//     // {
-//     //   header: "Insight",
-//     //   accessorKey: "action_insight",
-//     //   enableSorting: false,
-//     //   cell: ({ row }) =>
-//     //     renderInsightCell(
-//     //       <span className="text-primary">
-//     //         <i className="ri-information-line me-1"></i>
-//     //         View Insight
-//     //       </span>,
-//     //       row,
-//     //       "branch-lpo-insight"
-//     //     ),
-//     // },
-//   ],
-//   []
-// );
-
-// const ConsolidatedListColumns = useMemo(
-//   () => [
-//       {
-//       header: "Supplier",
-//       accessorKey: "supplier_name",
-//        meta: { sticky: "group" },
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <div className="d-flex flex-column">
-//             <span className="fw-semibold text-dark">
-//               {getValue() || "-"}
-//             </span>
-//             <small className="text-muted">
-//               {row.original.supplier_id || "-"}
-//             </small>
-//           </div>,
-//           row,
-//           "lpo-supplier"
-//         ),
-//     },
-//       {
-//       header: "Branch",
-//       accessorKey: "branch_name",
-//          meta: { sticky: "sub-group" },
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <div className="d-flex flex-column">
-//             <span className="fw-semibold text-dark">
-//               {getValue()?.replace(
-//                 /^AXCESS PHARMACY\s*-\s*/i,
-//                 ""
-//               ) || "-"}
-//             </span>
-//             {/* <small className="text-muted">
-//               {row.original.branch_id ?? "-"}
-//             </small> */}
-//           </div>,
-//           row,
-//           "lpo-branch"
-//         ),
-//     },
-  
-//     {
-//       header: "LPO",
-//       accessorKey: "lpo_number",
-     
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <span className="fw-semibold text-dark">
-//             {getValue() || "-"}
-//           </span>,
-//           row,
-//           "lpo-number"
-//         ),
-//     },
-  
-//          {
-//       header: "TotalValue(KES)",
-//       accessorKey: "total_lpo_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <span className="fw-semibold text-caramel">
-//             {formatAmount(getValue())}
-//           </span>,
-//           row,
-//           "lpo-total-value"
-//         ),
-//     },
-//     {
-//       header: "Class A SKUs",
-//       accessorKey: "class_a_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "lpo-class-a-skus"
-//         ),
-//     },
-//     {
-//       header: "Class A Value(KES)",
-//       accessorKey: "class_a_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "lpo-class-a-value"
-//         ),
-//     },
-//     {
-//       header: "Class A Share(%)",
-//       accessorKey: "class_a_value_share_perc",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {formatPercent(getValue())}
-//           </Badge>,
-//           row,
-//           "lpo-class-a-share"
-//         ),
-//     },
-//     {
-//       header: "Class B SKUs",
-//       accessorKey: "class_b_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "lpo-class-b-skus"
-//         ),
-//     },
-//     {
-//       header: "Class B Value(KES)",
-//       accessorKey: "class_b_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "lpo-class-b-value"
-//         ),
-//     },
-//     {
-//       header: "Class B Share(%)",
-//       accessorKey: "class_b_value_share_perc",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {formatPercent(getValue())}
-//           </Badge>,
-//           row,
-//           "lpo-class-b-share"
-//         ),
-//     },
-//     {
-//       header: "Class C SKUs",
-//       accessorKey: "class_c_skus",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "lpo-class-c-skus"
-//         ),
-//     },
-//     {
-//       header: "Class C Value(KES)",
-//       accessorKey: "class_c_value_kes",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatAmount(getValue()),
-//           row,
-//           "lpo-class-c-value"
-//         ),
-//     },
-//     {
-//       header: "Class C Share(%)",
-//       accessorKey: "class_c_value_share_perc",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {formatPercent(getValue())}
-//           </Badge>,
-//           row,
-//           "lpo-class-c-share"
-//         ),
-//     },  
-//     {
-//       header: "UniqueSKUs",
-//       accessorKey: "unique_skus_count",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "lpo-unique-skus"
-//         ),
-//     },
-//     {
-//       header: "OrderedPieces",
-//       accessorKey: "total_ordered_pieces",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatNumber(getValue()),
-//           row,
-//           "lpo-ordered-pieces"
-//         ),
-//     },
-   
-//     {
-//       header: "CapitalRisk",
-//       accessorKey: "capital_risk_flag",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {getValue()?.replace(/_/g, " ") || "-"}
-//           </Badge>,
-//           row,
-//           "lpo-capital-risk"
-//         ),
-//     },
-
-//       {
-//       header: "LPODate",
-//       accessorKey: "lpo_date",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatDate(getValue()),
-//           row,
-//           "lpo-date"
-//         ),
-//     },
-//     {
-//       header: "ExpectedDelivery",
-//       accessorKey: "expected_delivery_date",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           formatDate(getValue()),
-//           row,
-//           "lpo-expected-delivery"
-//         ),
-//     },
-  
-//     {
-//       header: "RaisedBy",
-//       accessorKey: "raised_by",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           getValue() || "-",
-//           row,
-//           "lpo-raised-by"
-//         ),
-//     },
-//     {
-//       header: "Status",
-//       accessorKey: "lpo_status",
-//       cell: ({ getValue, row }) =>
-//         renderInsightCell(
-//           <Badge className={getBadgeColor(getValue())}>
-//             {getValue() || "-"}
-//           </Badge>,
-//           row,
-//           "lpo-status"
-//         ),
-//     },
-//     // {
-//     //   header: "Insight",
-//     //   accessorKey: "action_insight",
-//     //   enableSorting: false,
-//     //   cell: ({ row }) =>
-//     //     renderInsightCell(
-//     //       <span className="text-primary">
-//     //         <i className="ri-information-line me-1"></i>
-//     //         View Insight
-//     //       </span>,
-//     //       row,
-//     //       "lpo-insight"
-//     //     ),
-//     // },
-//   ],
-//   []
-// );
+  return "bg-success-subtle text-success";
+};
 
 
-// // const skuColumns = useMemo(
-// //   () => [
-// //     {
-// //       header: "Drilldown",
-// //       accessorKey: "item_name",
-// //       meta: { sticky: "group" },
-// //       cell: ({ getValue, row }) =>
-// //         renderInsightCell(
-// //           <div className="d-flex flex-column">
-// //             <span className="fw-semibold text-dark">
-// //               {getValue() || "-"}
-// //             </span>
-// //             <small className="text-muted">
-// //               {row.original.item_code || "-"}
-// //             </small>
-// //           </div>,
-// //           row,
-// //           "sku-drilldown"
-// //         ),
-// //     },
-// //     {
-// //       header: "PackSize",
-// //       accessorKey: "pack_size",
-// //       cell: ({ getValue, row }) =>
-// //         renderInsightCell(
-// //           formatNumber(getValue()),
-// //           row,
-// //           "sku-pack-size"
-// //         ),
-// //     },
-// //     {
-// //       header: "Suppliers",
-// //       accessorKey: "suppliers_count",
-// //       cell: ({ getValue, row }) =>
-// //         renderInsightCell(
-// //           formatNumber(getValue()),
-// //           row,
-// //           "sku-suppliers"
-// //         ),
-// //     },
-// //     {
-// //       header: "DebitNotes",
-// //       accessorKey: "debit_notes_count",
-// //       cell: ({ getValue, row }) =>
-// //         renderInsightCell(
-// //           formatNumber(getValue()),
-// //           row,
-// //           "sku-debit-notes"
-// //         ),
-// //     },
-// //     {
-// //       header: "UnitsReturned",
-// //       accessorKey: "total_units_returned",
-// //       cell: ({ getValue, row }) =>
-// //         renderInsightCell(
-// //           formatNumber(getValue()),
-// //           row,
-// //           "sku-units-returned"
-// //         ),
-// //     },
-// //     {
-// //       header: "QtyReturned(W/P)",
-// //       accessorKey: "qty_returned_wp",
-// //       cell: ({ getValue, row }) =>
-// //         renderInsightCell(
-// //           <span className="fw-semibold text-caramel">
-// //             {getValue() || "-"}
-// //           </span>,
-// //           row,
-// //           "sku-qty-returned-wp"
-// //         ),
-// //     },
-// //     {
-// //       header: "ReturnValue(KES)",
-// //       accessorKey: "total_return_value_exc",
-// //       cell: ({ getValue, row }) =>
-// //         renderInsightCell(
-// //           <span className="fw-semibold text-danger">
-// //             {formatAmount(getValue())}
-// //           </span>,
-// //           row,
-// //           "sku-return-value"
-// //         ),
-// //     },
-// //     // {
-// //     //   header: "Insight",
-// //     //   accessorKey: "action_insight",
-// //     //   enableSorting: false,
-// //     //   cell: ({ row }) =>
-// //     //     renderInsightCell(
-// //     //       <span className="text-primary">
-// //     //         <i className="ri-information-line me-1"></i>
-// //     //         View Insight
-// //     //       </span>,
-// //     //       row,
-// //     //       "sku-insight"
-// //     //     ),
-// //     // },
-// //   ],
-// //   []
-// // );
+const getStatusBadge = (status) => {
+  const normalized = String(status || "").toUpperCase();
 
-// const tableConfig = {
-//   ConsolidatedList: {
-//     columns: ConsolidatedListColumns,
-//     data: ConsolidatedLPOReviewConsolidatedList,
-//     placeholder: "Search LPOs, suppliers...",
-//     emptyMessage: "No consolidated LPO records found.",
-//   },
-//   supplier: {
-//     columns: supplierColumns,
-//     data: ConsolidatedLPOReviewSupplier,
-//     placeholder: "Search suppliers...",
-//     emptyMessage: "No supplier LPO records found.",
-//   },
-//   branch: {
-//     columns: branchColumns,
-//     data: ConsolidatedLPOReviewBranch,
-//     placeholder: "Search branches...",
-//     emptyMessage: "No branch LPO records found.",
-//   },
-//   drilldown: {
-//     columns: drilldownColumns,
-//     data: ConsolidatedLPOReviewDrilldown,
-//     placeholder: "Search LPOs, items...",
-//     emptyMessage: "No LPO item drilldown records found.",
-//   },
-// };
+  const styles = {
+    BEST_PRICE: "bg-success-subtle text-success",
+    PREMIUM: "bg-warning-subtle text-warning",
+    ABOVE_MARKET: "bg-danger-subtle text-danger",
+  };
 
-//   const currentTable = tableConfig[activeTab];
+  return styles[normalized] || "bg-secondary-subtle text-secondary";
+};
 
-//  const toolbarContent = (
-//   <Nav
-//     pills
-//     className="nav-tabs-custom flex-wrap gap-1"
-//     role="tablist"
-//   >
-//     {ConsolidatedLPOReviewTabs.map((tab) => {
-//       const isActive = activeTab === tab.value;
+const renderInsightCell = (content, row, prefix) => {
+  const tooltipId = `${prefix}-${row.index}`;
 
-//       return (
-//         <NavItem key={tab.value}>
-//           <NavLink
-//             href="#"
-//             active={isActive}
-//             onClick={(event) => {
-//               event.preventDefault();
-//               setActiveTab(tab.value);
-//             }}
-//             className={`px-2 py-1 ${
-//               isActive ? tab.activeClass : tab.className
-//             }`}
-//             style={{
-//               whiteSpace: "nowrap",
-//               cursor: "pointer",
-//               fontSize: "11px",
-//               borderRadius: "6px",
-//             }}
-//           >
-//             {tab.label}
+  return (
+    <>
+      <div
+        id={tooltipId}
+        className="w-100 h-100"
+        style={{ cursor: "default" }}
+      >
+        {content}
+      </div>
 
-//             <Badge
-//               className={`ms-1 ${
-//                 isActive
-//                   ? "bg-white text-dark"
-//                   : `text-white ${tab.badgeClass}`
-//               }`}
-//             >
-//               {tabCounts[tab.value]}
-//             </Badge>
-//           </NavLink>
-//         </NavItem>
-//       );
-//     })}
-//   </Nav>
-// );
+      <UncontrolledTooltip target={tooltipId} placement="top">
+        {row.original.action_insight || "No insight available"}
+      </UncontrolledTooltip>
+    </>
+  );
+};
 
-// const handleExportExcel = () => {
-//   const rows = (currentTable.data || []).map((item) => {
-//     if (activeTab === "supplier") {
-//       return {
-//         "Supplier ID": item.supplier_id,
-//         "Supplier Name": item.supplier_name,
-//         "LPO Count": item.lpo_count,
-//         "Unique SKUs": item.unique_skus_count,
-//         "Total Value (KES)": item.total_value_kes,
-//         "Class A SKUs": item.class_a_skus,
-//         "Class A Value (KES)": item.class_a_value_kes,
-//         "Class B SKUs": item.class_b_skus,
-//         "Class B Value (KES)": item.class_b_value_kes,
-//         "Class C SKUs": item.class_c_skus,
-//         "Class C Value (KES)": item.class_c_value_kes,
-//         "Class C Share (%)": item.class_c_value_share_perc,
-//         "Action Insight": item.action_insight,
-//       };
-//     }
+const BestPricePerSupplierTable = ({
+  BestPricePerSupplierSupplierScorecardData = [],
+  BestPricePerSupplierItemMatrixData = [],
+  BestPricePerSupplierBestPriceCatalogData = [],
+  BestPricePerSupplierProposedHistoricalData = [],
+  error = null,
+  loading = false,
+}) => {
+  const [activeTab, setActiveTab] = useState("supplier");
 
-//     if (activeTab === "drilldown") {
-//       return {
-//         "LPO Number": item.lpo_number,
-//         "LPO Date": item.lpo_date,
-//         "Branch ID": item.branch_id,
-//         "Branch Name": item.branch_name,
-//         "Supplier ID": item.supplier_id,
-//         "Supplier Name": item.supplier_name,
-//         "Item Code": item.item_code,
-//         "Item Name": item.item_name,
-//         "Pack Size": item.pack_size,
-//         "Pack Quantity": item.pack_quantity,
-//         "Piece Quantity": item.piece_quantity,
-//         "Ordered Quantity (W/P)": item.ordered_qty_wp,
-//         "Pack Price (KES)": item.pack_price,
-//         "Unit Cost (KES)": item.unit_cost,
-//         "Line Total Cost (KES)": item.line_total_cost,
-//         "ABC Class": item.abc_class,
-//         "LPO Status": item.lpo_status,
-//         "Raised By": item.raised_by,
-//         "Action Insight": item.action_insight,
-//       };
-//     }
 
-//     if (activeTab === "branch") {
-//       return {
-//         "Branch ID": item.branch_id,
-//         "Branch Name": item.branch_name,
-//         "LPO Count": item.lpo_count,
-//         "Unique SKUs": item.unique_skus_count,
-//         "Total Value (KES)": item.total_value_kes,
-//         "Class A SKUs": item.class_a_skus,
-//         "Class A Value (KES)": item.class_a_value_kes,
-//         "Class B SKUs": item.class_b_skus,
-//         "Class B Value (KES)": item.class_b_value_kes,
-//         "Class C SKUs": item.class_c_skus,
-//         "Class C Value (KES)": item.class_c_value_kes,
-//         "Class C Share (%)": item.class_c_value_share_perc,
-//         "Action Insight": item.action_insight,
-//       };
-//     }
+  const supplierData = useMemo(() => {
+    return [...(BestPricePerSupplierSupplierScorecardData || [])].sort(
+      (a, b) =>
+        Number(b.total_spend_exc || 0) -
+        Number(a.total_spend_exc || 0)
+    );
+  }, [BestPricePerSupplierSupplierScorecardData]);
 
-//     return {
-//       "LPO Number": item.lpo_number,
-//       "LPO Date": item.lpo_date,
-//       "Expected Delivery Date": item.expected_delivery_date,
-//       "Branch ID": item.branch_id,
-//       "Branch Name": item.branch_name,
-//       "Supplier ID": item.supplier_id,
-//       "Supplier Name": item.supplier_name,
-//       "Raised By": item.raised_by,
-//       "LPO Status": item.lpo_status,
-//       "Total LPO Value (KES)": item.total_lpo_value_kes,
-//       "Unique SKUs": item.unique_skus_count,
-//       "Total Ordered Pieces": item.total_ordered_pieces,
-//       "Class A SKUs": item.class_a_skus,
-//       "Class A Value (KES)": item.class_a_value_kes,
-//       "Class A Share (%)": item.class_a_value_share_perc,
-//       "Class B SKUs": item.class_b_skus,
-//       "Class B Value (KES)": item.class_b_value_kes,
-//       "Class B Share (%)": item.class_b_value_share_perc,
-//       "Class C SKUs": item.class_c_skus,
-//       "Class C Value (KES)": item.class_c_value_kes,
-//       "Class C Share (%)": item.class_c_value_share_perc,
-//       "Capital Risk Flag": item.capital_risk_flag,
-//       "Action Insight": item.action_insight,
-//     };
-//   });
+  const itemMatrixData = useMemo(
+    () => BestPricePerSupplierItemMatrixData || [],
+    [BestPricePerSupplierItemMatrixData]
+  );
 
-//   const todayStr = new Date()
-//     .toLocaleDateString("en-GB")
-//     .replace(/\//g, "-");
+  const bestPriceCatalogData = useMemo(
+    () => BestPricePerSupplierBestPriceCatalogData || [],
+    [BestPricePerSupplierBestPriceCatalogData]
+  );
+          
+const proposedHistoricalData = useMemo(
+  () => BestPricePerSupplierProposedHistoricalData || [],
+  [BestPricePerSupplierProposedHistoricalData]
+);
 
-//   exportToExcel(
-//     rows,
-//     `Consolidated_LPO_Review_${activeTab}_${todayStr}`
-//   );
-// };
-
-//   return (
-// <Card
-//   className="card-height-100"
-//   id="branch-order-fill-rate-card"
-// >
-//   <CardHeader className="d-flex justify-content-between align-items-center flex-wrap border-0 pb-0 gap-2">
-// <div>
-//   <h4 className="card-title mb-0">Consolidated LPO Review</h4>
-//   <p className="text-muted mb-0">
-//     Review LPO values, supplier and branch performance, item classifications, and capital risk.
-//   </p>
-// </div>
-
-// <CardExportButtons
-//   targetId="consolidated-lpo-review-card"
-//   title="Consolidated LPO Review"
-//   onExport={handleExportExcel}
-// />
-//   </CardHeader>
-
+  const supplierColumns = useMemo(
+    () => [
+      {
+        header: "Supplier",
+        accessorKey: "supplier_name",
+        meta: { sticky: "group" },
+        cell: ({ row }) =>
+          renderInsightCell(
+            <div className="d-flex flex-column">
+              <span className="fw-semibold text-dark">
+                {row.original.supplier_name || "-"}
+              </span>
+              <small className="text-muted">
+                {row.original.supplier_id || "-"}
+              </small>
+            </div>,
+            row,
+            "scorecard-supplier"
+          ),
+      },
+        {
+        header: "SavingsLost(KES)",
+        accessorKey: "total_savings_lost_to_premium",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span
+              className={              
+                  "text-warning fw-semibold"               
+              }
+            >
+              {formatAmount(getValue())}
+            </span>,
+            row,
+            "scorecard-savings-lost"
+          ),
+      },
+      {
+        header: "TotalSpend.Excl(KES)",
+        accessorKey: "total_spend_exc",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span className="fw-semibold text-caramel">
+              {formatAmount(getValue())}
+            </span>,
+            row,
+            "scorecard-spend"
+          ),
+      },
+      {
+        header: "ItemsSupplied",
+        accessorKey: "total_items_supplied",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            formatNumber(getValue()),
+            row,
+            "scorecard-items"
+          ),
+      },
+      {
+        header: "BestPriceItems",
+        accessorKey: "best_price_items_count",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span className="fw-semibold text-success">
+              {formatNumber(getValue())}
+            </span>,
+            row,
+            "scorecard-wins"
+          ),
+      },
+      {
+        header: "PremiumItems",
+        accessorKey: "premium_items_count",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+          <span className="fw-semibold text-danger">
+              {formatNumber(getValue())}
+            </span>,
+            row,
+            "scorecard-premium-items"
+          ),
+      },
+      {
+        header: "WinRate(%)",
+        accessorKey: "price_competitiveness_win_rate_perc",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <Badge className={getBadgeColor(Number(getValue()))}>
+        {formatPercent(getValue())}
+      </Badge>,
+            row,
+            "scorecard-win-rate"
+          ),
+      },
+      {
+        header: "AvgPremium(%)",
+        accessorKey: "avg_premium_perc_when_higher",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+             <Badge className={getBadgeColor(Number(getValue()))}>
+        {formatPercent(getValue())}
+      </Badge>,
+            row,
+            "scorecard-avg-premium"
+          ),
+      },
     
-//           <CardBody>
-//             {error && (
-//               <Alert color="danger" className="mb-3">
-//                 {typeof error === "string"
-//                   ? error
-//                   : error.message || "Failed to load category spend data."}
-//               </Alert>
-//             )}
-//     <TanstackTable
-//       columns={currentTable.columns}
-//       data={currentTable.data}
-//       toolbarContent={toolbarContent}
-//       isGlobalFilter={true}
-//       SearchPlaceholder={currentTable.placeholder}
-//       customPageSize={10}
-//       pageSizeOptions={[5, 10, 20, 30, 50]}
-//       loading={loading}
-//       error={error}
-//       emptyMessage={currentTable.emptyMessage}
-//     />
-//       </CardBody>
-//         </Card>
-//   );
-// };
+     
+    ],
+    []
+  );
 
-// export default ConsolidatedLPOReviewTable;
+  const itemMatrixColumns = useMemo(
+    () => [
+      {
+        header: "Item",
+        accessorKey: "item_name",
+        meta: { sticky: "group" },
+        cell: ({ row }) =>
+          renderInsightCell(
+            <div className="d-flex flex-column">
+              <span className="fw-semibold text-dark">
+                {row.original.item_name || "-"}
+              </span>
+              <small className="text-muted">
+                {row.original.item_code || "-"}
+              </small>
+            </div>,
+            row,
+            "matrix-item"
+          ),
+      },
+      {
+        header: "Supplier",
+        accessorKey: "supplier_name",
+         meta: { sticky: "sub-group" },
+        cell: ({ row }) =>
+          renderInsightCell(
+            <div className="d-flex flex-column">
+              <span className="fw-semibold">
+                {row.original.supplier_name || "-"}
+              </span>
+              <small className="text-muted">
+                {row.original.supplier_id || "-"}
+              </small>
+            </div>,
+            row,
+            "matrix-supplier"
+          ),
+      },
+      {
+        header: "PackSize",
+        accessorKey: "pack_size",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            formatNumber(getValue()),
+            row,
+            "matrix-pack-size"
+          ),
+      },
+    
+      {
+        header: "Suppliers",
+        accessorKey: "total_suppliers_for_item",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            formatNumber(getValue()),
+            row,
+            "matrix-suppliers-count"
+          ),
+      },
+      {
+        header: "BestUnitPrice(KES)",
+        accessorKey: "best_unit_price",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span className="fw-semibold text-success">
+              {formatAmount(getValue())}
+            </span>,
+            row,
+            "matrix-best-unit-price"
+          ),
+      },
+      {
+        header: "LatestUnitPrice(KES)",
+        accessorKey: "latest_unit_price",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+                <span className="fw-semibold text-warning">
+    { formatAmount(getValue())}
+                </span>,      
+            row,
+            "matrix-latest-price"
+          ),
+      },
+      {
+        header: "MarketBest(KES)",
+        accessorKey: "market_best_unit_price",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+              <span className="fw-semibold text-info">
+ {formatAmount(getValue())}
+              </span>,           
+            row,
+            "matrix-market-best"
+          ),
+      },
+      {
+        header: "MarketWorst(KES)",
+        accessorKey: "market_worst_unit_price",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+             <span className="fw-semibold text-success">              
+            {formatAmount(getValue())}
+            </span>,
+            row,
+            "matrix-market-worst"
+          ),
+      },
+      {
+        header: "Premium(%)",
+        accessorKey: "premium_over_best_perc",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+ <Badge className={getBadgeColor(Number(getValue()))}>        
+       {formatPercent(getValue())}
+            </Badge>,
+            row,
+            "matrix-premium"
+          ),
+      },
+      {
+        header: "PiecesPurchased",
+        accessorKey: "total_pieces_purchased",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            formatNumber(getValue()),
+            row,
+            "matrix-pieces"
+          ),
+      },
+      {
+        header: "TotalSpend.Exc(KES)",
+        accessorKey: "total_spend_exc",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span className="fw-semibold text-caramel">
+              {formatAmount(getValue())}
+            </span>,
+            row,
+            "matrix-spend"
+          ),
+      },
+      {
+        header: "PotentialSavings(KES)",
+        accessorKey: "potential_savings_realizable",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span className="fw-semibold text-success">
+              {formatAmount(getValue())}
+            </span>,
+            row,
+            "matrix-savings"
+          ),
+      },
+        {
+        header: "PriceRank",
+        accessorKey: "price_rank",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+         <Badge className={getBadgeColor(Number(getValue()))}>
+              #{getValue() ?? "-"}
+            </Badge>,
+            row,
+            "matrix-rank"
+          ),
+      },
+      {
+        header: "Status",
+        accessorKey: "price_status",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+       <Badge className={getBadgeColor(Number(getValue()))}>
+              {getValue()?.replace(/_/g, " ") || "-"}
+            </Badge>,
+            row,
+            "matrix-status"
+          ),
+      },
+      {
+        header: "LastPurchased",
+        accessorKey: "last_purchased_date",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            formatDate(getValue()),
+            row,
+            "matrix-last-purchased"
+          ),
+      },
+      // {
+      //   header: "Insight",
+      //   accessorKey: "action_insight",
+      //   enableSorting: false,
+      //   cell: ({ row }) =>
+      //     renderInsightCell(
+      //       <span className="text-primary">
+      //         <i className="ri-information-line me-1" />
+      //         View Insight
+      //       </span>,
+      //       row,
+      //       "matrix-insight"
+      //     ),
+      // },
+    ],
+    []
+  );
+
+  const catalogColumns = useMemo(
+    () => [
+      {
+        header: "Item",
+        accessorKey: "item_name",
+        meta: { sticky: "group" },
+        cell: ({ row }) =>
+          renderInsightCell(
+            <div className="d-flex flex-column">
+              <span className="fw-semibold text-dark">
+                {row.original.item_name || "-"}
+              </span>
+              <small className="text-muted">
+                {row.original.item_code || "-"}
+              </small>
+            </div>,
+            row,
+            "catalog-item"
+          ),
+      },
+        {
+        header: "BestSupplier",
+        accessorKey: "best_supplier_name",
+
+        cell: ({ row }) =>
+          renderInsightCell(
+            <div className="d-flex flex-column">
+              <span className="fw-semibold">
+                {row.original.best_supplier_name || "-"}
+              </span>
+              <small className="text-muted">
+                {row.original.best_supplier_id || "-"}
+              </small>
+            </div>,
+            row,
+            "catalog-best-supplier"
+          ),
+      },
+        {
+        header: "Suppliers",
+        accessorKey: "total_suppliers_for_item",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span className=" text-info">
+  {formatNumber(getValue())}
+            </span>,         
+            row,
+            "catalog-suppliers"
+          ),
+      },
+      {
+        header: "PackSize",
+        accessorKey: "pack_size",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+              <span className=" text-danger">
+ {formatNumber(getValue())}
+              </span>,           
+            row,
+            "catalog-pack-size"
+          ),
+      },
+      {
+        header: "BestUnitPrice(KES)",
+        accessorKey: "best_unit_price",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span className="fw-semibold text-caramel">
+              {formatAmount(getValue())}
+            </span>,
+            row,
+            "catalog-best-unit-price"
+          ),
+      },
+      {
+        header: "BestPackPrice(KES)",
+        accessorKey: "best_pack_price",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+              <span className="fw-semibold text-success">
+ {formatAmount(getValue())}
+              </span>,           
+            row,
+            "catalog-best-pack-price"
+          ),
+      },
+      {
+        header: "Runner-upSupplier",
+        accessorKey: "runner_up_supplier_name",
+        cell: ({ row }) =>
+          renderInsightCell(
+            <div className="d-flex flex-column">
+              <span className="fw-semibold text-dark">
+                {row.original.runner_up_supplier_name || "-"}
+              </span>
+              <small className="text-muted">
+                {row.original.runner_up_supplier_id || "-"}
+              </small>
+            </div>,
+            row,
+            "catalog-runner-up"
+          ),
+      },
+      {
+        header: "Runner-upPrice(KES)",
+        accessorKey: "runner_up_unit_price",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+            <span className="fw-semibold text-warning">
+  {formatAmount(getValue())}
+            </span>,       
+            row,
+            "catalog-runner-up-price"
+          ),
+      },
+      {
+        header: "Runner-upPremium (%)",
+        accessorKey: "runner_up_premium_perc",
+        cell: ({ getValue, row }) =>
+          renderInsightCell(
+     <Badge className={getBadgeColor(Number(getValue()))}>
+              {formatPercent(getValue())}
+            </Badge>,
+            row,
+            "catalog-runner-up-premium"
+          ),
+      },
+      // {
+      //   header: "Insight",
+      //   accessorKey: "action_insight",
+      //   enableSorting: false,
+      //   cell: ({ row }) =>
+      //     renderInsightCell(
+      //       <span className="text-primary">
+      //         <i className="ri-information-line me-1" />
+      //         View Insight
+      //       </span>,
+      //       row,
+      //       "catalog-insight"
+      //     ),
+      // },
+    ],
+    []
+  );
+
+const proposedHistoricalColumns = useMemo(
+  () => [
+    {
+      header: "LPONumber",
+      accessorKey: "lpo_number",
+      meta: { sticky: "group" },
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          <span className="fw-semibold">
+            {getValue() || "-"}
+          </span>,
+          row,
+          "proposed-lpo"
+        ),
+    },
+    {
+      header: "Item",
+      accessorKey: "item_name",
+      meta: { sticky: "sub-group" },
+      cell: ({ row }) =>
+        renderInsightCell(
+          <div className="d-flex flex-column">
+            <span className="fw-semibold text-dark">
+              {row.original.item_name || "-"}
+            </span>
+            <small className="text-muted">
+              {row.original.item_code || "-"}
+            </small>
+          </div>,
+          row,
+          "proposed-item"
+        ),
+    },
+    {
+      header: "LPODate",
+      accessorKey: "lpo_date",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          formatDate(getValue()),
+          row,
+          "proposed-date"
+        ),
+    },
+    {
+      header: "Branch",
+      accessorKey: "branch_name",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          getValue()?.replace("AXCESS PHARMACY - ", "") || "-",
+          row,
+          "proposed-branch"
+        ),
+    },
+    
+    {
+      header: "ProposedSupplier",
+      accessorKey: "proposed_supplier_name",
+      cell: ({ row }) =>
+        renderInsightCell(
+          <div className="d-flex flex-column">
+            <span className="fw-semibold">
+              {row.original.proposed_supplier_name || "-"}
+            </span>
+            <small className="text-muted">
+              {row.original.proposed_supplier_id || "-"}
+            </small>
+          </div>,
+          row,
+          "proposed-supplier"
+        ),
+    },
+    {
+      header: "Quantity",
+      accessorKey: "proposed_quantity",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          <span className="text-info">
+ {formatNumber(getValue())}
+          </span>,        
+          row,
+          "proposed-quantity"
+        ),
+    },
+    {
+      header: "ProposedUnitCost(KES)",
+      accessorKey: "proposed_unit_cost",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          <span className="fw-semibold text-danger">
+            {formatAmount(getValue())}
+          </span>,
+          row,
+          "proposed-unit-cost"
+        ),
+    },
+    {
+      header: "HistoricalBestCost(KES)",
+      accessorKey: "best_historical_unit_cost",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          <span className="fw-semibold text-caramel">
+            {formatAmount(getValue())}
+          </span>,
+          row,
+          "proposed-historical-best"
+        ),
+    },
+    {
+      header: "HistoricalBestSupplier",
+      accessorKey: "best_historical_supplier_name",
+      cell: ({ row }) =>
+        renderInsightCell(
+          <div className="d-flex flex-column">
+            <span className="fw-semibold text-success">
+              {row.original.best_historical_supplier_name || "-"}
+            </span>
+            <small className="text-muted">
+              {row.original.best_historical_supplier_id || "-"}
+            </small>
+          </div>,
+          row,
+          "proposed-historical-supplier"
+        ),
+    },
+    {
+      header: "BestHistoricalDate",
+      accessorKey: "best_historical_date",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          formatDate(getValue()),
+          row,
+          "proposed-historical-date"
+        ),
+    },
+    {
+      header: "LatestHistoricalCost(KES)",
+      accessorKey: "latest_historical_unit_cost",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+            <span className="fw-semibold text-danger">
+    {formatAmount(getValue())}
+            </span>,      
+          row,
+          "proposed-latest-historical"
+        ),
+    },
+    {
+      header: "UnitCostVariance(KES)",
+      accessorKey: "variance_unit_cost",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          <span className="fw-semibold text-secondary">
+            {formatAmount(getValue())}
+          </span>,
+          row,
+          "proposed-variance"
+        ),
+    },
+    {
+      header: "Premium(%)",
+      accessorKey: "premium_over_best_perc",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+ <Badge className={getBadgeColor(Number(getValue()))}>
+              {formatPercent(getValue())}
+          </Badge>,
+          row,
+          "proposed-premium"
+        ),
+    },
+    {
+      header: "PotentialOverspend(KES)",
+      accessorKey: "potential_overspend_kes",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          <span className="fw-semibold text-danger">
+            {formatAmount(getValue())}
+          </span>,
+          row,
+          "proposed-overspend"
+        ),
+    },
+    {
+      header: "PriceVerdict",
+      accessorKey: "price_verdict",
+      cell: ({ getValue, row }) => {
+        const verdict = getValue();
+
+        return renderInsightCell(
+         <Badge className={getBadgeColor(Number(getValue()))}>
+            {verdict?.replace(/_/g, " ") || "-"}
+          </Badge>,
+          row,
+          "proposed-verdict"
+        );
+      },
+    },
+    {
+      header: "RaisedBy",
+      accessorKey: "raised_by",
+      cell: ({ getValue, row }) =>
+        renderInsightCell(
+          getValue() || "-",
+          row,
+          "proposed-raised-by"
+        ),
+    },
+    // {
+    //   header: "Insight",
+    //   accessorKey: "action_insight",
+    //   enableSorting: false,
+    //   cell: ({ row }) =>
+    //     renderInsightCell(
+    //       <span className="text-primary">
+    //         <i className="ri-information-line me-1" />
+    //         View Insight
+    //       </span>,
+    //       row,
+    //       "proposed-insight"
+    //     ),
+    // },
+  ],
+  []
+);
+
+  const tabs = [
+    {
+      label: "SupplierScore",
+      value: "supplier",
+      className: "bg-success-subtle text-success",
+      activeClass: "bg-success text-white",
+      badgeClass: "bg-success",
+    },
+    {
+      label: "ItemMatrix",
+      value: "matrix",
+      className: "bg-primary-subtle text-primary",
+      activeClass: "bg-primary text-white",
+      badgeClass: "bg-primary",
+    },
+    {
+      label: "BestPrice",
+      value: "catalog",
+      className: "bg-info-subtle text-info",
+      activeClass: "bg-info text-white",
+      badgeClass: "bg-info",
+    },
+    {
+  label: "ProposedHistorical",
+  value: "proposedHistorical",
+  className: "bg-warning-subtle text-warning",
+  activeClass: "bg-warning text-dark",
+  badgeClass: "bg-warning",
+},
+  ];
+
+  const tabCounts = {
+    supplier: supplierData.length,
+    matrix: itemMatrixData.length,
+    catalog: bestPriceCatalogData.length,
+      proposedHistorical: proposedHistoricalData.length,
+  };
+
+  const tableConfig = {
+    supplier: {
+      title: "Supplier Price Competitiveness",
+      description:
+        "Compare supplier win rates, savings lost, and total procurement spend.",
+      columns: supplierColumns,
+      data: supplierData,
+      placeholder: "Search suppliers...",
+      emptyMessage: "No supplier scorecard records found.",
+    },
+    matrix: {
+      title: "Supplier Item Price Matrix",
+      description:
+        "Compare supplier prices for each SKU, market prices, and potential savings.",
+      columns: itemMatrixColumns,
+      data: itemMatrixData,
+      placeholder: "Search items, suppliers...",
+      emptyMessage: "No item price comparison records found.",
+    },
+    catalog: {
+      title: "Best Price Supplier Catalog",
+      description:
+        "Identify the best-priced supplier for each item and compare the runner-up price.",
+      columns: catalogColumns,
+      data: bestPriceCatalogData,
+      placeholder: "Search items, best suppliers...",
+      emptyMessage: "No best price catalog records found.",
+    },
+    proposedHistorical: {
+  title: "Proposed vs Historical Supplier Prices",
+   description: "Proposed LPO prices vs historical best and latest costs.",
+
+  columns: proposedHistoricalColumns,
+  data: proposedHistoricalData,
+  placeholder: "Search LPO, items, suppliers...",
+  emptyMessage: "No proposed historical price records found.",
+},
+  };
+
+  const currentTable = tableConfig[activeTab];
+
+  const toolbarContent = (
+    <Nav
+      pills
+      className="nav-tabs-custom flex-wrap gap-1"
+      role="tablist"
+    >
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.value;
+
+        return (
+          <NavItem key={tab.value}>
+            <NavLink
+              href="#"
+              active={isActive}
+              onClick={(event) => {
+                event.preventDefault();
+                setActiveTab(tab.value);
+              }}
+              className={`px-2 py-1 ${
+                isActive ? tab.activeClass : tab.className
+              }`}
+              style={{
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+                fontSize: "11px",
+                borderRadius: "6px",
+              }}
+            >
+              {tab.label}
+
+              <Badge
+                className={`ms-1 ${
+                  isActive
+                    ? "bg-white text-dark"
+                    : `text-white ${tab.badgeClass}`
+                }`}
+              >
+                {tabCounts[tab.value]}
+              </Badge>
+            </NavLink>
+          </NavItem>
+        );
+      })}
+    </Nav>
+  );
+const handleExportExcel = () => {
+  const rows = (currentTable.data || []).map((item) => {
+    if (activeTab === "supplier") {
+      return {
+        "Supplier ID": item.supplier_id,
+        "Supplier Name": item.supplier_name,
+        "Items Supplied": item.total_items_supplied,
+        "Best Price Wins": item.best_price_items_count,
+        "Premium Items": item.premium_items_count,
+        "Win Rate (%)": item.price_competitiveness_win_rate_perc,
+        "Average Premium (%)": item.avg_premium_perc_when_higher,
+        "Savings Lost (KES)": item.total_savings_lost_to_premium,
+        "Total Spend (KES)": item.total_spend_exc,
+        "Action Insight": item.action_insight,
+      };
+    }
+
+    if (activeTab === "matrix") {
+      return {
+        "Item Code": item.item_code,
+        "Item Name": item.item_name,
+        "Supplier ID": item.supplier_id,
+        "Supplier Name": item.supplier_name,
+        "Pack Size": item.pack_size,
+        "Price Rank": item.price_rank,
+        "Total Suppliers": item.total_suppliers_for_item,
+        "Best Unit Price (KES)": item.best_unit_price,
+        "Latest Unit Price (KES)": item.latest_unit_price,
+        "Market Best (KES)": item.market_best_unit_price,
+        "Market Worst (KES)": item.market_worst_unit_price,
+        "Premium (%)": item.premium_over_best_perc,
+        "Pieces Purchased": item.total_pieces_purchased,
+        "Total Spend (KES)": item.total_spend_exc,
+        "Potential Savings (KES)": item.potential_savings_realizable,
+        "Price Status": item.price_status,
+        "Last Purchased": item.last_purchased_date,
+        "Action Insight": item.action_insight,
+      };
+    }
+
+    if (activeTab === "proposedHistorical") {
+  return {
+    "LPO Number": item.lpo_number,
+    "LPO Date": item.lpo_date,
+    "Branch": item.branch_name,
+    "Proposed Supplier ID": item.proposed_supplier_id,
+    "Proposed Supplier": item.proposed_supplier_name,
+    "Item Code": item.item_code,
+    "Item Name": item.item_name,
+    "Pack Size": item.pack_size,
+    "Proposed Quantity": item.proposed_quantity,
+    "Proposed Qty WP": item.proposed_qty_wp,
+    "Proposed Pack Cost (KES)": item.proposed_pack_cost,
+    "Proposed Unit Cost (KES)": item.proposed_unit_cost,
+    "Proposed Total Cost (KES)": item.proposed_total_cost,
+    "Historical Best Unit Cost (KES)": item.best_historical_unit_cost,
+    "Historical Best Supplier": item.best_historical_supplier_name,
+    "Historical Best Date": item.best_historical_date,
+    "Latest Historical Unit Cost (KES)": item.latest_historical_unit_cost,
+    "Unit Cost Variance (KES)": item.variance_unit_cost,
+    "Premium (%)": item.premium_over_best_perc,
+    "Potential Overspend (KES)": item.potential_overspend_kes,
+    "Price Verdict": item.price_verdict,
+    "Raised By": item.raised_by,
+    "Action Insight": item.action_insight,
+  };
+}
+    return {
+      "Item Code": item.item_code,
+      "Item Name": item.item_name,
+      "Pack Size": item.pack_size,
+      "Total Suppliers": item.total_suppliers_for_item,
+      "Best Supplier ID": item.best_supplier_id,
+      "Best Supplier Name": item.best_supplier_name,
+      "Best Unit Price (KES)": item.best_unit_price,
+      "Best Pack Price (KES)": item.best_pack_price,
+      "Runner-up Supplier ID": item.runner_up_supplier_id,
+      "Runner-up Supplier Name": item.runner_up_supplier_name,
+      "Runner-up Unit Price (KES)": item.runner_up_unit_price,
+      "Runner-up Premium (%)": item.runner_up_premium_perc,
+      "Action Insight": item.action_insight,
+    };
+  });
+
+  const todayStr = new Date()
+    .toLocaleDateString("en-GB")
+    .replace(/\//g, "-");
+
+  exportToExcel(
+    rows,
+    `Best_Price_Per_Supplier_${activeTab}_${todayStr}`
+  );
+};
+  return (
+    <Card
+      className="card-height-100"
+      id="best-price-per-supplier-card"
+    >
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
+        <div>
+          <h4 className="card-title mb-1">
+            Best Price Per Supplier
+          </h4>
+
+          <p className="text-muted mb-0">
+            Analyze supplier price competitiveness, compare item prices,
+            and identify the best supplier for each SKU.
+          </p>
+        </div>
+
+        <CardExportButtons
+          targetId="best-price-per-supplier-card"
+          title="Best Price Per Supplier"
+          onExport={handleExportExcel}
+        />
+      </CardHeader>
+
+      <CardBody>
+        {error && (
+          <Alert color="danger" className="mb-3">
+            {typeof error === "string"
+              ? error
+              : error.message || "Failed to load best price data."}
+          </Alert>
+        )}
+
+        <TanstackTable
+          columns={currentTable.columns}
+          data={currentTable.data}
+          tableTabs={toolbarContent}
+          isGlobalFilter={true}
+          SearchPlaceholder={currentTable.placeholder}
+          searchInputWidth="450px"
+          customPageSize={10}
+          pageSizeOptions={[5, 10, 20, 30, 50]}
+          tableClass="table align-middle table-hover table-bordered table-striped"
+          theadClass="table-light"
+          loading={loading}
+          error={error}
+          emptyMessage={currentTable.emptyMessage}
+        />
+      </CardBody>
+    </Card>
+  );
+};
+
+export default BestPricePerSupplierTable;
