@@ -140,8 +140,10 @@ const SalesByLocations = ({ data = [], error, loading }) => {
 
   return (
     <Card className="card-height-100" id="purchases-category-spend-card">
-      <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
-        <h4 className="card-title mb-0 flex-grow-1">Spend by Category</h4>
+ <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
+          {" "}
+                  <h5 className="card-title mb-0 ">
+          Spend by Category</h5>
 
         <CardExportButtons
           targetId="purchases-category-spend-card"

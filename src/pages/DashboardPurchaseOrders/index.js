@@ -713,20 +713,20 @@ dispatchGroupByRequests(
                     </Col>                                                       
                   </Row>                                  
                 <Row>
+                                    <Col xl={6}>
+                    <MonthToDatePurchases
+                      categories={monthToDateChart.categories}
+                      series={monthToDateChart.series}
+                      formatAmount={formatAmount}
+                    />
+                  </Col>  
                   <Col xl={6}>
                     <YearToDatePurchases
                       categories={actualSpendChart.categories}
                       series={actualSpendChart.series}
                       formatAmount={formatAmount}
                     />
-                  </Col>
-                  <Col xl={6}>
-                    <MonthToDatePurchases
-                      categories={monthToDateChart.categories}
-                      series={monthToDateChart.series}
-                      formatAmount={formatAmount}
-                    />
-                  </Col>                        
+                  </Col>                      
           <FilterActions
                   branch={filters.branch}
                     dateRange={filters.dateRange}

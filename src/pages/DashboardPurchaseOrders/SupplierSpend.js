@@ -169,7 +169,8 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
   return (
     <React.Fragment>
       <Card className="card-height-100" id="purchases-top-suppliers-card">
-        <CardHeader className="card-header align-items-center d-flex justify-content-between flex-wrap gap-2 pb-1">
+        <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
+          {" "}
           <div>
             <h4 className="card-title mb-1">Spend by Supplier</h4>
             <p className="text-muted mb-0">
@@ -177,7 +178,6 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
               contribution to total purchasing.
             </p>
           </div>
-
           <CardExportButtons
             targetId="purchases-top-suppliers-card"
             title="Spend by Supplier"

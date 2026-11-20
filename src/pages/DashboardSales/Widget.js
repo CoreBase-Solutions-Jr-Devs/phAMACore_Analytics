@@ -125,8 +125,7 @@ const Widget = ({
   };
 
   return (
-    <React.Fragment>
-     
+    <React.Fragment>   
      {loading ? (
           <div className="text-center py-5">
             <div

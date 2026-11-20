@@ -1125,9 +1125,9 @@ const filteredData = useMemo(() => {
 
   return (
     <Card className="card-height-100" id="branch-order-fill-rate-card">
-      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
+ <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
         <div>
-          <h4 className="card-title mb-1">Consolidated LPO Review</h4>
+          <h5 className="card-title mb-1">Consolidated LPO Review</h5>
           <p className="text-muted mb-0">
             Review LPO values, supplier and branch performance, item
             classifications, and capital risk.

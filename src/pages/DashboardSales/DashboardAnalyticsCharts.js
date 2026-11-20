@@ -642,17 +642,12 @@ const MonthToDateSalesChart = ({
 }) => {
   const colors = getChartColorsArray(dataColors);
 
-  const today = new Date();
+ const today = new Date();
+const todayDay = today.getDate();
 
-  const todayDay = today.getDate();
-
-  const todayLabel = today.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-  });
-
-  const todayIndex = categories.findIndex((day) => Number(day) === todayDay);
-
+const todayExists = categories.some(
+  (day) => Number(day) === todayDay
+);
   const options = {
     chart: {
       height: 350,
@@ -771,12 +766,6 @@ const MonthToDateSalesChart = ({
       categories,
       tickPlacement: "on",
 
-      //   title: {
-      //   text: `Days of ${today.toLocaleDateString("en-GB", {
-      //     month: "long",
-      //   })} ${today.getFullYear() - 1} vs ${today.getFullYear()}`,
-      // },
-
       labels: {
         formatter: (value) => {
           const day = Number(value);
@@ -796,92 +785,43 @@ const MonthToDateSalesChart = ({
         formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
       },
     },
-    // annotations: {
-    //   points: [
-    //     {
-    //       x: categories[categories.length - 1],
-    //       y: series[0]?.data?.[series[0].data.length - 1],
-    //       marker: {
-    //         size: 0,
-    //       },
-    //       label: {
-    //         text: "2026",
-    //         borderColor: colors[0],
-    //         offsetX: -15,
-    //         offsetY: -12,
-    //         style: {
-    //           background: colors[0],
-    //           color: "#fff",
-    //           fontSize: "12px",
-    //           fontWeight: 600,
-    //         },
-    //       },
-    //     },
-    //     {
-    //       x: categories[categories.length - 1],
-    //       y: series[1]?.data?.[series[1].data.length - 1],
-    //       marker: {
-    //         size: 0,
-    //       },
-    //       label: {
-    //         text: "2025",
-    //         borderColor: colors[0],
-    //         offsetX: -15,
-    //         offsetY: -12,
-    //         style: {
-    //           background: colors[0],
-    //           color: "#fff",
-    //           fontSize: "12px",
-    //           fontWeight: 600,
-    //         },
-    //       },
-    //     },
-    //   ],
-    // },
+
+  annotations: {
+  xaxis: todayExists
+    ? [
+        {
+          x: todayDay,
+          borderColor: "#C68E45",
+          strokeDashArray: 5,
+          borderWidth: 2,
+
+          label: {
+            text: "Today",
+            position: "top",
+            orientation: "horizontal",
+            borderColor: "#C68E45",
+            padding: 2,
+            style: {
+              color: "#fff",
+              background: "#C68E45",
+              fontSize: "11px",
+            },
+          },
+        },
+      ]
+    : [],
+},
   };
 
   return (
-    <div style={{ position: "relative" }}>
+
       <ReactApexChart
         options={options}
         series={series}
         type="line"
         height={350}
       />
-
-      {/* Today vertical line */}
-      <div
-        style={{
-          position: "absolute",
-          top: 35,
-          bottom: 55,
-          left: `calc(70px + ${(todayIndex / (categories.length - 1)) * 85}%)`,
-          borderLeft: "2px dotted #C68E45",
-          pointerEvents: "none",
-          zIndex: 5,
-        }}
-      />
-
-      {/* Today label */}
-      <div
-        style={{
-          position: "absolute",
-          top: 10,
-          left: `calc(70px + ${(todayIndex / (categories.length - 1)) * 85}%)`,
-          transform: "translateX(-50%)",
-          color: "#fff",
-          fontSize: "11px",
-          backgroundColor: "#C68E45",
-          padding: "2px 6px",
-          borderRadius: "4px",
-          // fontWeight: 500,
-          pointerEvents: "none",
-          zIndex: 6,
-        }}
-      >
-        Today
-      </div>
-    </div>
+    
   );
 };
 

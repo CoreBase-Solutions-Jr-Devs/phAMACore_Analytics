@@ -24,10 +24,10 @@ const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
   return (
     <React.Fragment>
       <Card id="purchases-mtd-card">
-          <CardHeader className="p-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <h4 className="card-title mb-0 flex-grow-1">
+            <CardHeader className="p-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                              <h6 className="card-title mb-0">
             Month to Date Comparative Line Graph(MTD){" "}
-          </h4>
+          </h6>
               <div className="d-flex align-items-center">
           <CardExportButtons
             targetId="purchases-mtd-card"
@@ -38,32 +38,30 @@ const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
         </CardHeader>
 
         <CardBody className="p-2 ">
-          <div className="w-100">
-            <div dir="ltr">
-              <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2">
-                <div className="d-flex align-items-center gap-2">
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: "25px",
-                      borderTop: "3px solid var(--vz-primary)",
-                    }}
-                  />
-                  <span className="text-muted">2026</span>
-                </div>
+        <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2 pb-1">
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "25px",
+        borderTop: "3px solid var(--vz-primary)",
+      }}
+    />
+    <span className="text-muted">2026</span>
+  </div>
 
-                <div className="d-flex align-items-center gap-2">
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: "25px",
-                      borderTop: "3px dashed var(--vz-primary)",
-                    }}
-                  />
-                  <span className="text-muted">2025</span>
-                </div>
-                    
-              </div>
+  <div className="d-flex align-items-center gap-2">
+    <span
+      style={{
+        display: "inline-block",
+        width: "25px",
+        borderTop: "3px dashed var(--vz-primary)",
+      }}
+    />
+    <span className="text-muted">2025</span>
+  </div>
+</div>
+<div className="mt-0 pt-0">
               <MonthToDateCharts
                 categories={categories}
                 series={series}
@@ -71,7 +69,7 @@ const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
                 dataColors='["--vz-primary", "--vz-success", "--vz-danger"]'
               />
             </div>
-          </div>
+         
         </CardBody>
       </Card>
     </React.Fragment>

@@ -126,16 +126,11 @@ const MonthToDateCharts = ({
 }) => {
   const colors = getChartColorsArray(dataColors);
 
+const today = new Date().getDate();
 
-  const today = new Date().getDate();
-
-  const currentDate = categories.find(
-    (date) => Number(date) === today
-  );
-
-  const todayIndex = categories.findIndex(
-    (date) => Number(date) === today
-  );
+const todayExists = categories.some(
+  (day) => Number(day) === today
+);
 
   const options = {
     chart: {
@@ -202,50 +197,40 @@ tooltip: {
       Number(val || 0).toLocaleString("en-KE"),
   },
 },
+annotations: {
+  xaxis: todayExists
+    ? [
+        {
+          x: today,
+          borderColor: "#C68E45",
+          strokeDashArray: 2,
+          borderWidth: 2,
+
+          label: {
+            text: "Today",
+            position: "top",
+            orientation: "horizontal",
+            borderColor: "#C68E45",
+            padding: 2,
+            style: {
+              color: "#fff",
+              background: "#C68E45",
+              fontSize: "11px",
+            },
+          },
+        },
+      ]
+    : [],
+},
   };
 
   return (
-  
-   <div style={{ position: "relative" }}>
     <ReactApexChart
       options={options}
       series={series}
       type="line"
       height={350}
     />
-  
-    <div
-      style={{
-        position: "absolute",
-        top: 35,
-        bottom: 55,
-      left: `calc(60px + ${
-  (todayIndex / (categories.length - 1)) * 85
-}%)`,
-        borderLeft: "2px dotted #C68E45",
-        pointerEvents: "none",
-        zIndex: 5,
-      }}
-    />
-        <div
-        style={{
-          position: "absolute",
-          top: 10,
-          left: `calc(60px + ${(todayIndex / (categories.length - 1)) * 85}%)`,
-          transform: "translateX(-50%)",
-          color: "#fff",
-          fontSize: "11px",
-          backgroundColor: "#C68E45",
-          padding: "2px 6px",
-          borderRadius: "4px",
-          // fontWeight: 500,
-          pointerEvents: "none",
-          zIndex: 6,
-        }}
-      >
-        Today
-      </div>
-  </div>
     );
   };
 

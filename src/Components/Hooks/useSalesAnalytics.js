@@ -234,7 +234,7 @@ const useSalesAnalytics = (
  
    * ------------------------------------------------------*/
   const monthlyChart = useMemo(() => {
-    const data = salesComparativeMTD || [];
+    const data = salesComparativeYTD || [];
 
     return {
       categories: data.map((item) => item.month_name),
@@ -254,14 +254,14 @@ const useSalesAnalytics = (
 
       salesGrowth: data.map((item) => Number(item.growth_perc) || 0),
     };
-  }, [salesComparativeMTD]);
+  }, [salesComparativeYTD]);
 
   /* -------------------------------------------------------
    * Month-to-Date Revenue Chart
    * ------------------------------------------------------*/
 
   const monthToDateChart = useMemo(() => {
-    const data = salesComparativeYTD || [];
+    const data = salesComparativeMTD || [];
 
     return {
       categories: data.map((item) => item.day_no),
@@ -282,7 +282,7 @@ const useSalesAnalytics = (
       grossProfit: data.map((item) => Number(item.current_year_gp) || 0),
       CostOfGoods: data.map((item) => Number(item.current_year_cogs) || 0),
     };
-  }, [salesComparativeYTD]);
+  }, [salesComparativeMTD]);
 
   const topProductsData = sales.reduce((acc, item) => {
     const name = item.item_Name || "UNKNOWN PRODUCT";

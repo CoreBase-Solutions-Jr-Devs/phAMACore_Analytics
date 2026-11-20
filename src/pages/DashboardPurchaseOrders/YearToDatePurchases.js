@@ -25,7 +25,8 @@ const YearToDatePurchases = ({categories, series, formatAmount}) => {
     <React.Fragment>
       <Card id="purchases-ytd-card">
           <CardHeader className="p-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <h4 className="card-title mb-0 ">Year to Date Comparative Line Graph(YTD) </h4>
+                     <h6 className="card-title mb-0">
+            Year to Date Comparative Line Graph(YTD) </h6>
             <div className="d-flex align-items-center">
           <CardExportButtons
             targetId="purchases-ytd-card"
@@ -35,10 +36,8 @@ const YearToDatePurchases = ({categories, series, formatAmount}) => {
           </div>
         </CardHeader>
 
-        <CardBody className="p-0 pb-2">
-          <div className="w-100">
-            <div dir="ltr">
-    <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2">
+        <CardBody className="pb-2">
+<div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2 pb-1">
   <div className="d-flex align-items-center gap-2">
     <span
       style={{
@@ -60,10 +59,9 @@ const YearToDatePurchases = ({categories, series, formatAmount}) => {
     />
     <span className="text-muted">2025</span>
   </div>
-    
 </div>
-              <RevenueCharts categories={categories} series={series} formatAmount={formatAmount} dataColors='["--vz-primary", "--vz-success", "--vz-danger"]' />
-            </div>
+<div className="mt-0 pt-0">
+              <RevenueCharts categories={categories} series={series} formatAmount={formatAmount} dataColors='["--vz-primary", "--vz-success", "--vz-danger"]' />            
           </div>
         </CardBody>
       </Card>

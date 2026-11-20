@@ -31,10 +31,10 @@ const BranchPerformance = ({
     <React.Fragment>
       <Card className="card-height-100" id="sales-branch-performance-card">
        <CardBody className="p-0">
-    <CardHeader className="align-items-center d-flex justify-content-between flex-wrap pb-1 gap-2">
-                <h4 className="card-title mb-0 ">
+ <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
+                <h5 className="card-title mb-0 ">
             Branch Performance-Revenue by Branch
-          </h4>
+          </h5>
           <CardExportButtons
             targetId="sales-branch-performance-card"
             title="Branch Performance"
