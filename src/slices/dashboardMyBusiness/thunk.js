@@ -5,9 +5,9 @@ import {
   getCashbookSummary as getCashbookSummaryApi,
   getKPIPurchases as getKPIPurchasesApi,
   getKPISalesTransactions as getKPISalesTransactionsApi,
-  getKPITotalStockValueByBranch as getKPITotalStockValueByBranchApi,
+  getKPIStockHealth as getKPIStockHealthApi,
 } from "../../helpers/fakebackend_helper";
-import { getMonthlyRanges, parseApiDate } from "../../pages/utils/dateHelper";
+import { getMonthlyRanges } from "../../pages/utils/dateHelper";
 import { toList, pick, num, metric } from "../../pages/utils/apiRow";
 
 // GET INVENTORY PROFIT SUMMARY USER / METRICS
@@ -99,23 +99,18 @@ export const fetchMonthlyTrend = createAsyncThunk(
         optional(getKPIPurchasesApi({
           clientid: 1, startDate: rangeStart, endDate: rangeEnd, branchcode, GroupBy: "MONTHLY",
         })),
-        optional(getKPITotalStockValueByBranchApi({ clientid: 1, whichcost: 1, branchcode })),
+        Promise.all(months.map((m) => optional(
+          getKPIStockHealthApi({
+            clientid: 1, AsOfDate: m.endDate, branchcode, GroupBy: "SUMMARY", whichcost: 1,
+          })
+        ))),
       ]);
 
-      // Stock value is a live figure: the API has no month-end history,
-      // so it is only plotted on the month that contains today.
-      const stockRows = stock || [];
-      const consolidated = stockRows.find((r) => Number(pick(r, "branch_id")) === 0);
-      const stockValue = stockRows.length
-        ? num(pick(consolidated, "total_stock_value")) ||
-          stockRows.reduce((sum, r) => sum + num(pick(r, "total_stock_value")), 0)
-        : null;
-      const today = new Date();
-      const isCurrent = (m) => parseApiDate(m.startDate) <= today && today <= parseApiDate(m.endDate);
       const sum = (rows, ...fields) => rows.reduce((total, r) => total + num(pick(r, ...fields)), 0);
+      const lastStockRows = stock[stock.length - 1] || [];
 
       return {
-        stockAsOf: pick(stockRows[0], "as_of_date") ?? null,
+        stockAsOf: pick(lastStockRows[0], "as_of_date") ?? null,
         months: months.map((m, i) => {
           const rows = branch
             ? sales[i].filter((r) => String(pick(r, "BranchCode")) === String(branch))
@@ -123,6 +118,7 @@ export const fetchMonthlyTrend = createAsyncThunk(
           const bought = (purchases || []).find((r) => pick(r, "year_month") === m.key);
           const revenue = sum(rows, "SalesValueExcl");
           const cost = sum(rows, "CostValue");
+          const stockRows = stock[i];
 
           return {
             ...m,
@@ -132,7 +128,7 @@ export const fetchMonthlyTrend = createAsyncThunk(
             units: sum(rows, "UnitsSold"),
             collections: cashbook[i] ? metric(cashbook[i], "Total Collections") : null,
             purchases: purchases ? num(pick(bought, "net_purchases_excl")) : null,
-            stockValue: isCurrent(m) ? stockValue : null,
+            stockValue: stockRows && stockRows.length ? sum(stockRows, "total_stock_value") : null,
           };
         }),
       };

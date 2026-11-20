@@ -28,7 +28,7 @@ const StockPurchases = () => {
       To: m.endDate,
       "Net Purchases excl. VAT (KES)": m.purchases == null ? "-" : money(m.purchases),
       "Cost of Sales (KES)": money(m.cost),
-      "Stock Value Today (KES)": m.stockValue == null ? "-" : money(m.stockValue),
+      "Stock Value (KES)": m.stockValue == null ? "-" : money(m.stockValue),
     }));
     exportToExcel(rows, `Purchases_vs_Cost_of_Sales_${exportStamp()}`);
   };
@@ -65,8 +65,8 @@ const StockPurchases = () => {
         </div>
         <div className="border-top px-3 pt-2">
           <small className="text-muted">
-            Purchases are supplier invoices less returns. Stock value is today's valuation and is only
-            shown on the current month, because month-end stock history is not available yet.
+            Purchases are supplier invoices less returns. Stock value is evaluated at average cost as of each
+            period's end date.
           </small>
         </div>
       </CardBody>
