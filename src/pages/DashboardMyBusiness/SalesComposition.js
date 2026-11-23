@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Nav, NavItem, NavLink, Spinner } from "reactstrap";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
+import FloatingTooltip from "../../Components/Common/FloatingTooltip";
 import { exportToExcel } from "../../helpers/export_helper";
 import { exportStamp, money } from "./TrendCardBody";
 import { formatCompact, formatCurrency } from "../utils/formatHelper";
@@ -52,6 +53,40 @@ const isInsurerAccount = (name = "") => {
 const SalesComposition = () => {
   const [activeTab, setActiveTab] = useState("composition");
   const [selectedBucket, setSelectedBucket] = useState(null);
+  const [hoverInfo, setHoverInfo] = useState(null);
+
+  const showOverflowTooltip = useCallback((el, x, y, label, text) => {
+    if (!el || el.scrollWidth <= el.clientWidth) {
+      setHoverInfo(null);
+      return;
+    }
+    setHoverInfo({
+      x,
+      y,
+      title: label,
+      mainValue: text,
+      mainColor: "#ffffff",
+      badgeColor: "#405189",
+    });
+  }, []);
+
+  const getCellTooltipHandlers = useCallback(
+    (label, text) => ({
+      onMouseEnter: (e) => showOverflowTooltip(e.currentTarget, e.clientX, e.clientY, label, text),
+      onMouseMove: (e) => {
+        if (e.currentTarget.scrollWidth > e.currentTarget.clientWidth) {
+          setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
+        }
+      },
+      onMouseLeave: () => setHoverInfo(null),
+      onFocus: (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        showOverflowTooltip(e.currentTarget, rect.left + rect.width / 2, rect.top, label, text);
+      },
+      onBlur: () => setHoverInfo(null),
+    }),
+    [showOverflowTooltip]
+  );
 
   const {
     salesByType = [],
@@ -436,35 +471,74 @@ const SalesComposition = () => {
                         Clear filter
                       </button>
                     </div>
-                    <div className="table-responsive" style={{ maxHeight: "175px", overflowY: "auto" }}>
-                      <table className="table table-sm table-nowrap align-middle mb-0">
+                    <div
+                      className="table-responsive"
+                      style={{ maxHeight: "175px", overflowY: "auto" }}
+                      onMouseLeave={() => setHoverInfo(null)}
+                    >
+                      <table
+                        className="table table-sm table-nowrap align-middle mb-0"
+                        style={{ tableLayout: "fixed", width: "100%" }}
+                      >
+                        <colgroup>
+                          <col style={{ width: "34%" }} />
+                          <col style={{ width: "22%" }} />
+                          <col style={{ width: "22%" }} />
+                          <col style={{ width: "22%" }} />
+                        </colgroup>
                         <thead className="table-light text-muted sticky-top">
                           <tr>
-                            <th>Customer / Insurer</th>
-                            <th>Segment</th>
-                            <th className="text-end">Bucket Bal.</th>
-                            <th className="text-end">Total Bal.</th>
+                            <th className="text-truncate">Customer / Insurer</th>
+                            <th className="text-truncate">Segment</th>
+                            <th className="text-end text-truncate">Bucket Bal.</th>
+                            <th className="text-end text-truncate">Total Bal.</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {agingSummary.drilledDebtors.slice(0, 50).map((d) => (
-                            <tr key={d.code}>
-                              <td className="fw-medium">
-                                {d.name} <small className="text-muted">({d.code})</small>
-                              </td>
-                              <td>
-                                <span
-                                  className={`badge bg-${d.isInsurer ? "primary" : "secondary"}-subtle text-${
-                                    d.isInsurer ? "primary" : "secondary"
-                                  }`}
+                          {agingSummary.drilledDebtors.slice(0, 50).map((d) => {
+                            const customerText = `${d.name} (${d.code})`;
+                            const segmentText = d.isInsurer ? "Insurance" : "Other Account";
+                            const bucketBalText = formatCompact(d[selectedBucket]);
+                            const totalBalText = formatCompact(d.total);
+                            return (
+                              <tr key={d.code}>
+                                <td
+                                  className="fw-medium text-truncate"
+                                  tabIndex={0}
+                                  {...getCellTooltipHandlers("Customer / Insurer", customerText)}
                                 >
-                                  {d.isInsurer ? "Insurance" : "Other Account"}
-                                </span>
-                              </td>
-                              <td className="text-end fw-semibold">{formatCompact(d[selectedBucket])}</td>
-                              <td className="text-end text-muted">{formatCompact(d.total)}</td>
-                            </tr>
-                          ))}
+                                  {d.name} <small className="text-muted">({d.code})</small>
+                                </td>
+                                <td
+                                  className="text-truncate"
+                                  tabIndex={0}
+                                  {...getCellTooltipHandlers("Segment", segmentText)}
+                                >
+                                  <span
+                                    className={`badge bg-${d.isInsurer ? "primary" : "secondary"}-subtle text-${
+                                      d.isInsurer ? "primary" : "secondary"
+                                    }`}
+                                  >
+                                    {segmentText}
+                                  </span>
+                                </td>
+                                <td
+                                  className="text-end fw-semibold text-truncate"
+                                  tabIndex={0}
+                                  {...getCellTooltipHandlers("Bucket Bal.", bucketBalText)}
+                                >
+                                  {bucketBalText}
+                                </td>
+                                <td
+                                  className="text-end text-muted text-truncate"
+                                  tabIndex={0}
+                                  {...getCellTooltipHandlers("Total Bal.", totalBalText)}
+                                >
+                                  {totalBalText}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
@@ -487,6 +561,8 @@ const SalesComposition = () => {
             as at {appliedFilters.endDate}.
           </small>
         </div>
+
+        <FloatingTooltip hoverInfo={hoverInfo} />
       </CardBody>
     </Card>
   );
