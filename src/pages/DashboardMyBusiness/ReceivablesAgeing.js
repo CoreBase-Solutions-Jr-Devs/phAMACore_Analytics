@@ -264,7 +264,7 @@ const ReceivablesAgeing = () => {
           onMouseLeave={() => setHoverInfo(null)}
         >
           <table className="table table-borderless table-hover table-centered table-nowrap mb-0">
-            <thead className="text-muted table-light sticky-top" style={{ zIndex: 1 }}>
+            <thead className="text-muted table-light sticky-top" style={{ zIndex: 2 }}>
               <tr>
                 {COLUMNS.map((col) => (
                   <th
@@ -373,7 +373,7 @@ const ReceivablesAgeing = () => {
                             ) : (
                               <div className="table-responsive" style={{ maxHeight: "220px", overflowY: "auto" }}>
                                 <table className="table table-sm table-bordered mb-0 fs-12 bg-white">
-                                  <thead className="table-light">
+                                  <thead className="table-light sticky-top" style={{ top: 0, zIndex: 1 }}>
                                     <tr>
                                       <th>Invoice / Ref</th>
                                       <th>Originating Branch</th>
