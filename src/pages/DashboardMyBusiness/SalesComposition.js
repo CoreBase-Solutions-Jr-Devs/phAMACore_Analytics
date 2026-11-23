@@ -395,15 +395,15 @@ const SalesComposition = () => {
             ) : (
               <>
                 {/* Clickable Aging Bucket Pills */}
-                <div className="row g-2 mb-3">
+                <div className="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-2 mb-3">
                   {agingSummary.buckets.map((b) => {
                     const isSelected = selectedBucket === b.key;
                     return (
-                      <div className="col-6 col-sm-4" key={b.key}>
+                      <div className="col" key={b.key}>
                         <div
                           role="button"
                           onClick={() => setSelectedBucket(isSelected ? null : b.key)}
-                          className={`p-2 rounded border ${
+                          className={`p-2 rounded border h-100 ${
                             isSelected ? `border-${b.color} bg-${b.color}-subtle` : "bg-light"
                           }`}
                           title="Click to drill down to debtors in this bucket"
