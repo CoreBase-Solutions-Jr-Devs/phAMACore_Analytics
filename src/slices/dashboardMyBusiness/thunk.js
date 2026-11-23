@@ -113,12 +113,16 @@ export const fetchMonthlyTrend = createAsyncThunk(
             : sales[i];
           const bought = (purchases || []).find((r) => pick(r, "year_month") === m.key);
           const revenue = sum(rows, "SalesValueExcl");
+          const salesIncl = sum(rows, "SalesValueIncl");
+          const taxAmount = sum(rows, "TaxAmount");
           const cost = sum(rows, "CostValue");
           const stockRows = stock[i];
 
           return {
             ...m,
             revenue,
+            salesIncl: salesIncl || revenue + taxAmount,
+            taxAmount,
             cost,
             grossProfit: revenue - cost,
             units: sum(rows, "UnitsSold"),
@@ -169,7 +173,7 @@ export const fetchStockConversionTrend = createAsyncThunk(
   }
 );
 
-// Output VAT Analysis
+// Output VAT Analysis (single-mode call)
 export const fetchOutputVATAnalysis = createAsyncThunk(
   "dashboardMyBusiness/fetchOutputVATAnalysis",
   async ({ startDate, endDate, StartDate, EndDate, branch = null, branchcode = null, GroupBy = "MONTHLY", TaxCode, TopN } = {}, { rejectWithValue }) => {
@@ -183,6 +187,99 @@ export const fetchOutputVATAnalysis = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.message || error?.message || "Failed to fetch output VAT analysis!"
+      );
+    }
+  }
+);
+
+// Output VAT Breakdown bundle (SUMMARY + MONTHLY + TAX_CODE + BRANCH in parallel)
+export const fetchVATBreakdown = createAsyncThunk(
+  "dashboardMyBusiness/fetchVATBreakdown",
+  async ({ startDate, endDate, StartDate, EndDate, branch = null, branchcode = null, TaxCode } = {}, { rejectWithValue }) => {
+    try {
+      const base = { clientid: 1, StartDate: StartDate ?? startDate, EndDate: EndDate ?? endDate };
+      const resolvedBranch = branchcode ?? branch;
+      if (resolvedBranch) base.branchcode = resolvedBranch;
+      if (TaxCode) base.TaxCode = TaxCode;
+      const safe = (p) => p.then(toList).catch(() => []);
+      const [summary, monthly, byTaxCode, byBranch] = await Promise.all([
+        safe(getOutputVATAnalysisApi({ ...base, GroupBy: "SUMMARY" })),
+        safe(getOutputVATAnalysisApi({ ...base, GroupBy: "MONTHLY" })),
+        safe(getOutputVATAnalysisApi({ ...base, GroupBy: "TAX_CODE" })),
+        safe(getOutputVATAnalysisApi({ ...base, GroupBy: "BRANCH" })),
+      ]);
+      return { summary, monthly, byTaxCode, byBranch };
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.message || "Failed to fetch VAT breakdown!"
+      );
+    }
+  }
+);
+
+// Stock Conversion Trend — Branch comparison table (GroupBy = BRANCH)
+export const fetchStockConversionByBranch = createAsyncThunk(
+  "dashboardMyBusiness/fetchStockConversionByBranch",
+  async ({ startDate, endDate, StartDate, EndDate, whichcost = 1, IncludeBlocked = true } = {}, { rejectWithValue }) => {
+    try {
+      const params = {
+        clientid: 1,
+        StartDate: StartDate ?? startDate,
+        EndDate: EndDate ?? endDate,
+        whichcost,
+        GroupBy: "BRANCH",
+        IncludeBlocked,
+      };
+      return toList(await getStockConversionTrendApi(params));
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.message || "Failed to fetch branch stock conversion!"
+      );
+    }
+  }
+);
+
+// Group & Branch Profitability (GroupBy = BRANCH)
+export const fetchBranchProfitability = createAsyncThunk(
+  "dashboardMyBusiness/fetchBranchProfitability",
+  async ({ startDate, endDate, StartDate, EndDate, branch = null, branchcode = null, Basis = "Avg Cost" } = {}, { rejectWithValue }) => {
+    try {
+      const resolvedBranch = branchcode ?? branch ?? 0;
+      const params = {
+        clientid: 1,
+        StartDate: StartDate ?? startDate,
+        EndDate: EndDate ?? endDate,
+        branchcode: resolvedBranch,
+        GroupBy: "BRANCH",
+        Basis,
+      };
+      return toList(await getInventoryProfitSummaryUserApi(params));
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.message || "Failed to fetch branch profitability!"
+      );
+    }
+  }
+);
+
+// Shared Customer Aging (PowerBIAccountBalance Mode = AGING) used by SalesComposition + ReceivablesAgeing
+export const fetchCustomerAging = createAsyncThunk(
+  "dashboardMyBusiness/fetchCustomerAging",
+  async ({ endDate, DateTo, branch = null, branchcode = null } = {}, { rejectWithValue }) => {
+    try {
+      const resolvedBranch = branchcode ?? branch ?? 0;
+      const params = {
+        clientid: 1,
+        Mode: "AGING",
+        AccountType: "CUSTOMER",
+        branchcode: resolvedBranch,
+        DateTo: DateTo ?? endDate,
+        IncludeZeroBal: false,
+      };
+      return toList(await getAccountBalanceApi(params));
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.message || "Failed to fetch customer aging!"
       );
     }
   }

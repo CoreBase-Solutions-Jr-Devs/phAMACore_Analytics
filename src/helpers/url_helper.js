@@ -23,8 +23,6 @@ export const GET_POWERBI_SALES =
 
 export const GET_POWERBI_KPISALES =
   "/api/PowerBi/PowerBIKPISalesTransactions";
-export const GET_POWERBI_KPI_OVERDUE_DEBTORS =
-  "/api/PowerBi/PowerBIKPIOverdueAccounts";
 export const GET_POWERBI_PURCHASE_ORDERS =
   "/api/PowerBi/PowerBIPurchaseOrders";
 export const GET_POWERBI_KPIPURCHASES =

@@ -6,7 +6,11 @@ import {
   fetchMonthlyTrend,
   fetchSalesByType,
   fetchStockConversionTrend,
+  fetchStockConversionByBranch,
   fetchOutputVATAnalysis,
+  fetchVATBreakdown,
+  fetchBranchProfitability,
+  fetchCustomerAging,
 } from "./thunk";
 import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
@@ -135,7 +139,11 @@ const initialState = {
   stockAsOf: null,
   salesByType: [],
   stockConversionTrend: [],
+  stockConversionByBranch: [],
   outputVATAnalysis: [],
+  vatBreakdown: { summary: [], monthly: [], byTaxCode: [], byBranch: [] },
+  branchProfitability: [],
+  customerAging: [],
 
   loading: false,
   loadingMonthlyTrend: false,
@@ -146,14 +154,22 @@ const initialState = {
   loadingAccountBalance: false,
   loadingCashbookSummary: false,
   loadingStockConversionTrend: false,
+  loadingStockConversionByBranch: false,
   loadingOutputVATAnalysis: false,
+  loadingVATBreakdown: false,
+  loadingBranchProfitability: false,
+  loadingCustomerAging: false,
 
   error: null,
   errorProfitSummary: null,
   errorAccountBalance: null,
   errorCashbookSummary: null,
   errorStockConversionTrend: null,
+  errorStockConversionByBranch: null,
   errorOutputVATAnalysis: null,
+  errorVATBreakdown: null,
+  errorBranchProfitability: null,
+  errorCustomerAging: null,
 
   filters: defaultFilters(),
   appliedFilters: defaultFilters(),
@@ -354,6 +370,78 @@ const DashboardMyBusinessSlice = createSlice({
         state.loadingOutputVATAnalysis = false;
         state.outputVATAnalysis = [];
         state.errorOutputVATAnalysis = action.payload || action.error?.message || "Failed to fetch output VAT analysis";
+      })
+
+      // STOCK CONVERSION BY BRANCH
+      .addCase(fetchStockConversionByBranch.pending, (state, action) => {
+        state.loadingStockConversionByBranch = true;
+        state.errorStockConversionByBranch = null;
+        state.stockConversionByBranchRequestId = action.meta.requestId;
+      })
+      .addCase(fetchStockConversionByBranch.fulfilled, (state, action) => {
+        if (state.stockConversionByBranchRequestId !== action.meta.requestId) return;
+        state.loadingStockConversionByBranch = false;
+        state.stockConversionByBranch = action.payload || [];
+      })
+      .addCase(fetchStockConversionByBranch.rejected, (state, action) => {
+        if (state.stockConversionByBranchRequestId !== action.meta.requestId) return;
+        state.loadingStockConversionByBranch = false;
+        state.stockConversionByBranch = [];
+        state.errorStockConversionByBranch = action.payload || action.error?.message || "Failed to fetch branch stock conversion";
+      })
+
+      // VAT BREAKDOWN BUNDLE
+      .addCase(fetchVATBreakdown.pending, (state, action) => {
+        state.loadingVATBreakdown = true;
+        state.errorVATBreakdown = null;
+        state.vatBreakdownRequestId = action.meta.requestId;
+      })
+      .addCase(fetchVATBreakdown.fulfilled, (state, action) => {
+        if (state.vatBreakdownRequestId !== action.meta.requestId) return;
+        state.loadingVATBreakdown = false;
+        state.vatBreakdown = action.payload || { summary: [], monthly: [], byTaxCode: [], byBranch: [] };
+      })
+      .addCase(fetchVATBreakdown.rejected, (state, action) => {
+        if (state.vatBreakdownRequestId !== action.meta.requestId) return;
+        state.loadingVATBreakdown = false;
+        state.vatBreakdown = { summary: [], monthly: [], byTaxCode: [], byBranch: [] };
+        state.errorVATBreakdown = action.payload || action.error?.message || "Failed to fetch VAT breakdown";
+      })
+
+      // BRANCH PROFITABILITY
+      .addCase(fetchBranchProfitability.pending, (state, action) => {
+        state.loadingBranchProfitability = true;
+        state.errorBranchProfitability = null;
+        state.branchProfitabilityRequestId = action.meta.requestId;
+      })
+      .addCase(fetchBranchProfitability.fulfilled, (state, action) => {
+        if (state.branchProfitabilityRequestId !== action.meta.requestId) return;
+        state.loadingBranchProfitability = false;
+        state.branchProfitability = action.payload || [];
+      })
+      .addCase(fetchBranchProfitability.rejected, (state, action) => {
+        if (state.branchProfitabilityRequestId !== action.meta.requestId) return;
+        state.loadingBranchProfitability = false;
+        state.branchProfitability = [];
+        state.errorBranchProfitability = action.payload || action.error?.message || "Failed to fetch branch profitability";
+      })
+
+      // SHARED CUSTOMER AGING (PowerBIAccountBalance Mode=AGING)
+      .addCase(fetchCustomerAging.pending, (state, action) => {
+        state.loadingCustomerAging = true;
+        state.errorCustomerAging = null;
+        state.customerAgingRequestId = action.meta.requestId;
+      })
+      .addCase(fetchCustomerAging.fulfilled, (state, action) => {
+        if (state.customerAgingRequestId !== action.meta.requestId) return;
+        state.loadingCustomerAging = false;
+        state.customerAging = action.payload || [];
+      })
+      .addCase(fetchCustomerAging.rejected, (state, action) => {
+        if (state.customerAgingRequestId !== action.meta.requestId) return;
+        state.loadingCustomerAging = false;
+        state.customerAging = [];
+        state.errorCustomerAging = action.payload || action.error?.message || "Failed to fetch customer aging";
       });
 
   },

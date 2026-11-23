@@ -8,11 +8,21 @@ import FilterActions from "./FilterActions";
 import Widgets from "./Widgets";
 import RevenueExpenses from "./RevenueExpenses";
 import StockPurchases from "./StockPurchases";
+import SalesComposition from "./SalesComposition";
+import VATBreakdown from "./VATBreakdown";
 import ReceivablesAgeing from "./ReceivablesAgeing";
 import StockMovements from "./StockMovements";
 import SalesCollection from "./SalesCollection";
 import { applyFilters } from "../../slices/dashboardMyBusiness/reducer";
-import { fetchMonthlyTrend, fetchSalesByType } from "../../slices/dashboardMyBusiness/thunk";
+import {
+  fetchMonthlyTrend,
+  fetchSalesByType,
+  fetchBranchProfitability,
+  fetchStockConversionTrend,
+  fetchStockConversionByBranch,
+  fetchVATBreakdown,
+  fetchCustomerAging,
+} from "../../slices/dashboardMyBusiness/thunk";
 import {
   saveActiveBranch,
   cleanBranchName,
@@ -48,15 +58,36 @@ export default function DashboardMyBusiness() {
     }
   }, [dispatch, branchCode, appliedFilters.branch]);
 
-  // One shared fetch feeds the three trend cards, and one feeds Sales Composition + VAT
+  // Dispatch shared dashboard data fetches whenever filters change
   useEffect(() => {
-    const range = {
-      startDate: appliedFilters.startDate,
-      endDate: appliedFilters.endDate,
-      branch: appliedFilters.branch ?? null,
-    };
+    const startDate = appliedFilters.startDate;
+    const endDate = appliedFilters.endDate;
+    const branch = appliedFilters.branch ?? null;
+    const range = { startDate, endDate, branch };
+
     dispatch(fetchMonthlyTrend(range));
     dispatch(fetchSalesByType(range));
+    dispatch(fetchBranchProfitability({ StartDate: startDate, EndDate: endDate, branchcode: branch }));
+    dispatch(
+      fetchStockConversionTrend({
+        StartDate: startDate,
+        EndDate: endDate,
+        branchcode: branch,
+        GroupBy: "MONTHLY",
+        whichcost: 1,
+        IncludeBlocked: true,
+      })
+    );
+    dispatch(
+      fetchStockConversionByBranch({
+        StartDate: startDate,
+        EndDate: endDate,
+        whichcost: 1,
+        IncludeBlocked: true,
+      })
+    );
+    dispatch(fetchVATBreakdown({ StartDate: startDate, EndDate: endDate, branchcode: branch }));
+    dispatch(fetchCustomerAging({ DateTo: endDate, branchcode: branch }));
   }, [dispatch, appliedFilters.startDate, appliedFilters.endDate, appliedFilters.branch]);
 
   const handleApplyFilters = useCallback(
@@ -96,7 +127,7 @@ export default function DashboardMyBusiness() {
 
         <Widgets onKpiComputed={setKpiData} />
 
-        <Row>
+        <Row className="mb-3">
           <Col xl={6}>
             <RevenueExpenses />
           </Col>
@@ -105,12 +136,22 @@ export default function DashboardMyBusiness() {
           </Col>
         </Row>
 
-        <Row>
+        <Row className="mb-3">
+          <Col xl={6}>
+            <SalesComposition />
+          </Col>
+          <Col xl={6}>
+            <VATBreakdown />
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
           <Col>
             <ReceivablesAgeing />
           </Col>
         </Row>
-        <Row>
+
+        <Row className="mb-3">
           <Col>
             <StockMovements />
           </Col>

@@ -11,6 +11,7 @@ import {
 
 import { getMonthToDateApi } from "../utils/dateHelper";
 import { formatAmount } from "../../helpers/format_helper";
+import { pick, num } from "../utils/apiRow";
 
 const formatKpiAmount = (val) => formatAmount(val, 2);
 
@@ -343,11 +344,13 @@ function Widgets({ onKpiComputed }) {
         inventoryProfitSummaryUser = [],
         cashbookSummary = [],
         cashbookSummaryMetrics = [],
+        vatBreakdown = {},
         appliedFilters = {},
 
         loadingProfitSummary = false,
         loadingAccountBalance = false,
         loadingCashbookSummary = false,
+        loadingVATBreakdown = false,
     } = useSelector(
         (state) =>
             state.DashboardMyBusiness ||
@@ -459,14 +462,43 @@ function Widgets({ onKpiComputed }) {
     }, [dispatch, appliedFilters?.branch, appliedFilters?.startDate, appliedFilters?.endDate]);
 
 
-    const salesValue = useMemo(() => {
+    const salesExclValue = useMemo(() => {
         return calculateSales(inventoryProfitSummaryUser);
     }, [inventoryProfitSummaryUser]);
 
+    const salesInclValue = useMemo(() => {
+        const vatSummaryRow = Array.isArray(vatBreakdown?.summary)
+            ? vatBreakdown.summary[0]
+            : null;
+        const fromVat = vatSummaryRow
+            ? num(pick(vatSummaryRow, "net_sales_incl_vat"))
+            : 0;
+        if (fromVat > 0) return fromVat;
+
+        const items = Array.isArray(inventoryProfitSummaryUser)
+            ? inventoryProfitSummaryUser
+            : inventoryProfitSummaryUser?.result || [];
+        const inclMetric = items.find((item) => {
+            const name = String(pick(item, "metric_name") || "").toLowerCase();
+            return name.includes("incl");
+        });
+        if (inclMetric) {
+            const parsed = num(pick(inclMetric, "metric_value"));
+            if (parsed > 0) return parsed;
+        }
+        return salesExclValue;
+    }, [vatBreakdown, inventoryProfitSummaryUser, salesExclValue]);
+
+    const salesValue = salesInclValue;
 
     const incomeStatementValue = useMemo(() => {
         return calculateProfit(inventoryProfitSummaryUser);
     }, [inventoryProfitSummaryUser]);
+
+    const grossMarginPct = useMemo(() => {
+        const denom = salesExclValue || salesInclValue;
+        return denom > 0 ? (incomeStatementValue / denom) * 100 : 0;
+    }, [incomeStatementValue, salesExclValue, salesInclValue]);
 
 
     const cashAvailableValue = useMemo(() => {
@@ -563,14 +595,14 @@ function Widgets({ onKpiComputed }) {
             decimals: 2,
         },
         {
-            title: "Sales",
+            title: "Sales (Incl. VAT)",
             value: salesValue,
             prefix: "KES",
             suffix: "",
             icon: "trending-up",
             color: "primary",
-            subtitle: "Current period sales",
-            loading: loadingProfitSummary,
+            subtitle: "Total sales with VAT included",
+            loading: loadingProfitSummary && loadingVATBreakdown,
             decimals: 2,
         },
         {
@@ -580,7 +612,7 @@ function Widgets({ onKpiComputed }) {
             suffix: "",
             icon: "package",
             color: "warning",
-            subtitle: "Gross profit (sales less cost of sales)",
+            subtitle: `GP margin: ${grossMarginPct.toFixed(1)}% (excl. VAT)`,
             loading: loadingProfitSummary,
             decimals: 2,
         },
