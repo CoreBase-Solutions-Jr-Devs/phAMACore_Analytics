@@ -155,10 +155,11 @@ export const fetchSalesByType = createAsyncThunk(
 // Stock Conversion Trend
 export const fetchStockConversionTrend = createAsyncThunk(
   "dashboardMyBusiness/fetchStockConversionTrend",
-  async ({ StartDate, EndDate, branch = null, WhichCost = 1, GroupBy = "MONTHLY", IncludeBlocked = true } = {}, { rejectWithValue }) => {
+  async ({ startDate, endDate, StartDate, EndDate, branch = null, branchcode = null, whichcost = 1, GroupBy = "MONTHLY", IncludeBlocked = true } = {}, { rejectWithValue }) => {
     try {
-      const params = { clientid: 1, StartDate, EndDate, WhichCost, GroupBy, IncludeBlocked };
-      if (branch) params.branchcode = branch;
+      const params = { clientid: 1, StartDate: StartDate ?? startDate, EndDate: EndDate ?? endDate, whichcost, GroupBy, IncludeBlocked };
+      const resolvedBranch = branchcode ?? branch;
+      if (resolvedBranch) params.branchcode = resolvedBranch;
       return toList(await getStockConversionTrendApi(params));
     } catch (error) {
       return rejectWithValue(
@@ -171,18 +172,21 @@ export const fetchStockConversionTrend = createAsyncThunk(
 // Output VAT Analysis
 export const fetchOutputVATAnalysis = createAsyncThunk(
   "dashboardMyBusiness/fetchOutputVATAnalysis",
-  async ({ StartDate, EndDate, branch = null, GroupBy = "MONTHLY", TaxCode, TopN } = {}, { rejectWithValue }) => {
+  async ({ startDate, endDate, StartDate, EndDate, branch = null, branchcode = null, GroupBy = "MONTHLY", TaxCode, TopN } = {}, { rejectWithValue }) => {
     try {
-      const params = { clientid: 1, StartDate, EndDate, GroupBy, TaxCode, TopN };
-      if (branch) params.branchcode = branch;
+      const params = { clientid: 1, StartDate: StartDate ?? startDate, EndDate: EndDate ?? endDate, GroupBy };
+      const resolvedBranch = branchcode ?? branch;
+      if (resolvedBranch) params.branchcode = resolvedBranch;
+      if (TaxCode) params.TaxCode = TaxCode;
+      if (TopN != null) params.TopN = TopN;
       return toList(await getOutputVATAnalysisApi(params));
     } catch (error) {
       return rejectWithValue(
-        error?.response?.data?.message || error?.message || "Failed to fetch ouput VAT Analysis!"
+        error?.response?.data?.message || error?.message || "Failed to fetch output VAT analysis!"
       );
     }
   }
-)
+);
 
 // Aliases for fetch naming convention
 export const fetchInventoryProfitSummaryUser = getInventoryProfitSummaryUser;

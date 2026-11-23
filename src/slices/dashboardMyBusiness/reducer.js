@@ -5,6 +5,8 @@ import {
   getCashbookSummary,
   fetchMonthlyTrend,
   fetchSalesByType,
+  fetchStockConversionTrend,
+  fetchOutputVATAnalysis,
 } from "./thunk";
 import { DEFAULT_DATE_RANGE } from "../../pages/utils/dateHelper";
 
@@ -318,15 +320,18 @@ const DashboardMyBusinessSlice = createSlice({
 
       // STOCK CONVERSION TREND
       builder
-      .addCase(fetchStockConversionTrend.pending, (state) => {
+      .addCase(fetchStockConversionTrend.pending, (state, action) => {
         state.loadingStockConversionTrend = true;
         state.errorStockConversionTrend = null;
+        state.stockConversionTrendRequestId = action.meta.requestId;
       })
       .addCase(fetchStockConversionTrend.fulfilled, (state, action) => {
+        if (state.stockConversionTrendRequestId !== action.meta.requestId) return;
         state.loadingStockConversionTrend = false;
         state.stockConversionTrend = action.payload || [];
       })
       .addCase(fetchStockConversionTrend.rejected, (state, action) => {
+        if (state.stockConversionTrendRequestId !== action.meta.requestId) return;
         state.loadingStockConversionTrend = false;
         state.stockConversionTrend = [];
         state.errorStockConversionTrend = action.payload || action.error?.message || "Failed to fetch stock conversion trend";
@@ -334,18 +339,21 @@ const DashboardMyBusinessSlice = createSlice({
 
       // OUTPUT VAT ANALYSIS
       builder
-      .addCase(fetch.pending, (state) => {
+      .addCase(fetchOutputVATAnalysis.pending, (state, action) => {
         state.loadingOutputVATAnalysis = true;
         state.errorOutputVATAnalysis = null;
+        state.outputVATAnalysisRequestId = action.meta.requestId;
       })
-      .addCase(fetch.fulfilled, (state, action) => {
+      .addCase(fetchOutputVATAnalysis.fulfilled, (state, action) => {
+        if (state.outputVATAnalysisRequestId !== action.meta.requestId) return;
         state.loadingOutputVATAnalysis = false;
         state.outputVATAnalysis = action.payload || [];
       })
-      .addCase(fetch.rejected, (state, action) => {
+      .addCase(fetchOutputVATAnalysis.rejected, (state, action) => {
+        if (state.outputVATAnalysisRequestId !== action.meta.requestId) return;
         state.loadingOutputVATAnalysis = false;
         state.outputVATAnalysis = [];
-        state.errorOutputVATAnalysis = action.payload || action.error?.message || "Failed to fetch stock conversion trend";
+        state.errorOutputVATAnalysis = action.payload || action.error?.message || "Failed to fetch output VAT analysis";
       });
 
   },
