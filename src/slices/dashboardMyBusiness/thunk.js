@@ -6,6 +6,8 @@ import {
   getKPIPurchases as getKPIPurchasesApi,
   getKPISalesTransactions as getKPISalesTransactionsApi,
   getKPIStockHealth as getKPIStockHealthApi,
+  getStockConversionTrend as getStockConversionTrendApi,
+  getOutputVATAnalysis as getOutputVATAnalysisApi,
 } from "../../helpers/fakebackend_helper";
 import { getMonthlyRanges } from "../../pages/utils/dateHelper";
 import { toList, pick, num, metric } from "../../pages/utils/apiRow";
@@ -19,10 +21,8 @@ export const getInventoryProfitSummaryUser = createAsyncThunk(
       return response.data ?? response;
     } catch (error) {
       return rejectWithValue(
-        error?.response?.data?.message ||
-        error?.response?.data ||
-        error.message ||
-        "Failed to fetch inventory profit summary"
+        error?.response?.data?.message || error?.response?.data ||
+        error.message || "Failed to fetch inventory profit summary!"
       );
     }
   }
@@ -37,10 +37,8 @@ export const getAccountBalance = createAsyncThunk(
       return response.data ?? response;
     } catch (error) {
       return rejectWithValue(
-        error?.response?.data?.message ||
-        error?.response?.data ||
-        error.message ||
-        "Failed to fetch account balance"
+        error?.response?.data?.message || error?.response?.data ||
+        error.message || "Failed to fetch account balance!"
       );
     }
   }
@@ -61,10 +59,8 @@ export const getCashbookSummary = createAsyncThunk(
       return response.data ?? response;
     } catch (error) {
       return rejectWithValue(
-        error?.response?.data?.message ||
-        error?.response?.data ||
-        error.message ||
-        "Failed to fetch cashbook summary"
+        error?.response?.data?.message || error?.response?.data ||
+        error.message || "Failed to fetch cashbook summary!"
       );
     }
   }
@@ -134,7 +130,7 @@ export const fetchMonthlyTrend = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue(
-        error?.response?.data?.message || error?.message || "Failed to fetch monthly trend"
+        error?.response?.data?.message || error?.message || "Failed to fetch monthly trend!"
       );
     }
   }
@@ -150,11 +146,43 @@ export const fetchSalesByType = createAsyncThunk(
       return toList(await getKPISalesTransactionsApi(params));
     } catch (error) {
       return rejectWithValue(
-        error?.response?.data?.message || error?.message || "Failed to fetch sales by type"
+        error?.response?.data?.message || error?.message || "Failed to fetch sales by type!"
       );
     }
   }
 );
+
+// Stock Conversion Trend
+export const fetchStockConversionTrend = createAsyncThunk(
+  "dashboardMyBusiness/fetchStockConversionTrend",
+  async ({ StartDate, EndDate, branch = null, WhichCost = 1, GroupBy = "MONTHLY", IncludeBlocked = true } = {}, { rejectWithValue }) => {
+    try {
+      const params = { clientid: 1, StartDate, EndDate, WhichCost, GroupBy, IncludeBlocked };
+      if (branch) params.branchcode = branch;
+      return toList(await getStockConversionTrendApi(params));
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.message || "Failed to fetch stock conversion trend!"
+      );
+    }
+  }
+);
+
+// Output VAT Analysis
+export const fetchOutputVATAnalysis = createAsyncThunk(
+  "dashboardMyBusiness/fetchOutputVATAnalysis",
+  async ({ StartDate, EndDate, branch = null, GroupBy = "MONTHLY", TaxCode, TopN } = {}, { rejectWithValue }) => {
+    try {
+      const params = { clientid: 1, StartDate, EndDate, GroupBy, TaxCode, TopN };
+      if (branch) params.branchcode = branch;
+      return toList(await getOutputVATAnalysisApi(params));
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || error?.message || "Failed to fetch ouput VAT Analysis!"
+      );
+    }
+  }
+)
 
 // Aliases for fetch naming convention
 export const fetchInventoryProfitSummaryUser = getInventoryProfitSummaryUser;

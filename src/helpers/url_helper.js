@@ -57,6 +57,10 @@ export const GET_POWERBI_KPI_BRANCH_ORDER_FILL_RATE =
   "/api/PowerBi/PowerBIKPIBranchOrderFillRate";
 export const GET_POWERBI_KPI_BRANCH_TRANSFERS = 
   "/api/PowerBi/PowerBIKPIBranchTransfers";
+export const GET_POWERBI_KPI_OUTPUT_VAT_ANALYSIS =
+  "/api/PowerBi/PowerBIKPIOutputVATAnalysis";
+export const GET_POWERBI_KPI_STOCK_CONVERSION_TREND =
+  "/api/PowerBi/PowerBIKPIStockConversionTrend";
 
 export const GET_POWERBI_MAVERICK_SPEND = 
   "/api/PowerBi/PowerBIKPIMaverickSpend";

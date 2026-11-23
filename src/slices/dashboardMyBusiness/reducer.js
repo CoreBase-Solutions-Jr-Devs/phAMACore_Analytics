@@ -132,6 +132,8 @@ const initialState = {
   monthlyTrend: [],
   stockAsOf: null,
   salesByType: [],
+  stockConversionTrend: [],
+  outputVATAnalysis: [],
 
   loading: false,
   loadingMonthlyTrend: false,
@@ -141,11 +143,15 @@ const initialState = {
   loadingProfitSummary: false,
   loadingAccountBalance: false,
   loadingCashbookSummary: false,
+  loadingStockConversionTrend: false,
+  loadingOutputVATAnalysis: false,
 
   error: null,
   errorProfitSummary: null,
   errorAccountBalance: null,
   errorCashbookSummary: null,
+  errorStockConversionTrend: null,
+  errorOutputVATAnalysis: null,
 
   filters: defaultFilters(),
   appliedFilters: defaultFilters(),
@@ -309,6 +315,39 @@ const DashboardMyBusinessSlice = createSlice({
         state.salesByType = [];
         state.errorSalesByType = action.payload || action.error?.message || "Failed to fetch sales by type";
       });
+
+      // STOCK CONVERSION TREND
+      builder
+      .addCase(fetchStockConversionTrend.pending, (state) => {
+        state.loadingStockConversionTrend = true;
+        state.errorStockConversionTrend = null;
+      })
+      .addCase(fetchStockConversionTrend.fulfilled, (state, action) => {
+        state.loadingStockConversionTrend = false;
+        state.stockConversionTrend = action.payload || [];
+      })
+      .addCase(fetchStockConversionTrend.rejected, (state, action) => {
+        state.loadingStockConversionTrend = false;
+        state.stockConversionTrend = [];
+        state.errorStockConversionTrend = action.payload || action.error?.message || "Failed to fetch stock conversion trend";
+      });
+
+      // OUTPUT VAT ANALYSIS
+      builder
+      .addCase(fetch.pending, (state) => {
+        state.loadingOutputVATAnalysis = true;
+        state.errorOutputVATAnalysis = null;
+      })
+      .addCase(fetch.fulfilled, (state, action) => {
+        state.loadingOutputVATAnalysis = false;
+        state.outputVATAnalysis = action.payload || [];
+      })
+      .addCase(fetch.rejected, (state, action) => {
+        state.loadingOutputVATAnalysis = false;
+        state.outputVATAnalysis = [];
+        state.errorOutputVATAnalysis = action.payload || action.error?.message || "Failed to fetch stock conversion trend";
+      });
+
   },
 });
 
