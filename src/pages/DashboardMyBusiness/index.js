@@ -137,10 +137,13 @@ export default function DashboardMyBusiness() {
         </Row>
 
         <Row className="mb-3">
-          <Col xl={6}>
+          <Col>
             <SalesComposition />
           </Col>
-          <Col xl={6}>
+        </Row>
+
+        <Row className="mb-3">
+          <Col>
             <VATBreakdown />
           </Col>
         </Row>
