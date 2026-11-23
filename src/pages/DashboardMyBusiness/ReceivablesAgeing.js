@@ -9,6 +9,7 @@ import CardExportButtons from "../../Components/Common/CardExportButtons";
 import FloatingTooltip from "../../Components/Common/FloatingTooltip";
 import { exportStamp, money } from "./TrendCardBody";
 import { toList, pick, num } from "../utils/apiRow";
+import useTableCellTooltip from "./useTableCellTooltip";
 
 const AGE_BUCKETS = [
   { key: "over_120", status: "120+ Days", color: "danger", risk: "Critical", riskColor: "danger", rank: 5 },
@@ -62,7 +63,7 @@ const ReceivablesAgeing = () => {
   const [bucketFilter, setBucketFilter] = useState("ALL");
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
-  const [hoverInfo, setHoverInfo] = useState(null);
+  const { hoverInfo, setHoverInfo, getCellTooltipHandlers, clearTooltip } = useTableCellTooltip();
 
   // Expandable invoice & originating branch drill-down (PowerBIAccountBalance Mode = DETAIL)
   const [expandedCode, setExpandedCode] = useState(null);
@@ -261,9 +262,23 @@ const ReceivablesAgeing = () => {
         <div
           className="table-responsive table-card"
           style={{ maxHeight: "430px", overflowY: "auto" }}
-          onMouseLeave={() => setHoverInfo(null)}
+          onMouseLeave={clearTooltip}
         >
-          <table className="table table-borderless table-hover table-centered table-nowrap mb-0">
+          <table
+            className="table table-borderless table-hover table-centered table-nowrap mb-0"
+            style={{ tableLayout: "fixed", width: "100%" }}
+          >
+            <colgroup>
+              <col style={{ width: "22%" }} />
+              <col style={{ width: "11%" }} />
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "11%" }} />
+              <col style={{ width: "11%" }} />
+            </colgroup>
             <thead className="text-muted table-light sticky-top" style={{ zIndex: 2 }}>
               <tr>
                 {COLUMNS.map((col) => (
@@ -272,7 +287,8 @@ const ReceivablesAgeing = () => {
                     role={col.sortable ? "button" : undefined}
                     onClick={col.sortable ? () => toggleSort(col.key) : undefined}
                     title={col.sortable ? "Click to sort" : undefined}
-                    className={col.key !== "customer" && col.key !== "rank" ? "text-end" : ""}
+                    className={`text-truncate ${col.key !== "customer" && col.key !== "rank" ? "text-end" : ""}`}
+                    {...getCellTooltipHandlers("Column", col.label)}
                   >
                     {col.label}
                     {col.sortable && (
@@ -309,46 +325,61 @@ const ReceivablesAgeing = () => {
                       : item.riskColor === "warning"
                       ? "#f7b84b"
                       : "#0ab39c";
+                  const rowTooltipPayload = {
+                    title: item.customer,
+                    badgeColor: riskHex,
+                    mainValue: `Outstanding: ${formatCurrency(item.balance, "KES", 2)}`,
+                    mainColor: "#00e396",
+                    subText: `Code: ${item.code} · Last Invoice: ${item.lastInvoice} · Last Payment: ${item.lastPayment}`,
+                    extraText: item.insight || "Click row to inspect invoices & originating branch.",
+                  };
 
                   return (
                     <React.Fragment key={`${item.code}-${index}`}>
                       <tr
                         role="button"
+                        tabIndex={0}
                         onClick={() => handleRowExpand(item)}
                         onMouseEnter={(e) =>
                           setHoverInfo({
                             x: e.clientX,
                             y: e.clientY,
-                            title: item.customer,
-                            badgeColor: riskHex,
-                            mainValue: `Outstanding: ${formatCurrency(item.balance, "KES", 2)}`,
-                            mainColor: "#00e396",
-                            subText: `Code: ${item.code} · Last Invoice: ${item.lastInvoice} · Last Payment: ${item.lastPayment}`,
-                            extraText: item.insight || "Click row to inspect invoices & originating branch.",
+                            ...rowTooltipPayload,
                           })
                         }
                         onMouseMove={(e) =>
                           setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null))
                         }
-                        onMouseLeave={() => setHoverInfo(null)}
+                        onMouseLeave={clearTooltip}
+                        onFocus={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setHoverInfo({
+                            x: rect.left + rect.width / 2,
+                            y: rect.top,
+                            ...rowTooltipPayload,
+                          });
+                        }}
+                        onBlur={clearTooltip}
                       >
                         <td className="fw-medium">
-                          <i
-                            className={`me-1 text-muted ${
-                              isExpanded ? "ri-arrow-down-s-line" : "ri-arrow-right-s-line"
-                            }`}
-                          />
-                          <span>{item.customer}</span>
-                          <div className="text-muted fs-11 ps-3">{item.code}</div>
+                          <div className="text-truncate">
+                            <i
+                              className={`me-1 text-muted ${
+                                isExpanded ? "ri-arrow-down-s-line" : "ri-arrow-right-s-line"
+                              }`}
+                            />
+                            <span>{item.customer}</span>
+                          </div>
+                          <div className="text-muted fs-11 ps-3 text-truncate">{item.code}</div>
                         </td>
-                        <td className="text-end fw-semibold">{formatCompact(item.balance)}</td>
-                        <td className="text-end text-muted fs-12">{formatCompact(item.current_0_30)}</td>
-                        <td className="text-end text-muted fs-12">{formatCompact(item.days_31_60)}</td>
-                        <td className="text-end text-muted fs-12">{formatCompact(item.days_61_90)}</td>
-                        <td className="text-end text-danger fs-12">{formatCompact(item.days_91_120)}</td>
-                        <td className="text-end text-danger fw-medium fs-12">{formatCompact(item.over_120)}</td>
-                        <td className="text-end text-muted fs-12">{item.lastPayment}</td>
-                        <td>
+                        <td className="text-end fw-semibold text-truncate">{formatCompact(item.balance)}</td>
+                        <td className="text-end text-muted fs-12 text-truncate">{formatCompact(item.current_0_30)}</td>
+                        <td className="text-end text-muted fs-12 text-truncate">{formatCompact(item.days_31_60)}</td>
+                        <td className="text-end text-muted fs-12 text-truncate">{formatCompact(item.days_61_90)}</td>
+                        <td className="text-end text-danger fs-12 text-truncate">{formatCompact(item.days_91_120)}</td>
+                        <td className="text-end text-danger fw-medium fs-12 text-truncate">{formatCompact(item.over_120)}</td>
+                        <td className="text-end text-muted fs-12 text-truncate">{item.lastPayment}</td>
+                        <td className="text-truncate">
                           <span className={`badge bg-${item.color}-subtle text-${item.color}`}>
                             {item.status}
                           </span>
@@ -371,37 +402,124 @@ const ReceivablesAgeing = () => {
                                 No invoice ledger entries returned for this period.
                               </div>
                             ) : (
-                              <div className="table-responsive" style={{ maxHeight: "220px", overflowY: "auto" }}>
-                                <table className="table table-sm table-bordered mb-0 fs-12 bg-white">
+                              <div
+                                className="table-responsive"
+                                style={{ maxHeight: "220px", overflowY: "auto" }}
+                                onMouseLeave={clearTooltip}
+                              >
+                                <table
+                                  className="table table-sm table-bordered mb-0 fs-12 bg-white"
+                                  style={{ tableLayout: "fixed", width: "100%" }}
+                                >
+                                  <colgroup>
+                                    <col style={{ width: "14%" }} />
+                                    <col style={{ width: "18%" }} />
+                                    <col style={{ width: "11%" }} />
+                                    <col style={{ width: "12%" }} />
+                                    <col style={{ width: "12%" }} />
+                                    <col style={{ width: "11%" }} />
+                                    <col style={{ width: "11%" }} />
+                                    <col style={{ width: "11%" }} />
+                                  </colgroup>
                                   <thead className="table-light sticky-top" style={{ top: 0, zIndex: 1 }}>
                                     <tr>
-                                      <th>Invoice / Ref</th>
-                                      <th>Originating Branch</th>
-                                      <th>Invoice Date</th>
-                                      <th>Est. Due Date (+30d)</th>
-                                      <th>Type</th>
-                                      <th className="text-end">Debit</th>
-                                      <th className="text-end">Credit</th>
-                                      <th className="text-end">Running Bal.</th>
+                                      <th className="text-truncate" {...getCellTooltipHandlers("Column", "Invoice / Ref")}>
+                                        Invoice / Ref
+                                      </th>
+                                      <th className="text-truncate" {...getCellTooltipHandlers("Column", "Originating Branch")}>
+                                        Originating Branch
+                                      </th>
+                                      <th className="text-truncate" {...getCellTooltipHandlers("Column", "Invoice Date")}>
+                                        Invoice Date
+                                      </th>
+                                      <th className="text-truncate" {...getCellTooltipHandlers("Column", "Est. Due Date (+30d)")}>
+                                        Est. Due Date (+30d)
+                                      </th>
+                                      <th className="text-truncate" {...getCellTooltipHandlers("Column", "Type")}>
+                                        Type
+                                      </th>
+                                      <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Debit")}>
+                                        Debit
+                                      </th>
+                                      <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Credit")}>
+                                        Credit
+                                      </th>
+                                      <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Running Bal.")}>
+                                        Running Bal.
+                                      </th>
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {detailRows.map((d, dIdx) => (
-                                      <tr key={`${pick(d, "doc_ref")}-${dIdx}`}>
-                                        <td className="fw-medium">{pick(d, "doc_ref") || "-"}</td>
-                                        <td>{cleanBranchName(pick(d, "branch_name") || "-")}</td>
-                                        <td>{formatDate(pick(d, "trans_date"))}</td>
-                                        <td>{estimateDueDate(pick(d, "trans_date"), 30)}</td>
-                                        <td className="text-muted">{pick(d, "trans_type") || "-"}</td>
-                                        <td className="text-end">{formatCompact(num(pick(d, "debit")))}</td>
-                                        <td className="text-end text-success">
-                                          {formatCompact(num(pick(d, "credit")))}
-                                        </td>
-                                        <td className="text-end fw-semibold">
-                                          {formatCompact(num(pick(d, "running_balance")))}
-                                        </td>
-                                      </tr>
-                                    ))}
+                                    {detailRows.map((d, dIdx) => {
+                                      const docRef = pick(d, "doc_ref") || "-";
+                                      const origBranch = cleanBranchName(pick(d, "branch_name") || "-");
+                                      const invDate = formatDate(pick(d, "trans_date"));
+                                      const dueDate = estimateDueDate(pick(d, "trans_date"), 30);
+                                      const transType = pick(d, "trans_type") || "-";
+                                      const debitText = formatCompact(num(pick(d, "debit")));
+                                      const creditText = formatCompact(num(pick(d, "credit")));
+                                      const runBalText = formatCompact(num(pick(d, "running_balance")));
+                                      return (
+                                        <tr key={`${docRef}-${dIdx}`}>
+                                          <td
+                                            className="fw-medium text-truncate"
+                                            tabIndex={0}
+                                            {...getCellTooltipHandlers("Invoice / Ref", docRef)}
+                                          >
+                                            {docRef}
+                                          </td>
+                                          <td
+                                            className="text-truncate"
+                                            tabIndex={0}
+                                            {...getCellTooltipHandlers("Originating Branch", origBranch)}
+                                          >
+                                            {origBranch}
+                                          </td>
+                                          <td
+                                            className="text-truncate"
+                                            tabIndex={0}
+                                            {...getCellTooltipHandlers("Invoice Date", invDate)}
+                                          >
+                                            {invDate}
+                                          </td>
+                                          <td
+                                            className="text-truncate"
+                                            tabIndex={0}
+                                            {...getCellTooltipHandlers("Est. Due Date (+30d)", dueDate)}
+                                          >
+                                            {dueDate}
+                                          </td>
+                                          <td
+                                            className="text-muted text-truncate"
+                                            tabIndex={0}
+                                            {...getCellTooltipHandlers("Type", transType)}
+                                          >
+                                            {transType}
+                                          </td>
+                                          <td
+                                            className="text-end text-truncate"
+                                            tabIndex={0}
+                                            {...getCellTooltipHandlers("Debit", debitText)}
+                                          >
+                                            {debitText}
+                                          </td>
+                                          <td
+                                            className="text-end text-success text-truncate"
+                                            tabIndex={0}
+                                            {...getCellTooltipHandlers("Credit", creditText)}
+                                          >
+                                            {creditText}
+                                          </td>
+                                          <td
+                                            className="text-end fw-semibold text-truncate"
+                                            tabIndex={0}
+                                            {...getCellTooltipHandlers("Running Bal.", runBalText)}
+                                          >
+                                            {runBalText}
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
                                   </tbody>
                                 </table>
                               </div>

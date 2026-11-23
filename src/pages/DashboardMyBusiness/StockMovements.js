@@ -7,6 +7,7 @@ import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 import FloatingTooltip from "../../Components/Common/FloatingTooltip";
 import { cleanBranchName } from './../../helpers/branch_helper';
+import useTableCellTooltip from "./useTableCellTooltip";
 
 const formatDMY = (date) => {
   const d = String(date.getDate()).padStart(2, "0");
@@ -39,7 +40,7 @@ const StockMovements = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
-  const [hoverInfo, setHoverInfo] = useState(null);
+  const { hoverInfo, setHoverInfo, getCellTooltipHandlers } = useTableCellTooltip();
 
   const handleCellHover = (e, info) => {
     setHoverInfo({
@@ -186,16 +187,42 @@ const StockMovements = () => {
           style={{ maxHeight: "380px", overflowY: "auto" }}
           onMouseLeave={handleMouseLeave}
         >
-          <table className="table table-borderless table-centered table-nowrap mb-0">
+          <table
+            className="table table-borderless table-centered table-nowrap mb-0"
+            style={{ tableLayout: "fixed", width: "100%" }}
+          >
+            <colgroup>
+              <col style={{ width: "24%" }} />
+              <col style={{ width: "16%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "12%" }} />
+              <col style={{ width: "13%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "11%" }} />
+            </colgroup>
             <thead className="text-muted table-light sticky-top" style={{ zIndex: 1 }}>
               <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Stock</th>
-                <th>Min Reorder</th>
-                <th>Monthly Demand</th>
-                <th>Branch</th>
-                <th>Status</th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Product")}>
+                  Product
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Category")}>
+                  Category
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Stock")}>
+                  Stock
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Min Reorder")}>
+                  Min Reorder
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Monthly Demand")}>
+                  Monthly Demand
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Branch")}>
+                  Branch
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Status")}>
+                  Status
+                </th>
               </tr>
             </thead>
 
@@ -236,45 +263,54 @@ const StockMovements = () => {
                       ? "#299cdb"
                       : "#0ab39c";
                   const minReorder = item.effective_min_qty ?? item.branch_min_qty;
+                  const rowInfo = {
+                    title: item.item_name || item.item_code || "Product",
+                    badgeColor: badgeHex,
+                    mainValue: `${formatNumber(item.current_stock_qty)} in stock · ${badge.label}`,
+                    mainColor: badgeHex,
+                    subText: `Branch: ${branchName} · Min Reorder: ${formatNumber(minReorder)} · Monthly Demand: ${formatNumber(item.monthly_demand)}`,
+                    extraText: item.action_insight || (item.item_code ? `SKU: ${item.item_code} · Category: ${item.item_subgroup || item.item_group || "-"}` : undefined),
+                  };
 
                   return (
                     <tr
                       key={`${item.item_code}-${item.branch_id}-${index}`}
-                      onMouseEnter={(e) =>
-                        handleCellHover(e, {
-                          title: item.item_name || item.item_code || "Product",
-                          badgeColor: badgeHex,
-                          mainValue: `${formatNumber(item.current_stock_qty)} in stock · ${badge.label}`,
-                          mainColor: badgeHex,
-                          subText: `Branch: ${branchName} · Min Reorder: ${formatNumber(minReorder)} · Monthly Demand: ${formatNumber(item.monthly_demand)}`,
-                          extraText: item.action_insight || (item.item_code ? `SKU: ${item.item_code} · Category: ${item.item_subgroup || item.item_group || "-"}` : undefined),
-                        })
-                      }
+                      tabIndex={0}
+                      onMouseEnter={(e) => handleCellHover(e, rowInfo)}
                       onMouseMove={handleMouseMove}
                       onMouseLeave={handleMouseLeave}
+                      onFocus={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setHoverInfo({
+                          x: rect.left + rect.width / 2,
+                          y: rect.top,
+                          ...rowInfo,
+                        });
+                      }}
+                      onBlur={handleMouseLeave}
                     >
                       <td className="fw-medium">
-                        <div>{item.item_name}</div>
-                        <small className="text-muted">{item.item_code}</small>
+                        <div className="text-truncate">{item.item_name}</div>
+                        <small className="text-muted d-block text-truncate">{item.item_code}</small>
                       </td>
-                      <td className="text-muted">
+                      <td className="text-muted text-truncate">
                         {item.item_subgroup || item.item_group || "-"}
                       </td>
                       <td
-                        className={
+                        className={`text-truncate ${
                           Number(item.current_stock_qty) <= 0
                             ? "text-danger fw-semibold"
                             : "fw-semibold"
-                        }
+                        }`}
                       >
                         {formatNumber(item.current_stock_qty)}
                       </td>
-                      <td>
+                      <td className="text-truncate">
                         {formatNumber(minReorder)}
                       </td>
-                      <td>{formatNumber(item.monthly_demand)}</td>
-                      <td>{branchName}</td>
-                      <td>
+                      <td className="text-truncate">{formatNumber(item.monthly_demand)}</td>
+                      <td className="text-truncate">{branchName}</td>
+                      <td className="text-truncate">
                         <span
                           className={`badge bg-${badge.color}-subtle text-${badge.color}`}
                         >

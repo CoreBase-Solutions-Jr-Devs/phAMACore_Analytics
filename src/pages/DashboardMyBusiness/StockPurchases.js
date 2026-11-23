@@ -5,7 +5,9 @@ import { StockPurchasesCharts } from "./DashboardMyBusinessCharts";
 import { exportToExcel } from "../../helpers/export_helper";
 import { cleanBranchName, getCachedBranchName } from "../../helpers/branch_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
+import FloatingTooltip from "../../Components/Common/FloatingTooltip";
 import TrendCardBody, { exportStamp, money } from "./TrendCardBody";
+import useTableCellTooltip from "./useTableCellTooltip";
 import { fetchStockConversionTrend } from "../../slices/dashboardMyBusiness/thunk";
 import { formatCompact, formatCurrency } from "../utils/formatHelper";
 import { pick, num } from "../utils/apiRow";
@@ -14,6 +16,7 @@ const StockPurchases = () => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("monthly");
   const [drillBranch, setDrillBranch] = useState(null); // { code, name } for inline branch drill-down
+  const { hoverInfo, getCellTooltipHandlers, clearTooltip } = useTableCellTooltip();
 
   const {
     stockConversionTrend = [],
@@ -269,16 +272,39 @@ const StockPurchases = () => {
             </TrendCardBody>
           </div>
         ) : (
-          <div className="table-responsive" style={{ maxHeight: "340px", overflowY: "auto" }}>
-            <table className="table table-sm table-hover table-nowrap align-middle mb-0">
+          <div className="table-responsive" style={{ maxHeight: "340px", overflowY: "auto" }} onMouseLeave={clearTooltip}>
+            <table
+              className="table table-sm table-hover table-nowrap align-middle mb-0"
+              style={{ tableLayout: "fixed", width: "100%" }}
+            >
+              <colgroup>
+                <col style={{ width: "24%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "14%" }} />
+                <col style={{ width: "14%" }} />
+              </colgroup>
               <thead className="table-light text-muted sticky-top" style={{ zIndex: 1 }}>
                 <tr>
-                  <th className="ps-3">Branch (click to drill)</th>
-                  <th className="text-end">Transfers / Inflow</th>
-                  <th className="text-end">Cost of Sales</th>
-                  <th className="text-end">Closing Stock</th>
-                  <th className="text-end">Conv. %</th>
-                  <th className="text-end pe-3">Cover (mo)</th>
+                  <th className="ps-3 text-truncate" {...getCellTooltipHandlers("Column", "Branch (click to drill)")}>
+                    Branch (click to drill)
+                  </th>
+                  <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Transfers / Inflow")}>
+                    Transfers / Inflow
+                  </th>
+                  <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Cost of Sales")}>
+                    Cost of Sales
+                  </th>
+                  <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Closing Stock")}>
+                    Closing Stock
+                  </th>
+                  <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Conv. %")}>
+                    Conv. %
+                  </th>
+                  <th className="text-end pe-3 text-truncate" {...getCellTooltipHandlers("Column", "Cover (mo)")}>
+                    Cover (mo)
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -302,31 +328,72 @@ const StockPurchases = () => {
                     </td>
                   </tr>
                 ) : (
-                  branchRows.map((row) => (
-                    <tr
-                      key={row.branchId ?? row.branchName}
-                      role="button"
-                      onClick={() => handleDrillIntoBranch(row)}
-                      title="Click to view monthly Transfers In vs COGS vs Closing Stock for this branch"
-                    >
-                      <td className="ps-3 fw-medium text-primary">{row.branchName}</td>
-                      <td className="text-end">{formatCompact(row.inflow)}</td>
-                      <td className="text-end text-danger">{formatCompact(row.cogs)}</td>
-                      <td className="text-end fw-semibold">{formatCompact(row.closing)}</td>
-                      <td className="text-end">
-                        <span
-                          className={`badge bg-${
-                            row.conversionPct >= 95 ? "success" : row.conversionPct >= 75 ? "warning" : "danger"
-                          }-subtle text-${
-                            row.conversionPct >= 95 ? "success" : row.conversionPct >= 75 ? "warning" : "danger"
-                          }`}
+                  branchRows.map((row) => {
+                    const inflowText = formatCompact(row.inflow);
+                    const cogsText = formatCompact(row.cogs);
+                    const closingText = formatCompact(row.closing);
+                    const convText = `${row.conversionPct.toFixed(1)}%`;
+                    const coverText = row.coverMonths.toFixed(1);
+                    return (
+                      <tr
+                        key={row.branchId ?? row.branchName}
+                        role="button"
+                        onClick={() => handleDrillIntoBranch(row)}
+                        title="Click to view monthly Transfers In vs COGS vs Closing Stock for this branch"
+                      >
+                        <td
+                          className="ps-3 fw-medium text-primary text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Branch", row.branchName)}
                         >
-                          {row.conversionPct.toFixed(1)}%
-                        </span>
-                      </td>
-                      <td className="text-end pe-3 text-muted">{row.coverMonths.toFixed(1)}</td>
-                    </tr>
-                  ))
+                          {row.branchName}
+                        </td>
+                        <td
+                          className="text-end text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Transfers / Inflow", inflowText)}
+                        >
+                          {inflowText}
+                        </td>
+                        <td
+                          className="text-end text-danger text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Cost of Sales", cogsText)}
+                        >
+                          {cogsText}
+                        </td>
+                        <td
+                          className="text-end fw-semibold text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Closing Stock", closingText)}
+                        >
+                          {closingText}
+                        </td>
+                        <td
+                          className="text-end text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Conv. %", convText)}
+                        >
+                          <span
+                            className={`badge bg-${
+                              row.conversionPct >= 95 ? "success" : row.conversionPct >= 75 ? "warning" : "danger"
+                            }-subtle text-${
+                              row.conversionPct >= 95 ? "success" : row.conversionPct >= 75 ? "warning" : "danger"
+                            }`}
+                          >
+                            {convText}
+                          </span>
+                        </td>
+                        <td
+                          className="text-end pe-3 text-muted text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Cover (mo)", coverText)}
+                        >
+                          {coverText}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -340,6 +407,8 @@ const StockPurchases = () => {
               : "Group view: Bar 1 shows net Supplier Purchases Received. Switch to 'By Branch' and click any branch to view Transfers Received (In)."}
           </small>
         </div>
+
+        <FloatingTooltip hoverInfo={hoverInfo} />
       </CardBody>
     </Card>
   );

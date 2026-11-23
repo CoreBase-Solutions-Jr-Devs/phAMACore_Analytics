@@ -7,12 +7,15 @@ import { formatCompact, formatCurrency } from "../utils/formatHelper";
 import { exportToExcel } from "../../helpers/export_helper";
 import { cleanBranchName, saveActiveBranch } from "../../helpers/branch_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
+import FloatingTooltip from "../../Components/Common/FloatingTooltip";
 import TrendCardBody, { exportStamp, money } from "./TrendCardBody";
+import useTableCellTooltip from "./useTableCellTooltip";
 import { pick, num } from "../utils/apiRow";
 
 const RevenueExpenses = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("branch");
+  const { hoverInfo, getCellTooltipHandlers, clearTooltip } = useTableCellTooltip();
 
   const {
     monthlyTrend = [],
@@ -204,16 +207,39 @@ const RevenueExpenses = () => {
             />
           </TrendCardBody>
         ) : (
-          <div className="table-responsive" style={{ maxHeight: "340px", overflowY: "auto" }}>
-            <table className="table table-sm table-hover table-nowrap align-middle mb-0">
+          <div className="table-responsive" style={{ maxHeight: "340px", overflowY: "auto" }} onMouseLeave={clearTooltip}>
+            <table
+              className="table table-sm table-hover table-nowrap align-middle mb-0"
+              style={{ tableLayout: "fixed", width: "100%" }}
+            >
+              <colgroup>
+                <col style={{ width: "24%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "12%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "16%" }} />
+              </colgroup>
               <thead className="table-light text-muted sticky-top" style={{ zIndex: 1 }}>
                 <tr>
-                  <th className="ps-3">Branch</th>
-                  <th className="text-end">Sales (incl. VAT)</th>
-                  <th className="text-end">GP (KES)</th>
-                  <th className="text-end">GP %</th>
-                  <th className="text-end">Op. Expenses</th>
-                  <th className="text-end pe-3">Op. Profit/Loss</th>
+                  <th className="ps-3 text-truncate" {...getCellTooltipHandlers("Column", "Branch")}>
+                    Branch
+                  </th>
+                  <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Sales (incl. VAT)")}>
+                    Sales (incl. VAT)
+                  </th>
+                  <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "GP (KES)")}>
+                    GP (KES)
+                  </th>
+                  <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "GP %")}>
+                    GP %
+                  </th>
+                  <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Op. Expenses")}>
+                    Op. Expenses
+                  </th>
+                  <th className="text-end pe-3 text-truncate" {...getCellTooltipHandlers("Column", "Op. Profit/Loss")}>
+                    Op. Profit/Loss
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -238,43 +264,94 @@ const RevenueExpenses = () => {
                   </tr>
                 ) : (
                   <>
-                    {branchRows.rows.map((row) => (
-                      <tr
-                        key={row.branchCode ?? row.branchName}
-                        role="button"
-                        onClick={() => handleBranchClick(row.branchCode)}
-                        title="Click to filter dashboard by this branch"
-                      >
-                        <td className="ps-3 fw-medium text-primary">{row.branchName}</td>
-                        <td className="text-end fw-semibold">{formatCompact(row.salesIncl)}</td>
-                        <td className="text-end text-success fw-medium">{formatCompact(row.grossProfit)}</td>
-                        <td className="text-end">
-                          <span
-                            className={`badge bg-${
-                              row.marginPct >= 30 ? "success" : row.marginPct >= 20 ? "warning" : "danger"
-                            }-subtle text-${
-                              row.marginPct >= 30 ? "success" : row.marginPct >= 20 ? "warning" : "danger"
-                            }`}
+                    {branchRows.rows.map((row) => {
+                      const salesText = formatCompact(row.salesIncl);
+                      const gpText = formatCompact(row.grossProfit);
+                      const gpPctText = `${row.marginPct.toFixed(1)}%`;
+                      return (
+                        <tr
+                          key={row.branchCode ?? row.branchName}
+                          role="button"
+                          onClick={() => handleBranchClick(row.branchCode)}
+                          title="Click to filter dashboard by this branch"
+                        >
+                          <td
+                            className="ps-3 fw-medium text-primary text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Branch", row.branchName)}
                           >
-                            {row.marginPct.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="text-end text-muted fs-12">—</td>
-                        <td className="text-end pe-3 text-muted fs-12">—</td>
-                      </tr>
-                    ))}
+                            {row.branchName}
+                          </td>
+                          <td
+                            className="text-end fw-semibold text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Sales (incl. VAT)", salesText)}
+                          >
+                            {salesText}
+                          </td>
+                          <td
+                            className="text-end text-success fw-medium text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("GP (KES)", gpText)}
+                          >
+                            {gpText}
+                          </td>
+                          <td
+                            className="text-end text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("GP %", gpPctText)}
+                          >
+                            <span
+                              className={`badge bg-${
+                                row.marginPct >= 30 ? "success" : row.marginPct >= 20 ? "warning" : "danger"
+                              }-subtle text-${
+                                row.marginPct >= 30 ? "success" : row.marginPct >= 20 ? "warning" : "danger"
+                              }`}
+                            >
+                              {gpPctText}
+                            </span>
+                          </td>
+                          <td className="text-end text-muted fs-12 text-truncate">—</td>
+                          <td className="text-end pe-3 text-muted fs-12 text-truncate">—</td>
+                        </tr>
+                      );
+                    })}
                   </>
                 )}
               </tbody>
               {branchRows.rows.length > 0 && (
                 <tfoot className="table-light fw-semibold">
                   <tr>
-                    <td className="ps-3">Group Total</td>
-                    <td className="text-end">{formatCompact(branchRows.groupTotals.salesIncl)}</td>
-                    <td className="text-end text-success">{formatCompact(branchRows.groupTotals.grossProfit)}</td>
-                    <td className="text-end">{branchRows.groupTotals.marginPct.toFixed(1)}%</td>
-                    <td className="text-end text-muted fs-12">Pending</td>
-                    <td className="text-end pe-3 text-muted fs-12">Pending</td>
+                    <td
+                      className="ps-3 text-truncate"
+                      tabIndex={0}
+                      {...getCellTooltipHandlers("Branch", "Group Total")}
+                    >
+                      Group Total
+                    </td>
+                    <td
+                      className="text-end text-truncate"
+                      tabIndex={0}
+                      {...getCellTooltipHandlers("Sales (incl. VAT)", formatCompact(branchRows.groupTotals.salesIncl))}
+                    >
+                      {formatCompact(branchRows.groupTotals.salesIncl)}
+                    </td>
+                    <td
+                      className="text-end text-success text-truncate"
+                      tabIndex={0}
+                      {...getCellTooltipHandlers("GP (KES)", formatCompact(branchRows.groupTotals.grossProfit))}
+                    >
+                      {formatCompact(branchRows.groupTotals.grossProfit)}
+                    </td>
+                    <td
+                      className="text-end text-truncate"
+                      tabIndex={0}
+                      {...getCellTooltipHandlers("GP %", `${branchRows.groupTotals.marginPct.toFixed(1)}%`)}
+                    >
+                      {branchRows.groupTotals.marginPct.toFixed(1)}%
+                    </td>
+                    <td className="text-end text-muted fs-12 text-truncate">Pending</td>
+                    <td className="text-end pe-3 text-muted fs-12 text-truncate">Pending</td>
                   </tr>
                 </tfoot>
               )}
@@ -288,6 +365,8 @@ const RevenueExpenses = () => {
             profit/loss will populate once <strong>Expense &amp; Target Inputs</strong> is finalized.
           </small>
         </div>
+
+        <FloatingTooltip hoverInfo={hoverInfo} />
       </CardBody>
     </Card>
   );

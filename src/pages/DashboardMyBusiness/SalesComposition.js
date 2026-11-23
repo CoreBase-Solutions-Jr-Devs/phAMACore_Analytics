@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Nav, NavItem, NavLink, Spinner } from "reactstrap";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 import FloatingTooltip from "../../Components/Common/FloatingTooltip";
+import useTableCellTooltip from "./useTableCellTooltip";
 import { exportToExcel } from "../../helpers/export_helper";
 import { exportStamp, money } from "./TrendCardBody";
 import { formatCompact, formatCurrency } from "../utils/formatHelper";
@@ -17,32 +18,11 @@ const AGING_BUCKETS = [
 ];
 
 const INSURER_KEYWORDS = [
-  "INSURANCE",
-  "ASSURANCE",
-  "JUBILEE",
-  "AAR",
-  "BRITAM",
-  "CIC",
-  "MADISON",
-  "APA",
-  "GA ",
-  "UAP",
-  "OLD MUTUAL",
-  "MINET",
-  "SHA",
-  "NHIF",
-  "RESOLUTION",
-  "FIRST ASSURANCE",
-  "HERITAGE",
-  "LION",
-  "SANLAM",
-  "PACIS",
-  "MUA",
-  "MTIBA",
-  "BLISS",
-  "LIAISON",
-  "KCB INSURANCE",
-  "EQUITY INSURANCE",
+  "INSURANCE", "ASSURANCE", "JUBILEE", "AAR", "BRITAM",
+  "CIC", "MADISON", "APA", "GA ", "UAP",
+  "OLD MUTUAL", "MINET", "SHA", "NHIF", "RESOLUTION",
+  "FIRST ASSURANCE", "HERITAGE", "LION", "SANLAM", "PACIS",
+  "MUA", "MTIBA", "BLISS", "LIAISON", "KCB INSURANCE", "EQUITY INSURANCE",
 ];
 
 const isInsurerAccount = (name = "") => {
@@ -53,40 +33,7 @@ const isInsurerAccount = (name = "") => {
 const SalesComposition = () => {
   const [activeTab, setActiveTab] = useState("composition");
   const [selectedBucket, setSelectedBucket] = useState(null);
-  const [hoverInfo, setHoverInfo] = useState(null);
-
-  const showOverflowTooltip = useCallback((el, x, y, label, text) => {
-    if (!el || el.scrollWidth <= el.clientWidth) {
-      setHoverInfo(null);
-      return;
-    }
-    setHoverInfo({
-      x,
-      y,
-      title: label,
-      mainValue: text,
-      mainColor: "#ffffff",
-      badgeColor: "#405189",
-    });
-  }, []);
-
-  const getCellTooltipHandlers = useCallback(
-    (label, text) => ({
-      onMouseEnter: (e) => showOverflowTooltip(e.currentTarget, e.clientX, e.clientY, label, text),
-      onMouseMove: (e) => {
-        if (e.currentTarget.scrollWidth > e.currentTarget.clientWidth) {
-          setHoverInfo((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null));
-        }
-      },
-      onMouseLeave: () => setHoverInfo(null),
-      onFocus: (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        showOverflowTooltip(e.currentTarget, rect.left + rect.width / 2, rect.top, label, text);
-      },
-      onBlur: () => setHoverInfo(null),
-    }),
-    [showOverflowTooltip]
-  );
+  const { hoverInfo, getCellTooltipHandlers, clearTooltip } = useTableCellTooltip();
 
   const {
     salesByType = [],
@@ -344,45 +291,120 @@ const SalesComposition = () => {
                 </div>
 
                 {/* Sales Split Table */}
-                <div className="table-responsive mb-3">
-                  <table className="table table-sm table-nowrap align-middle mb-0">
+                <div className="table-responsive mb-3" onMouseLeave={clearTooltip}>
+                  <table
+                    className="table table-sm table-nowrap align-middle mb-0"
+                    style={{ tableLayout: "fixed", width: "100%" }}
+                  >
+                    <colgroup>
+                      <col style={{ width: "28%" }} />
+                      <col style={{ width: "24%" }} />
+                      <col style={{ width: "24%" }} />
+                      <col style={{ width: "24%" }} />
+                    </colgroup>
                     <thead className="table-light text-muted">
                       <tr>
-                        <th>Sales Channel</th>
-                        <th className="text-end">Txns</th>
-                        <th className="text-end">Incl. VAT</th>
-                        <th className="text-end">Share</th>
+                        <th className="text-truncate" {...getCellTooltipHandlers("Column", "Sales Channel")}>
+                          Sales Channel
+                        </th>
+                        <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Txns")}>
+                          Txns
+                        </th>
+                        <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Incl. VAT")}>
+                          Incl. VAT
+                        </th>
+                        <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Share")}>
+                          Share
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td>
+                        <td
+                          className="text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Sales Channel", "Cash — Cash Sales & Cash Invoices")}
+                        >
                           <span className="badge bg-success-subtle text-success me-2">Cash</span>
                           Cash Sales &amp; Cash Invoices
                         </td>
-                        <td className="text-end text-muted">{composition.cash.count.toLocaleString()}</td>
-                        <td className="text-end fw-semibold">{formatCompact(composition.cash.incl)}</td>
-                        <td className="text-end">{composition.cash.pct.toFixed(1)}%</td>
+                        <td
+                          className="text-end text-muted text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Txns", composition.cash.count.toLocaleString())}
+                        >
+                          {composition.cash.count.toLocaleString()}
+                        </td>
+                        <td
+                          className="text-end fw-semibold text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Incl. VAT", formatCompact(composition.cash.incl))}
+                        >
+                          {formatCompact(composition.cash.incl)}
+                        </td>
+                        <td
+                          className="text-end text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Share", `${composition.cash.pct.toFixed(1)}%`)}
+                        >
+                          {composition.cash.pct.toFixed(1)}%
+                        </td>
                       </tr>
                       <tr>
-                        <td>
+                        <td
+                          className="text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Sales Channel", "Account — Insurance & Other Account Sales")}
+                        >
                           <span className="badge bg-primary-subtle text-primary me-2">Account</span>
                           Insurance &amp; Other Account Sales
                         </td>
-                        <td className="text-end text-muted">{composition.account.count.toLocaleString()}</td>
-                        <td className="text-end fw-semibold">{formatCompact(composition.account.incl)}</td>
-                        <td className="text-end">{composition.account.pct.toFixed(1)}%</td>
+                        <td
+                          className="text-end text-muted text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Txns", composition.account.count.toLocaleString())}
+                        >
+                          {composition.account.count.toLocaleString()}
+                        </td>
+                        <td
+                          className="text-end fw-semibold text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Incl. VAT", formatCompact(composition.account.incl))}
+                        >
+                          {formatCompact(composition.account.incl)}
+                        </td>
+                        <td
+                          className="text-end text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Share", `${composition.account.pct.toFixed(1)}%`)}
+                        >
+                          {composition.account.pct.toFixed(1)}%
+                        </td>
                       </tr>
                       <tr>
-                        <td>
+                        <td
+                          className="text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Sales Channel", "Returns — Credit Notes / Sales Returns")}
+                        >
                           <span className="badge bg-danger-subtle text-danger me-2">Returns</span>
                           Credit Notes / Sales Returns
                         </td>
-                        <td className="text-end text-muted">{composition.creditNotes.count.toLocaleString()}</td>
-                        <td className="text-end text-danger fw-medium">
+                        <td
+                          className="text-end text-muted text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Txns", composition.creditNotes.count.toLocaleString())}
+                        >
+                          {composition.creditNotes.count.toLocaleString()}
+                        </td>
+                        <td
+                          className="text-end text-danger fw-medium text-truncate"
+                          tabIndex={0}
+                          {...getCellTooltipHandlers("Incl. VAT", formatCompact(composition.creditNotes.incl))}
+                        >
                           {formatCompact(composition.creditNotes.incl)}
                         </td>
-                        <td className="text-end text-muted">—</td>
+                        <td className="text-end text-muted text-truncate">—</td>
                       </tr>
                     </tbody>
                   </table>
@@ -474,7 +496,7 @@ const SalesComposition = () => {
                     <div
                       className="table-responsive"
                       style={{ maxHeight: "175px", overflowY: "auto" }}
-                      onMouseLeave={() => setHoverInfo(null)}
+                      onMouseLeave={clearTooltip}
                     >
                       <table
                         className="table table-sm table-nowrap align-middle mb-0"

@@ -4,6 +4,8 @@ import ReactApexChart from "react-apexcharts";
 import { Card, CardBody, CardHeader, Nav, NavItem, NavLink, Spinner } from "reactstrap";
 import getChartColorsArray from "../../Components/Common/ChartsDynamicColor";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
+import FloatingTooltip from "../../Components/Common/FloatingTooltip";
+import useTableCellTooltip from "./useTableCellTooltip";
 import TrendCardBody, { exportStamp, money } from "./TrendCardBody";
 import { exportToExcel } from "../../helpers/export_helper";
 import { cleanBranchName } from "../../helpers/branch_helper";
@@ -22,6 +24,7 @@ const VATBreakdown = () => {
   const [drilldownRows, setDrilldownRows] = useState([]);
   const [loadingDrilldown, setLoadingDrilldown] = useState(false);
   const [errorDrilldown, setErrorDrilldown] = useState(null);
+  const { hoverInfo, getCellTooltipHandlers, clearTooltip } = useTableCellTooltip();
 
   const {
     vatBreakdown = { summary: [], monthly: [], byTaxCode: [], byBranch: [] },
@@ -282,15 +285,35 @@ const VATBreakdown = () => {
           )}
 
           {activeTab === "tax" && (
-            <div className="table-responsive" style={{ maxHeight: "260px", overflowY: "auto" }}>
-              <table className="table table-sm table-nowrap align-middle mb-0">
+            <div className="table-responsive" style={{ maxHeight: "260px", overflowY: "auto" }} onMouseLeave={clearTooltip}>
+              <table
+                className="table table-sm table-nowrap align-middle mb-0"
+                style={{ tableLayout: "fixed", width: "100%" }}
+              >
+                <colgroup>
+                  <col style={{ width: "24%" }} />
+                  <col style={{ width: "19%" }} />
+                  <col style={{ width: "19%" }} />
+                  <col style={{ width: "19%" }} />
+                  <col style={{ width: "19%" }} />
+                </colgroup>
                 <thead className="table-light text-muted sticky-top">
                   <tr>
-                    <th>Tax Code</th>
-                    <th className="text-end">Rate %</th>
-                    <th className="text-end">Sales Incl.</th>
-                    <th className="text-end">Output VAT</th>
-                    <th className="text-end">Net Excl.</th>
+                    <th className="text-truncate" {...getCellTooltipHandlers("Column", "Tax Code")}>
+                      Tax Code
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Rate %")}>
+                      Rate %
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Sales Incl.")}>
+                      Sales Incl.
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Output VAT")}>
+                      Output VAT
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Net Excl.")}>
+                      Net Excl.
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -307,20 +330,55 @@ const VATBreakdown = () => {
                       </td>
                     </tr>
                   ) : (
-                    vatBreakdown.byTaxCode.map((r, idx) => (
-                      <tr key={pick(r, "tax_code") || idx}>
-                        <td>
-                          <span className="fw-medium">{pick(r, "tax_description") || pick(r, "tax_code") || "-"}</span>
-                          <small className="text-muted ms-1">({pick(r, "tax_code") || "-"})</small>
-                        </td>
-                        <td className="text-end">{num(pick(r, "statutory_rate_perc")).toFixed(1)}%</td>
-                        <td className="text-end">{formatCompact(num(pick(r, "net_sales_incl_vat")))}</td>
-                        <td className="text-end text-warning fw-medium">
-                          {formatCompact(num(pick(r, "net_output_vat")))}
-                        </td>
-                        <td className="text-end">{formatCompact(num(pick(r, "net_sales_excl_vat")))}</td>
-                      </tr>
-                    ))
+                    vatBreakdown.byTaxCode.map((r, idx) => {
+                      const desc = pick(r, "tax_description") || pick(r, "tax_code") || "-";
+                      const code = pick(r, "tax_code") || "-";
+                      const taxLabel = `${desc} (${code})`;
+                      const rateText = `${num(pick(r, "statutory_rate_perc")).toFixed(1)}%`;
+                      const salesInclText = formatCompact(num(pick(r, "net_sales_incl_vat")));
+                      const outputVatText = formatCompact(num(pick(r, "net_output_vat")));
+                      const netExclText = formatCompact(num(pick(r, "net_sales_excl_vat")));
+                      return (
+                        <tr key={pick(r, "tax_code") || idx}>
+                          <td
+                            className="text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Tax Code", taxLabel)}
+                          >
+                            <span className="fw-medium">{desc}</span>
+                            <small className="text-muted ms-1">({code})</small>
+                          </td>
+                          <td
+                            className="text-end text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Rate %", rateText)}
+                          >
+                            {rateText}
+                          </td>
+                          <td
+                            className="text-end text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Sales Incl.", salesInclText)}
+                          >
+                            {salesInclText}
+                          </td>
+                          <td
+                            className="text-end text-warning fw-medium text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Output VAT", outputVatText)}
+                          >
+                            {outputVatText}
+                          </td>
+                          <td
+                            className="text-end text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Net Excl.", netExclText)}
+                          >
+                            {netExclText}
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -328,15 +386,35 @@ const VATBreakdown = () => {
           )}
 
           {activeTab === "branch" && (
-            <div className="table-responsive" style={{ maxHeight: "260px", overflowY: "auto" }}>
-              <table className="table table-sm table-nowrap align-middle mb-0">
+            <div className="table-responsive" style={{ maxHeight: "260px", overflowY: "auto" }} onMouseLeave={clearTooltip}>
+              <table
+                className="table table-sm table-nowrap align-middle mb-0"
+                style={{ tableLayout: "fixed", width: "100%" }}
+              >
+                <colgroup>
+                  <col style={{ width: "24%" }} />
+                  <col style={{ width: "19%" }} />
+                  <col style={{ width: "19%" }} />
+                  <col style={{ width: "19%" }} />
+                  <col style={{ width: "19%" }} />
+                </colgroup>
                 <thead className="table-light text-muted sticky-top">
                   <tr>
-                    <th>Branch</th>
-                    <th className="text-end">Sales Incl.</th>
-                    <th className="text-end">Output VAT</th>
-                    <th className="text-end">Net Excl.</th>
-                    <th className="text-end">Eff. %</th>
+                    <th className="text-truncate" {...getCellTooltipHandlers("Column", "Branch")}>
+                      Branch
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Sales Incl.")}>
+                      Sales Incl.
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Output VAT")}>
+                      Output VAT
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Net Excl.")}>
+                      Net Excl.
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Eff. %")}>
+                      Eff. %
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -353,19 +431,52 @@ const VATBreakdown = () => {
                       </td>
                     </tr>
                   ) : (
-                    vatBreakdown.byBranch.map((r, idx) => (
-                      <tr key={pick(r, "branch_id", "branch_code") || idx}>
-                        <td className="fw-medium">
-                          {cleanBranchName(pick(r, "branch_name") || String(pick(r, "branch_code") || "-"))}
-                        </td>
-                        <td className="text-end">{formatCompact(num(pick(r, "net_sales_incl_vat")))}</td>
-                        <td className="text-end text-warning fw-medium">
-                          {formatCompact(num(pick(r, "net_output_vat")))}
-                        </td>
-                        <td className="text-end">{formatCompact(num(pick(r, "net_sales_excl_vat")))}</td>
-                        <td className="text-end">{num(pick(r, "effective_output_vat_rate_perc")).toFixed(1)}%</td>
-                      </tr>
-                    ))
+                    vatBreakdown.byBranch.map((r, idx) => {
+                      const branchName = cleanBranchName(pick(r, "branch_name") || String(pick(r, "branch_code") || "-"));
+                      const salesInclText = formatCompact(num(pick(r, "net_sales_incl_vat")));
+                      const outputVatText = formatCompact(num(pick(r, "net_output_vat")));
+                      const netExclText = formatCompact(num(pick(r, "net_sales_excl_vat")));
+                      const effPctText = `${num(pick(r, "effective_output_vat_rate_perc")).toFixed(1)}%`;
+                      return (
+                        <tr key={pick(r, "branch_id", "branch_code") || idx}>
+                          <td
+                            className="fw-medium text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Branch", branchName)}
+                          >
+                            {branchName}
+                          </td>
+                          <td
+                            className="text-end text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Sales Incl.", salesInclText)}
+                          >
+                            {salesInclText}
+                          </td>
+                          <td
+                            className="text-end text-warning fw-medium text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Output VAT", outputVatText)}
+                          >
+                            {outputVatText}
+                          </td>
+                          <td
+                            className="text-end text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Net Excl.", netExclText)}
+                          >
+                            {netExclText}
+                          </td>
+                          <td
+                            className="text-end text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Eff. %", effPctText)}
+                          >
+                            {effPctText}
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -373,15 +484,35 @@ const VATBreakdown = () => {
           )}
 
           {activeTab === "drilldown" && (
-            <div className="table-responsive" style={{ maxHeight: "260px", overflowY: "auto" }}>
-              <table className="table table-sm table-nowrap align-middle mb-0">
+            <div className="table-responsive" style={{ maxHeight: "260px", overflowY: "auto" }} onMouseLeave={clearTooltip}>
+              <table
+                className="table table-sm table-nowrap align-middle mb-0"
+                style={{ tableLayout: "fixed", width: "100%" }}
+              >
+                <colgroup>
+                  <col style={{ width: "24%" }} />
+                  <col style={{ width: "18%" }} />
+                  <col style={{ width: "20%" }} />
+                  <col style={{ width: "19%" }} />
+                  <col style={{ width: "19%" }} />
+                </colgroup>
                 <thead className="table-light text-muted sticky-top">
                   <tr>
-                    <th>Document</th>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th className="text-end">Sales Incl.</th>
-                    <th className="text-end">Output VAT</th>
+                    <th className="text-truncate" {...getCellTooltipHandlers("Column", "Document")}>
+                      Document
+                    </th>
+                    <th className="text-truncate" {...getCellTooltipHandlers("Column", "Date")}>
+                      Date
+                    </th>
+                    <th className="text-truncate" {...getCellTooltipHandlers("Column", "Type")}>
+                      Type
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Sales Incl.")}>
+                      Sales Incl.
+                    </th>
+                    <th className="text-end text-truncate" {...getCellTooltipHandlers("Column", "Output VAT")}>
+                      Output VAT
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -405,17 +536,52 @@ const VATBreakdown = () => {
                       </td>
                     </tr>
                   ) : (
-                    drilldownRows.map((r, idx) => (
-                      <tr key={`${pick(r, "document_number")}-${idx}`}>
-                        <td className="fw-medium">{pick(r, "document_number") || "-"}</td>
-                        <td className="text-muted fs-12">{formatDate(pick(r, "sale_date"))}</td>
-                        <td className="fs-12">{pick(r, "transaction_type") || "-"}</td>
-                        <td className="text-end">{formatCompact(num(pick(r, "net_sales_incl_vat")))}</td>
-                        <td className="text-end text-warning fw-medium">
-                          {formatCompact(num(pick(r, "net_output_vat")))}
-                        </td>
-                      </tr>
-                    ))
+                    drilldownRows.map((r, idx) => {
+                      const docNum = pick(r, "document_number") || "-";
+                      const dateText = formatDate(pick(r, "sale_date"));
+                      const typeText = pick(r, "transaction_type") || "-";
+                      const salesInclText = formatCompact(num(pick(r, "net_sales_incl_vat")));
+                      const outputVatText = formatCompact(num(pick(r, "net_output_vat")));
+                      return (
+                        <tr key={`${pick(r, "document_number")}-${idx}`}>
+                          <td
+                            className="fw-medium text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Document", docNum)}
+                          >
+                            {docNum}
+                          </td>
+                          <td
+                            className="text-muted fs-12 text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Date", dateText)}
+                          >
+                            {dateText}
+                          </td>
+                          <td
+                            className="fs-12 text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Type", typeText)}
+                          >
+                            {typeText}
+                          </td>
+                          <td
+                            className="text-end text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Sales Incl.", salesInclText)}
+                          >
+                            {salesInclText}
+                          </td>
+                          <td
+                            className="text-end text-warning fw-medium text-truncate"
+                            tabIndex={0}
+                            {...getCellTooltipHandlers("Output VAT", outputVatText)}
+                          >
+                            {outputVatText}
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -430,6 +596,8 @@ const VATBreakdown = () => {
             <strong>{summary.vatLabel} only:</strong> {summary.disclaimer}
           </div>
         </div>
+
+        <FloatingTooltip hoverInfo={hoverInfo} />
       </CardBody>
     </Card>
   );
