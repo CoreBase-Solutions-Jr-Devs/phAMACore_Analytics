@@ -169,8 +169,8 @@ export const getKPIConsolidatedLPOReview = (params) =>
 export const getKPIBestPricePerSupplier = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_BEST_PRICE_PER_SUPPLIER, { params });
 
-export const getKPIOutputVATAnalysis = (params) => 
+export const getOutputVATAnalysis = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_KPI_OUTPUT_VAT_ANALYSIS, { params });
 
-export const getKPIStockConversionTrend = (params) => 
+export const getStockConversionTrend = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_KPI_STOCK_CONVERSION_TREND, { params });
