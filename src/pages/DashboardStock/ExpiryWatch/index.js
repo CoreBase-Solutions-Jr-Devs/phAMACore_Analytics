@@ -125,10 +125,8 @@ const ExpiryWatch = () => {
                     />
 
                     <Section
-                        title="EXPIRY WATCH"
                         pageLabel="Expiry Watch"
                         rightClickBtn={toggleRightColumn}
-                        onExportExcel={handleExportExpiryWatch}
                     />
 
                     <Row>

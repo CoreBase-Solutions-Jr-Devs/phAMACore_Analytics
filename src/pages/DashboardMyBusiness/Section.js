@@ -5,7 +5,7 @@ import { getCachedBranchName } from "../../helpers/branch_helper";
 import { formatAmount } from "../../helpers/format_helper";
 import DashboardSectionHeader from "../../Components/Common/DashboardSectionHeader";
 
-const Section = ({ rightClickBtn, kpiData = {}, pageLabel = "My Business" }) => {
+const Section = ({ rightClickBtn, kpiData = {}, pageLabel = "My Business", showMetricsHeader = true }) => {
   const appliedFilters = useSelector(
     (state) => (state.DashboardMyBusiness || state.MyBusiness)?.appliedFilters || {}
   );
@@ -68,9 +68,10 @@ const Section = ({ rightClickBtn, kpiData = {}, pageLabel = "My Business" }) => 
       branchDisplayName={branchDisplayName}
       startDate={startDate}
       endDate={endDate}
-      onExportExcel={handleExportExcel}
-      onPrint={handlePrint}
+      onExportExcel={showMetricsHeader ? handleExportExcel : undefined}
+      onPrint={showMetricsHeader ? handlePrint : undefined}
       onFilterClick={rightClickBtn}
+      showMetricsHeader={showMetricsHeader}
     />
   );
 };

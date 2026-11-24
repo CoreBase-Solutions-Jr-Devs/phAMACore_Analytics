@@ -5,11 +5,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import Section from "../../DashboardStock/Section";
 import FilterActions from "../../DashboardStock/FilterActions";
-import BranchTransfersSection, {
-    normalizeDestStockAging,
-    normalizeDrilldownRows,
-} from "../../DashboardStock/components/BranchTransfersSection";
-import { exportToExcel } from "../../../helpers/export_helper";
+import BranchTransfersSection from "../../DashboardStock/components/BranchTransfersSection";
 import {
     fetchBranches,
     fetchKPIBranchTransfers,
@@ -34,8 +30,6 @@ const BranchTransfers = () => {
 
     const {
         branches = [],
-        branchTransfersDrilldown = [],
-        branchTransfersDestStockAging = [],
         filters = {},
         appliedFilters,
     } = useSelector((state) => state.StockInventory ?? {});
@@ -93,50 +87,6 @@ const BranchTransfers = () => {
         dispatch(fetchKPIBranchTransfers({ ...periodParams, GroupBy: "DEST_STOCK_AGING" }));
     }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate]);
 
-    const handleExportBranchTransfers = () => {
-        const allAgingRows = normalizeDestStockAging(branchTransfersDestStockAging);
-        const allDrilldownRows = normalizeDrilldownRows(branchTransfersDrilldown);
-        const docToSource = new Map();
-        allDrilldownRows.forEach((d) => {
-            if (d.transferDoc && d.transferDoc !== "-") {
-                docToSource.set(d.transferDoc, {
-                    sourceBranchCode: d.sourceBranchCode,
-                    sourceBranchName: d.sourceBranchName,
-                });
-            }
-        });
-        const enrichedAgingRows = allAgingRows.map((r) => {
-            const match = docToSource.get(r.transferDoc);
-            return match
-                ? {
-                      ...r,
-                      sourceBranchCode: r.sourceBranchCode || match.sourceBranchCode,
-                      sourceBranchName: r.sourceBranchName || match.sourceBranchName,
-                  }
-                : r;
-        });
-
-        const rows = enrichedAgingRows.map((r) => ({
-            "Product": r.itemName,
-            "Item Code": r.itemCode,
-            "Batch": r.batchNo,
-            "Source Branch": r.sourceBranchName || "-",
-            "Destination Branch": r.destBranchName,
-            "Transfer Document": r.transferDoc,
-            "Transfer Date": r.transferDate,
-            "Receipt Document": r.receiptDoc,
-            "Receipt Date": r.receiptDate,
-            "Transferred Units (Packs)": r.transferredUnits,
-            "Transfer Value (KES)": r.transferredCost,
-            "Sold Since Receipt": r.unitsSoldSinceReceipt,
-            "Current Branch Stock": r.currentBranchStock,
-            "Days in Stock": r.daysInStock,
-            "Aging Bucket": r.agingBucket,
-        }));
-        const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-        exportToExcel(rows, `Branch_Transfers_${todayStr}`);
-    };
-
     const handleApplyFilters = () => {
         const nextBranch = filters.branch && Number(filters.branch) > 0 ? Number(filters.branch) : 0;
         saveActiveBranch("stock", nextBranch);
@@ -156,10 +106,8 @@ const BranchTransfers = () => {
                     />
 
                     <Section
-                        title="BRANCH TRANSFERS & PULL TO MAIN BRANCH"
                         pageLabel="Branch Transfers"
                         rightClickBtn={toggleRightColumn}
-                        onExportExcel={handleExportBranchTransfers}
                     />
 
                     <BranchTransfersSection />
