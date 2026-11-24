@@ -14,7 +14,7 @@ const yesterday = () => {
 const defaultFilters = (branch = 0) => ({
   branch: branch ?? 0,
   // Month to Yesterday by default: a one-day window made the cover and velocity figures meaningless
-  dateRange: DEFAULT_DATE_RANGE === "Month to Yesterday" ? "Month To Yesterday" : DEFAULT_DATE_RANGE,
+  dateRange: DEFAULT_DATE_RANGE,
   startDate: formatDMY(monthStart()),
   endDate: formatDMY(yesterday()),
 });
