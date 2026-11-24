@@ -49,7 +49,7 @@ import { groupBy } from "lodash";
 
 const KPI_GROUP_BYS = [
   "SUMMARY",
-  "CATEGORY",
+ 
   "SUPPLIER",
   "BRANCH",
   "MONTHLY",
@@ -96,7 +96,7 @@ const DashboardPurchaseOrders = () => {
     kpiOverdueAccounts = [],
 
     KPISummary = [],
-    KPICategory = [],
+    // KPICategory = [],
     KPISupplier = [],
     KPIBranch = [],
     KPIMonthly = [],
@@ -129,7 +129,7 @@ const DashboardPurchaseOrders = () => {
 
     ActualSpend = [],
     ActualSpendSummary = [],
-    ActualSpendCategory = [],
+    // ActualSpendCategory = [],
     ActualSpendSupplier = [],
     ActualSpendBranch = [],
     ActualSpendMonthly = [],
@@ -137,7 +137,7 @@ const DashboardPurchaseOrders = () => {
 
     DailySpend = [],
     DailySpendSummary = [],
-    DailySpendCategory = [],
+    // DailySpendCategory = [],
     DailySpendSupplier = [],
     DailySpendBranch = [],
     DailySpendMonthly = [],
@@ -145,7 +145,7 @@ const DashboardPurchaseOrders = () => {
 
     LastYearActualSpend = [],
     LastYearActualSpendSummary = [],
-    LastYearActualSpendCategory = [],
+    // LastYearActualSpendCategory = [],
     LastYearActualSpendSupplier = [],
     LastYearActualSpendBranch = [],
     LastYearActualSpendMonthly = [],
@@ -153,7 +153,7 @@ const DashboardPurchaseOrders = () => {
 
     LastYearDailySpend = [],
     LastYearDailySpendSummary = [],
-    LastYearDailySpendCategory = [],
+    // LastYearDailySpendCategory = [],
     LastYearDailySpendSupplier = [],
     LastYearDailySpendBranch = [],
     LastYearDailySpendMonthly = [],
@@ -185,7 +185,7 @@ const DashboardPurchaseOrders = () => {
     actualSpendChart,
     monthToDateChart,
     bottomSuppliers,
-    spendByCategory,
+    // spendByCategory,
     currentReceivables,
     overdue31To60,
     overdue61To90,
@@ -198,7 +198,7 @@ const DashboardPurchaseOrders = () => {
 
     KPIPurchases,
     KPISummary,
-    KPICategory,
+    // KPICategory,
     KPISupplier,
     KPIBranch,
     KPIMonthly,
@@ -230,7 +230,7 @@ const DashboardPurchaseOrders = () => {
 
     ActualSpend,
     ActualSpendSummary,
-    ActualSpendCategory,
+    // ActualSpendCategory,
     ActualSpendSupplier,
     ActualSpendBranch,
     ActualSpendMonthly,
@@ -238,7 +238,7 @@ const DashboardPurchaseOrders = () => {
 
     DailySpend,
     DailySpendSummary,
-    DailySpendCategory,
+    // DailySpendCategory,
     DailySpendSupplier,
     DailySpendBranch,
     DailySpendMonthly,
@@ -246,7 +246,7 @@ const DashboardPurchaseOrders = () => {
 
     LastYearActualSpend,
     LastYearActualSpendSummary,
-    LastYearActualSpendCategory,
+    // LastYearActualSpendCategory,
     LastYearActualSpendSupplier,
     LastYearActualSpendBranch,
     LastYearActualSpendMonthly,
@@ -254,7 +254,7 @@ const DashboardPurchaseOrders = () => {
 
     LastYearDailySpend,
     LastYearDailySpendSummary,
-    LastYearDailySpendCategory,
+    // LastYearDailySpendCategory,
     LastYearDailySpendSupplier,
     LastYearDailySpendBranch,
     LastYearDailySpendMonthly,
@@ -413,19 +413,19 @@ const DashboardPurchaseOrders = () => {
     //       }),
     //     );
 
-    dispatch(
-      getKPIOverdueAccounts({
-        clientid: 1,
-        mode: "AGING",
-        accountType: "SUPPLIER",
-        branchcode: filters.branch,
-        dateFrom: filters.startDate,
-        dateTo: filters.endDate,
-        periodFrom: getPeriod(filters.startDate),
-        periodTo: getPeriod(filters.endDate),
-        includeZeroBal: false,
-      }),
-    );
+    // dispatch(
+    //   getKPIOverdueAccounts({
+    //     clientid: 1,
+    //     mode: "AGING",
+    //     accountType: "SUPPLIER",
+    //     branchcode: filters.branch,
+    //     dateFrom: filters.startDate,
+    //     dateTo: filters.endDate,
+    //     periodFrom: getPeriod(filters.startDate),
+    //     periodTo: getPeriod(filters.endDate),
+    //     includeZeroBal: false,
+    //   }),
+    // );
 
     dispatchGroupByRequests(
       getKPILeadTime,
@@ -537,19 +537,19 @@ const DashboardPurchaseOrders = () => {
       KPI_GROUP_BYS,
     );
 
-    dispatch(
-      getKPIOverdueAccounts({
-        clientid: 1,
-        mode: "AGING",
-        accountType: "SUPPLIER",
-        branchcode: filters.branch,
-        dateFrom: filters.startDate,
-        dateTo: filters.endDate,
-        periodFrom: getPeriod(filters.startDate),
-        periodTo: getPeriod(filters.endDate),
-        includeZeroBal: false,
-      }),
-    );
+    // dispatch(
+    //   getKPIOverdueAccounts({
+    //     clientid: 1,
+    //     mode: "AGING",
+    //     accountType: "SUPPLIER",
+    //     branchcode: filters.branch,
+    //     dateFrom: filters.startDate,
+    //     dateTo: filters.endDate,
+    //     periodFrom: getPeriod(filters.startDate),
+    //     periodTo: getPeriod(filters.endDate),
+    //     includeZeroBal: false,
+    //   }),
+    // );
 
     dispatchGroupByRequests(
       getKPILeadTime,

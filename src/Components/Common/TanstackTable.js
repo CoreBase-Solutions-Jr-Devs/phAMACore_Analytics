@@ -174,10 +174,9 @@ const TanstackTable = ({
         </Col>
       )}
 
-      {/* FILTER + TABS - RIGHT */}
       {(tableTabs || toolbarContent) && (
-        <Col xs="auto" className="ms-auto">
-          <div className="d-flex align-items-center gap-2 flex-nowrap">
+         <Col xs="auto" className="ms-auto">
+    <div className="d-flex align-items-center gap-2 flex-nowrap">
             {tableTabs}
             {toolbarContent}
           </div>

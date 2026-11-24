@@ -73,7 +73,7 @@ const { user } = useSelector((state) => state.Profile || {});
 
     return (
         <React.Fragment>
-            <Dropdown isOpen={isProfileDropdown} toggle={toggleProfileDropdown} className="ms-sm-3 header-item ">
+            <Dropdown isOpen={isProfileDropdown} toggle={toggleProfileDropdown} className="ms-sm-3 header-item  profile-dropdown-top">
                 <DropdownToggle tag="button" type="button" className="btn btn-body shadow-sm">
                     <span className="d-flex align-items-center">
                         <img className="rounded-circle header-profile-user" src={defaultUser}
@@ -84,7 +84,7 @@ const { user } = useSelector((state) => state.Profile || {});
                     </span>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-menu-end p-2">
-                    <DropdownItem className="p-0">
+                    <DropdownItem className="px-2">
                         <Link to="/profile" className="dropdown-item">
                             <i
                                 className="mdi mdi-account-circle text-caramel fs-16 align-middle me-1"
@@ -97,7 +97,7 @@ const { user } = useSelector((state) => state.Profile || {});
 
                     <div className="dropdown-divider"></div>
 
-                    <DropdownItem className="p-0">
+                    <DropdownItem className="px-2">
                         <button
                             type="button"
                             className="dropdown-item border-0 bg-transparent"
