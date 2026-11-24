@@ -23,8 +23,6 @@ export const GET_POWERBI_SALES =
 
 export const GET_POWERBI_KPISALES =
   "/api/PowerBi/PowerBIKPISalesTransactions";
-export const GET_POWERBI_KPI_OVERDUE_DEBTORS =
-  "/api/PowerBi/PowerBIKPIOverdueAccounts";
 export const GET_POWERBI_PURCHASE_ORDERS =
   "/api/PowerBi/PowerBIPurchaseOrders";
 export const GET_POWERBI_KPIPURCHASES =
@@ -57,6 +55,10 @@ export const GET_POWERBI_KPI_BRANCH_ORDER_FILL_RATE =
   "/api/PowerBi/PowerBIKPIBranchOrderFillRate";
 export const GET_POWERBI_KPI_BRANCH_TRANSFERS = 
   "/api/PowerBi/PowerBIKPIBranchTransfers";
+export const GET_POWERBI_KPI_OUTPUT_VAT_ANALYSIS =
+  "/api/PowerBi/PowerBIKPIOutputVATAnalysis";
+export const GET_POWERBI_KPI_STOCK_CONVERSION_TREND =
+  "/api/PowerBi/PowerBIKPIStockConversionTrend";
 
 export const GET_POWERBI_MAVERICK_SPEND = 
   "/api/PowerBi/PowerBIKPIMaverickSpend";

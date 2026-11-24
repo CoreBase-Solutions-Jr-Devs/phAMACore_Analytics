@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Card, CardBody, CardHeader, Spinner } from "reactstrap";
 import { getKPIStockHealth } from "../../helpers/fakebackend_helper";
@@ -7,6 +7,7 @@ import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 import FloatingTooltip from "../../Components/Common/FloatingTooltip";
 import { cleanBranchName } from './../../helpers/branch_helper';
+import useTableCellTooltip from "./useTableCellTooltip";
 
 const formatDMY = (date) => {
   const d = String(date.getDate()).padStart(2, "0");
@@ -38,7 +39,8 @@ const StockMovements = () => {
   const [stockAlerts, setStockAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [hoverInfo, setHoverInfo] = useState(null);
+  const [search, setSearch] = useState("");
+  const { hoverInfo, setHoverInfo, getCellTooltipHandlers } = useTableCellTooltip();
 
   const handleCellHover = (e, info) => {
     setHoverInfo({
@@ -116,8 +118,24 @@ const StockMovements = () => {
     };
   }, [appliedFilters.branch, appliedFilters.endDate]);
 
+  const filteredStockAlerts = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return stockAlerts;
+    return (stockAlerts || []).filter((item) => {
+      const badge = getStatusBadge(item.stockout_risk_status);
+      const branchName = cleanBranchName(item.branch_name || `Branch ${item.branch_id}`);
+      const haystack = [
+        item.item_name, item.item_code, item.item_subgroup, item.item_group, branchName, item.branch_name, badge.label, item.stockout_risk_status,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [stockAlerts, search]);
+
   const handleExportExcel = () => {
-    const rows = (stockAlerts || []).map((item) => ({
+    const rows = (filteredStockAlerts || []).map((item) => ({
       Product: item.item_name || item.item_code || "",
       Category: item.item_group || "-",
       Stock: Number(item.current_stock_qty || 0).toLocaleString(),
@@ -133,10 +151,28 @@ const StockMovements = () => {
   return (
     <Card className="card-height-100" id="stock-movements-card">
       <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
-        <h4 className="card-title mb-0">
-          Stock Alerts & Movement Tracking
-        </h4>
-        <div className="d-flex align-items-center gap-2">
+        <div>
+          <h4 className="card-title mb-0">
+            Stock Alerts & Movement Tracking
+          </h4>
+          {!loading && !error && (
+            <small className="text-muted">
+              {search.trim()
+                ? `Showing ${filterekAlerts.length.toLocaleString()} of ${stockAlerts.length.toLocaleString()} alerts`
+                : `${stockAlerts.length.toLocaleString()} stock alerts`}
+            </small>
+          )}
+        </div>
+        <div className="d-flex align-items-center gap-2 flex-wrap">
+          <input
+            type="search"
+            className="form-control form-control-sm"
+            style={{ width: "220px" }}
+            placeholder="Search product, SKU, category, branch..."
+            aria-label="Search stock alerts"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
           <CardExportButtons
             onExport={handleExportExcel}
             targetId="stock-movements-card"
@@ -151,16 +187,42 @@ const StockMovements = () => {
           style={{ maxHeight: "380px", overflowY: "auto" }}
           onMouseLeave={handleMouseLeave}
         >
-          <table className="table table-borderless table-centered table-nowrap mb-0">
+          <table
+            className="table table-borderless table-centered table-nowrap mb-0"
+            style={{ tableLayout: "fixed", width: "100%" }}
+          >
+            <colgroup>
+              <col style={{ width: "24%" }} />
+              <col style={{ width: "16%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "12%" }} />
+              <col style={{ width: "13%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "11%" }} />
+            </colgroup>
             <thead className="text-muted table-light sticky-top" style={{ zIndex: 1 }}>
               <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Stock</th>
-                <th>Min Reorder</th>
-                <th>Monthly Demand</th>
-                <th>Branch</th>
-                <th>Status</th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Product")}>
+                  Product
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Category")}>
+                  Category
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Stock")}>
+                  Stock
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Min Reorder")}>
+                  Min Reorder
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Monthly Demand")}>
+                  Monthly Demand
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Branch")}>
+                  Branch
+                </th>
+                <th className="text-truncate" {...getCellTooltipHandlers("Column", "Status")}>
+                  Status
+                </th>
               </tr>
             </thead>
 
@@ -178,14 +240,18 @@ const StockMovements = () => {
                     {error}
                   </td>
                 </tr>
-              ) : stockAlerts.length === 0 ? (
+              ) : filteredStockAlerts.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="text-center py-5">
-                    <h6 className="text-muted mb-0">No stock alerts found</h6>
+                    <h6 className="text-muted mb-0">
+                      {search.trim()
+                        ? `No stock alerts matching "${search.trim()}"`
+                        : "No stock alerts found"}
+                    </h6>
                   </td>
                 </tr>
               ) : (
-                stockAlerts.map((item, index) => {
+                filteredStockAlerts.map((item, index) => {
                   const badge = getStatusBadge(item.stockout_risk_status);
                   const branchName = cleanBranchName(item.branch_name || `Branch ${item.branch_id}`);
                   const badgeHex =
@@ -197,45 +263,54 @@ const StockMovements = () => {
                       ? "#299cdb"
                       : "#0ab39c";
                   const minReorder = item.effective_min_qty ?? item.branch_min_qty;
+                  const rowInfo = {
+                    title: item.item_name || item.item_code || "Product",
+                    badgeColor: badgeHex,
+                    mainValue: `${formatNumber(item.current_stock_qty)} in stock · ${badge.label}`,
+                    mainColor: badgeHex,
+                    subText: `Branch: ${branchName} · Min Reorder: ${formatNumber(minReorder)} · Monthly Demand: ${formatNumber(item.monthly_demand)}`,
+                    extraText: item.action_insight || (item.item_code ? `SKU: ${item.item_code} · Category: ${item.item_subgroup || item.item_group || "-"}` : undefined),
+                  };
 
                   return (
                     <tr
                       key={`${item.item_code}-${item.branch_id}-${index}`}
-                      onMouseEnter={(e) =>
-                        handleCellHover(e, {
-                          title: item.item_name || item.item_code || "Product",
-                          badgeColor: badgeHex,
-                          mainValue: `${formatNumber(item.current_stock_qty)} in stock · ${badge.label}`,
-                          mainColor: badgeHex,
-                          subText: `Branch: ${branchName} · Min Reorder: ${formatNumber(minReorder)} · Monthly Demand: ${formatNumber(item.monthly_demand)}`,
-                          extraText: item.action_insight || (item.item_code ? `SKU: ${item.item_code} · Category: ${item.item_subgroup || item.item_group || "-"}` : undefined),
-                        })
-                      }
+                      tabIndex={0}
+                      onMouseEnter={(e) => handleCellHover(e, rowInfo)}
                       onMouseMove={handleMouseMove}
                       onMouseLeave={handleMouseLeave}
+                      onFocus={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setHoverInfo({
+                          x: rect.left + rect.width / 2,
+                          y: rect.top,
+                          ...rowInfo,
+                        });
+                      }}
+                      onBlur={handleMouseLeave}
                     >
                       <td className="fw-medium">
-                        <div>{item.item_name}</div>
-                        <small className="text-muted">{item.item_code}</small>
+                        <div className="text-truncate">{item.item_name}</div>
+                        <small className="text-muted d-block text-truncate">{item.item_code}</small>
                       </td>
-                      <td className="text-muted">
+                      <td className="text-muted text-truncate">
                         {item.item_subgroup || item.item_group || "-"}
                       </td>
                       <td
-                        className={
+                        className={`text-truncate ${
                           Number(item.current_stock_qty) <= 0
                             ? "text-danger fw-semibold"
                             : "fw-semibold"
-                        }
+                        }`}
                       >
                         {formatNumber(item.current_stock_qty)}
                       </td>
-                      <td>
+                      <td className="text-truncate">
                         {formatNumber(minReorder)}
                       </td>
-                      <td>{formatNumber(item.monthly_demand)}</td>
-                      <td>{branchName}</td>
-                      <td>
+                      <td className="text-truncate">{formatNumber(item.monthly_demand)}</td>
+                      <td className="text-truncate">{branchName}</td>
+                      <td className="text-truncate">
                         <span
                           className={`badge bg-${badge.color}-subtle text-${badge.color}`}
                         >

@@ -156,7 +156,7 @@ const TransferAgingTable = ({
         return (
             <div className="d-flex flex-column align-items-center justify-content-center py-4 text-center text-muted" style={{ minHeight: "160px" }}>
                 <i className="ri-inbox-line display-6 mb-2"></i>
-                <div className="fw-medium">No transfer records found</div>
+                <div className="fw-medium">No Branch Transfer records found!</div>
                 <small className="text-muted">Try adjusting the branch filter, search query, or date range.</small>
             </div>
         );
@@ -728,7 +728,18 @@ const BranchTransfersSection = () => {
                                     <small className="text-muted">Loading branch transfers...</small>
                                 </div>
                             ) : errorBranchTransfers && !enrichedAgingRows.length ? (
-                                <div className="text-danger text-center py-3 small">{String(errorBranchTransfers)}</div>
+                                <div className="d-flex flex-column align-items-center justify-content-center py-4 text-center text-danger" style={{ minHeight: "180px" }}>
+                                    <i className="ri-error-warning-line display-6 mb-2"></i>
+                                    <div className="text-danger text-center py-3 small">
+                                        {String(errorBranchTransfers)}
+                                    </div>
+                                </div>
+                            ) : !enrichedAgingRows.length && !allDrilldownRows.length ? (
+                                <div className="d-flex flex-column align-items-center justify-content-center py-4 text-center text-muted" style={{ minHeight: "180px" }}>
+                                    <i className="ri-inbox-line display-6 mb-2"></i>
+                                    <div className="fw-medium">No Branch Transfer records found!</div>
+                                    <small className="text-muted">Try adjusting the date range or branch filter.</small>
+                                </div>
                             ) : (
                                 <TransferAgingTable
                                     agingRows={enrichedAgingRows}
