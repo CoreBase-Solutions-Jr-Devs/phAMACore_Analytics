@@ -4,13 +4,21 @@ import { ProgressiveSalesChart } from "./DashboardAnalyticsCharts";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const YearToDateSales = ({ series, categories, salesVariance, salesGrowth, grossProfit, CostOfGoods, formatAmount }) => {
-const currentMonthIndex = new Date().getMonth();
+const YearToDateSales = ({
+  series,
+  categories,
+  salesVariance,
+  salesGrowth,
+  grossProfit,
+  CostOfGoods,
+  formatAmount,
+}) => {
+  const currentMonthIndex = new Date().getMonth();
 
-const currentMonthVariance = salesVariance?.[currentMonthIndex];
-const currentMonthGrowth = salesGrowth?.[currentMonthIndex];
-const currentMonthGP = grossProfit?.[currentMonthIndex];
-const currentMonthCOGS = CostOfGoods?.[currentMonthIndex];
+  const currentMonthVariance = salesVariance?.[currentMonthIndex];
+  const currentMonthGrowth = salesGrowth?.[currentMonthIndex];
+  const currentMonthGP = grossProfit?.[currentMonthIndex];
+  const currentMonthCOGS = CostOfGoods?.[currentMonthIndex];
 
   const handleExportExcel = () => {
     const rows = (categories || []).map((cat, idx) => {
@@ -45,41 +53,40 @@ const currentMonthCOGS = CostOfGoods?.[currentMonthIndex];
             </div>
           </CardHeader>
           <CardBody className="p-2">
+            <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2 pb-1">
+              <div className="d-flex align-items-center gap-2">
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "25px",
+                    borderTop: "3px solid var(--vz-primary)",
+                  }}
+                />
+                <span className="text-muted">2026</span>
+              </div>
 
-<div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2 pb-1">
-  <div className="d-flex align-items-center gap-2">
-    <span
-      style={{
-        display: "inline-block",
-        width: "25px",
-        borderTop: "3px solid var(--vz-primary)",
-      }}
-    />
-    <span className="text-muted">2026</span>
-  </div>
-
-  <div className="d-flex align-items-center gap-2">
-    <span
-      style={{
-        display: "inline-block",
-        width: "25px",
-        borderTop: "3px dashed var(--vz-primary)",
-      }}
-    />
-    <span className="text-muted">2025</span>
-  </div>
-</div>
-<div className="mt-0 pt-0">
-            <ProgressiveSalesChart
-              series={series}
-              categories={categories}
-              salesVariance={salesVariance}
-              salesGrowth={salesGrowth}
-              grossProfit={grossProfit}
-              CostOfGoods={CostOfGoods}
-              formatAmount={formatAmount}
-              dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
-            />
+              <div className="d-flex align-items-center gap-2">
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "25px",
+                    borderTop: "3px dashed var(--vz-primary)",
+                  }}
+                />
+                <span className="text-muted">2025</span>
+              </div>
+            </div>
+            <div className="mt-0 pt-0">
+              <ProgressiveSalesChart
+                series={series}
+                categories={categories}
+                salesVariance={salesVariance}
+                salesGrowth={salesGrowth}
+                grossProfit={grossProfit}
+                CostOfGoods={CostOfGoods}
+                formatAmount={formatAmount}
+                dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
+              />
             </div>
           </CardBody>
         </Card>

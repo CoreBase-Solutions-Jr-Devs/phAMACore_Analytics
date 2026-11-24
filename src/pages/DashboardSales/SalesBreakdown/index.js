@@ -22,99 +22,88 @@ const SalesBreakdown = () => {
   const dispatch = useDispatch();
 
   const [rightColumn, setRightColumn] = useState(false);
-const [isSticky, setIsSticky] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
-const [selectedBranchName, setSelectedBranchName] =
-  useState("All Branches");
+  const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
   const {
-  
     salesChannel = [],
     filters,
     loading,
     error,
   } = useSelector((state) => state.salesBreakdown);
-    const {
-    salesBranch = [],
-  
-  } = useSelector((state) => state.powerbi);
+  const { salesBranch = [] } = useSelector((state) => state.powerbi);
 
-const {
-  CASH,
-  INSURANCE,
-  OTHER_ACCOUNT,
-  RETURN,
-  TOTAL,
-} = useSalesAnalytics(
-  [], // 1. sales
-  [], // 2. kpiOverdueAccounts
-  [], // 3. salesType
-  salesBranch, // 4. salesBranch
-  [], // 5. salesBranch_Type
-  salesChannel, // 6. salesChannel
-  [], // 7. salesComparativeYTD
-  [], // 8. salesComparativeMTD
-  [], // 9. salesMonthly
-  [], // 10. salesDaily
-  [], // 11. salesPeriodicBreakdown  <-- ADD THIS
-  [], // 12. salesSubgroup
-  [], // 13. monthlySales
-  [], // 14. monthToDateSales
-  [], // 15. lastYearMonthToDateSales
-  [], // 16. lastYearMonthlySales
-  [], // 17. marginAnalysisBand
-  [], // 18. marginAnalysisDrilldown
-  [], // 19. marginAnalysisSku
-  [], // 20. customerMemberAnalysisSummary
-  [], // 21. customerMemberAnalysisBranch
-  [], // 22. customerMemberAnalysisCohort
-  [], // 23. julySalesTarget
-  [], // 24. augustSalesTarget
-  [], // 25. septemberSalesTarget
-  [], // 26. octoberSalesTarget
-  [], // 27. salesTarget
-  [], // 28. salesTargetSummary
-  [], // 29. salesTargetBranch
-  [], // 30. salesTargetMONTHLY_PIVOT
-  filters, // 31. filters
-);
-
-useEffect(() => {
-  const params = {
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    groupBy: "CHANNEL",
-  };
-
-  console.log(
-    "%c[SalesBreakdown] Initial API request",
-    "color: blue; font-weight: bold;",
-    params,
+  const { CASH, INSURANCE, OTHER_ACCOUNT, RETURN, TOTAL } = useSalesAnalytics(
+    [], // 1. sales
+    [], // 2. kpiOverdueAccounts
+    [], // 3. salesType
+    salesBranch, // 4. salesBranch
+    [], // 5. salesBranch_Type
+    salesChannel, // 6. salesChannel
+    [], // 7. salesComparativeYTD
+    [], // 8. salesComparativeMTD
+    [], // 9. salesMonthly
+    [], // 10. salesDaily
+    [], // 11. salesPeriodicBreakdown  <-- ADD THIS
+    [], // 12. salesSubgroup
+    [], // 13. monthlySales
+    [], // 14. monthToDateSales
+    [], // 15. lastYearMonthToDateSales
+    [], // 16. lastYearMonthlySales
+    [], // 17. marginAnalysisBand
+    [], // 18. marginAnalysisDrilldown
+    [], // 19. marginAnalysisSku
+    [], // 20. customerMemberAnalysisSummary
+    [], // 21. customerMemberAnalysisBranch
+    [], // 22. customerMemberAnalysisCohort
+    [], // 23. julySalesTarget
+    [], // 24. augustSalesTarget
+    [], // 25. septemberSalesTarget
+    [], // 26. octoberSalesTarget
+    [], // 27. salesTarget
+    [], // 28. salesTargetSummary
+    [], // 29. salesTargetBranch
+    [], // 30. salesTargetMONTHLY_PIVOT
+    filters, // 31. filters
   );
 
-  console.trace("[SalesBreakdown] Dispatch call stack");
+  useEffect(() => {
+    const params = {
+      clientid: 1,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      branchcode: filters.branch,
+      groupBy: "CHANNEL",
+    };
 
-  dispatch(getKPISalesTransactions(params));
-}, [dispatch]);
+    console.log(
+      "%c[SalesBreakdown] Initial API request",
+      "color: blue; font-weight: bold;",
+      params,
+    );
 
-useEffect(() => {
-  return () => {
-    console.log("[SalesBreakdown] Unmounting — clearSalesData dispatched");
-    dispatch(clearSalesBreakdownData());
-  };
-}, [dispatch]);
+    console.trace("[SalesBreakdown] Dispatch call stack");
 
-useEffect(() => {
-  const handleScroll = () => {
-    setIsSticky(window.scrollY > 50);
-  };
+    dispatch(getKPISalesTransactions(params));
+  }, [dispatch]);
 
-  window.addEventListener("scroll", handleScroll);
+  useEffect(() => {
+    return () => {
+      console.log("[SalesBreakdown] Unmounting — clearSalesData dispatched");
+      dispatch(clearSalesBreakdownData());
+    };
+  }, [dispatch]);
 
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleApplyFilters = () => {
     dispatch(
@@ -128,12 +117,6 @@ useEffect(() => {
       }),
     );
   };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (salesBranch || []).find(
-  //         (m) => Number(m.branchID) === Number(filters.branch),
-  //       )?.branchName || "";
 
   document.title = "Sales Breakdown| phAMACore Analytics";
 
@@ -146,57 +129,56 @@ useEffect(() => {
           subtitle={selectedBranchName}
         />
         <div
-  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
-  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
-}`}
-  style={{
-    position: "sticky",
-    top: "70px",
-    zIndex: 1030,
-    width: "100%",
-    marginTop: "-15px",
-    // backgroundColor: "#",
-  }}
->
-    <div className="d-flex align-items-center flex-wrap gap-2">
+          className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+            isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+          }`}
+          style={{
+            position: "sticky",
+            top: "70px",
+            zIndex: 100,
+            width: "100%",
+            marginTop: "-15px",
+            // backgroundColor: "#",
+          }}
+        >
+          <div className="d-flex align-items-center flex-wrap gap-2">
+            <div className="d-flex align-items-center gap-1">
+              <span>Filtered From:</span>
+              <strong>{filters?.startDate || ""}</strong> to{" "}
+              <strong>{filters?.endDate || ""}</strong>
+            </div>
 
-  <div className="d-flex align-items-center gap-1">
-    <span>Filtered From:</span>
-    <strong>{filters?.startDate || ""}</strong> to{" "}
-<strong>{filters?.endDate || ""}</strong>
-  </div>
+            <div
+              style={{
+                borderLeft: "2px solid #ced4da",
+                height: "12px",
+                margin: "0 4px",
+              }}
+            />
 
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-
-  <div className="d-flex align-items-center gap-1">
-    <span>Selected Branch:</span>
-    <strong>{selectedBranchName}</strong>
-  </div>
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-  <div className="d-flex align-items-center gap-1 no-print">
-    <button
-      type="button"
-      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-      onClick={toggleRightColumn}
-    >
-      <i className="ri-filter-fill"></i>
-      Filter
-    </button>
-  </div>
-  </div>
-</div> 
+            <div className="d-flex align-items-center gap-1">
+              <span>Selected Branch:</span>
+              <strong>{selectedBranchName}</strong>
+            </div>
+            <div
+              style={{
+                borderLeft: "2px solid #ced4da",
+                height: "12px",
+                margin: "0 4px",
+              }}
+            />
+            <div className="d-flex align-items-center gap-1 no-print">
+              <button
+                type="button"
+                className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                onClick={toggleRightColumn}
+              >
+                <i className="ri-filter-fill"></i>
+                Filter
+              </button>
+            </div>
+          </div>
+        </div>
         <Row>
           <Col xl={12}>
             <Performance
@@ -221,7 +203,7 @@ useEffect(() => {
               OTHER_ACCOUNT={OTHER_ACCOUNT}
               RETURN={RETURN}
               TOTAL={TOTAL}
-                 loading={loading}
+              loading={loading}
               error={error}
             />
           </Col>

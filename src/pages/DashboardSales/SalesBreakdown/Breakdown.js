@@ -14,7 +14,6 @@ const Breakdown = ({
   loading,
   rightClickBtn,
 }) => {
-  // Keep all five channels visible, even before API data loads.
   const channels = [
     { sales_channel: "TOTAL", ...(TOTAL ?? {}) },
     { sales_channel: "CASH", ...(CASH ?? {}) },
@@ -31,10 +30,6 @@ const Breakdown = ({
     if (percentage == null || Number.isNaN(Number(percentage))) {
       return "bg-warning-subtle text-warning";
     }
-
-    // if (percentage < 0) {
-    //   return "bg-danger-subtle text-danger";
-    // }
 
     if (percentage < 10) {
       return "bg-danger-subtle text-danger-emphasis";
@@ -53,21 +48,20 @@ const Breakdown = ({
   });
 
   const numericHeaders = [
-    "Trans",
-    "Line Items",
-    "Unique Clients",
-    "Units Sold",
-    "Sales Excl. (KES)",
-    "Tax (KES)",
-    "Sales Incl. (KES)",
-    "COGS (KES)",
-    "GP (KES)",
-    "GP Margin (%)",
-    "Avg Order Value (KES)",
-    "Sales Share (%)",
+    "Transactions",
+    "LineItems",
+    "UniqueClients",
+    "UnitsSold",
+    "SalesExcl.(KES)",
+    "Tax(KES)",
+    "SalesIncl.(KES)",
+    "COGS(KES)",
+    "GrossProfit(KES)",
+    "GPMargin(%)",
+    "AvgOrderValue(KES)",
+    "SalesShare(%)",
   ];
 
-  // Export all five channels to Excel.
   const handleExportExcel = () => {
     const rows = channels.map((item) => ({
       "Sales Channel": item.sales_channel.replace(/_/g, " "),
@@ -145,7 +139,7 @@ const Breakdown = ({
                 {numericHeaders.map((header) => (
                   <th
                     key={header}
-                    className="text-end"
+                    
                     style={{ whiteSpace: "nowrap" }}
                   >
                     {header}
@@ -192,43 +186,43 @@ const Breakdown = ({
                         {item.sales_channel.replace(/_/g, " ")}
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td style={totalStyle}>
                         {formatNumber(item.transaction_count)}
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td style={totalStyle}>
                         {formatNumber(item.total_line_items)}
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td style={totalStyle}>
                         {formatNumber(item.unique_clients)}
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td  style={totalStyle}>
                         {formatNumber(item.total_units_sold)}
                       </td>
 
-                      <td className="text-end text-primary" style={totalStyle}>
+                      <td className="text-primary fw-medium" style={totalStyle}>
                         {formatAmount(item.total_sales_excl)}
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td className="fw-medium" style={totalStyle}>
                         {formatAmount(item.total_tax)}
                       </td>
 
-                      <td className="text-end text-caramel" style={totalStyle}>
+                      <td className="text-caramel fw-medium" style={totalStyle}>
                         {formatAmount(item.total_sales_incl)}
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td className="text-info fw-medium" style={totalStyle}>
                         {formatAmount(item.total_cogs)}
                       </td>
 
-                      <td className="text-end text-success" style={totalStyle}>
+                      <td className="text-success fw-medium" style={totalStyle}>
                         {formatAmount(item.gross_profit)}
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td  style={totalStyle}>
                         <Badge
                           pill
                           className={getBadgeColor(
@@ -239,11 +233,11 @@ const Breakdown = ({
                         </Badge>
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td className="text-danger fw-medium" style={totalStyle}>
                         {formatAmount(item.avg_order_value)}
                       </td>
 
-                      <td className="text-end" style={totalStyle}>
+                      <td style={totalStyle}>
                         <Badge
                           pill
                           className={getBadgeColor(

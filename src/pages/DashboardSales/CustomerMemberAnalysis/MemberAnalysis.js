@@ -71,10 +71,6 @@ const MemberAnalysis = ({
       return "bg-warning-subtle text-warning";
     }
 
-    // if (percentage < 0) {
-    //   return "bg-danger-subtle text-danger";
-    // }
-
     if (percentage < 10) {
       return "bg-danger-subtle text-danger-emphasis";
     }
@@ -101,9 +97,7 @@ const MemberAnalysis = ({
     exportToExcel(rows, `Customer_Cohort_Analysis_${todayStr}`);
   };
 
-  // const handlePrint = () => {
-  //   triggerPrint();
-  // };
+ 
 
   return (
     <Card
@@ -144,28 +138,28 @@ const MemberAnalysis = ({
           </div>
         ) : (
           <div className="table-responsive table-card">
-            <table className="table table-hover align-middle table-nowrap mb-0">
+            <table className="table table-hover table-bordered align-middle table-nowrap mb-0">
               <thead className="table-light">
                 <tr>
                   {[
-                    { label: "Cohort", align: "text-start" },
-                    { label: "Members", align: "text-end" },
-                    { label: "Transactions", align: "text-end" },
+                    { label: "Cohort"},
+                    { label: "Members"},
+                    { label: "Transactions"},
                     {
-                      label: "Sales Excl. Tax (KES)",
-                      align: "text-end",
+                      label: "SalesExcl.Tax(KES)",
+                    
                     },
                     {
-                      label: "Sales Incl. Tax (KES)",
-                      align: "text-end",
+                      label: "SalesIncl.Tax(KES)",
+                  
                     },
                     {
-                      label: "Average Basket (KES)",
-                      align: "text-end",
+                      label: "AverageBasket(KES)",
+                    
                     },
                     {
-                      label: "Sales Contribution",
-                      align: "text-end",
+                      label: "SalesContribution",
+                     
                     },
                   ].map((column) => (
                     <th key={column.label} className={`${column.align} py-3`}>
@@ -193,7 +187,7 @@ const MemberAnalysis = ({
                         />
 
                         <div>
-                          <div className="fw-semibold text-dark">
+                          <div className="fw-medium text-dark">
                             {item.name}
                           </div>
                           <Badge
@@ -212,40 +206,40 @@ const MemberAnalysis = ({
                       </div>
                     </td>
 
-                    <td className="text-end">
-                      <span className="fw-semibold text-dark">
+                    <td >
+                      <span>
                         {formatNumber(item.members)}
                       </span>
                     </td>
 
-                    <td className="text-end">
-                      <span className="text-muted">
+                    <td >
+                      <span>
                         {formatNumber(item.transactions)}
                       </span>
                     </td>
 
-                    <td className="text-end">
+                    <td>
                       <span
-                        className="fw-semibold"
-                        style={{ color: "#9a6b35" }}
+                        className="fw-semibold text-caramel"
+                       
                       >
                         {formatNumber(item.salesExcl)}
                       </span>
                     </td>
 
-                    <td className="text-end">
-                      <span className="text-dark">
+                    <td >
+                      <span className="text-danger fw-medium">
                         {formatNumber(item.salesIncl)}
                       </span>
                     </td>
 
-                    <td className="text-end">
-                      <span className="fw-semibold text-primary">
+                    <td>
+                      <span className="fw-medium text-primary">
                         {formatNumber(item.averageBasket)}
                       </span>
                     </td>
 
-                    <td className="text-end">
+                    <td>
                       <Badge
                         pill
                         className={getBadgeColor(item.contribution)}

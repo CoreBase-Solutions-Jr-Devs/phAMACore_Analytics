@@ -12,7 +12,6 @@ import {
    getBranches as getBranchesApi,
 } from "../../helpers/fakebackend_helper";
 
-// MAIN SALES
 export const getSalesTransactions = createAsyncThunk(
   "powerbi/getSalesTransactions",
   async (params, { rejectWithValue }) => {
@@ -24,7 +23,7 @@ export const getSalesTransactions = createAsyncThunk(
     }
   },
 );
-// KPI SALES
+
 export const getKPISalesTransactions = createAsyncThunk(
   "powerbi/getKPISalesTransactions",
   async (params, { rejectWithValue }) => {
@@ -67,7 +66,7 @@ export const getKPIOverdueAccounts = createAsyncThunk(
     }
   },
 );
-// MONTHLY CHART
+
 export const getMonthlySales = createAsyncThunk(
   "powerbi/getMonthlySales",
   async (params, { rejectWithValue }) => {
@@ -80,7 +79,6 @@ export const getMonthlySales = createAsyncThunk(
   },
 );
 
-// LAST YEAR MONTHLY SALES
 export const getLastYearMonthlySales = createAsyncThunk(
   "powerbi/getLastYearMonthlySales",
   async (params, { rejectWithValue }) => {
@@ -93,7 +91,6 @@ export const getLastYearMonthlySales = createAsyncThunk(
   },
 );
 
-// MONTH TO DATE
 export const getMonthToDateSales = createAsyncThunk(
   "powerbi/getMonthToDateSales",
   async (params, { rejectWithValue }) => {
@@ -106,7 +103,6 @@ export const getMonthToDateSales = createAsyncThunk(
   },
 );
 
-// LAST YEAR MONTH TO DATE
 export const getLastYearMonthToDateSales = createAsyncThunk(
   "powerbi/getLastYearMonthToDateSales",
   async (params, { rejectWithValue }) => {

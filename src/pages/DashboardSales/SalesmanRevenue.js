@@ -46,8 +46,7 @@ const SalesRevenueAnalysis = ({
   error = null,
 }) => {
   const [activeTab, setActiveTab] = useState("salesperson");
-
-  // Salesperson columns
+  
   const salespersonColumns = useMemo(
     () => [
       columnHelper.accessor("staff_Name", {
@@ -109,7 +108,6 @@ const SalesRevenueAnalysis = ({
     [],
   );
 
-  // Customer columns
   const customerColumns = useMemo(
     () => [
       columnHelper.accessor("client_Name", {

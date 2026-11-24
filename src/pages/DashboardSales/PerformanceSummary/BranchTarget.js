@@ -1,11 +1,10 @@
-
 import React, { useMemo } from "react";
 import {
   Card,
   CardBody,
   CardHeader,
   Badge,
-   UncontrolledTooltip,
+  UncontrolledTooltip,
 } from "reactstrap";
 import TanstackTable from "../../../Components/Common/TanstackTable";
 import { exportToExcel } from "../../../helpers/export_helper";
@@ -26,21 +25,7 @@ const MONTHS = [
   { key: "dec", label: "Dec", monthNo: 12 },
 ];
 
-// const BRANCHES = [
-//   { branchID: 1, branchName: "Syokimau" },
-//   { branchID: 2, branchName: "Tassia" },
-//   { branchID: 3, branchName: "Machakos" },
-//   { branchID: 4, branchName: "Mtwapa" },
-//   { branchID: 5, branchName: "Kasarani" },
-//   { branchID: 6, branchName: "Eldoret" },
-//   { branchID: 7, branchName: "Busia" },
-//   { branchID: 8, branchName: "Msa GPO" },
-//   { branchID: 9, branchName: "Kitale" },
-//   { branchID: 10, branchName: "Kisii" },
-// ];
-
-const formatAmount = (value) =>
-  Number(value ?? 0).toLocaleString("en-KE",);
+const formatAmount = (value) => Number(value ?? 0).toLocaleString("en-KE");
 
 const getBadgeColor = (percentage) => {
   if (percentage == null || Number.isNaN(Number(percentage))) {
@@ -64,18 +49,12 @@ const getBadgeColor = (percentage) => {
 const getBranchName = (apiName, fallbackName) => {
   if (!apiName) return fallbackName;
 
-  return apiName
-    .replace(/^AXCESS PHARMACY\s*-\s*/i, "")
-    .trim();
+  return apiName.replace(/^AXCESS PHARMACY\s*-\s*/i, "").trim();
 };
-
 
 const InsightCell = ({ id, children, insight }) => (
   <>
-    <span
-      id={id}
-      style={{ cursor: insight ? "help" : "default" }}
-    >
+    <span id={id} style={{ cursor: insight ? "help" : "default" }}>
       {children}
     </span>
 
@@ -87,78 +66,58 @@ const InsightCell = ({ id, children, insight }) => (
   </>
 );
 
-const BranchTarget = ({
-  data = [],
-  loading = false,
-  error = null,
-}) => {
+const BranchTarget = ({ data = [], loading = false, error = null }) => {
   const sourceData = Array.isArray(data) ? data : [];
 
-  // Transform API records into one row per branch.
-  
-const branchData = useMemo(() => {
-  const branches = new Map();
+  const branchData = useMemo(() => {
+    const branches = new Map();
 
-  sourceData.forEach((item) => {
-    const branchID = Number(item.branchID);
+    sourceData.forEach((item) => {
+      const branchID = Number(item.branchID);
 
-    // Create the branch only once.
-    if (!branches.has(branchID)) {
-      const row = {
-        branchID,
-        branchName: getBranchName(
-          item.branchName,
-          `Branch ${branchID}`
-        ),
-      };
+      // Create the branch only once.
+      if (!branches.has(branchID)) {
+        const row = {
+          branchID,
+          branchName: getBranchName(item.branchName, `Branch ${branchID}`),
+        };
 
-      // Initialize all monthly values.
-      MONTHS.forEach(({ key }) => {
-        row[`${key}Sales`] = 0;
-        row[`${key}Target`] = 0;
-        row[`${key}Variance`] = 0;
-        row[`${key}Achievement`] = 0;
-        row[`${key}ActionInsight`] = "";
-      });
+        // Initialize all monthly values.
+        MONTHS.forEach(({ key }) => {
+          row[`${key}Sales`] = 0;
+          row[`${key}Target`] = 0;
+          row[`${key}Variance`] = 0;
+          row[`${key}Achievement`] = 0;
+          row[`${key}ActionInsight`] = "";
+        });
 
-      branches.set(branchID, row);
-    }
+        branches.set(branchID, row);
+      }
 
-    const row = branches.get(branchID);
+      const row = branches.get(branchID);
 
-    // Populate the corresponding month.
-    const month = MONTHS.find(
-      (entry) => entry.monthNo === Number(item.monthNo)
+      // Populate the corresponding month.
+      const month = MONTHS.find(
+        (entry) => entry.monthNo === Number(item.monthNo),
+      );
+
+      if (!month) return;
+
+      row[`${month.key}Sales`] = Number(item.actualSalesExcl ?? 0);
+
+      row[`${month.key}Target`] = Number(item.targetSales ?? 0);
+
+      row[`${month.key}Variance`] = Number(item.variance ?? 0);
+
+      row[`${month.key}Achievement`] = Number(item.achievementPct ?? 0);
+
+      row[`${month.key}ActionInsight`] = item.action_insight ?? "";
+    });
+
+    return Array.from(branches.values()).sort((a, b) =>
+      a.branchName.localeCompare(b.branchName),
     );
-
-    if (!month) return;
-
-    row[`${month.key}Sales`] = Number(
-      item.actualSalesExcl ?? 0
-    );
-
-    row[`${month.key}Target`] = Number(
-      item.targetSales ?? 0
-    );
-
-    row[`${month.key}Variance`] = Number(
-      item.variance ?? 0
-    );
-
-    row[`${month.key}Achievement`] = Number(
-      item.achievementPct ?? 0
-    );
-
-    row[`${month.key}ActionInsight`] =
-      item.action_insight ?? "";
-  });
-
-  return Array.from(branches.values()).sort(
-    (a, b) => a.branchName.localeCompare(b.branchName)
-  );
-}, [sourceData]);
-
-
+  }, [sourceData]);
 
   const columns = useMemo(() => {
     const branchColumn = {
@@ -180,106 +139,96 @@ const branchData = useMemo(() => {
     };
 
     const monthlyColumns = MONTHS.flatMap((month) => [
-   
-{
-  header: `${month.label} Sales`,
-  accessorKey: `${month.key}Sales`,
-  enableSorting: true,
-  cell: ({ getValue, row }) => (
-    <InsightCell
-      id={`insight-${row.original.branchID}-${month.key}-sales`}
-      insight={row.original[`${month.key}ActionInsight`]}
-    >
-      <div className="text-caramel fw-semibold">
-{formatAmount(getValue())}
-      </div>
-      
-    </InsightCell>
-  ),
-  meta: {
-    tdClassName: "text-end",
-    tdStyle: { borderLeft: "1px solid #cbd5e1" },
-  },
-},
-{
-  header: `${month.label} Target`,
-  accessorKey: `${month.key}Target`,
-  enableSorting: true,
-  cell: ({ getValue, row }) => (
-    <InsightCell
-      id={`insight-${row.original.branchID}-${month.key}-target`}
-      insight={row.original[`${month.key}ActionInsight`]}
-    >
-       <div className="fw-semibold">
-      {formatAmount(getValue())}
-       </div>
-    </InsightCell>
-  ),
-  meta: { tdClassName: "text-end" },
-},
-{
-  header: `${month.label} Variance`,
-  accessorKey: `${month.key}Variance`,
-  enableSorting: true,
-  cell: ({ getValue, row }) => {
-    const variance = Number(getValue() ?? 0);
+      {
+        header: `${month.label} Sales`,
+        accessorKey: `${month.key}Sales`,
+        enableSorting: true,
+        cell: ({ getValue, row }) => (
+          <InsightCell
+            id={`insight-${row.original.branchID}-${month.key}-sales`}
+            insight={row.original[`${month.key}ActionInsight`]}
+          >
+            <div className="text-caramel fw-medium">
+              {formatAmount(getValue())}
+            </div>
+          </InsightCell>
+        ),
+        meta: {
+          tdClassName: "text-end",
+          tdStyle: { borderLeft: "1px solid #cbd5e1" },
+        },
+      },
+      {
+        header: `${month.label} Target`,
+        accessorKey: `${month.key}Target`,
+        enableSorting: true,
+        cell: ({ getValue, row }) => (
+          <InsightCell
+            id={`insight-${row.original.branchID}-${month.key}-target`}
+            insight={row.original[`${month.key}ActionInsight`]}
+          >
+            <div className="fw-medium text-info">{formatAmount(getValue())}</div>
+          </InsightCell>
+        ),
+        meta: { tdClassName: "text-end" },
+      },
+      {
+        header: `${month.label} Variance`,
+        accessorKey: `${month.key}Variance`,
+        enableSorting: true,
+        cell: ({ getValue, row }) => {
+          const variance = Number(getValue() ?? 0);
 
-    return (
-      <InsightCell
-        id={`insight-${row.original.branchID}-${month.key}-variance`}
-        insight={row.original[`${month.key}ActionInsight`]}
-      >
-        <span
-          className={`fw-semibold ${
-            variance > 0
-              ? "text-success"
-              : variance < 0
-                ? "text-danger"
-                : ""
-          }`}
-        >
-          {formatAmount(variance)}
-        </span>
-      </InsightCell>
-    );
-  },
-  meta: { tdClassName: "text-end" },
-},
-{
-  header: `${month.label} Achievement`,
-  accessorKey: `${month.key}Achievement`,
-  enableSorting: true,
-  cell: ({ getValue, row }) => {
-    const achievement = Number(getValue() ?? 0);
-    const statusColor =
-      row.original[`${month.key}StatusColor`];
+          return (
+            <InsightCell
+              id={`insight-${row.original.branchID}-${month.key}-variance`}
+              insight={row.original[`${month.key}ActionInsight`]}
+            >
+              <span
+                className={`fw-medium ${
+                  variance > 0
+                    ? "text-success"
+                    : variance < 0
+                      ? "text-danger"
+                      : ""
+                }`}
+              >
+                {formatAmount(variance)}
+              </span>
+            </InsightCell>
+          );
+        },
+        meta: { tdClassName: "text-end" },
+      },
+      {
+        header: `${month.label} Achievement`,
+        accessorKey: `${month.key}Achievement`,
+        enableSorting: true,
+        cell: ({ getValue, row }) => {
+          const achievement = Number(getValue() ?? 0);
+          const statusColor = row.original[`${month.key}StatusColor`];
 
-    return (
-      <InsightCell
-        id={`insight-${row.original.branchID}-${month.key}-achievement`}
-        insight={row.original[`${month.key}ActionInsight`]}
-      >
-        <Badge
-  pill
-  className={getBadgeColor(achievement)}
->
-  {achievement.toFixed(1)}%
-</Badge>
-      </InsightCell>
-    );
-  },
-  meta: {
-    tdClassName: "text-end",
-    tdStyle: { borderRight: "1px solid #cbd5e1" },
-  },
-},
-
+          return (
+            <InsightCell
+              id={`insight-${row.original.branchID}-${month.key}-achievement`}
+              insight={row.original[`${month.key}ActionInsight`]}
+            >
+              <Badge pill className={getBadgeColor(achievement)}>
+                {achievement.toFixed(1)}%
+              </Badge>
+            </InsightCell>
+          );
+        },
+        meta: {
+          tdClassName: "text-end",
+          tdStyle: { borderRight: "1px solid #cbd5e1" },
+        },
+      },
     ]);
 
     return [branchColumn, ...monthlyColumns];
   }, []);
 
-  // Two header rows: each month spans four metric columns.
   const customHeader = (
     <>
       <tr>
@@ -322,12 +271,8 @@ const branchData = useMemo(() => {
             >
               Sales
             </th>
-            <th className="table-light text-end fw-normal">
-              Target
-            </th>
-            <th className="table-light text-end fw-normal">
-              Var (KES)
-            </th>
+            <th className="table-light text-end fw-normal">Target</th>
+            <th className="table-light text-end fw-normal">Var (KES)</th>
             <th
               className="table-light text-end fw-normal"
               style={{ borderRight: "1px solid #cbd5e1" }}
@@ -345,14 +290,11 @@ const branchData = useMemo(() => {
       const row = { Branch: branch.branchName };
 
       MONTHS.forEach((month) => {
-        row[`${month.label} Sales (KES)`] =
-          branch[`${month.key}Sales`];
+        row[`${month.label} Sales (KES)`] = branch[`${month.key}Sales`];
 
-        row[`${month.label} Target (KES)`] =
-          branch[`${month.key}Target`];
+        row[`${month.label} Target (KES)`] = branch[`${month.key}Target`];
 
-        row[`${month.label} Variance (KES)`] =
-          branch[`${month.key}Variance`];
+        row[`${month.label} Variance (KES)`] = branch[`${month.key}Variance`];
 
         row[`${month.label} Achievement (%)`] =
           branch[`${month.key}Achievement`];
@@ -361,29 +303,21 @@ const branchData = useMemo(() => {
       return row;
     });
 
-    const today = new Date()
-      .toLocaleDateString("en-GB")
-      .replace(/\//g, "-");
+    const today = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
 
-    exportToExcel(
-      rows,
-      `Branch_Sales_Target_Performance_${today}`
-    );
+    exportToExcel(rows, `Branch_Sales_Target_Performance_${today}`);
   };
 
   return (
-    <Card
-      id="branch-target-performance-card"
-      className="card-height-100"
-    >
+    <Card id="branch-target-performance-card" className="card-height-100">
       <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
         <div>
           <h4 className="card-title mb-1">
             Branch Sales &amp; Target Performance
           </h4>
           <p className="text-muted mb-0">
-            
-            Compare monthly sales revenue against assigned targets across branches.
+            Compare monthly sales revenue against assigned targets across
+            branches.
           </p>
         </div>
 
@@ -407,7 +341,7 @@ const branchData = useMemo(() => {
           columns={columns}
           data={branchData}
           customHeader={customHeader}
-            searchInputWidth = "450px"
+          searchInputWidth="450px"
           isGlobalFilter={true}
           isColumnFilter={false}
           customPageSize={10}

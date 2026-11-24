@@ -11,7 +11,6 @@ import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import FilterActions from "../../../Components/Common/FilterActions";
 import Bands from "./Bands";
 import Drilldown from "./Drilldown";
-// import MarginSKU from "./MarginSKU";
 import useSalesAnalytics from "../../../Components/Hooks/useSalesAnalytics";
 import { getMarginAnalysis } from "../../../slices/dashboardSales/MarginAnalysis/thunk";
 import { clearMarginAnalysisData } from "../../../slices/dashboardSales/MarginAnalysis/reducer";
@@ -79,8 +78,6 @@ const {
   filters, // 31. filters
 );
 
-
-
 const handleMarginBandSelect = (band) => {
   setSelectedMarginBand(band);
 
@@ -109,7 +106,7 @@ const handleMarginBandSelect = (band) => {
     dispatch(
       getMarginAnalysis({
         ...params,
-        // MarginBand: "",
+          MarginBand: selectedMarginBand === "ALL" ? "" : selectedMarginBand,
         groupBy: "SKU",
       }),
     );
@@ -119,11 +116,7 @@ const handleMarginBandSelect = (band) => {
         ...params,
         groupBy: "BAND",
       }),
-    );
-
-
-
-   
+    );   
       dispatch(
         getMarginAnalysis({
           ...params,
@@ -181,18 +174,12 @@ const handleMarginBandSelect = (band) => {
   dispatch(
     getMarginAnalysis({
       ...params,
-        MarginBand: "",
+         MarginBand: selectedMarginBand === "ALL" ? "" : selectedMarginBand,
 
       groupBy: "SKU",
     }),
   );
 };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (marginAnalysisDrilldown || []).find(
-  //         (m) => Number(m.branch_id) === Number(filters.branch),
-  //       )?.branch_name || "Unknown Branch";
   document.title = "Margin Analysis | phAMACore Analytics";
 
   return (
@@ -210,10 +197,9 @@ const handleMarginBandSelect = (band) => {
   style={{
     position: "sticky",
     top: "70px",
-    zIndex: 1030,
+    zIndex: 100,
     width: "100%",
     marginTop: "-15px",
-    // backgroundColor: "#",
   }}
 >
     <div className="d-flex align-items-center flex-wrap gap-2">

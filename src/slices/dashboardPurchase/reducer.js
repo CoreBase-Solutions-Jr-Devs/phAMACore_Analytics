@@ -27,7 +27,7 @@ const initialState = {
   KPICategory: [],
   KPISupplier: [],
   KPIBranch: [],
-  KPIMonthly: [],
+  // KPIMonthly: [],
   KPIType: [],
 
   // Maverick Spend
@@ -371,9 +371,9 @@ const PurchaseOrdersSlice = createSlice({
             state.KPIBranch = result;
             break;
 
-          case "MONTHLY":
-            state.KPIMonthly = result;
-            break;
+          // case "MONTHLY":
+          //   state.KPIMonthly = result;
+          //   break;
 
           case "TYPE":
             state.KPIType = result;

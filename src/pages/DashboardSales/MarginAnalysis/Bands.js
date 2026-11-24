@@ -11,10 +11,6 @@ const Bands = ({
   marginBand25To30,
   marginBand30To45,
   marginBandAbove45,
-  // marginDrilldown25,
-  // marginDrilldown25To30,
-  // marginDrilldown30To45,
-  // marginDrilldownAbove45,
   selectedBranchName,
   loading,
   error,
@@ -27,15 +23,6 @@ const Bands = ({
   console.log("Margin Band 25-30:", marginBand25To30);
   console.log("Margin Band 30-45:", marginBand30To45);
   console.log("Margin Band Above 45:", marginBandAbove45);
-  // const selectedBranchName =
-  // salesBranch?.find(
-  //   (item) => item.branch_ID === Number(branch),
-  // )?.branch_Name || "All Branches";
-
-  // const [showDrilldown, setShowDrilldown] = useState(false);
-  // const [selectedBand, setSelectedBand] = useState("");
-  // const [selectedDrilldown, setSelectedDrilldown] = useState([]);
-
   const handleCardClick = (band, data) => {
     setSelectedBand(band);
     setSelectedDrilldown(data);
@@ -99,7 +86,6 @@ const Bands = ({
   };
   return (
     <React.Fragment>
-    
       {loading ? (
         <div className="text-center py-5">
           <div
@@ -123,16 +109,7 @@ const Bands = ({
                 <div>
                   <div className="d-flex justify-content-between align-items-center">
                     <p className="font-medium mb-0">{"<25%"}</p>
-
-                    {/* <span
-                    className="text-muted  "
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleCardClick("<25%", marginDrilldown25)}
-                  >
-                    <i className="ri-arrow-right-circle-line fs-3 text-secondary"></i>
-                  </span> */}
                   </div>
-
                   <h5 className="mt-2 ff-secondary fw-semibold text-secondary">
                     KES{" "}
                     {Number(marginBand25.sales_value_kes || 0).toLocaleString(
@@ -140,7 +117,6 @@ const Bands = ({
                     )}
                   </h5>
                 </div>
-
                 <p className="mb-0 text-muted mt-auto">
                   {Number(marginBand25.sales_share_perc ?? 0).toFixed(1)}% of
                   total sales
@@ -155,15 +131,6 @@ const Bands = ({
                 <div>
                   <div className="d-flex justify-content-between align-items-center">
                     <p className="font-medium mb-0">{"25% to 30%"}</p>
-                    {/* <span
-                    className="text-muted "
-                    style={{ cursor: "pointer" }}
-                    // onClick={() =>
-                    //   handleCardClick("<25% To <30%", marginDrilldown25To30)
-                    // }
-                  >
-                    <i className="ri-arrow-right-circle-line fs-3 text-warning"></i>
-                  </span> */}
                   </div>
                   <h5 className="mt-2 ff-secondary fw-semibold text-warning">
                     KES{" "}
@@ -186,15 +153,6 @@ const Bands = ({
                 <div>
                   <div className="d-flex justify-content-between align-items-center">
                     <p className="font-medium mb-0">{"30% to 45%"}</p>
-                    {/* <span
-                    className="text-muted "
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      handleCardClick("30% to 45%", marginDrilldown30To45)
-                    }
-                  >
-                    <i className="ri-arrow-right-circle-line fs-3 text-danger"></i>
-                  </span> */}
                   </div>
                   <h5 className="mt-2 ff-secondary fw-semibold text-danger">
                     KES{" "}
@@ -217,15 +175,6 @@ const Bands = ({
                 <div>
                   <div className="d-flex justify-content-between align-items-center">
                     <p className="font-medium mb-0">{">45%"}</p>
-                    {/* <span
-                    className="text-muted "
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      handleCardClick(">45%", marginDrilldownAbove45)
-                    }
-                  >
-                    <i className="ri-arrow-right-circle-line fs-3 text-success"></i>
-                  </span> */}
                   </div>
                   <h5 className="mt-2 ff-secondary fw-semibold text-success">
                     KES{" "}
@@ -244,14 +193,6 @@ const Bands = ({
           </Col>
         </Row>
       )}
-      {/* <Drilldown
-        show={showDrilldown}
-        onCloseClick={() => setShowDrilldown(false)}
-        data={selectedDrilldown}
-        marginBand={selectedBand}
-        loading={loading}
-        error={error}
-      /> */}
     </React.Fragment>
   );
 };

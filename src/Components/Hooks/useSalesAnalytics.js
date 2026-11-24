@@ -264,8 +264,7 @@ const useSalesAnalytics = (
     const data = salesComparativeMTD || [];
 
     return {
-      categories: data.map((item) => item.day_no),
-
+      categories: data.map((item) => `Day ${item.day_no}`),
       series: [
         {
           name: String(data[0]?.curr_date?.slice(0, 4) ?? ""),

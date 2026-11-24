@@ -19,13 +19,10 @@ import BranchTarget from "./BranchTarget";
 
 const PerformanceSummary = () => {
   const dispatch = useDispatch();
-
   const [rightColumn, setRightColumn] = useState(false);
-const [isSticky, setIsSticky] = useState(false);
-
+  const [isSticky, setIsSticky] = useState(false);
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
-const [selectedBranchName, setSelectedBranchName] =
-  useState("All Branches");
+  const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
   const {
     salesTargetSummary = [],
     salesTargetBranch = [],
@@ -81,38 +78,38 @@ const [selectedBranchName, setSelectedBranchName] =
     // targetVariance,
     // targetActionInsight,
   } = useSalesAnalytics(
-  [], // 1. sales
-  [], // 2. kpiOverdueAccounts
-  [], // 3. salesType
-  [], // 4. salesBranch
-  [], // 5. salesBranch_Type
-  [], // 6. salesChannel
-  [], // 7. salesComparativeYTD
-  [], // 8. salesComparativeMTD
-  [], // 9. salesMonthly
-  [], // 10. salesDaily
-   [], // 11. salesPeriodicBreakdown  <-- MISSING
-  [], // 12. salesSubgroup
-  [], // 13. monthlySales
-  [], // 14. monthToDateSales
-  [], // 14. lastYearMonthToDateSales
-  [], // 16. lastYearMonthlySales
-  [], // 17. marginAnalysisBand
-  [], // 18. marginAnalysisDrilldown
-  [], // 19. marginAnalysisSku
-  [], // 20. customerMemberAnalysisSummary
-  [], // 21. customerMemberAnalysisBranch
-  [], // 22. customerMemberAnalysisCohort
-  [], // 23. julySalesTarget
-  [], // 24. augustSalesTarget
-  [], // 25. septemberSalesTarget
-  [], // 26. octoberSalesTarget
-  [], // 27. salesTarget
-  salesTargetSummary,      
-  salesTargetBranch,        
-  salesTargetMONTHLY_PIVOT, 
-  filters,                 
-);
+    [], // 1. sales
+    [], // 2. kpiOverdueAccounts
+    [], // 3. salesType
+    [], // 4. salesBranch
+    [], // 5. salesBranch_Type
+    [], // 6. salesChannel
+    [], // 7. salesComparativeYTD
+    [], // 8. salesComparativeMTD
+    [], // 9. salesMonthly
+    [], // 10. salesDaily
+    [], // 11. salesPeriodicBreakdown  <-- MISSING
+    [], // 12. salesSubgroup
+    [], // 13. monthlySales
+    [], // 14. monthToDateSales
+    [], // 14. lastYearMonthToDateSales
+    [], // 16. lastYearMonthlySales
+    [], // 17. marginAnalysisBand
+    [], // 18. marginAnalysisDrilldown
+    [], // 19. marginAnalysisSku
+    [], // 20. customerMemberAnalysisSummary
+    [], // 21. customerMemberAnalysisBranch
+    [], // 22. customerMemberAnalysisCohort
+    [], // 23. julySalesTarget
+    [], // 24. augustSalesTarget
+    [], // 25. septemberSalesTarget
+    [], // 26. octoberSalesTarget
+    [], // 27. salesTarget
+    salesTargetSummary,
+    salesTargetBranch,
+    salesTargetMONTHLY_PIVOT,
+    filters,
+  );
 
   useEffect(() => {
     const dateRanges = getDateRanges();
@@ -120,14 +117,14 @@ const [selectedBranchName, setSelectedBranchName] =
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
-   
-      PivotMetric: 'ALL',
+
+      PivotMetric: "ALL",
     };
 
     dispatch(
       getSalesTarget({
         ...params,
-           branchcode: filters.branch,
+        branchcode: filters.branch,
         groupBy: "SUMMARY",
       }),
     );
@@ -135,17 +132,17 @@ const [selectedBranchName, setSelectedBranchName] =
     dispatch(
       getSalesTarget({
         ...params,
-           branchcode: filters.branch,
+        branchcode: filters.branch,
         groupBy: "BRANCH",
       }),
     );
-       dispatch(
+    dispatch(
       getSalesTarget({
         ...params,
-        
+
         groupBy: "MONTHLY",
-          startDate: dateRanges.currentYearStart,
-  endDate: dateRanges.today,
+        startDate: dateRanges.currentYearStart,
+        endDate: dateRanges.today,
       }),
     );
   }, [dispatch]);
@@ -160,26 +157,26 @@ const [selectedBranchName, setSelectedBranchName] =
     const handleScroll = () => {
       setIsSticky(window.scrollY > 50);
     };
-  
+
     window.addEventListener("scroll", handleScroll);
-  
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleApplyFilters = () => {
     const dateRanges = getDateRanges();
-   const params = {
+    const params = {
       clientid: 1,
       startDate: filters.startDate,
       endDate: filters.endDate,
 
-     PivotMetric: 'ALL',
+      PivotMetric: "ALL",
     };
 
     dispatch(
       getSalesTarget({
         ...params,
-              branchcode: filters.branch,
+        branchcode: filters.branch,
         groupBy: "SUMMARY",
       }),
     );
@@ -187,28 +184,21 @@ const [selectedBranchName, setSelectedBranchName] =
     dispatch(
       getSalesTarget({
         ...params,
-              branchcode: filters.branch,
+        branchcode: filters.branch,
         groupBy: "BRANCH",
       }),
     );
-       dispatch(
+    dispatch(
       getSalesTarget({
         ...params,
         groupBy: "MONTHLY",
-          startDate: dateRanges.currentYearStart,
-  endDate: dateRanges.today,
+        startDate: dateRanges.currentYearStart,
+        endDate: dateRanges.today,
       }),
     );
   };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (salesTargetBranch || []).find(
-  //         (m) => Number(m.branchID) === Number(filters.branch),
-  //       )?.branchName || "Unknown Branch";
 
   document.title = "Performance Summary| phAMACore Analytics";
-
   return (
     <div className="page-content">
       <Container fluid>
@@ -217,58 +207,56 @@ const [selectedBranchName, setSelectedBranchName] =
           pageTitle="Sales"
           subtitle={selectedBranchName}
         />
-<div
-  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
-  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
-}`}
-  style={{
-    position: "sticky",
-    top: "70px",
-    zIndex: 1030,
-    width: "100%",
-    marginTop: "-15px",
-    // backgroundColor: "#",
-  }}
->
-    <div className="d-flex align-items-center flex-wrap gap-2">
+        <div
+          className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+            isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+          }`}
+          style={{
+            position: "sticky",
+            top: "70px",
+            zIndex: 100,
+            width: "100%",
+            marginTop: "-15px",
+          }}
+        >
+          <div className="d-flex align-items-center flex-wrap gap-2">
+            <div className="d-flex align-items-center gap-1">
+              <span>Filtered From:</span>
+              <strong>{filters?.startDate || ""}</strong> to{" "}
+              <strong>{filters?.endDate || ""}</strong>
+            </div>
 
-  <div className="d-flex align-items-center gap-1">
-    <span>Filtered From:</span>
-    <strong>{filters?.startDate || ""}</strong> to{" "}
-<strong>{filters?.endDate || ""}</strong>
-  </div>
+            <div
+              style={{
+                borderLeft: "2px solid #ced4da",
+                height: "12px",
+                margin: "0 4px",
+              }}
+            />
 
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-
-  <div className="d-flex align-items-center gap-1">
-    <span>Selected Branch:</span>
-    <strong>{selectedBranchName}</strong>
-  </div>
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-  <div className="d-flex align-items-center gap-1 no-print">
-    <button
-      type="button"
-      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-      onClick={toggleRightColumn}
-    >
-      <i className="ri-filter-fill"></i>
-      Filter
-    </button>
-  </div>
-  </div>
-</div> 
+            <div className="d-flex align-items-center gap-1">
+              <span>Selected Branch:</span>
+              <strong>{selectedBranchName}</strong>
+            </div>
+            <div
+              style={{
+                borderLeft: "2px solid #ced4da",
+                height: "12px",
+                margin: "0 4px",
+              }}
+            />
+            <div className="d-flex align-items-center gap-1 no-print">
+              <button
+                type="button"
+                className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                onClick={toggleRightColumn}
+              >
+                <i className="ri-filter-fill"></i>
+                Filter
+              </button>
+            </div>
+          </div>
+        </div>
         <Row>
           <Col xl={12}>
             <Performance
@@ -279,17 +267,14 @@ const [selectedBranchName, setSelectedBranchName] =
               rightClickBtn={toggleRightColumn}
             />
           </Col>
-         
         </Row>
         <Row>
           <Col xl={12}>
-          
-          <BranchTarget 
-          data = {performanceSummaryMONTHLY}/>
-             loading={loading}
-              error={error}
+            <BranchTarget data={performanceSummaryMONTHLY} />
+            loading={loading}
+            error={error}
           </Col>
-           <FilterActions
+          <FilterActions
             branch={filters.branch}
             dateRange={filters.dateRange}
             startDate={filters.startDate}
@@ -297,8 +282,7 @@ const [selectedBranchName, setSelectedBranchName] =
             onBranchChange={(value) =>
               dispatch(setBranch(value === "" ? null : Number(value)))
             }
-                        onBranchNameChange={setSelectedBranchName}
-
+            onBranchNameChange={setSelectedBranchName}
             onDateRangeChange={(value) => dispatch(setDateRange(value))}
             onStartDateChange={(value) => dispatch(setStartDate(value))}
             onEndDateChange={(value) => dispatch(setEndDate(value))}

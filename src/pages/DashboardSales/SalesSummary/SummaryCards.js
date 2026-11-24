@@ -15,7 +15,6 @@ const SummaryCards = ({
   averageBasket,
   bestMonthName,
   bestMonthSales,
-
   selectedBranchName,
   error,
   loading,
@@ -106,7 +105,6 @@ const SummaryCards = ({
             className="g-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6"
             id="sales-summary-widgets"
           >
-            {/* 1. Total Sales */}
             <Col className="d-flex">
               <Card className="card-animate w-100 h-80">
                 <CardBody className="p-2 d-flex flex-column">
@@ -119,8 +117,7 @@ Tax Inclusive                  </p>
                 </CardBody>
               </Card>
             </Col>
-
-            {/* 2. Net Sales */}
+         
             <Col className="d-flex">
               <Card className="card-animate w-100 h-80">
                 <CardBody className="p-2 d-flex flex-column">
@@ -129,14 +126,13 @@ Tax Inclusive                  </p>
                     KES {Number(netSales || 0).toLocaleString("en-KE")}
                   </h5>
                   <p className="mb-0 text-muted mt-auto">
-                    After VAT of KES{" "}
+                    Tax:{" "}
                     {Number(totalTax || 0).toLocaleString("en-KE")}
                   </p>
                 </CardBody>
               </Card>
             </Col>
 
-            {/* 3. Clients Served */}
             <Col className="d-flex">
               <Card className="card-animate w-100 h-80">
                 <CardBody className="p-2 d-flex flex-column">
@@ -149,7 +145,6 @@ Tax Inclusive                  </p>
               </Card>
             </Col>
 
-            {/* 4. Average Margin */}
             <Col className="d-flex">
               <Card className="card-animate w-100 h-80">
                 <CardBody className="p-2 d-flex flex-column">
@@ -162,7 +157,6 @@ Tax Inclusive                  </p>
               </Card>
             </Col>
 
-            {/* 5. Average Basket */}
             <Col className="d-flex">
               <Card className="card-animate w-100 h-80">
                 <CardBody className="p-2 d-flex flex-column">
@@ -179,13 +173,9 @@ Tax Inclusive                  </p>
               </Card>
             </Col>
 
-            {/* 6. Best Month */}
             <Col className="d-flex">
               <Card className="card-animate w-100 h-80">
-                <CardBody className="p-2 d-flex flex-column">
-                    <div>
-
-                    </div>
+                <CardBody className="p-2 d-flex flex-column">               
                   <p className="text-medium mb-0">Best Month</p>
                   <h5 className="mt-2 ff-secondary fw-semibold text-success">
                     {bestMonthName}

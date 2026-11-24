@@ -36,7 +36,7 @@ const DashboardSales = () => {
   const { branchId } = useParams();
 
   const [rightColumn, setRightColumn] = useState(false);
-const [isSticky, setIsSticky] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
 
@@ -63,83 +63,69 @@ const [isSticky, setIsSticky] = useState(false);
     loading,
   } = useSelector((state) => state.powerbi);
 
-  // const branchCode = branchId ?? null;
-  // const isBranchView = !!branchCode;
-
-const {
-  formatAmount,
-  totalRevenue,
-  revenueChange,
-  lastYearRevenue,
-  cashSales,
-  salesInvoices,
-  cashInvoicesPercentage,
-  salesInvoicesPercentage,
-  cashSalesPercentage,
-  creditNotesPercentage,
-  cashInvoices,
-  ordersReceived,
-  branchData,
-  branchChartSeries,
-  branchCategories,
-  currentReceivables,
-  overdue31To60,
-  overdue61To90,
-  overdue91To120,
-  overdue120Plus,
-  topDebtors,
-  creditNotes,
-  overdueDebtorsCount,
-  bottomProducts,
-  salesmanData,
-  customerData,
-  topProducts,
-  monthlyChart,
-  monthToDateChart,
-} = useSalesAnalytics(
-  sales,                    // 1. sales
-  kpiOverdueAccounts,       // 2. kpiOverdueAccounts
-  salesType,                // 3. salesType
-  salesBranch,              // 4. salesBranch
-  salesBranch_Type,         // 5. salesBranch_Type
-  [],                       // 6. salesChannel
-  salesComparativeYTD,      // 7. salesComparativeYTD
-  salesComparativeMTD,      // 8. salesComparativeMTD
-  [],                       // 9. salesMonthly
-  [],                       // 10. salesDaily
-  [],                       // 11. salesPeriodicBreakdown
-  [],                       // 12. salesSubgroup
-  [],                       // 13. monthlySales
-  [],                       // 14. monthToDateSales
-  [],                       // 15. lastYearMonthToDateSales
-  [],                       // 16. lastYearMonthlySales
-  [],                       // 17. marginAnalysisBand
-  [],                       // 18. marginAnalysisDrilldown
-  [],                       // 19. marginAnalysisSku
-  [],                       // 20. customerMemberAnalysisSummary
-  [],                       // 21. customerMemberAnalysisBranch
-  [],                       // 22. customerMemberAnalysisCohort
-  [],                       // 23. julySalesTarget
-  [],                       // 24. augustSalesTarget
-  [],                       // 25. septemberSalesTarget
-  [],                       // 26. octoberSalesTarget
-  [],                       // 27. salesTarget
-  [],                       // 28. salesTargetSummary
-  [],                       // 29. salesTargetBranch
-  [],                       // 30. salesTargetMONTHLY_PIVOT
-  filters                   // 31. filters
-);
-
-  // const {
-  //   currentYearStart,
-  //   currentMonthStart,
-  //   today,
-  //   lastYearStart,
-  //   lastYearMonthStart,
-  //   lastYearToday,
-  // } = getDateRanges();
-
-  // const dates = getDateRanges();
+  const {
+    formatAmount,
+    totalRevenue,
+    revenueChange,
+    lastYearRevenue,
+    cashSales,
+    salesInvoices,
+    cashInvoicesPercentage,
+    salesInvoicesPercentage,
+    cashSalesPercentage,
+    creditNotesPercentage,
+    cashInvoices,
+    ordersReceived,
+    branchData,
+    branchChartSeries,
+    branchCategories,
+    currentReceivables,
+    overdue31To60,
+    overdue61To90,
+    overdue91To120,
+    overdue120Plus,
+    topDebtors,
+    creditNotes,
+    overdueDebtorsCount,
+    bottomProducts,
+    salesmanData,
+    customerData,
+    topProducts,
+    monthlyChart,
+    monthToDateChart,
+  } = useSalesAnalytics(
+    sales, // 1. sales
+    kpiOverdueAccounts, // 2. kpiOverdueAccounts
+    salesType, // 3. salesType
+    salesBranch, // 4. salesBranch
+    salesBranch_Type, // 5. salesBranch_Type
+    [], // 6. salesChannel
+    salesComparativeYTD, // 7. salesComparativeYTD
+    salesComparativeMTD, // 8. salesComparativeMTD
+    [], // 9. salesMonthly
+    [], // 10. salesDaily
+    [], // 11. salesPeriodicBreakdown
+    [], // 12. salesSubgroup
+    [], // 13. monthlySales
+    [], // 14. monthToDateSales
+    [], // 15. lastYearMonthToDateSales
+    [], // 16. lastYearMonthlySales
+    [], // 17. marginAnalysisBand
+    [], // 18. marginAnalysisDrilldown
+    [], // 19. marginAnalysisSku
+    [], // 20. customerMemberAnalysisSummary
+    [], // 21. customerMemberAnalysisBranch
+    [], // 22. customerMemberAnalysisCohort
+    [], // 23. julySalesTarget
+    [], // 24. augustSalesTarget
+    [], // 25. septemberSalesTarget
+    [], // 26. octoberSalesTarget
+    [], // 27. salesTarget
+    [], // 28. salesTargetSummary
+    [], // 29. salesTargetBranch
+    [], // 30. salesTargetMONTHLY_PIVOT
+    filters, // 31. filters
+  );
 
   useEffect(() => {
     dispatch(
@@ -150,42 +136,6 @@ const {
         branchcode: filters.branch,
       }),
     );
-
-    // dispatch(
-    //   getLastYearMonthlySales({
-    //     clientid: 1,
-    //     startDate: dates.lastYearStart,
-    //     endDate: dates.lastYearToday,
-    //     branchcode: branchId,
-    //   }),
-    // );
-
-    // dispatch(
-    //   getMonthlySales({
-    //     clientid: 1,
-    //     startDate: dates.currentYearStart,
-    //     endDate: dates.today,
-    //     branchcode: branchId,
-    //   }),
-    // );
-
-    // dispatch(
-    //   getMonthToDateSales({
-    //     clientid: 1,
-    //     startDate: dates.currentMonthStart,
-    //     endDate: dates.today,
-    //     branchcode: branchId,
-    //   }),
-    // );
-
-    // dispatch(
-    //   getLastYearMonthToDateSales({
-    //     clientid: 1,
-    //     startDate: dates.lastYearMonthStart,
-    //     endDate: dates.lastYearToday,
-    //     branchcode: branchId,
-    //   }),
-    // );
 
     const params = {
       clientid: 1,
@@ -229,8 +179,6 @@ const {
       }),
     );
 
-  
-
     dispatch(
       getKPIOverdueAccounts({
         clientid: 1,
@@ -252,16 +200,15 @@ const {
     };
   }, [dispatch]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 50);
+    };
 
- useEffect(() => {
-   const handleScroll = () => {
-     setIsSticky(window.scrollY > 50);
-   };
- 
-   window.addEventListener("scroll", handleScroll);
- 
-   return () => window.removeEventListener("scroll", handleScroll);
- }, []);
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleApplyFilters = () => {
     dispatch(
@@ -329,12 +276,6 @@ const {
       }),
     );
   };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (salesBranch || []).find(
-  //         (m) => Number(m.branch_id) === Number(filters.branch),
-  //       )?.branch_name || "";
 
   document.title = "Sales Dashboard | phAMACore Analytics";
 
@@ -346,80 +287,81 @@ const {
           pageTitle="Dashboard"
           subtitle={selectedBranchName}
         />
-<div
-  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
-  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
-}`}
-  style={{
-    position: "sticky",
-    top: "70px",
-    zIndex: 1030,
-    width: "100%",
-    marginTop: "-15px",
-    // backgroundColor: "#",
-  }}
->
-    <div className="d-flex align-items-center flex-wrap gap-2">
+        <div
+          className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+            isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+          }`}
+          style={{
+            position: "sticky",
+            top: "70px",
+            zIndex: 100,
+            width: "100%",
+            marginTop: "-15px",
+            // backgroundColor: "#",
+          }}
+        >
+          <div className="d-flex align-items-center flex-wrap gap-2">
+            <div className="d-flex align-items-center gap-1">
+              <span>Filtered From:</span>
+              <strong>{filters?.startDate || ""}</strong> to{" "}
+              <strong>{filters?.endDate || ""}</strong>
+            </div>
 
-  <div className="d-flex align-items-center gap-1">
-    <span>Filtered From:</span>
-    <strong>{filters?.startDate || ""}</strong> to{" "}
-<strong>{filters?.endDate || ""}</strong>
-  </div>
+            <div
+              style={{
+                borderLeft: "2px solid #ced4da",
+                height: "12px",
+                margin: "0 4px",
+              }}
+            />
 
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-
-  <div className="d-flex align-items-center gap-1">
-    <span>Selected Branch:</span>
-    <strong>{selectedBranchName}</strong>
-  </div>
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-  <div className="d-flex align-items-center gap-1 no-print">
-    <button
-      type="button"
-      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-      onClick={toggleRightColumn}
-    >
-      <i className="ri-filter-fill"></i>
-      Filter
-    </button>
-  </div>
-  </div>
-</div> 
+            <div className="d-flex align-items-center gap-1">
+              <span>Selected Branch:</span>
+              <strong>{selectedBranchName}</strong>
+            </div>
+            <div
+              style={{
+                borderLeft: "2px solid #ced4da",
+                height: "12px",
+                margin: "0 4px",
+              }}
+            />
+            <div className="d-flex align-items-center gap-1 no-print">
+              <button
+                type="button"
+                className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                onClick={toggleRightColumn}
+              >
+                <i className="ri-filter-fill"></i>
+                Filter
+              </button>
+            </div>
+          </div>
+        </div>
         <Row>
-          <Widget
-            kpisales={kpiSales}
-            totalRevenue={totalRevenue}
-            cashSales={cashSales}
-            salesInvoices={salesInvoices}
-            ordersReceived={ordersReceived}
-            formatAmount={formatAmount}
-            cashInvoicesPercentage={cashInvoicesPercentage}
-            salesInvoicesPercentage={salesInvoicesPercentage}
-            cashSalesPercentage={cashSalesPercentage}
-            overdueDebtorsCount={overdueDebtorsCount}
-            creditNotesPercentage={creditNotesPercentage}
-            creditNotes={creditNotes}
-            // revenueChange={revenueChange}
-            cashInvoices={cashInvoices}
-            // branchMap={branchMap}
-            selectedBranchName={selectedBranchName}
-            rightClickBtn={toggleRightColumn}
-            loading={loading}
-            error={error}
-          />
+          <Col xl={12}>
+            <Widget
+              kpisales={kpiSales}
+              totalRevenue={totalRevenue}
+              cashSales={cashSales}
+              salesInvoices={salesInvoices}
+              ordersReceived={ordersReceived}
+              formatAmount={formatAmount}
+              cashInvoicesPercentage={cashInvoicesPercentage}
+              salesInvoicesPercentage={salesInvoicesPercentage}
+              cashSalesPercentage={cashSalesPercentage}
+              overdueDebtorsCount={overdueDebtorsCount}
+              creditNotesPercentage={creditNotesPercentage}
+              creditNotes={creditNotes}
+              // revenueChange={revenueChange}
+              cashInvoices={cashInvoices}
+              // branchMap={branchMap}
+              selectedBranchName={selectedBranchName}
+              rightClickBtn={toggleRightColumn}
+              loading={loading}
+              error={error}
+            />
+          </Col>
         </Row>
 
         <Row>
@@ -435,34 +377,8 @@ const {
             />
           </Col>
         </Row>
-        {/* <Row>
-          <Col>
-            <ReceivablesAgeing
-              kpiOverdueAccounts={kpiOverdueAccounts}
-              currentReceivables={currentReceivables}
-              // overdue1To30={overdue1To30}
-              overdue31To60={overdue31To60}
-              overdue61To90={overdue61To90}
-              overdue91To120={overdue91To120}
-              overdue120Plus={overdue120Plus}
-              topDebtors={topDebtors}
-              formatAmount={formatAmount}
-              error={error}
-              loading={loading}
-            />
-          </Col>
-        </Row> */}
 
         <Row>
-          {/* <Col xl={6}>
-            <SalesmanRevenue
-              sales={sales}
-              data={salesmanData}
-              formatAmount={formatAmount}
-              error={error}
-              loading={loading}
-            />
-          </Col> */}
           <Col xl={12}>
             <SalesRevenueAnalysis
               sales={sales}
@@ -474,7 +390,7 @@ const {
             />
           </Col>
         </Row>
-       
+
         <Row>
           <Col xl={6}>
             <MonthToDateSales

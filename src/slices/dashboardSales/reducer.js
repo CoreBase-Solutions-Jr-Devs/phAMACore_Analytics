@@ -40,7 +40,6 @@ const initialState = {
   dateRange: "Month To Yesterday",
   startDate: formatDMY(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
   endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
-
   },
 };
 
@@ -72,16 +71,6 @@ const powerBISlice = createSlice({
           state.filters.endDate = formatDMY(y);
           break;
         }
-
-        // case "Last 7 Days": {
-        //   const end = new Date();
-        //   const start = new Date();
-        //   start.setDate(end.getDate() - 7);
-
-        //   state.filters.startDate = formatDMY(start);
-        //   state.filters.endDate = formatDMY(end);
-        //   break;
-        // }
 
         case "This Week": {
           const today = new Date();
@@ -236,10 +225,6 @@ const powerBISlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // ------------------------------------------
-      // SALES TRANSACTIONS
-      // ------------------------------------------
-
       .addCase(getSalesTransactions.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -263,10 +248,6 @@ const powerBISlice = createSlice({
           "Error loading sales transactions";
       })
 
-      // ------------------------------------------
-      // KPI SALES TRANSACTIONS
-      // ------------------------------------------
-
       .addCase(getKPISalesTransactions.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -278,8 +259,6 @@ const powerBISlice = createSlice({
 
         const groupBy = action.meta.arg?.groupBy;
         const result = action.payload?.result || action.payload || [];
-
-        // Store the latest KPI sales result
 
         switch (groupBy) {
           case "TYPE":
@@ -310,10 +289,6 @@ const powerBISlice = createSlice({
             state.salesDaily = result;
             break;
 
-            //  case "PERIODIC_BREAKDOWN":
-            // state.salesPeriodicBreakdown = result;
-            // break;
-
           default:
             break;
         }
@@ -327,10 +302,6 @@ const powerBISlice = createSlice({
           action.error.message ||
           "Error loading KPI sales transactions";
       })
-
-      // ------------------------------------------
-      // MONTHLY SALES
-      // ------------------------------------------
 
       .addCase(getMonthlySales.pending, (state) => {
         state.loading = true;
@@ -352,10 +323,6 @@ const powerBISlice = createSlice({
           action.error.message ||
           "Error loading monthly sales";
       })
-
-      // ------------------------------------------
-      // LAST YEAR MONTHLY SALES
-      // ------------------------------------------
 
       .addCase(getLastYearMonthlySales.pending, (state) => {
         state.loading = true;
@@ -379,10 +346,6 @@ const powerBISlice = createSlice({
           "Error loading last year monthly sales";
       })
 
-      // ------------------------------------------
-      // MONTH TO DATE SALES
-      // ------------------------------------------
-
       .addCase(getMonthToDateSales.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -403,10 +366,6 @@ const powerBISlice = createSlice({
           action.error.message ||
           "Error loading month-to-date sales";
       })
-
-      // ------------------------------------------
-      // LAST YEAR MONTH TO DATE SALES
-      // ------------------------------------------
 
       .addCase(getLastYearMonthToDateSales.pending, (state) => {
         state.loading = true;
@@ -429,10 +388,6 @@ const powerBISlice = createSlice({
           action.error.message ||
           "Error loading last year month-to-date sales";
       })
-
-      // ------------------------------------------
-      // KPI OVERDUE ACCOUNTS
-      // ------------------------------------------
 
       .addCase(getKPIOverdueAccounts.pending, (state) => {
         state.loading = true;

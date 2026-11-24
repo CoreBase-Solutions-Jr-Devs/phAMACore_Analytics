@@ -1,4 +1,3 @@
-
 import React, { useMemo } from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -19,20 +18,20 @@ const TopCustomers = ({ data = [], loading, error }) => {
               {row.original.client_Name || "Unknown Customer"}
             </div>
             <small className="text-muted">
-               {row.original.client_ID || "N/A"}
+              {row.original.client_ID || "N/A"}
             </small>
           </div>
         ),
       }),
-      
-columnHelper.accessor("item_Name", {
-  header: "Item",
-  cell: (info) => (
-    <span className="fw-medium text-dark ">
-      {info.getValue() || "N/A"}
-    </span>
-  ),
-}),
+
+      columnHelper.accessor("item_Name", {
+        header: "Item",
+        cell: (info) => (
+          <span className="fw-medium text-dark ">
+            {info.getValue() || "N/A"}
+          </span>
+        ),
+      }),
 
       columnHelper.accessor("brancch_Name", {
         header: "Branch",
@@ -43,7 +42,6 @@ columnHelper.accessor("item_Name", {
         ),
       }),
 
-    
       columnHelper.accessor("totalSalesExcl", {
         header: "SalesExcl.",
         cell: (info) => (
@@ -77,15 +75,6 @@ columnHelper.accessor("item_Name", {
         ),
       }),
 
-      // columnHelper.accessor("transaction_IDs", {
-      //   header: "TransID",
-      //   cell: (info) => (
-      //     <span className="text-muted small">
-      //       {info.getValue() || "N/A"}
-      //     </span>
-      //   ),
-      // }),
-
       columnHelper.accessor("invoice_Number", {
         header: "InvNum",
       }),
@@ -115,66 +104,60 @@ columnHelper.accessor("item_Name", {
       "Invoice Date": item.invoice_Date || "",
     }));
 
-    const todayStr = new Date()
-      .toLocaleDateString("en-GB")
-      .replace(/\//g, "-");
+    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
 
     exportToExcel(rows, `Customer_Revenue_${todayStr}`);
   };
 
-return (
-  <Card className="card-height-100" id="sales-top-customers-card">
-    <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
-      <h4 className="card-title mb-0 flex-grow-1">
-Sales by Customer
-      </h4>
+  return (
+    <Card className="card-height-100" id="sales-top-customers-card">
+      <CardHeader className="align-items-center d-flex justify-content-between flex-wrap gap-2">
+        <h4 className="card-title mb-0 flex-grow-1">Sales by Customer</h4>
 
-      <CardExportButtons
-        targetId="sales-top-customers-card"
-        title="Customer Sales Details"
-        onExport={handleExportExcel}
-      />
-    </CardHeader>
-
-    <CardBody>
-      {loading ? (
-        <div className="text-center py-5">
-          <div
-            className="spinner-border text-primary mb-3"
-            role="status"
-          ></div>
-        </div>
-      ) : error ? (
-        <div className="text-center py-5">
-          <h6 className="text-danger mb-2">{error}</h6>
-        </div>
-      ) : data.length === 0 ? (
-        <div className="text-center py-5">
-          <p className="text-muted mb-2">
-            No Customer Sales Details data available
-          </p>
-        </div>
-      ) : (
-        <TanstackTable
-          columns={columns}
-          data={data}
-          loading={loading}
-          error={error}
-           
-
-          searchInputWidth="450px"
-          isGlobalFilter={true}
-          isColumnFilter={false}
-          customPageSize={10}
-          showPagination={true}
-          showPageSize={true}
-          SearchPlaceholder="Search customer..."
-          emptyMessage="No customer revenue data available"
+        <CardExportButtons
+          targetId="sales-top-customers-card"
+          title="Customer Sales Details"
+          onExport={handleExportExcel}
         />
-      )}
-    </CardBody>
-  </Card>
-);
+      </CardHeader>
+
+      <CardBody>
+        {loading ? (
+          <div className="text-center py-5">
+            <div
+              className="spinner-border text-primary mb-3"
+              role="status"
+            ></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-5">
+            <h6 className="text-danger mb-2">{error}</h6>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="text-center py-5">
+            <p className="text-muted mb-2">
+              No Customer Sales Details data available
+            </p>
+          </div>
+        ) : (
+          <TanstackTable
+            columns={columns}
+            data={data}
+            loading={loading}
+            error={error}
+            searchInputWidth="450px"
+            isGlobalFilter={true}
+            isColumnFilter={false}
+            customPageSize={10}
+            showPagination={true}
+            showPageSize={true}
+            SearchPlaceholder="Search customer..."
+            emptyMessage="No customer revenue data available"
+          />
+        )}
+      </CardBody>
+    </Card>
+  );
 };
 
 export default TopCustomers;

@@ -112,7 +112,7 @@ const handlePrint = () => {
   </div>
 ) : (
         <Row
-          className="g-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 row-cols-lg-5"
+          className="g-2 mb-0 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 row-cols-lg-5"
           id="margin-band-widgets"
         >
           <Col className="d-flex">

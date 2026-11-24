@@ -70,7 +70,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-medium">{formatAmount(getValue())}</span>
+      <span className="fw-medium text-danger">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -79,7 +79,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="text-info fw-medium">{formatAmount(getValue())}</span>
+      <span className="text-success fw-medium">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -88,7 +88,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-medium">{formatAmount(getValue())}</span>
+      <span className="fw-medium text-secondary">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -117,7 +117,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-semibold text-success">{formatAmount(getValue())}</span>
+      <span className="fw-medium text-success">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -126,7 +126,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-semibold text-secondary">{formatAmount(getValue())}</span>
+      <span className="fw-medium">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -135,7 +135,7 @@ const columns = [
     enableSorting: true,
     sortingFn: numericSort,
     cell: ({ getValue }) => (
-      <span className="fw-semibold text-danger">{formatAmount(getValue())}</span>
+      <span className="fw-medium text-danger">{formatAmount(getValue())}</span>
     ),
   },
   {
@@ -173,15 +173,10 @@ const columns = [
 
 const SummaryTable = ({
   salesPeriodicBreakdownData = [],
-
   loading,
   error,
 }) => {
-  //   const data = Array.isArray(salesPeriodicBreakdownData)
-  //     ? salesPeriodicBreakdownData
-  //     : [];
   const handleExportExcel = () => {
-    // Export all records supplied to the component.
     const rows = (salesPeriodicBreakdownData ?? []).map((original) => ({
       Period: original.period ?? "—",
       "Cash Sales": Number(original.cash_sales_incl ?? 0),
@@ -211,8 +206,8 @@ const SummaryTable = ({
           <div>
             <h5 className="card-title mb-1">Sales Breakdown by Period</h5>
             <p className="text-muted mb-0">
-              Year to date, monthly and weekly sales by payment type, with VAT,
-              net sales, clients served, margin and average basket.{" "}
+              Year to date, monthly and weekly sales by payment type, 
+              clients served and average basket.{" "}
             </p>
           </div>
           <div className="d-flex align-items-center gap-2 flex-wrap">

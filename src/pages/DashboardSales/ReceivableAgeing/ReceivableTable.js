@@ -70,11 +70,10 @@ const ReceivablesTabs = [
   },
 ];
 
-  const formatAmount = (value) => Number(value ?? 0).toLocaleString("en-KE");
+const formatAmount = (value) => Number(value ?? 0).toLocaleString("en-KE");
 
-  const formatDate = (value) =>
-    value ? new Date(value).toLocaleDateString("en-GB") : "-";
-
+const formatDate = (value) =>
+  value ? new Date(value).toLocaleDateString("en-GB") : "-";
 
 const getCustomerRisk = (customer) => {
   if (customer.over_120 != null) {
@@ -118,8 +117,6 @@ const getCustomerRisk = (customer) => {
   };
 };
 
-
-// Clickable Action Insight cell
 const InsightCell = ({ insight, id, children }) => {
   return (
     <>
@@ -146,92 +143,54 @@ const ReceivablesAgeingTable = ({
 }) => {
   const [activeTab, setActiveTab] = useState("ALL");
 
-  // Filter customers based on selected ageing range
-const filteredData = useMemo(() => {
-  if (activeTab === "ALL") return data;
+  const filteredData = useMemo(() => {
+    if (activeTab === "ALL") return data;
 
-  const selectedTab = ReceivablesTabs.find(
-    (tab) => tab.value === activeTab
-  );
+    const selectedTab = ReceivablesTabs.find((tab) => tab.value === activeTab);
 
-  if (!selectedTab?.field) return data;
+    if (!selectedTab?.field) return data;
 
-  return data.filter(
-    (item) => Number(item[selectedTab.field] ?? 0) !== 0
-  );
-}, [data, activeTab]);
+    return data.filter((item) => Number(item[selectedTab.field] ?? 0) !== 0);
+  }, [data, activeTab]);
 
-  // Customer counts for each tab
-const tabCounts = useMemo(() => {
-  const counts = { ALL: data.length };
+  const tabCounts = useMemo(() => {
+    const counts = { ALL: data.length };
 
-  ReceivablesTabs.forEach((tab) => {
-    if (tab.field) {
-      counts[tab.value] = data.filter(
-        (item) => Number(item[tab.field] ?? 0) !== 0
-      ).length;
-    }
-  });
+    ReceivablesTabs.forEach((tab) => {
+      if (tab.field) {
+        counts[tab.value] = data.filter(
+          (item) => Number(item[tab.field] ?? 0) !== 0,
+        ).length;
+      }
+    });
 
-  console.table(counts);
+    console.table(counts);
 
-  return counts;
-}, [data]);
-
-// const filteredData = useMemo(() => {
-//   console.log("=== RECEIVABLES AGEING DEBUG ===");
-//   console.log("Active Tab:", activeTab);
-
-//   if (activeTab === "ALL") {
-//     console.log("Showing ALL customers:", data.length);
-//     return data;
-//   }
-
-//   const selectedTab = ReceivablesTabs.find(
-//     (tab) => tab.value === activeTab
-//   );
-
-//   console.log("Selected Tab:", selectedTab);
-//   console.log("Selected Ageing Field:", selectedTab?.field);
-
-//   if (!selectedTab?.field) return data;
-
-//   const filtered = data.filter(
-//     (item) =>
-//       item[selectedTab.field] !== null &&
-//       item[selectedTab.field] !== undefined
-//   );
-
-//   console.log("Filtered Customers:", filtered);
-//   console.log("Filtered Customer Count:", filtered.length);
-
-//   return filtered;
-// }, [data, activeTab]);
+    return counts;
+  }, [data]);
 
   const columns = useMemo(
     () => [
-   columnHelper.accessor(
-  (row) => `${row.cusname ?? ""} ${row.cuscode ?? ""}`,
-  {
-    id: "customer",
-    header: "Customer",
-    cell: ({ row }) => (
-      <InsightCell
-        id={`insight-customer-${row.index}`}
-        insight={row.original.action_insight}
-      >
-        <div style={{ minWidth: "170px" }}>
-          <div className="fw-semibold">
-            {row.original.cusname || "-"}
-          </div>
-          <small className="text-muted">
-            {row.original.cuscode || "-"}
-          </small>
-        </div>
-      </InsightCell>
-    ),
-  }
-),
+      columnHelper.accessor(
+        (row) => `${row.cusname ?? ""} ${row.cuscode ?? ""}`,
+        {
+          id: "customer",
+          header: "Customer",
+          cell: ({ row }) => (
+            <InsightCell
+              id={`insight-customer-${row.index}`}
+              insight={row.original.action_insight}
+            >
+              <div style={{ minWidth: "170px" }}>
+                <div className="fw-semibold">{row.original.cusname || "-"}</div>
+                <small className="text-muted">
+                  {row.original.cuscode || "-"}
+                </small>
+              </div>
+            </InsightCell>
+          ),
+        },
+      ),
 
       columnHelper.accessor("account_type", {
         header: "AccType",
@@ -245,19 +204,19 @@ const tabCounts = useMemo(() => {
         ),
       }),
 
-    columnHelper.accessor("total_balance", {
-  header: "TotalBal(KES)",
-  cell: (info) => (
-    <InsightCell
-      id={`insight-balance-${info.row.index}`}
-      insight={info.row.original.action_insight}
-    >
-      <span className="fw-bold text-caramel">
-        {formatAmount(info.getValue())}
-      </span>
-    </InsightCell>
-  ),
-}),
+      columnHelper.accessor("total_balance", {
+        header: "TotalBal(KES)",
+        cell: (info) => (
+          <InsightCell
+            id={`insight-balance-${info.row.index}`}
+            insight={info.row.original.action_insight}
+          >
+            <span className="fw-bold text-caramel">
+              {formatAmount(info.getValue())}
+            </span>
+          </InsightCell>
+        ),
+      }),
 
       columnHelper.accessor("last_invoice_date", {
         header: "LastInvDate",
@@ -280,9 +239,7 @@ const tabCounts = useMemo(() => {
             id={`insight-payment-${info.row.index}`}
             insight={info.row.original.action_insight}
           >
-            <span className="text-muted small">
-              {"_"}
-            </span>
+            <span className="text-muted small">{"_"}</span>
           </InsightCell>
         ),
       }),
@@ -294,7 +251,7 @@ const tabCounts = useMemo(() => {
           const risk = getCustomerRisk(row.original);
 
           return (
-            <Badge className={risk.className}  pill>
+            <Badge className={risk.className} pill>
               {"_"}
             </Badge>
           );
@@ -304,33 +261,26 @@ const tabCounts = useMemo(() => {
     [],
   );
 
-const handleExportExcel = () => {
-  const exportData = filteredData.map((item) => ({
-    "Customer Name": item.cusname || "-",
-    "Customer Code": item.cuscode || "-",
-    "Account Type": item.account_type || "-",
-    "Total Balance (KES)": Number(item.total_balance || 0),
-    "Last Invoice Date": formatDate(item.last_invoice_date),
-    "Last Payment Date": formatDate(item.last_payment_date),
-    "Action Insight": item.action_insight || "-",
-    Risk: getCustomerRisk(item).label,
-  }));
+  const handleExportExcel = () => {
+    const exportData = filteredData.map((item) => ({
+      "Customer Name": item.cusname || "-",
+      "Customer Code": item.cuscode || "-",
+      "Account Type": item.account_type || "-",
+      "Total Balance (KES)": Number(item.total_balance || 0),
+      "Last Invoice Date": formatDate(item.last_invoice_date),
+      "Last Payment Date": formatDate(item.last_payment_date),
+      "Action Insight": item.action_insight || "-",
+      Risk: getCustomerRisk(item).label,
+    }));
 
-  const today = new Date()
-    .toLocaleDateString("en-GB")
-    .replace(/\//g, "-");
+    const today = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
 
-  const selectedTab = ReceivablesTabs.find(
-    (tab) => tab.value === activeTab
-  );
+    const selectedTab = ReceivablesTabs.find((tab) => tab.value === activeTab);
 
-  const safeTabName = selectedTab.label.replace(/[^a-zA-Z0-9]+/g, "_");
+    const safeTabName = selectedTab.label.replace(/[^a-zA-Z0-9]+/g, "_");
 
-  exportToExcel(
-    exportData,
-    `Receivables_Ageing_${safeTabName}_${today}`
-  );
-};
+    exportToExcel(exportData, `Receivables_Ageing_${safeTabName}_${today}`);
+  };
 
   return (
     <Card id="receivables-ageing-details" className="shadow-sm">
@@ -343,9 +293,10 @@ const handleExportExcel = () => {
         </div>
 
         <CardExportButtons
-                          title="Receivables Ageing Details"
+          title="Receivables Ageing Details"
           targetId="receivables-ageing-details"
-onExport={handleExportExcel}        />
+          onExport={handleExportExcel}
+        />
       </CardHeader>
 
       <CardBody>
@@ -399,12 +350,6 @@ onExport={handleExportExcel}        />
                       }}
                     >
                       {tab.label}
-{/* 
-     <Badge
-className={`ms-1 ${isActive ? "bg-white text-dark" : `text-white ${tab.badgeClass}`}`}
->
-  {tabCounts[tab.value]}
-</Badge> */}
                     </NavLink>
                   </NavItem>
                 );

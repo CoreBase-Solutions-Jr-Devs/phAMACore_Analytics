@@ -21,94 +21,89 @@ const SalesSummary = () => {
   const dispatch = useDispatch();
 
   const [rightColumn, setRightColumn] = useState(false);
-const [isSticky, setIsSticky] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
 
   const toggleRightColumn = () => setRightColumn((prev) => !prev);
-const [selectedBranchName, setSelectedBranchName] =
-  useState("All Branches");
+  const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
   const {
-  
     salesPeriodicBreakdown = [],
     filters,
     loading,
     error,
   } = useSelector((state) => state.salesSummary);
-   
 
   const {
-  salesPeriodicBreakdownData,
-   totalSalesIncl,
-  netSales,
-  totalTax,
-  clientsServed,
-  averageMargin,
-  averageBasket,
-  bestMonthName,
-  bestMonthSales,
-} = useSalesAnalytics(
-  [], // sales
-  [], // kpiOverdueAccounts
-  [], // salesType
-  [], // salesBranch
-  [], // salesBranch_Type
-  [], // salesChannel
-  [], // salesComparativeYTD
-  [], // salesComparativeMTD
-  [], // salesMonthly
-  [], // salesDaily
-  salesPeriodicBreakdown,
-  [], // salesSubgroup - MISSING ARGUMENT
-  [], // monthlySales
-  [], // monthToDateSales
-  [], // lastYearMonthToDateSales
-  [], // lastYearMonthlySales
-  [], // marginAnalysisBand
-  [], // marginAnalysisDrilldown
-  [], // marginAnalysisSku
-  [], // customerMemberAnalysisSummary
-  [], // customerMemberAnalysisBranch
-  [], // customerMemberAnalysisCohort
-  [], // julySalesTarget
-  [], // augustSalesTarget
-  [], // septemberSalesTarget
-  [], // octoberSalesTarget
-  [], // salesTarget
-  [], // salesTargetSummary
-  [], // salesTargetBranch
-  [], // salesTargetMONTHLY_PIVOT
-  filters,
-);
+    salesPeriodicBreakdownData,
+    totalSalesIncl,
+    netSales,
+    totalTax,
+    clientsServed,
+    averageMargin,
+    averageBasket,
+    bestMonthName,
+    bestMonthSales,
+  } = useSalesAnalytics(
+    [], // sales
+    [], // kpiOverdueAccounts
+    [], // salesType
+    [], // salesBranch
+    [], // salesBranch_Type
+    [], // salesChannel
+    [], // salesComparativeYTD
+    [], // salesComparativeMTD
+    [], // salesMonthly
+    [], // salesDaily
+    salesPeriodicBreakdown,
+    [], // salesSubgroup - MISSING ARGUMENT
+    [], // monthlySales
+    [], // monthToDateSales
+    [], // lastYearMonthToDateSales
+    [], // lastYearMonthlySales
+    [], // marginAnalysisBand
+    [], // marginAnalysisDrilldown
+    [], // marginAnalysisSku
+    [], // customerMemberAnalysisSummary
+    [], // customerMemberAnalysisBranch
+    [], // customerMemberAnalysisCohort
+    [], // julySalesTarget
+    [], // augustSalesTarget
+    [], // septemberSalesTarget
+    [], // octoberSalesTarget
+    [], // salesTarget
+    [], // salesTargetSummary
+    [], // salesTargetBranch
+    [], // salesTargetMONTHLY_PIVOT
+    filters,
+  );
 
-useEffect(() => {
-  const params = {
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    GroupBy: "PERIODIC_BREAKDOWN",
-  };
+  useEffect(() => {
+    const params = {
+      clientid: 1,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      branchcode: filters.branch,
+      GroupBy: "PERIODIC_BREAKDOWN",
+    };
 
+    dispatch(getKPISalesTransactions(params));
+  }, [dispatch]);
 
+  useEffect(() => {
+    return () => {
+      console.log("[SalesSummary] Unmounting — clearSalesData dispatched");
+      dispatch(clearSalesSummaryData());
+    };
+  }, [dispatch]);
 
-  dispatch(getKPISalesTransactions(params));
-}, [dispatch]);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 50);
+    };
 
-useEffect(() => {
-  return () => {
-    console.log("[SalesSummary] Unmounting — clearSalesData dispatched");
-    dispatch(clearSalesSummaryData());
-  };
-}, [dispatch]);
+    window.addEventListener("scroll", handleScroll);
 
-useEffect(() => {
-  const handleScroll = () => {
-    setIsSticky(window.scrollY > 50);
-  };
-
-  window.addEventListener("scroll", handleScroll);
-
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleApplyFilters = () => {
     dispatch(
@@ -117,17 +112,11 @@ useEffect(() => {
         startDate: filters.startDate,
         endDate: filters.endDate,
         branchcode: filters.branch,
-    GroupBy: "PERIODIC_BREAKDOWN",
+        GroupBy: "PERIODIC_BREAKDOWN",
         // IncludeCollections: 1,
       }),
     );
   };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (salesBranch || []).find(
-  //         (m) => Number(m.branchID) === Number(filters.branch),
-  //       )?.branchName || "";
 
   document.title = "Sales Breakdown| phAMACore Analytics";
 
@@ -140,83 +129,80 @@ useEffect(() => {
           subtitle={selectedBranchName}
         />
         <div
-  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
-  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
-}`}
-  style={{
-    position: "sticky",
-    top: "70px",
-    zIndex: 1030,
-    width: "100%",
-    marginTop: "-15px",
-    // backgroundColor: "#",
-  }}
->
-    <div className="d-flex align-items-center flex-wrap gap-2">
+          className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+            isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+          }`}
+          style={{
+            position: "sticky",
+            top: "70px",
+            zIndex: 100,
+            width: "100%",
+            marginTop: "-15px",
+          }}
+        >
+          <div className="d-flex align-items-center flex-wrap gap-2">
+            <div className="d-flex align-items-center gap-1">
+              <span>Filtered From:</span>
+              <strong>{filters?.startDate || ""}</strong> to{" "}
+              <strong>{filters?.endDate || ""}</strong>
+            </div>
 
-  <div className="d-flex align-items-center gap-1">
-    <span>Filtered From:</span>
-    <strong>{filters?.startDate || ""}</strong> to{" "}
-<strong>{filters?.endDate || ""}</strong>
-  </div>
+            <div
+              style={{
+                borderLeft: "2px solid #ced4da",
+                height: "12px",
+                margin: "0 4px",
+              }}
+            />
 
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-
-  <div className="d-flex align-items-center gap-1">
-    <span>Selected Branch:</span>
-    <strong>{selectedBranchName}</strong>
-  </div>
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-  <div className="d-flex align-items-center gap-1 no-print">
-    <button
-      type="button"
-      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-      onClick={toggleRightColumn}
-    >
-      <i className="ri-filter-fill"></i>
-      Filter
-    </button>
-  </div>
-  </div>
-</div> 
-        <Row>
+            <div className="d-flex align-items-center gap-1">
+              <span>Selected Branch:</span>
+              <strong>{selectedBranchName}</strong>
+            </div>
+            <div
+              style={{
+                borderLeft: "2px solid #ced4da",
+                height: "12px",
+                margin: "0 4px",
+              }}
+            />
+            <div className="d-flex align-items-center gap-1 no-print">
+              <button
+                type="button"
+                className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                onClick={toggleRightColumn}
+              >
+                <i className="ri-filter-fill"></i>
+                Filter
+              </button>
+            </div>
+          </div>
+        </div>
+        {/* <Row>
           <Col xl={12}>
             <SummaryCards
               totalSalesIncl={totalSalesIncl}
-  netSales={netSales}
-  totalTax={totalTax}
-  clientsServed={clientsServed}
-  averageMargin={averageMargin}
-  averageBasket={averageBasket}
-  bestMonthName={bestMonthName}
-  bestMonthSales={bestMonthSales}
+              netSales={netSales}
+              totalTax={totalTax}
+              clientsServed={clientsServed}
+              averageMargin={averageMargin}
+              averageBasket={averageBasket}
+              bestMonthName={bestMonthName}
+              bestMonthSales={bestMonthSales}
               selectedBranchName={selectedBranchName}
               loading={loading}
               error={error}
               rightClickBtn={toggleRightColumn}
             />
           </Col>
-        </Row>
+        </Row> */}
         <Row>
           <Col xl={12}>
             <SummaryTable
               salesPeriodicBreakdownData={salesPeriodicBreakdownData}
-                            selectedBranchName={selectedBranchName}
-
-               rightClickBtn={toggleRightColumn}
-                 loading={loading}
+              selectedBranchName={selectedBranchName}
+              rightClickBtn={toggleRightColumn}
+              loading={loading}
               error={error}
             />
           </Col>

@@ -199,10 +199,6 @@ const AudiencesSessionsCharts = ({ dataColors, series }) => {
   );
 };
 
-// ============================
-// TopProductsCharts
-// ============================
-
 const TopProductsCharts = ({ dataColors, series, categories = [] }) => {
   const colors = getChartColorsArray(dataColors);
 
@@ -479,33 +475,33 @@ const ProgressiveSalesChart = ({
       },
     },
 
-    annotations: {
-      xaxis: currentMonthExists
-        ? [
-            {
-              x: currentMonth,
-              borderColor: "#C68E45",
-              strokeDashArray: 5,
-              borderWidth: 2,
+    // annotations: {
+    //   xaxis: currentMonthExists
+    //     ? [
+    //         {
+    //           x: currentMonth,
+    //           borderColor: "#C68E45",
+    //           strokeDashArray: 5,
+    //           borderWidth: 2,
 
-              label: {
-                text: "currentMonth",
-                position: "top",
-                orientation: "horizontal",
-                borderColor: "#C68E45",
-                padding: "2px 6px",
-                borderRadius: "4px",
-                style: {
-                  color: "#fff",
-                  background: "#C68E45",
-                  fontSize: "11px",
-                  // fontWeight: 500,
-                },
-              },
-            },
-          ]
-        : [],
-    },
+    //           label: {
+    //             text: "currentMonth",
+    //             position: "top",
+    //             orientation: "horizontal",
+    //             borderColor: "#C68E45",
+    //             padding: "2px 6px",
+    //             borderRadius: "4px",
+    //             style: {
+    //               color: "#fff",
+    //               background: "#C68E45",
+    //               fontSize: "11px",
+    //               // fontWeight: 500,
+    //             },
+    //           },
+    //         },
+    //       ]
+    //     : [],
+    // },
   };
 
   return (
@@ -561,15 +557,8 @@ const BranchPerformanceChart = ({
       enabled: false,
     },
 
-    // markers: {
-    //   size: [0, 4],
-    // },
-
     xaxis: {
       categories,
-      //  title: {
-      //       text: "Branches",
-      //     },
       labels: {
         rotate: -45,
         rotateAlways: true,
@@ -642,12 +631,10 @@ const MonthToDateSalesChart = ({
 }) => {
   const colors = getChartColorsArray(dataColors);
 
- const today = new Date();
-const todayDay = today.getDate();
+  const today = new Date();
+  const todayDay = today.getDate();
 
-const todayExists = categories.some(
-  (day) => Number(day) === todayDay
-);
+  const todayExists = categories.some((day) => Number(day) === todayDay);
   const options = {
     chart: {
       height: 350,
@@ -786,42 +773,40 @@ const todayExists = categories.some(
       },
     },
 
-  annotations: {
-  xaxis: todayExists
-    ? [
-        {
-          x: todayDay,
-          borderColor: "#C68E45",
-          strokeDashArray: 5,
-          borderWidth: 2,
+    //   annotations: {
+    //   xaxis: todayExists
+    //     ? [
+    //         {
+    //           x: todayDay,
+    //           borderColor: "#C68E45",
+    //           strokeDashArray: 5,
+    //           borderWidth: 2,
 
-          label: {
-            text: "Today",
-            position: "top",
-            orientation: "horizontal",
-            borderColor: "#C68E45",
-            padding: 2,
-            style: {
-              color: "#fff",
-              background: "#C68E45",
-              fontSize: "11px",
-            },
-          },
-        },
-      ]
-    : [],
-},
+    //           label: {
+    //             text: "Today",
+    //             position: "top",
+    //             orientation: "horizontal",
+    //             borderColor: "#C68E45",
+    //             padding: 2,
+    //             style: {
+    //               color: "#fff",
+    //               background: "#C68E45",
+    //               fontSize: "11px",
+    //             },
+    //           },
+    //         },
+    //       ]
+    //     : [],
+    // },
   };
 
   return (
-
-      <ReactApexChart
-        options={options}
-        series={series}
-        type="line"
-        height={350}
-      />
-    
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="line"
+      height={350}
+    />
   );
 };
 
@@ -834,7 +819,6 @@ const CountriesCharts = ({ dataColors, series }) => {
     barchartCountriesColors = ["#f06548"];
   }
 
-  // Ensure series data is mutable
   const validSeries = React.useMemo(() => {
     if (!series || !Array.isArray(series)) return [{ data: [] }];
     return series.map((s) => ({ ...s }));

@@ -59,16 +59,6 @@ const salesTargetSlice = createSlice({
           break;
         }
 
-        // case "Last 7 Days": {
-        //   const end = new Date();
-        //   const start = new Date();
-        //   start.setDate(end.getDate() - 7);
-
-        //   state.filters.startDate = formatDMY(start);
-        //   state.filters.endDate = formatDMY(end);
-        //   break;
-        // }
-
         case "This Week": {
           const today = new Date();
 
@@ -221,7 +211,6 @@ const salesTargetSlice = createSlice({
 
 extraReducers: (builder) => {
   builder
-    // General Sales Target
     .addCase(getSalesTarget.pending, (state) => {
       state.loading = true;
       state.error = null;

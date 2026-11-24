@@ -110,10 +110,7 @@ const ReceivablesAgeing = ({
                         </p>
                       </div>
                       <h6 className="mb-0 fw-semibold text-success">
-                        {" "}
-                        {/* {Number(currentReceivables ?? 0).toLocaleString(
-                          "en-KE",
-                        )} */}
+                        {" "}           
                         0
                       </h6>
                     </CardBody>
@@ -129,8 +126,7 @@ const ReceivablesAgeing = ({
                           31–60 Days
                         </p>
                       </div>
-                      <h6 className="mb-0 fw-semibold text-warning">
-                        {/* KES {Number(overdue31To60 ?? 0).toLocaleString("en-KE")} */}
+                      <h6 className="mb-0 fw-semibold text-warning">                       
                         0
                       </h6>
                     </CardBody>
@@ -164,7 +160,6 @@ const ReceivablesAgeing = ({
                       </div>
                       <h6 className="mb-0 fw-semibold text-info">
                        {" "}
-                        {/* {Number(overdue91To120 ?? 0).toLocaleString("en-KE")} */}
                         0
                       </h6>
                     </CardBody>
@@ -182,7 +177,6 @@ const ReceivablesAgeing = ({
                       </div>
                       <h6 className="mb-0 fw-semibold text-danger">
                         {" "}
-                        {/* {Number(overdue120Plus ?? 0).toLocaleString("en-KE")} */}
                         0
                       </h6>
                     </CardBody>

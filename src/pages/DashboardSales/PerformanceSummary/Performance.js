@@ -6,16 +6,6 @@ import {
   triggerPrint,
 } from "../../../helpers/export_helper";
 const Performance = ({
-  //   netSales,
-  //   targetSales,
-  //   achievementPct,
-  //   grossProfit,
-  //   grossMarginPct,
-  //   averageBasketValue,
-  //   transactionCount,
-  //   totalBranches,
-  //   targetVariance,
-  //   targetActionInsight,
   performanceSummary,
   selectedBranchName,
   error,
@@ -108,7 +98,6 @@ const Performance = ({
   return (
     <div>
       <React.Fragment>
-     
         {loading ? (
           <div className="text-center py-5">
             <div
@@ -123,7 +112,7 @@ const Performance = ({
           </div>
         ) : (
           <Row
-            className="g-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4"
+            className="g-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-5 "
             id="margin-band-widgets"
           >
             <Col className="d-flex">
@@ -160,9 +149,9 @@ const Performance = ({
                   </p>
                 </CardBody>
               </Card>
-              <UncontrolledTooltip placement="top" target="netSalesInsight">
+              {/* <UncontrolledTooltip placement="top" target="netSalesInsight">
                 {actionInsight}
-              </UncontrolledTooltip>
+              </UncontrolledTooltip> */}
             </Col>
 
             <Col className="d-flex">
@@ -179,20 +168,31 @@ const Performance = ({
                     </h5>
                   </div>
 
-                  <p className="mb-0 text-muted mt-auto">
-                    Gross margin pct:
-                     <span className="fw-semibold ms-1">
-                                         {Number(performanceSummary?.grossMarginPct ?? 0).toFixed(1)}%
-
-                     
-                    </span>
-                  
-                  </p>
+                  <div className="mb-0 mt-auto">
+                    <p className="mb-0 text-muted">
+                      Margin pct:
+                      <span className="fw-semibold ms-1">
+                        {Number(
+                          performanceSummary?.grossMarginPct ?? 0,
+                        ).toFixed(1)}
+                        %
+                      </span>
+                    </p>
+                    <p className="mb-0  text-muted">
+                      COGS:
+                      <span className="fw-semibold ms-1">
+                        KES{" "}
+                        {Number(
+                          performanceSummary?.totalCOGS ?? 0,
+                        ).toLocaleString("en-KE")}
+                      </span>
+                    </p>
+                  </div>
                 </CardBody>
               </Card>
-              <UncontrolledTooltip placement="top" target="netSalesInsight">
+              {/* <UncontrolledTooltip placement="top" target="netSalesInsight">
                 {actionInsight}
-              </UncontrolledTooltip>
+              </UncontrolledTooltip> */}
             </Col>
             <Col className="d-flex">
               <Card className="card-animate w-100 h-80" id="netSalesInsight">
@@ -208,16 +208,54 @@ const Performance = ({
                     </h5>
                   </div>
 
-                  <p className="mb-0 text-muted mt-auto">
-                    Average customer spend
+                    <p className="mb-0 text-muted mt-auto">
+                    Sales.incl:
+                    <span className="fw-semibold ms-1">
+                    KES{" "}
+                      {Number(
+                        performanceSummary?.actualSalesIncl ?? 0,
+                      ).toLocaleString("en-KE")}
+                    </span>
                   </p>
                 </CardBody>
               </Card>
-              <UncontrolledTooltip placement="top" target="netSalesInsight">
+              {/* <UncontrolledTooltip placement="top" target="netSalesInsight">
                 {actionInsight}
-              </UncontrolledTooltip>
+              </UncontrolledTooltip> */}
             </Col>
+         
+            {/* Target Performance */}
             <Col className="d-flex">
+              <Card
+                className="card-animate w-100 h-80"
+                id="targetPerformanceCard"
+              >
+                <CardBody className="p-2 d-flex flex-column">
+                  <div>
+                    <p className="font-medium mb-0">Variance</p>
+
+                    <h5 className="mt-2 ff-secondary fw-semibold text-success">
+                      KES{" "}
+                      {Number(performanceSummary?.variance ?? 0).toLocaleString(
+                        "en-KE",
+                      )}
+                    </h5>
+                  </div>
+
+                  <p className="mb-0 text-muted mt-auto">
+                    Gap to Target:
+                    <span className="fw-semibold ms-1">
+                      KES{" "}
+                      {Number(
+                        performanceSummary?.gapToTarget ?? 0,
+                      ).toLocaleString("en-KE")}
+                    </span>
+                  </p>
+                </CardBody>
+              </Card>
+            </Col>
+
+   <Col className="d-flex">
               <Card className="card-animate w-100 h-80" id="netSalesInsight">
                 <CardBody className="p-2 d-flex flex-column">
                   <div>
@@ -228,12 +266,51 @@ const Performance = ({
                     </h5>
                   </div>
 
-                  <p className="mb-0 text-muted mt-auto">Purchase Activity</p>
+                  <p className="mb-0 text-muted mt-auto">
+                   Branches:{" "}
+                    <span className="fw-semibold mx-1">
+                      {Number(
+                        performanceSummary?.totalBranches ?? 0,
+                      ).toLocaleString("en-KE")}
+                    </span>
+                   
+                  </p>
                 </CardBody>
               </Card>
-              <UncontrolledTooltip placement="top" target="netSalesInsight">
+              {/* <UncontrolledTooltip placement="top" target="netSalesInsight">
                 {actionInsight}
-              </UncontrolledTooltip>
+              </UncontrolledTooltip> */}
+            </Col>
+            
+            {/* Sales Including Tax */}
+            {/* <Col className="d-flex">
+              <Card className="card-animate w-100 h-80" id="salesInclCard">
+                <CardBody className="p-2 d-flex flex-column">
+                  <div>
+                    <p className="font-medium mb-0">Sales Incl. Tax</p>
+
+                    <h5 className="mt-2 ff-secondary fw-semibold text-info">
+                      KES{" "}
+                      {Number(
+                        performanceSummary?.actualSalesIncl ?? 0,
+                      ).toLocaleString("en-KE")}
+                    </h5>
+                  </div>
+
+                  <p className="mb-0 text-muted mt-auto">
+                    Total sales including VAT
+                  </p>
+                </CardBody>
+              </Card>
+            </Col> */}
+          </Row>
+        )}
+        {performanceSummary?.action_insight && (
+          <Row className="mt-1 g-0">
+            <Col xs="12">
+              <div className="alert alert-info mb-0 mt-0 py-1 w-100">
+                {performanceSummary.action_insight}
+              </div>
             </Col>
           </Row>
         )}
