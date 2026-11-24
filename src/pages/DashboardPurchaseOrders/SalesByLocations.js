@@ -140,11 +140,9 @@ const SalesByLocations = ({ data = [], error, loading }) => {
 
   return (
     <Card className="card-height-100" id="purchases-category-spend-card">
- <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
-          {" "}
-                  <h5 className="card-title mb-0 ">
-          Spend by Category</h5>
-
+      <CardHeader className="d-flex justify-content-between align-items-center flex-wrap pb-1 gap-2">
+        {" "}
+        <h5 className="card-title mb-0 ">Spend by Category</h5>
         <CardExportButtons
           targetId="purchases-category-spend-card"
           title="Spend by Category"
@@ -153,19 +151,19 @@ const SalesByLocations = ({ data = [], error, loading }) => {
       </CardHeader>
 
       <CardBody>
-          {loading ? (
-    <div className="d-flex justify-content-center align-items-center py-5">
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-    </div>
-  ) : error ? (
-    <div className="alert alert-danger mb-0">
-      {typeof error === "string"
-        ? error
-        : error.message || "Failed to load supplier spend data."}
-    </div>
-  ) : data?.length > 0 ? (
+        {loading ? (
+          <div className="d-flex justify-content-center align-items-center py-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="alert alert-danger mb-0">
+            {typeof error === "string"
+              ? error
+              : error.message || "Failed to load supplier spend data."}
+          </div>
+        ) : data?.length > 0 ? (
           <TanstackTable
             columns={columns}
             data={data}

@@ -21,12 +21,12 @@ import {
   getLastYearActualSpend,
   getLastYearDailySpend,
   getKPIPurchases,
-    getKPIMaverickSpend,
-    getKPIPriceAlerts,
-    getKPILeadTime,
-    getGoodsReceived,
-    getLastYearGoodsReceived,
-    //  getBestPricePerSupplier,
+  getKPIMaverickSpend,
+  getKPIPriceAlerts,
+  getKPILeadTime,
+  getGoodsReceived,
+  getLastYearGoodsReceived,
+  //  getBestPricePerSupplier,
 } from "../../slices/dashboardPurchase/thunk";
 import FilterActions from "../../Components/Common/FilterActions";
 import {
@@ -35,10 +35,8 @@ import {
   setStartDate,
   setEndDate,
 } from "../../slices/dashboardPurchase/reducer";
-import {
-getKPIOverdueAccounts
-} from "../../slices/dashboardSales/thunk";
- import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
+import { getKPIOverdueAccounts } from "../../slices/dashboardSales/thunk";
+import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
 import usePurchaseOrders from "../../Components/Hooks/usePurchaseOrders";
 // import BestPrices from "./BestPrices";
 import {
@@ -46,7 +44,8 @@ import {
   getPreviousYearDate,
   getPeriod,
 } from "../../helpers/date_helper";
-import { getKPIConsolidatedLPOReview} from "../../slices/dashboardPurchase/ConsolidatedLPOReview/thunk";
+import { getKPIConsolidatedLPOReview } from "../../slices/dashboardPurchase/ConsolidatedLPOReview/thunk";
+import { groupBy } from "lodash";
 
 const KPI_GROUP_BYS = [
   "SUMMARY",
@@ -57,9 +56,7 @@ const KPI_GROUP_BYS = [
   "TYPE",
 ];
 
-const ACTUAL_SPEND_GROUP_BYS = [
-  "MONTHLY",
-];
+const ACTUAL_SPEND_GROUP_BYS = ["MONTHLY"];
 
 const LEAD_TIME_GROUP_BYS = [
   "SUMMARY",
@@ -68,11 +65,7 @@ const LEAD_TIME_GROUP_BYS = [
   "MONTH",
   "BRANCH",
 ];
-const PRICE_ALERTS_GROUP_BYS = [
-  "SUMMARY",
-  "ITEM_ALERTS",
-  "ITEM_HISTORY",
-];
+const PRICE_ALERTS_GROUP_BYS = ["SUMMARY", "ITEM_ALERTS", "ITEM_HISTORY"];
 const MAVERICK_SPEND_GROUP_BYS = [
   "SUMMARY",
   "SUPPLIER",
@@ -84,110 +77,108 @@ const MAVERICK_SPEND_GROUP_BYS = [
 const DashboardPurchaseOrders = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [rightColumn, setRightColumn] = useState(false);
-const [isSticky, setIsSticky] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
 
   const toggleRightColumn = () => {
     setRightColumn(!rightColumn);
   };
 
-  const [selectedBranchName, setSelectedBranchName] =
-    useState("All Branches");
-
-const {
-  PurchaseOrders = [],
-
-  KPIPurchases = [],
-  kpiOverdueAccounts = [],
-
-  KPISummary = [],
-  KPICategory = [],
-  KPISupplier = [],
-  KPIBranch = [],
-  KPIMonthly = [],
-  KPIType = [],
-
-  KPIMaverickSpend = [],
-  KPIMaverickSpendSummary = [],
-  KPIMaverickSpendSupplier = [],
-  KPIMaverickSpendBranch = [],
-  KPIMaverickSpendOffPOInvoices = [],
-  KPIMaverickSpendPOPriceVariance = [],
-
-  // Price Alerts
-  KPIPriceAlerts = [],
-  KPIPriceAlertsSummary = [],
-  KPIPriceAlertsItems = [],
-  KPIPriceAlertsHistory = [],
-
-  // BestPricePerSupplier = [],
-
-  KPILeadTime = [],
-  KPILeadTimeSummary = [],
-  KPILeadTimeSupplier = [],
-  KPILeadTimePODetails = [],
-  KPILeadTimeMonth = [],
-  KPILeadTimeBranch = [],
-
-  GoodsReceived = [],
-  LastYearGoodsReceived = [],
-
-  ActualSpend = [],
-  ActualSpendSummary = [],
-  ActualSpendCategory = [],
-  ActualSpendSupplier = [],
-  ActualSpendBranch = [],
-  ActualSpendMonthly = [],
-  ActualSpendType = [],
-
-  DailySpend = [],
-  DailySpendSummary = [],
-  DailySpendCategory = [],
-  DailySpendSupplier = [],
-  DailySpendBranch = [],
-  DailySpendMonthly = [],
-  DailySpendType = [],
-
-  LastYearActualSpend = [],
-  LastYearActualSpendSummary = [],
-  LastYearActualSpendCategory = [],
-  LastYearActualSpendSupplier = [],
-  LastYearActualSpendBranch = [],
-  LastYearActualSpendMonthly = [],
-  LastYearActualSpendType = [],
-
-  LastYearDailySpend = [],
-  LastYearDailySpendSummary = [],
-  LastYearDailySpendCategory = [],
-  LastYearDailySpendSupplier = [],
-  LastYearDailySpendBranch = [],
-  LastYearDailySpendMonthly = [],
-  LastYearDailySpendType = [],
-loading,
-  error,
-  filters,
-} = useSelector((state) => state.PurchaseOrders);
+  const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
 
   const {
- KPIConsolidatedLPOReviewConsolidatedList = [],
-  KPIConsolidatedLPOReviewSummary = [],
-  KPIConsolidatedLPOReviewSupplier = [],
-  KPIConsolidatedLPOReviewBranch = [],
-  KPIConsolidatedLPOReviewDrilldown = [],
+    PurchaseOrders = [],
+
+    KPIPurchases = [],
+    kpiOverdueAccounts = [],
+
+    KPISummary = [],
+    KPICategory = [],
+    KPISupplier = [],
+    KPIBranch = [],
+    KPIMonthly = [],
+    KPIType = [],
+
+    KPIMaverickSpend = [],
+    KPIMaverickSpendSummary = [],
+    KPIMaverickSpendSupplier = [],
+    KPIMaverickSpendBranch = [],
+    KPIMaverickSpendOffPOInvoices = [],
+    KPIMaverickSpendPOPriceVariance = [],
+
+    // Price Alerts
+    KPIPriceAlerts = [],
+    KPIPriceAlertsSummary = [],
+    KPIPriceAlertsItems = [],
+    KPIPriceAlertsHistory = [],
+
+    // BestPricePerSupplier = [],
+
+    KPILeadTime = [],
+    KPILeadTimeSummary = [],
+    KPILeadTimeSupplier = [],
+    KPILeadTimePODetails = [],
+    KPILeadTimeMonth = [],
+    KPILeadTimeBranch = [],
+
+    GoodsReceived = [],
+    LastYearGoodsReceived = [],
+
+    ActualSpend = [],
+    ActualSpendSummary = [],
+    ActualSpendCategory = [],
+    ActualSpendSupplier = [],
+    ActualSpendBranch = [],
+    ActualSpendMonthly = [],
+    ActualSpendType = [],
+
+    DailySpend = [],
+    DailySpendSummary = [],
+    DailySpendCategory = [],
+    DailySpendSupplier = [],
+    DailySpendBranch = [],
+    DailySpendMonthly = [],
+    DailySpendType = [],
+
+    LastYearActualSpend = [],
+    LastYearActualSpendSummary = [],
+    LastYearActualSpendCategory = [],
+    LastYearActualSpendSupplier = [],
+    LastYearActualSpendBranch = [],
+    LastYearActualSpendMonthly = [],
+    LastYearActualSpendType = [],
+
+    LastYearDailySpend = [],
+    LastYearDailySpendSummary = [],
+    LastYearDailySpendCategory = [],
+    LastYearDailySpendSupplier = [],
+    LastYearDailySpendBranch = [],
+    LastYearDailySpendMonthly = [],
+    LastYearDailySpendType = [],
+    loading,
+    error,
+    filters,
+  } = useSelector((state) => state.PurchaseOrders);
+
+  const {
+    KPIConsolidatedLPOReviewConsolidatedList = [],
+    KPIConsolidatedLPOReviewSummary = [],
+    KPIConsolidatedLPOReviewSupplier = [],
+    KPIConsolidatedLPOReviewBranch = [],
+    KPIConsolidatedLPOReviewDrilldown = [],
   } = useSelector((state) => state.consolidatedLPOReview);
 
   const {
     formatAmount,
-   purchaseSummary,
+    purchaseSummary,
     leadTimeSummary,
-      priceAlertSummary,
-  maverickSpendSummary,
-  maverickSpendPercentage,
-  spendBySupplier,
+    priceAlertSummary,
+    maverickSpendSummary,
+    maverickSpendPercentage,
+    spendBySupplier,
     topSuppliers,
     top2Suppliers,
     branchData,
@@ -195,425 +186,426 @@ loading,
     monthToDateChart,
     bottomSuppliers,
     spendByCategory,
-     currentReceivables,
+    currentReceivables,
     overdue31To60,
     overdue61To90,
     overdue91To120,
     overdue120Plus,
     overdueSupplierAccounts,
-     ConsolidatedLPOReviewSummaryData,
-  
+    ConsolidatedLPOReviewSummaryData,
   } = usePurchaseOrders(
-    
-  PurchaseOrders,
+    PurchaseOrders,
 
-  KPIPurchases,
-  KPISummary,
-  KPICategory,
-  KPISupplier,
-  KPIBranch,
-  KPIMonthly,
-  KPIType,
+    KPIPurchases,
+    KPISummary,
+    KPICategory,
+    KPISupplier,
+    KPIBranch,
+    KPIMonthly,
+    KPIType,
 
-  KPIMaverickSpend,
-  KPIMaverickSpendSummary,
-  KPIMaverickSpendSupplier,
-  KPIMaverickSpendBranch,
-  KPIMaverickSpendOffPOInvoices,
-  KPIMaverickSpendPOPriceVariance,
+    KPIMaverickSpend,
+    KPIMaverickSpendSummary,
+    KPIMaverickSpendSupplier,
+    KPIMaverickSpendBranch,
+    KPIMaverickSpendOffPOInvoices,
+    KPIMaverickSpendPOPriceVariance,
 
-  KPIPriceAlerts,
-  KPIPriceAlertsSummary,
-  KPIPriceAlertsItems,
-  KPIPriceAlertsHistory,
+    KPIPriceAlerts,
+    KPIPriceAlertsSummary,
+    KPIPriceAlertsItems,
+    KPIPriceAlertsHistory,
 
-  // BestPricePerSupplier,
+    // BestPricePerSupplier,
 
-  KPILeadTime,
-  KPILeadTimeSummary,
-  KPILeadTimeSupplier,
-  KPILeadTimePODetails,
-  KPILeadTimeMonth,
-  KPILeadTimeBranch,
+    KPILeadTime,
+    KPILeadTimeSummary,
+    KPILeadTimeSupplier,
+    KPILeadTimePODetails,
+    KPILeadTimeMonth,
+    KPILeadTimeBranch,
 
-  GoodsReceived,
-  LastYearGoodsReceived,
+    GoodsReceived,
+    LastYearGoodsReceived,
 
-  ActualSpend,
-  ActualSpendSummary,
-  ActualSpendCategory,
-  ActualSpendSupplier,
-  ActualSpendBranch,
-  ActualSpendMonthly,
-  ActualSpendType,
+    ActualSpend,
+    ActualSpendSummary,
+    ActualSpendCategory,
+    ActualSpendSupplier,
+    ActualSpendBranch,
+    ActualSpendMonthly,
+    ActualSpendType,
 
-  DailySpend,
-  DailySpendSummary,
-  DailySpendCategory,
-  DailySpendSupplier,
-  DailySpendBranch,
-  DailySpendMonthly,
-  DailySpendType,
+    DailySpend,
+    DailySpendSummary,
+    DailySpendCategory,
+    DailySpendSupplier,
+    DailySpendBranch,
+    DailySpendMonthly,
+    DailySpendType,
 
-  LastYearActualSpend,
-  LastYearActualSpendSummary,
-  LastYearActualSpendCategory,
-  LastYearActualSpendSupplier,
-  LastYearActualSpendBranch,
-  LastYearActualSpendMonthly,
-  LastYearActualSpendType,
+    LastYearActualSpend,
+    LastYearActualSpendSummary,
+    LastYearActualSpendCategory,
+    LastYearActualSpendSupplier,
+    LastYearActualSpendBranch,
+    LastYearActualSpendMonthly,
+    LastYearActualSpendType,
 
-  LastYearDailySpend,
-  LastYearDailySpendSummary,
-  LastYearDailySpendCategory,
-  LastYearDailySpendSupplier,
-  LastYearDailySpendBranch,
-  LastYearDailySpendMonthly,
-  LastYearDailySpendType,
+    LastYearDailySpend,
+    LastYearDailySpendSummary,
+    LastYearDailySpendCategory,
+    LastYearDailySpendSupplier,
+    LastYearDailySpendBranch,
+    LastYearDailySpendMonthly,
+    LastYearDailySpendType,
 
-     kpiOverdueAccounts,
+    kpiOverdueAccounts,
 
-   [], //KPISupplierOrderFillRateSummary,
-   [], //KPISupplierOrderFillRateSupplierOFR,
-   [], //KPISupplierOrderFillRateOrderDrilldown,
-   [], //KPISupplierOrderFillRateBranch,
+    [], //KPISupplierOrderFillRateSummary,
+    [], //KPISupplierOrderFillRateSupplierOFR,
+    [], //KPISupplierOrderFillRateOrderDrilldown,
+    [], //KPISupplierOrderFillRateBranch,
 
-   [], //KPISupplierReturnsSummary,
-   [], //KPISupplierReturnsSupplier,
-   [], //KPISupplierReturnsDrilldown,
-   [], //KPISupplierReturnsBranch,
-   [], //KPISupplierReturnsSKU,
-   [], //KPISupplierReturnsReason,
+    [], //KPISupplierReturnsSummary,
+    [], //KPISupplierReturnsSupplier,
+    [], //KPISupplierReturnsDrilldown,
+    [], //KPISupplierReturnsBranch,
+    [], //KPISupplierReturnsSKU,
+    [], //KPISupplierReturnsReason,
 
-   [], //KPIConsolidatedLPOReviewConsolidatedList,
-  KPIConsolidatedLPOReviewSummary,
-   [], //KPIConsolidatedLPOReviewSupplier,
-   [], //KPIConsolidatedLPOReviewBranch,
-   [], //KPIConsolidatedLPOReviewDrilldown,
+    [], //KPIConsolidatedLPOReviewConsolidatedList,
+    KPIConsolidatedLPOReviewSummary,
+    [], //KPIConsolidatedLPOReviewSupplier,
+    [], //KPIConsolidatedLPOReviewBranch,
+    [], //KPIConsolidatedLPOReviewDrilldown,
 
-   [], //KPIBestPricePerSupplierItemMatrix,
-   [], //KPIBestPricePerSupplierSupplierScorecard,
-   [], //KPIBestPricePerSupplierBestPriceCatalog,
-   [], //KPIBestPricePerSupplierProposedHistorical,
+    [], //KPIBestPricePerSupplierItemMatrix,
+    [], //KPIBestPricePerSupplierSupplierScorecard,
+    [], //KPIBestPricePerSupplierBestPriceCatalog,
+    [], //KPIBestPricePerSupplierProposedHistorical,
 
-  filters
-);
+    filters,
+  );
 
   const {
-  currentYearStart,
-  currentMonthStart,
-  today,
-  lastYearStart,
-  lastYearMonthStart,
-  lastYearToday,
-} = getDateRanges();
+    currentYearStart,
+    currentMonthStart,
+    today,
+    lastYearStart,
+    lastYearMonthStart,
+    lastYearToday,
+  } = getDateRanges();
 
-const dates = getDateRanges();
+  const dates = getDateRanges();
 
-  const dispatchGroupByRequests = (
-    thunk,
-    commonParams,
-    groupBys
-  ) => {
+  const dispatchGroupByRequests = (thunk, commonParams, groupBys) => {
     groupBys.forEach((groupBy) => {
       dispatch(
         thunk({
           ...commonParams,
           groupBy,
-        })
+        }),
       );
     });
   };
 
-useEffect(() => {
+  useEffect(() => {
+    // ----------------------------------------------
+    // PURCHASE ORDERS
+    // ----------------------------------------------
 
-  // ----------------------------------------------
-  // PURCHASE ORDERS
-  // ----------------------------------------------
+    // dispatch(
+    //   getPurchaseOrders({
+    //     clientid: 1,
+    //     startDate: filters.startDate,
+    //     endDate: filters.endDate,
+    //     branchcode: branchId ,
+    //   })
+    // );
 
-  // dispatch(
-  //   getPurchaseOrders({
-  //     clientid: 1,
-  //     startDate: filters.startDate,
-  //     endDate: filters.endDate,
-  //     branchcode: branchId ,
-  //   })
-  // );
-
-//   dispatch(
-//   getBestPricePerSupplier({
-//     clientid: 1,
-//     startDate: filters.startDate,
-//     endDate: filters.endDate,
-//     branchcode: filters.branch,
-//     itemCode: "",
-//     supplierCode: "",
-//     groupBy: "ITEM_MATRIX",
-//     includeZeroPrice: false,
-//     topN: 0,
-//   })
-// );
+    //   dispatch(
+    //   getBestPricePerSupplier({
+    //     clientid: 1,
+    //     startDate: filters.startDate,
+    //     endDate: filters.endDate,
+    //     branchcode: filters.branch,
+    //     itemCode: "",
+    //     supplierCode: "",
+    //     groupBy: "ITEM_MATRIX",
+    //     includeZeroPrice: false,
+    //     topN: 0,
+    //   })
+    // );
 
     dispatch(
       getKPIConsolidatedLPOReview({
-          clientid: 1,
-      branchcode: filters.branch,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      TopN: 0,
-      status: "All",
+        clientid: 1,
+        branchcode: filters.branch,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        TopN: 0,
+        status: "All",
         groupBy: "SUMMARY",
       }),
     );
 
-dispatch(
-  getGoodsReceived({
-   
-      startDate: dates.currentMonthStart,
-      endDate: dates.today,
+    dispatch(
+      getGoodsReceived({
+        startDate: dates.currentMonthStart,
+        endDate: dates.today,
         clientid: 1,
-    branchcode: filters.branch,
-  })
-);
+        branchcode: filters.branch,
+      }),
+    );
 
-dispatch(
-  getLastYearGoodsReceived({
-   
-    startDate: dates.lastYearMonthStart,
-    endDate: dates.lastYearToday,
-      clientid: 1,
-    branchcode: filters.branch,
-  })
-);
+    dispatch(
+      getLastYearGoodsReceived({
+        startDate: dates.lastYearMonthStart,
+        endDate: dates.lastYearToday,
+        clientid: 1,
+        branchcode: filters.branch,
+      }),
+    );
 
-//   dispatchGroupByRequests(
-//     getActualSpend,
-//     {
-//       clientid: 1,
-//       startDate: dates.currentYearStart,
-//       endDate: dates.today,
-//     branchcode: filters.branch,
-//     },
-//     ACTUAL_SPEND_GROUP_BYS
-//   );
+    dispatchGroupByRequests(
+      getActualSpend,
+      {
+        clientid: 1,
+        startDate: dates.currentYearStart,
+        endDate: dates.today,
+        branchcode: filters.branch,
+      },
+      ACTUAL_SPEND_GROUP_BYS,
+    );
 
-//   dispatchGroupByRequests(
-//     getLastYearActualSpend,
-//     {
-//       clientid: 1,
-//       startDate: dates.lastYearStart,
-//       endDate: dates.lastYearToday,
-//     branchcode: filters.branch,
-//     },
-// ACTUAL_SPEND_GROUP_BYS
-//   );
+    dispatchGroupByRequests(
+      getLastYearActualSpend,
+      {
+        clientid: 1,
+        startDate: dates.lastYearStart,
+        endDate: dates.lastYearToday,
+        branchcode: filters.branch,
+      },
+      ACTUAL_SPEND_GROUP_BYS,
+    );
 
-  dispatchGroupByRequests(
-    getKPIPurchases,
-    {
-      clientid: 1,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-    branchcode: filters.branch,
-      TopN: 0,
-    },
-    KPI_GROUP_BYS
-  );
+    dispatchGroupByRequests(
+      getKPIPurchases,
+      {
+        clientid: 1,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        branchcode: filters.branch,
+        TopN: 0,
+      },
+      KPI_GROUP_BYS,
+    );
 
-   dispatch(
-        getKPIOverdueAccounts({
-          clientid: 1,
+    //  dispatch(
+    //       getKPIPurchases({
+    //       clientid: 1,
+    //     startDate: filters.startDate,
+    //     endDate: dates.lastYearToday,
+    //   branchcode: filters.branch,
+    //    groupBy: "MONTHLY",
+    //     TopN: 0,
+    //       }),
+    //     );
+
+    dispatch(
+      getKPIOverdueAccounts({
+        clientid: 1,
         mode: "AGING",
         accountType: "SUPPLIER",
-    branchcode: filters.branch,
-      dateFrom:  filters.startDate,
-    dateTo:  filters.endDate,
-    periodFrom: getPeriod(filters.startDate),
-      periodTo: getPeriod(filters.endDate),
-    includeZeroBal: false,
-        }),
-      );
+        branchcode: filters.branch,
+        dateFrom: filters.startDate,
+        dateTo: filters.endDate,
+        periodFrom: getPeriod(filters.startDate),
+        periodTo: getPeriod(filters.endDate),
+        includeZeroBal: false,
+      }),
+    );
 
-      dispatchGroupByRequests(
-  getKPILeadTime,
-  {
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    supplier_code: "",
-    TopN: 0,
-  },
-  LEAD_TIME_GROUP_BYS
-);
+    dispatchGroupByRequests(
+      getKPILeadTime,
+      {
+        clientid: 1,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        branchcode: filters.branch,
+        supplier_code: "",
+        TopN: 0,
+      },
+      LEAD_TIME_GROUP_BYS,
+    );
 
-dispatchGroupByRequests(
-  getKPIPriceAlerts,
-  {
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    ThresholdPerc: 10,
-    ChangeType: "ALL",
-    ItemCode: "",
-    IncludeZeroPrice: false,
-    TopN: 0,
-  },
-  PRICE_ALERTS_GROUP_BYS
-);
-dispatchGroupByRequests(
-  getKPIMaverickSpend,
-  {
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    TopN: 0,
-  },
-  MAVERICK_SPEND_GROUP_BYS
-);
-
-}, [dispatch]);
+    dispatchGroupByRequests(
+      getKPIPriceAlerts,
+      {
+        clientid: 1,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        branchcode: filters.branch,
+        ThresholdPerc: 10,
+        ChangeType: "ALL",
+        ItemCode: "",
+        IncludeZeroPrice: false,
+        TopN: 0,
+      },
+      PRICE_ALERTS_GROUP_BYS,
+    );
+    dispatchGroupByRequests(
+      getKPIMaverickSpend,
+      {
+        clientid: 1,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        branchcode: filters.branch,
+        TopN: 0,
+      },
+      MAVERICK_SPEND_GROUP_BYS,
+    );
+  }, [dispatch]);
 
   useEffect(() => {
     return () => {
       dispatch(clearPurchaseOrdersData());
     };
   }, [dispatch]);
-useEffect(() => {
-  const handleScroll = () => {
-    setIsSticky(window.scrollY > 50);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 50);
+    };
 
-  window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-const handleApplyFilters = () => {
-  // dispatch(
-  //   getPurchaseOrders({
-  //     clientid: 1,
-  //     startDate: filters.startDate,
-  //     endDate: filters.endDate,
-  //     branchcode: filters.branch ?? null,
-  //   })
-  // );
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+  const handleApplyFilters = () => {
+    // dispatch(
+    //   getPurchaseOrders({
+    //     clientid: 1,
+    //     startDate: filters.startDate,
+    //     endDate: filters.endDate,
+    //     branchcode: filters.branch ?? null,
+    //   })
+    // );
 
-// const goodsReceivedParams = {
-//   clientid: 1,
-//     branchcode: filters.branch,
-// };
+    // const goodsReceivedParams = {
+    //   clientid: 1,
+    //     branchcode: filters.branch,
+    // };
 
-// dispatch(
-//   getGoodsReceived({
-//     ...goodsReceivedParams,
-//     startDate: filters.startDate,
-//     endDate: filters.endDate,
-//   })
-// );
+    // dispatch(
+    //   getGoodsReceived({
+    //     ...goodsReceivedParams,
+    //     startDate: filters.startDate,
+    //     endDate: filters.endDate,
+    //   })
+    // );
 
-// dispatch(
-//   getGoodsReceived({
-//     ...goodsReceivedParams,
-//     startDate: getPreviousYearDate(filters.startDate),
-//     endDate: getPreviousYearDate(filters.endDate),
-//   })
-// );
+    // dispatch(
+    //   getGoodsReceived({
+    //     ...goodsReceivedParams,
+    //     startDate: getPreviousYearDate(filters.startDate),
+    //     endDate: getPreviousYearDate(filters.endDate),
+    //   })
+    // );
 
     dispatch(
       getKPIConsolidatedLPOReview({
-            clientid: 1,
-      branchcode: filters.branch,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      TopN: 0,
-      status: "All",
+        clientid: 1,
+        branchcode: filters.branch,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        TopN: 0,
+        status: "All",
         groupBy: "SUMMARY",
       }),
     );
 
-  dispatchGroupByRequests(
-    getKPIPurchases,
-    {
-      clientid: 1,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-    branchcode: filters.branch,
-      TopN: 0,
-    },
-    KPI_GROUP_BYS
-  );
+    dispatchGroupByRequests(
+      getKPIPurchases,
+      {
+        clientid: 1,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        branchcode: filters.branch,
+        TopN: 0,
+      },
+      KPI_GROUP_BYS,
+    );
 
-   dispatch(
-        getKPIOverdueAccounts({
-          clientid: 1,
+    dispatch(
+      getKPIOverdueAccounts({
+        clientid: 1,
         mode: "AGING",
         accountType: "SUPPLIER",
-    branchcode: filters.branch,
-      dateFrom:  filters.startDate,
-    dateTo:  filters.endDate,
-    periodFrom: getPeriod(filters.startDate),
-      periodTo: getPeriod(filters.endDate),
-    includeZeroBal: false,
-        }),
-      );
+        branchcode: filters.branch,
+        dateFrom: filters.startDate,
+        dateTo: filters.endDate,
+        periodFrom: getPeriod(filters.startDate),
+        periodTo: getPeriod(filters.endDate),
+        includeZeroBal: false,
+      }),
+    );
 
-           dispatchGroupByRequests(
-  getKPILeadTime,
-  {
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    supplier_code: "",
-    TopN: 0,
-  },
-  LEAD_TIME_GROUP_BYS
-);
+    dispatchGroupByRequests(
+      getKPILeadTime,
+      {
+        clientid: 1,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        branchcode: filters.branch,
+        supplier_code: "",
+        TopN: 0,
+      },
+      LEAD_TIME_GROUP_BYS,
+    );
 
-dispatchGroupByRequests(
-  getKPIPriceAlerts,
-  {
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    ThresholdPerc: 10,
-    ChangeType: "ALL",
-    ItemCode: "",
-    IncludeZeroPrice: false,
-    TopN: 0,
-  },
-  PRICE_ALERTS_GROUP_BYS
-);
-//   dispatch(
-//   getBestPricePerSupplier({
-//     clientid: 1,
-//     startDate: filters.startDate,
-//     endDate: filters.endDate,
-//     branchcode: filters.branch,
-//     itemCode: "",
-//     supplierCode: "",
-//     groupBy: "ITEM_MATRIX",
-//     includeZeroPrice: false,
-//     topN: 0,
-//   })
-// );
+    dispatchGroupByRequests(
+      getKPIPriceAlerts,
+      {
+        clientid: 1,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        branchcode: filters.branch,
+        ThresholdPerc: 10,
+        ChangeType: "ALL",
+        ItemCode: "",
+        IncludeZeroPrice: false,
+        TopN: 0,
+      },
+      PRICE_ALERTS_GROUP_BYS,
+    );
+    //   dispatch(
+    //   getBestPricePerSupplier({
+    //     clientid: 1,
+    //     startDate: filters.startDate,
+    //     endDate: filters.endDate,
+    //     branchcode: filters.branch,
+    //     itemCode: "",
+    //     supplierCode: "",
+    //     groupBy: "ITEM_MATRIX",
+    //     includeZeroPrice: false,
+    //     topN: 0,
+    //   })
+    // );
 
-dispatchGroupByRequests(
-  getKPIMaverickSpend,
-  {
-    clientid: 1,
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    branchcode: filters.branch,
-    TopN: 0,
-  },
-  MAVERICK_SPEND_GROUP_BYS
-);
-};
-        
+    dispatchGroupByRequests(
+      getKPIMaverickSpend,
+      {
+        clientid: 1,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        branchcode: filters.branch,
+        TopN: 0,
+      },
+      MAVERICK_SPEND_GROUP_BYS,
+    );
+  };
+
   return (
     <React.Fragment>
       <div className="page-content">
@@ -621,136 +613,124 @@ dispatchGroupByRequests(
           <BreadCrumb
             title="Purchases"
             pageTitle="Dashboard"
-                subtitle= {selectedBranchName}
-
-          /> 
-<div
-  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
-  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
-}`}
-  style={{
-    position: "sticky",
-    top: "70px",
-    zIndex: 1030,
-    width: "100%",
-    marginTop: "-15px",
-    // backgroundColor: "#",
-  }}
->
-    <div className="d-flex align-items-center flex-wrap gap-2">
-
-  <div className="d-flex align-items-center gap-1">
-    <span>Filtered From:</span>
-    <strong>{filters?.startDate || ""}</strong> to{" "}
-<strong>{filters?.endDate || ""}</strong>
-  </div>
-
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-
-  <div className="d-flex align-items-center gap-1">
-    <span>Selected Branch:</span>
-    <strong>{selectedBranchName}</strong>
-  </div>
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-  <div className="d-flex align-items-center gap-1 no-print">
-    <button
-      type="button"
-      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-      onClick={toggleRightColumn}
-    >
-      <i className="ri-filter-fill"></i>
-      Filter
-    </button>
-  </div>
-  </div>
-</div>                  
-                <Row>
-                    <Col xl={12}>
-                     <Widget
-                    rightClickBtn={toggleRightColumn}
-                    formatAmount={formatAmount}
-                    purchaseSummary={purchaseSummary}
-                 ConsolidatedLPOReviewSummaryData={ConsolidatedLPOReviewSummaryData}
-                    leadTimeSummary={leadTimeSummary}
-                    priceAlertSummary={priceAlertSummary}
-                    maverickSpendSummary={maverickSpendSummary}
-                    maverickSpendPercentage={maverickSpendPercentage}
-                                  selectedBranchName={selectedBranchName}
-
-                    error={error}
-                    loading={loading}
-                  />
-                    </Col>                 
-                </Row>
-                <Row>
-                  <Col xl={12}>            
-                      <StoreVisits
-                        data={branchData}
-                        error={error}
-                        loading={loading}
-                      />
-                  </Col>
-                  </Row>
-                  <Row>
-                      <Col xl={12}>
-                      <SupplierSpend
-                        supplierData={spendBySupplier}                      
-                        loading={loading}
-                        error={error}
-                      />
-                    </Col>                                                       
-                  </Row>                                  
-                <Row>
-                                    <Col xl={6}>
-                    <MonthToDatePurchases
-                      categories={monthToDateChart.categories}
-                      series={monthToDateChart.series}
-                      formatAmount={formatAmount}
-                    />
-                  </Col>  
-                  <Col xl={6}>
-                    <YearToDatePurchases
-                      categories={actualSpendChart.categories}
-                      series={actualSpendChart.series}
-                      formatAmount={formatAmount}
-                    />
-                  </Col>                      
-          <FilterActions
-                  branch={filters.branch}
-                    dateRange={filters.dateRange}
-                    startDate={filters.startDate}
-                    endDate={filters.endDate}
-                    onBranchChange={(value) =>
-                      dispatch(setBranch(value === "" ? null : Number(value)))
-                    }
-                      onBranchNameChange={setSelectedBranchName}
-
-                    onDateRangeChange={(value) =>
-                      dispatch(setDateRange(value))
-                    }
-                    onStartDateChange={(value) =>
-                      dispatch(setStartDate(value))
-                    }
-                    onEndDateChange={(value) =>
-                      dispatch(setEndDate(value))
-                    }
-            onApply={handleApplyFilters}
-            rightColumn={rightColumn}
-            hideRightColumn={toggleRightColumn}
+            subtitle={selectedBranchName}
           />
-                </Row>        
+          <div
+            className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+              isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+            }`}
+            style={{
+              position: "sticky",
+              top: "70px",
+              zIndex: 100,
+              width: "100%",
+              marginTop: "-15px",
+              // backgroundColor: "#",
+            }}
+          >
+            <div className="d-flex align-items-center flex-wrap gap-2">
+              <div className="d-flex align-items-center gap-1">
+                <span>Filtered From:</span>
+                <strong>{filters?.startDate || ""}</strong> to{" "}
+                <strong>{filters?.endDate || ""}</strong>
+              </div>
+
+              <div
+                style={{
+                  borderLeft: "2px solid #ced4da",
+                  height: "12px",
+                  margin: "0 4px",
+                }}
+              />
+
+              <div className="d-flex align-items-center gap-1">
+                <span>Selected Branch:</span>
+                <strong>{selectedBranchName}</strong>
+              </div>
+              <div
+                style={{
+                  borderLeft: "2px solid #ced4da",
+                  height: "12px",
+                  margin: "0 4px",
+                }}
+              />
+              <div className="d-flex align-items-center gap-1 no-print">
+                <button
+                  type="button"
+                  className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                  onClick={toggleRightColumn}
+                >
+                  <i className="ri-filter-fill"></i>
+                  Filter
+                </button>
+              </div>
+            </div>
+          </div>
+          <Row>
+            <Col xl={12}>
+              <Widget
+                rightClickBtn={toggleRightColumn}
+                formatAmount={formatAmount}
+                purchaseSummary={purchaseSummary}
+                ConsolidatedLPOReviewSummaryData={
+                  ConsolidatedLPOReviewSummaryData
+                }
+                leadTimeSummary={leadTimeSummary}
+                priceAlertSummary={priceAlertSummary}
+                maverickSpendSummary={maverickSpendSummary}
+                maverickSpendPercentage={maverickSpendPercentage}
+                selectedBranchName={selectedBranchName}
+                error={error}
+                loading={loading}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col xl={12}>
+              <StoreVisits data={branchData} error={error} loading={loading} />
+            </Col>
+          </Row>
+          <Row>
+            <Col xl={12}>
+              <SupplierSpend
+                supplierData={spendBySupplier}
+                loading={loading}
+                error={error}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col xl={6}>
+              <MonthToDatePurchases
+                categories={monthToDateChart.categories}
+                series={monthToDateChart.series}
+                formatAmount={formatAmount}
+              />
+            </Col>
+            <Col xl={6}>
+              <YearToDatePurchases
+                categories={actualSpendChart.categories}
+                series={actualSpendChart.series}
+                formatAmount={formatAmount}
+              />
+            </Col>
+            <FilterActions
+              branch={filters.branch}
+              dateRange={filters.dateRange}
+              startDate={filters.startDate}
+              endDate={filters.endDate}
+              onBranchChange={(value) =>
+                dispatch(setBranch(value === "" ? null : Number(value)))
+              }
+              onBranchNameChange={setSelectedBranchName}
+              onDateRangeChange={(value) => dispatch(setDateRange(value))}
+              onStartDateChange={(value) => dispatch(setStartDate(value))}
+              onEndDateChange={(value) => dispatch(setEndDate(value))}
+              onApply={handleApplyFilters}
+              rightColumn={rightColumn}
+              hideRightColumn={toggleRightColumn}
+            />
+          </Row>
         </Container>
       </div>
     </React.Fragment>

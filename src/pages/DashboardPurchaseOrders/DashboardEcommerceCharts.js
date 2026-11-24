@@ -81,31 +81,31 @@ const currentMonthExists = categories.includes(currentMonth);
   },
 },
 
-annotations: {
-  xaxis: currentMonthExists
-    ? [
-        {
-          x: currentMonth,
-          borderColor: "#C68E45",
-          strokeDashArray: 2,
-          borderWidth: 2,
-          label: {
-            text: "currentMonth",
-            position: "top",
-            orientation: "horizontal",
-            borderColor: "#C68E45",
-             padding: "2px 6px",
-                borderRadius: "4px",
-            style: {
-              color: "#fff",
-              background: "#C68E45",
-              fontSize: "11px",
-            },
-          },
-        },
-      ]
-    : [],
-},
+// annotations: {
+//   xaxis: currentMonthExists
+//     ? [
+//         {
+//           x: currentMonth,
+//           borderColor: "#C68E45",
+//           strokeDashArray: 2,
+//           borderWidth: 2,
+//           label: {
+//             text: "currentMonth",
+//             position: "top",
+//             orientation: "horizontal",
+//             borderColor: "#C68E45",
+//              padding: "2px 6px",
+//                 borderRadius: "4px",
+//             style: {
+//               color: "#fff",
+//               background: "#C68E45",
+//               fontSize: "11px",
+//             },
+//           },
+//         },
+//       ]
+//     : [],
+// },
   };
 
   return (
@@ -168,6 +168,9 @@ const todayExists = categories.some(
         show: false,
       },
        labels: {
+          rotate: 0,
+    rotateAlways: false,
+    hideOverlappingLabels: false,
     formatter: (value) => {
       const day = Number(value);
       return day === 1 || day % 5 === 0 ? day : "";
@@ -197,31 +200,31 @@ tooltip: {
       Number(val || 0).toLocaleString("en-KE"),
   },
 },
-annotations: {
-  xaxis: todayExists
-    ? [
-        {
-          x: today,
-          borderColor: "#C68E45",
-          strokeDashArray: 2,
-          borderWidth: 2,
+// annotations: {
+//   xaxis: todayExists
+//     ? [
+//         {
+//           x: today,
+//           borderColor: "#C68E45",
+//           strokeDashArray: 2,
+//           borderWidth: 2,
 
-          label: {
-            text: "Today",
-            position: "top",
-            orientation: "horizontal",
-            borderColor: "#C68E45",
-            padding: 2,
-            style: {
-              color: "#fff",
-              background: "#C68E45",
-              fontSize: "11px",
-            },
-          },
-        },
-      ]
-    : [],
-},
+//           label: {
+//             text: "Today",
+//             position: "top",
+//             orientation: "horizontal",
+//             borderColor: "#C68E45",
+//             padding: 2,
+//             style: {
+//               color: "#fff",
+//               background: "#C68E45",
+//               fontSize: "11px",
+//             },
+//           },
+//         },
+//       ]
+//     : [],
+// },
   };
 
   return (
@@ -347,7 +350,6 @@ const SpendCharts = ({ dataColors, series, categories, formatAmount }) => {
   );
 };
 
-
 const StoreVisitsCharts = ({
   dataColors,
   categories = [],
@@ -461,6 +463,5 @@ const StoreVisitsCharts = ({
     />
   );
 };
-
 
 export { RevenueCharts, StoreVisitsCharts, SpendCharts, MonthToDateCharts };

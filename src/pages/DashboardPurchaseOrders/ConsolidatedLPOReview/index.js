@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ConsolidatedLPOReviewTable from "../ConsolidatedLPOReview/ConsolidatedLPOReviewTable";
 import ConsolidatedLPOReviewCards from "../ConsolidatedLPOReview/ConsolidatedLPOReviewCards";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import { getKPIConsolidatedLPOReview} from "../../../slices/dashboardPurchase/ConsolidatedLPOReview/thunk";
+import { getKPIConsolidatedLPOReview } from "../../../slices/dashboardPurchase/ConsolidatedLPOReview/thunk";
 import FilterActions from "../../../Components/Common/FilterActions";
 import {
   setBranch,
@@ -23,7 +23,7 @@ const ConsolidatedLPOReview = () => {
   const navigate = useNavigate();
 
   const [rightColumn, setRightColumn] = useState(false);
-const [isSticky, setIsSticky] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
 
   const toggleRightColumn = () => {
     setRightColumn(!rightColumn);
@@ -32,109 +32,109 @@ const [isSticky, setIsSticky] = useState(false);
   const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
 
   const {
- KPIConsolidatedLPOReviewConsolidatedList = [],
-  KPIConsolidatedLPOReviewSummary = [],
-  KPIConsolidatedLPOReviewSupplier = [],
-  KPIConsolidatedLPOReviewBranch = [],
-  KPIConsolidatedLPOReviewDrilldown = [],
+    KPIConsolidatedLPOReviewConsolidatedList = [],
+    KPIConsolidatedLPOReviewSummary = [],
+    KPIConsolidatedLPOReviewSupplier = [],
+    KPIConsolidatedLPOReviewBranch = [],
+    KPIConsolidatedLPOReviewDrilldown = [],
 
     loading,
     error,
     filters,
   } = useSelector((state) => state.consolidatedLPOReview);
 
-const {
-  ConsolidatedLPOReviewConsolidatedListData,
-  ConsolidatedLPOReviewSummaryData,
-  ConsolidatedLPOReviewSupplierData,
-  ConsolidatedLPOReviewBranchData,
-  ConsolidatedLPOReviewDrilldownData,
-} = usePurchaseOrders(
-  [], // PurchaseOrders
-  [], // KPIPurchases
-  [], // KPISummary
-  [], // KPICategory
-  [], // KPISupplier
-  [], // KPIBranch
-  [], // KPIMonthly
-  [], // KPIType
+  const {
+    ConsolidatedLPOReviewConsolidatedListData,
+    ConsolidatedLPOReviewSummaryData,
+    ConsolidatedLPOReviewSupplierData,
+    ConsolidatedLPOReviewBranchData,
+    ConsolidatedLPOReviewDrilldownData,
+  } = usePurchaseOrders(
+    [], // PurchaseOrders
+    [], // KPIPurchases
+    [], // KPISummary
+    [], // KPICategory
+    [], // KPISupplier
+    [], // KPIBranch
+    [], // KPIMonthly
+    [], // KPIType
 
-  [], // KPIMaverickSpend
-  [], // KPIMaverickSpendSummary
-  [], // KPIMaverickSpendSupplier
-  [], // KPIMaverickSpendBranch
-  [], // KPIMaverickSpendOffPOInvoices
-  [], // KPIMaverickSpendPOPriceVariance
+    [], // KPIMaverickSpend
+    [], // KPIMaverickSpendSummary
+    [], // KPIMaverickSpendSupplier
+    [], // KPIMaverickSpendBranch
+    [], // KPIMaverickSpendOffPOInvoices
+    [], // KPIMaverickSpendPOPriceVariance
 
-  [], // KPIPriceAlerts
-  [], // KPIPriceAlertsSummary
-  [], // KPIPriceAlertsItems
-  [], // KPIPriceAlertsHistory
+    [], // KPIPriceAlerts
+    [], // KPIPriceAlertsSummary
+    [], // KPIPriceAlertsItems
+    [], // KPIPriceAlertsHistory
 
-  [], // KPILeadTime
-  [], // KPILeadTimeSummary
-  [], // KPILeadTimeSupplier
-  [], // KPILeadTimePODetails
-  [], // KPILeadTimeMonth
-  [], // KPILeadTimeBranch
+    [], // KPILeadTime
+    [], // KPILeadTimeSummary
+    [], // KPILeadTimeSupplier
+    [], // KPILeadTimePODetails
+    [], // KPILeadTimeMonth
+    [], // KPILeadTimeBranch
 
-  [], // GoodsReceived
-  [], // LastYearGoodsReceived
+    [], // GoodsReceived
+    [], // LastYearGoodsReceived
 
-  [], // ActualSpend
-  [], // ActualSpendSummary
-  [], // ActualSpendCategory
-  [], // ActualSpendSupplier
-  [], // ActualSpendBranch
-  [], // ActualSpendMonthly
-  [], // ActualSpendType
+    [], // ActualSpend
+    [], // ActualSpendSummary
+    [], // ActualSpendCategory
+    [], // ActualSpendSupplier
+    [], // ActualSpendBranch
+    [], // ActualSpendMonthly
+    [], // ActualSpendType
 
-  [], // DailySpend
-  [], // DailySpendSummary
-  [], // DailySpendCategory
-  [], // DailySpendSupplier
-  [], // DailySpendBranch
-  [], // DailySpendMonthly
-  [], // DailySpendType
+    [], // DailySpend
+    [], // DailySpendSummary
+    [], // DailySpendCategory
+    [], // DailySpendSupplier
+    [], // DailySpendBranch
+    [], // DailySpendMonthly
+    [], // DailySpendType
 
-  [], // LastYearActualSpend
-  [], // LastYearActualSpendSummary
-  [], // LastYearActualSpendCategory
-  [], // LastYearActualSpendSupplier
-  [], // LastYearActualSpendBranch
-  [], // LastYearActualSpendMonthly
-  [], // LastYearActualSpendType
+    [], // LastYearActualSpend
+    [], // LastYearActualSpendSummary
+    [], // LastYearActualSpendCategory
+    [], // LastYearActualSpendSupplier
+    [], // LastYearActualSpendBranch
+    [], // LastYearActualSpendMonthly
+    [], // LastYearActualSpendType
 
-  [], // LastYearDailySpend
-  [], // LastYearDailySpendSummary
-  [], // LastYearDailySpendCategory
-  [], // LastYearDailySpendSupplier
-  [], // LastYearDailySpendBranch
-  [], // LastYearDailySpendMonthly
-  [], // LastYearDailySpendType
+    [], // LastYearDailySpend
+    [], // LastYearDailySpendSummary
+    [], // LastYearDailySpendCategory
+    [], // LastYearDailySpendSupplier
+    [], // LastYearDailySpendBranch
+    [], // LastYearDailySpendMonthly
+    [], // LastYearDailySpendType
 
-  [], // kpiOverdueAccounts
+    [], // kpiOverdueAccounts
 
-  [], // KPISupplierOrderFillRateSummary
-  [], // KPISupplierOrderFillRateSupplierOFR
-  [], // KPISupplierOrderFillRateOrderDrilldown
-  [], // KPISupplierOrderFillRateBranch
+    [], // KPISupplierOrderFillRateSummary
+    [], // KPISupplierOrderFillRateSupplierOFR
+    [], // KPISupplierOrderFillRateOrderDrilldown
+    [], // KPISupplierOrderFillRateBranch
 
-  [], // KPISupplierReturnsSummary
-  [], // KPISupplierReturnsSupplier
-  [], // KPISupplierReturnsDrilldown
-  [], // KPISupplierReturnsBranch
-  [], // KPISupplierReturnsSKU
-  [], // KPISupplierReturnsReason
+    [], // KPISupplierReturnsSummary
+    [], // KPISupplierReturnsSupplier
+    [], // KPISupplierReturnsDrilldown
+    [], // KPISupplierReturnsBranch
+    [], // KPISupplierReturnsSKU
+    [], // KPISupplierReturnsReason
 
-  KPIConsolidatedLPOReviewConsolidatedList,
-  KPIConsolidatedLPOReviewSummary,
-  KPIConsolidatedLPOReviewSupplier,
-  KPIConsolidatedLPOReviewBranch,
-  KPIConsolidatedLPOReviewDrilldown,
+    KPIConsolidatedLPOReviewConsolidatedList,
+    KPIConsolidatedLPOReviewSummary,
+    KPIConsolidatedLPOReviewSupplier,
+    KPIConsolidatedLPOReviewBranch,
+    KPIConsolidatedLPOReviewDrilldown,
 
-  filters
-);
+    filters,
+  );
 
   useEffect(() => {
     const params = {
@@ -169,7 +169,7 @@ const {
         groupBy: "BRANCH",
       }),
     );
-      dispatch(
+    dispatch(
       getKPIConsolidatedLPOReview({
         ...params,
         groupBy: "CONSOLIDATED_LIST",
@@ -193,14 +193,14 @@ const {
     const handleScroll = () => {
       setIsSticky(window.scrollY > 50);
     };
-  
+
     window.addEventListener("scroll", handleScroll);
-  
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleApplyFilters = () => {
-   const params = {
+    const params = {
       clientid: 1,
       branchcode: filters.branch,
       startDate: filters.startDate,
@@ -232,7 +232,7 @@ const {
         groupBy: "BRANCH",
       }),
     );
-      dispatch(
+    dispatch(
       getKPIConsolidatedLPOReview({
         ...params,
         groupBy: "CONSOLIDATED_LIST",
@@ -250,57 +250,56 @@ const {
             subtitle={selectedBranchName}
           />
           <div
-  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
-  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
-}`}
-  style={{
-    position: "sticky",
-    top: "70px",
-    zIndex: 1030,
-    width: "100%",
-    marginTop: "-15px",
-    // backgroundColor: "#",
-  }}
->
-    <div className="d-flex align-items-center flex-wrap gap-2">
+            className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+              isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+            }`}
+            style={{
+              position: "sticky",
+              top: "70px",
+              zIndex: 100,
+              width: "100%",
+              marginTop: "-15px",
+              // backgroundColor: "#",
+            }}
+          >
+            <div className="d-flex align-items-center flex-wrap gap-2">
+              <div className="d-flex align-items-center gap-1">
+                <span>Filtered From:</span>
+                <strong>{filters?.startDate || ""}</strong> to{" "}
+                <strong>{filters?.endDate || ""}</strong>
+              </div>
 
-  <div className="d-flex align-items-center gap-1">
-    <span>Filtered From:</span>
-    <strong>{filters?.startDate || ""}</strong> to{" "}
-<strong>{filters?.endDate || ""}</strong>
-  </div>
+              <div
+                style={{
+                  borderLeft: "2px solid #ced4da",
+                  height: "12px",
+                  margin: "0 4px",
+                }}
+              />
 
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-
-  <div className="d-flex align-items-center gap-1">
-    <span>Selected Branch:</span>
-    <strong>{selectedBranchName}</strong>
-  </div>
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-  <div className="d-flex align-items-center gap-1 no-print">
-    <button
-      type="button"
-      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-      onClick={toggleRightColumn}
-    >
-      <i className="ri-filter-fill"></i>
-      Filter
-    </button>
-  </div>
-  </div>
-</div>   
+              <div className="d-flex align-items-center gap-1">
+                <span>Selected Branch:</span>
+                <strong>{selectedBranchName}</strong>
+              </div>
+              <div
+                style={{
+                  borderLeft: "2px solid #ced4da",
+                  height: "12px",
+                  margin: "0 4px",
+                }}
+              />
+              <div className="d-flex align-items-center gap-1 no-print">
+                <button
+                  type="button"
+                  className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                  onClick={toggleRightColumn}
+                >
+                  <i className="ri-filter-fill"></i>
+                  Filter
+                </button>
+              </div>
+            </div>
+          </div>
           <Row>
             <Col xl={12}>
               <ConsolidatedLPOReviewCards
@@ -317,11 +316,17 @@ const {
           <Row>
             <Col>
               <ConsolidatedLPOReviewTable
-                ConsolidatedLPOReviewSupplier={ConsolidatedLPOReviewSupplierData}
- ConsolidatedLPOReviewDrilldown={ConsolidatedLPOReviewDrilldownData}
-  ConsolidatedLPOReviewBranch={ConsolidatedLPOReviewBranchData}
-  ConsolidatedLPOReviewConsolidatedList={ConsolidatedLPOReviewConsolidatedListData}
-  // SupplierReturnsReason={SupplierReturnsReasonData}
+                ConsolidatedLPOReviewSupplier={
+                  ConsolidatedLPOReviewSupplierData
+                }
+                ConsolidatedLPOReviewDrilldown={
+                  ConsolidatedLPOReviewDrilldownData
+                }
+                ConsolidatedLPOReviewBranch={ConsolidatedLPOReviewBranchData}
+                ConsolidatedLPOReviewConsolidatedList={
+                  ConsolidatedLPOReviewConsolidatedListData
+                }
+                // SupplierReturnsReason={SupplierReturnsReasonData}
                 error={error}
                 loading={loading}
               />

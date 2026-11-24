@@ -53,9 +53,10 @@ const StoreVisits = ({ data = {}, error, loading }) => {
 
           {loading ? (
             <div className="text-center py-5">
-              <div className="spinner-border text-primary mb-3" role="status">
-                {/* <span className="visually-hidden">Loading...</span> */}
-              </div>
+              <div
+                className="spinner-border text-primary mb-3"
+                role="status"
+              ></div>
             </div>
           ) : error ? (
             <div className="text-center py-5">

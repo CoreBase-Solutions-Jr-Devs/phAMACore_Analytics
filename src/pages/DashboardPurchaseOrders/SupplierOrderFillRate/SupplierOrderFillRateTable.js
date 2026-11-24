@@ -60,21 +60,21 @@ const getStatusBadge = (status) => {
 
 const SupplierOrderTabs = [
   {
-    label: "Supplier OFR",
+    label: "SupplierOFRAnalysis",
     value: "supplier",
     className: "bg-primary-subtle text-primary",
     activeClass: "bg-primary text-white",
     badgeClass: "bg-primary",
   },
   {
-    label: "Order Drilldown",
+    label: "OrderDrilldownAnalysis",
     value: "orders",
     className: "bg-success-subtle text-success",
     activeClass: "bg-success text-white",
     badgeClass: "bg-success",
   },
   {
-    label: "Branch",
+    label: "BranchAnalysis",
     value: "branch",
     className: "bg-warning-subtle text-warning",
     activeClass: "bg-warning text-dark",
@@ -124,7 +124,6 @@ const renderInsightCell = (content, row, prefix) => {
   );
 };
  
-// Branch OFR columns
 const supplierColumns = useMemo(
   () => [
     {
@@ -317,7 +316,6 @@ const supplierColumns = useMemo(
   []
 );
 
-// Order Drilldown columns
 const orderColumns = useMemo(
   () => [
     {
@@ -558,7 +556,6 @@ const orderColumns = useMemo(
   []
 );
 
-// Top Shortages columns
 const branchColumns = useMemo(
   () => [
     {
@@ -900,6 +897,7 @@ const handleExportExcel = () => {
       isGlobalFilter={true}
       SearchPlaceholder={currentTable.placeholder}
       customPageSize={10}
+         searchInputWidth="450px"
       pageSizeOptions={[5, 10, 20, 30, 50]}
       loading={loading}
       error={error}

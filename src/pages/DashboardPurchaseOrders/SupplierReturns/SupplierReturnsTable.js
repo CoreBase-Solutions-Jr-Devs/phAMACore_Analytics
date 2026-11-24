@@ -60,7 +60,7 @@ const getStatusBadge = (status) => {
 
 const SupplierReturnsTabs = [
   {
-    label: "Supplier",
+    label: "SupplierAnalysis",
     value: "supplier",
     className: "bg-primary-subtle text-primary",
     activeClass: "bg-primary text-white",
@@ -74,7 +74,7 @@ const SupplierReturnsTabs = [
     badgeClass: "bg-success",
   },
   {
-    label: "Branch",
+    label: "BranchAnalysis",
     value: "branch",
     className: "bg-warning-subtle text-warning",
     activeClass: "bg-warning text-dark",
@@ -936,8 +936,7 @@ const handleExportExcel = () => {
       onExport={handleExportExcel}
     />
   </CardHeader>
-
-    
+   
           <CardBody>
             {error && (
               <Alert color="danger" className="mb-3">

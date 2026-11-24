@@ -9,10 +9,6 @@ const getBadgeColor = (percentage) => {
     return "bg-warning-subtle text-warning";
   }
 
-  // if (percentage < 0) {
-  //   return "bg-danger-subtle text-danger";
-  // }
-
   if (percentage < 10) {
     return "bg-danger-subtle text-danger-emphasis";
   }
@@ -23,20 +19,17 @@ const getBadgeColor = (percentage) => {
   return "bg-success-subtle text-success";
 };
 
-// Format currency
 const formatAmount = (value) =>
   Number(value ?? 0).toLocaleString("en-KE", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-// Format percentages
 const formatPercentage = (value) => `${Number(value ?? 0).toFixed(2)}%`;
 
 const SupplierSpend = ({ supplierData, error, loading }) => {
   const hasData = Array.isArray(supplierData) && supplierData.length > 0;
 
-  // Table columns
   const columns = [
     {
       header: "Rank",
@@ -50,7 +43,7 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
       accessorKey: "supplier_name",
       cell: ({ row }) => (
         <div>
-          <div className="fw-semibold text-dark">
+          <div className="fw-medium text-dark">
             {row.original.supplier_name}
           </div>
           <small className="text-muted">{row.original.supplier_id}</small>
@@ -61,7 +54,7 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
       header: "NetPurch(Incl.)KES",
       accessorKey: "net_purchases_incl",
       cell: ({ getValue }) => (
-        <span className="fw-semibold text-caramel">
+        <span className="fw-medium text-caramel">
           {formatAmount(getValue())}
         </span>
       ),
@@ -70,7 +63,7 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
       header: "GrossPurch(Excl.)KES",
       accessorKey: "gross_purchases_excl",
       cell: ({ getValue }) => (
-        <span className="text-success fw-semibold">
+        <span className="text-success fw-medium">
           {formatAmount(getValue())}
         </span>
       ),
@@ -79,7 +72,7 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
       header: "NetPurch(Excl.)KES",
       accessorKey: "net_purchases_excl",
       cell: ({ getValue }) => (
-        <span className="fw-semibold text-secondary">
+        <span className="fw-medium text-secondary">
           {formatAmount(getValue())}
         </span>
       ),
@@ -88,7 +81,7 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
       header: "Returns(Excl.)KES",
       accessorKey: "purchase_returns_excl",
       cell: ({ getValue }) => (
-        <span className="text-danger font-semibold">
+        <span className="text-danger font-medium">
           {formatAmount(getValue())}
         </span>
       ),
@@ -141,7 +134,6 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
     },
   ];
 
-  // Export supplier data
   const handleExportExcel = () => {
     const rows = (supplierData || []).map((item) => ({
       Rank: item.rank_pos,
@@ -206,6 +198,7 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
               isGlobalFilter={true}
               isColumnFilter={false}
               customPageSize={10}
+                 searchInputWidth="450px"
               pageSizeOptions={[5, 10, 20, 30, 50]}
               showPagination={true}
               showPageSize={true}

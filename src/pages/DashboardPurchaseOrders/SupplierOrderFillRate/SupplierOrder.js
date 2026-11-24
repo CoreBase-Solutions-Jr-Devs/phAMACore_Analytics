@@ -138,8 +138,7 @@ const SupplierOrder = ({
                   <h5 className="mt-1 ff-secondary fw-semibold text-primary">
                     {summary.total_pos_issued ?? 0}
                   </h5>
-                  <div className="mb-0 mt-auto">
-                 
+                  <div className="mb-0 mt-auto">                 
                        <p className="text-muted mb-0">
                       Fulfilled POs:{" "}
                       <span className="fw-semibold">

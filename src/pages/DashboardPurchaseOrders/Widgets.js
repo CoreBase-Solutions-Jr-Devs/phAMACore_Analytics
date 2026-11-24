@@ -17,7 +17,6 @@ const Widgets = ({
   priceAlertSummary = {},
   maverickSpendSummary = {},
   maverickSpendPercentage = 0,
-  // avgLeadTime = 0,
   rightClickBtn,
   selectedBranchName,
 }) => {
@@ -102,36 +101,6 @@ const Widgets = ({
 
   return (
     <React.Fragment>
- {/* <div
-      className="d-flex align-items-center justify-content-center flex-wrap gap-4 bg-body p-2"
-      style={{
-        position: "sticky",
-        top: "0px",
-        zIndex: 1030,
-        width: "100%",
-      }}
-    >
-      <div className="d-flex align-items-center gap-2">
-        <span>Filtered From:</span>
-        <strong>{startDate}</strong> to <strong>{endDate}</strong>
-      </div>
-
-      <div className="d-flex align-items-center gap-2">
-        <span>Selected Branch:</span>
-        <strong>{selectedBranchName}</strong>
-      </div>
-
-      <div className="d-flex align-items-center gap-2 no-print">
-        <button
-          type="button"
-          className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-          onClick={rightClickBtn}
-        >
-          <i className="ri-filter-fill"></i>
-          Filter
-        </button>
-      </div>
-    </div> */}
 
       <Row
         className="g-2 mb-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 mt-0"
@@ -277,7 +246,7 @@ const Widgets = ({
 
               <div className="mb-0 mt-auto">
                 <p className="text-muted mb-0">
-                  On-time Delivery:{" "}
+                  Rate:{" "}
                   <span className="fw-semibold">
                     {`${Number(
                       leadTimeSummaryData.on_time_delivery_rate_perc || 0,

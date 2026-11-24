@@ -248,74 +248,100 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
 
   // ============================================================
 
-const actualSpendChart = useMemo(() => {
-  const now = new Date();
+ const actualSpendChart = useMemo(() => {
+    const now = new Date();
 
-  const currentYear = now.getFullYear();
-  const lastYear = currentYear - 1;
+    const currentYear = now.getFullYear();
+    const lastYear = currentYear - 1;
 
-  const months = Array.from({ length: 12 }, (_, i) =>
-    new Date(2000, i, 1).toLocaleString("en-US", {
-      month: "short",
-    })
-  );
+    // Use selected end date if available
+    let endDate = now;
 
-  const currentYearMap = Object.fromEntries(
-    months.map((month) => [month, 0])
-  );
+    if (filters?.endDate) {
+      const [day, month, year] = filters.endDate.split("/").map(Number);
+      endDate = new Date(year, month - 1, day);
+    }
 
-  const lastYearMap = Object.fromEntries(
-    months.map((month) => [month, 0])
-  );
+    // const endMonth = endDate.getMonth() + 1;
 
-  // Current year Goods Received
-  (GoodsReceived || []).forEach((item) => {
-    if (!item?.invoice_Date) return;
+    // January → selected month
+    const months = Array.from({ length: 12 }, (_, i) =>
+      new Date(2000, i, 1).toLocaleString("en-US", {
+        month: "short",
+      }),
+    );
 
-    const invoiceDate = new Date(item.invoice_Date);
+    const currentYearMap = Object.fromEntries(
+      months.map((month) => [month, 0]),
+    );
 
-    if (invoiceDate.getFullYear() !== currentYear) return;
+    const lastYearMap = Object.fromEntries(months.map((month) => [month, 0]));
 
-    const month = months[invoiceDate.getMonth()];
+    // =========================
+    // CURRENT YEAR
+    // =========================
 
-    const spend = Number(item.total_grn_value || 0);
+    (ActualSpendMonthly || []).forEach((item) => {
+      if (!item?.year || !item?.month) return;
 
-    currentYearMap[month] += spend;
-  });
+      if (Number(item.year) !== currentYear) return;
 
-  // Last year Goods Received
-  (LastYearGoodsReceived || []).forEach((item) => {
-    if (!item?.invoice_Date) return;
+      const monthIndex = Number(item.month) - 1;
 
-    const invoiceDate = new Date(item.invoice_Date);
+      const month = new Date(2000, monthIndex, 1).toLocaleString("en-US", {
+        month: "short",
+      });
 
-    if (invoiceDate.getFullYear() !== lastYear) return;
+      const spend = Number(item.net_purchases_incl || 0);
 
-    const month = months[invoiceDate.getMonth()];
+      if (currentYearMap[month] !== undefined) {
+        currentYearMap[month] += spend;
+      }
+    });
 
-    const spend = Number(item.total_grn_value || 0);
+    // =========================
+    // LAST YEAR
+    // =========================
 
-    lastYearMap[month] += spend;
-  });
+    (LastYearActualSpendMonthly || []).forEach((item) => {
+      if (!item?.year || !item?.month) return;
 
-  return {
-    categories: months,
-    series: [
-      {
-        name: `${currentYear}`,
-        data: months.map((month) =>
-          Number(currentYearMap[month].toFixed(2))
-        ),
-      },
-      {
-        name: `${lastYear}`,
-        data: months.map((month) =>
-          Number(lastYearMap[month].toFixed(2))
-        ),
-      },
-    ],
-  };
-}, [GoodsReceived, LastYearGoodsReceived]);
+      if (Number(item.year) !== lastYear) return;
+
+      const monthIndex = Number(item.month) - 1;
+
+      const month = new Date(2000, monthIndex, 1).toLocaleString("en-US", {
+        month: "short",
+      });
+
+      const spend = Number(item.net_purchases_incl || 0);
+
+      if (lastYearMap[month] !== undefined) {
+        lastYearMap[month] += spend;
+      }
+    });
+
+    console.log("ActualSpendMonthly:", ActualSpendMonthly);
+    console.log("LastYearActualSpendMonthly:", LastYearActualSpendMonthly);
+
+    console.log("Current Year Map:", currentYearMap);
+    console.log("Last Year Map:", lastYearMap);
+
+    return {
+      categories: months,
+
+      series: [
+        {
+          name: `${currentYear}`,
+          data: months.map((month) => Number(currentYearMap[month] || 0)),
+        },
+        {
+          name: `${lastYear}`,
+          data: months.map((month) => Number(lastYearMap[month] || 0)),
+        },
+      ],
+    };
+  }, [ActualSpendMonthly, LastYearActualSpendMonthly, filters]);
 
   // ============================================================
   // MONTH-TO-DATE SPEND CHART
@@ -388,26 +414,7 @@ const actualSpendChart = useMemo(() => {
         lastYearMap[day] += Number(item?.total_grn_value || 0);
       }
     });
-    console.log("========== MTD PURCHASES DEBUG ==========");
 
-    console.log("Current year:", currentYear);
-    console.log("Last year:", lastYear);
-
-    console.log("GoodsReceived:", GoodsReceived);
-    console.log("LastYearGoodsReceived:", LastYearGoodsReceived);
-
-    console.log("Current year map:", currentYearMap);
-    console.log("Last year map:", lastYearMap);
-
-    console.log(
-      "Current year chart data:",
-      DAYS.map((day) => currentYearMap[day]),
-    );
-
-    console.log(
-      "Last year chart data:",
-      DAYS.map((day) => lastYearMap[day]),
-    );
     return {
       categories: DAYS.map(String),
 

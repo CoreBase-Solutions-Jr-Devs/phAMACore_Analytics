@@ -5,9 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AgeingCards from "../SupplierAgeing/AgeingCards";
 import SupplierAgeingTable from "../SupplierAgeing/SupplierAgeingTable";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import {
-  getKPIOverdueAccounts,
-} from "../../../slices/dashboardSales/thunk";
+import { getKPIOverdueAccounts } from "../../../slices/dashboardSales/thunk";
 import FilterActions from "../../../Components/Common/FilterActions";
 import {
   setBranch,
@@ -15,125 +13,121 @@ import {
   setStartDate,
   setEndDate,
 } from "../../../slices/dashboardPurchase/SupplierAgeing/reducer";
- import { clearSupplierAgeingData } from "../../../slices/dashboardPurchase/SupplierAgeing/reducer";
+import { clearSupplierAgeingData } from "../../../slices/dashboardPurchase/SupplierAgeing/reducer";
 import usePurchaseOrders from "../../../Components/Hooks/usePurchaseOrders";
-import {
-  getPeriod,
-} from "../../../helpers/date_helper";
+import { getPeriod } from "../../../helpers/date_helper";
 const SupplierAgeing = () => {
-  document.title = "Purchases Dashboard | phAMACore Analytics"
+  document.title = "Purchases Dashboard | phAMACore Analytics";
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [rightColumn, setRightColumn] = useState(false);
-const [isSticky, setIsSticky] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
 
   const toggleRightColumn = () => {
     setRightColumn(!rightColumn);
   };
 
-  const [selectedBranchName, setSelectedBranchName] =
-    useState("All Branches");
+  const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
 
-const {
-  kpiOverdueAccounts = [],
-loading,
-  error,
-  filters,
-} = useSelector((state) => state.supplierAgeing);
+  const {
+    kpiOverdueAccounts = [],
+    loading,
+    error,
+    filters,
+  } = useSelector((state) => state.supplierAgeing);
 
-const {
-  currentReceivables,
-  overdue31To60,
-  overdue61To90,
-  overdue91To120,
-  overdue120Plus,
-  overdueSupplierAccounts,
-} = usePurchaseOrders(
-  [], // PurchaseOrders
-  [], // KPIPurchases
-  [], // KPISummary
-  [], // KPICategory
-  [], // KPISupplier
-  [], // KPIBranch
-  [], // KPIMonthly
-  [], // KPIType
+  const {
+    currentReceivables,
+    overdue31To60,
+    overdue61To90,
+    overdue91To120,
+    overdue120Plus,
+    overdueSupplierAccounts,
+  } = usePurchaseOrders(
+    [], // PurchaseOrders
+    [], // KPIPurchases
+    [], // KPISummary
+    [], // KPICategory
+    [], // KPISupplier
+    [], // KPIBranch
+    [], // KPIMonthly
+    [], // KPIType
 
-  [], // KPIMaverickSpend
-  [], // KPIMaverickSpendSummary
-  [], // KPIMaverickSpendSupplier
-  [], // KPIMaverickSpendBranch
-  [], // KPIMaverickSpendOffPOInvoices
-  [], // KPIMaverickSpendPOPriceVariance
+    [], // KPIMaverickSpend
+    [], // KPIMaverickSpendSummary
+    [], // KPIMaverickSpendSupplier
+    [], // KPIMaverickSpendBranch
+    [], // KPIMaverickSpendOffPOInvoices
+    [], // KPIMaverickSpendPOPriceVariance
 
-  [], // KPIPriceAlerts
-  [], // KPIPriceAlertsSummary
-  [], // KPIPriceAlertsItems
-  [], // KPIPriceAlertsHistory
+    [], // KPIPriceAlerts
+    [], // KPIPriceAlertsSummary
+    [], // KPIPriceAlertsItems
+    [], // KPIPriceAlertsHistory
 
-  [], // KPILeadTime
-  [], // KPILeadTimeSummary
-  [], // KPILeadTimeSupplier
-  [], // KPILeadTimePODetails
-  [], // KPILeadTimeMonth
-  [], // KPILeadTimeBranch
+    [], // KPILeadTime
+    [], // KPILeadTimeSummary
+    [], // KPILeadTimeSupplier
+    [], // KPILeadTimePODetails
+    [], // KPILeadTimeMonth
+    [], // KPILeadTimeBranch
 
-  [], // GoodsReceived
-  [], // LastYearGoodsReceived
+    [], // GoodsReceived
+    [], // LastYearGoodsReceived
 
-  [], // ActualSpend
-  [], // ActualSpendSummary
-  [], // ActualSpendCategory
-  [], // ActualSpendSupplier
-  [], // ActualSpendBranch
-  [], // ActualSpendMonthly
-  [], // ActualSpendType
+    [], // ActualSpend
+    [], // ActualSpendSummary
+    [], // ActualSpendCategory
+    [], // ActualSpendSupplier
+    [], // ActualSpendBranch
+    [], // ActualSpendMonthly
+    [], // ActualSpendType
 
-  [], // DailySpend
-  [], // DailySpendSummary
-  [], // DailySpendCategory
-  [], // DailySpendSupplier
-  [], // DailySpendBranch
-  [], // DailySpendMonthly
-  [], // DailySpendType
+    [], // DailySpend
+    [], // DailySpendSummary
+    [], // DailySpendCategory
+    [], // DailySpendSupplier
+    [], // DailySpendBranch
+    [], // DailySpendMonthly
+    [], // DailySpendType
 
-  [], // LastYearActualSpend
-  [], // LastYearActualSpendSummary
-  [], // LastYearActualSpendCategory
-  [], // LastYearActualSpendSupplier
-  [], // LastYearActualSpendBranch
-  [], // LastYearActualSpendMonthly
-  [], // LastYearActualSpendType
+    [], // LastYearActualSpend
+    [], // LastYearActualSpendSummary
+    [], // LastYearActualSpendCategory
+    [], // LastYearActualSpendSupplier
+    [], // LastYearActualSpendBranch
+    [], // LastYearActualSpendMonthly
+    [], // LastYearActualSpendType
 
-  [], // LastYearDailySpend
-  [], // LastYearDailySpendSummary
-  [], // LastYearDailySpendCategory
-  [], // LastYearDailySpendSupplier
-  [], // LastYearDailySpendBranch
-  [], // LastYearDailySpendMonthly
-  [], // LastYearDailySpendType
+    [], // LastYearDailySpend
+    [], // LastYearDailySpendSummary
+    [], // LastYearDailySpendCategory
+    [], // LastYearDailySpendSupplier
+    [], // LastYearDailySpendBranch
+    [], // LastYearDailySpendMonthly
+    [], // LastYearDailySpendType
 
-  kpiOverdueAccounts,
-  filters
-);
+    kpiOverdueAccounts,
+    filters,
+  );
 
-useEffect(() => {
-
-   dispatch(
-        getKPIOverdueAccounts({
-          clientid: 1,
+  useEffect(() => {
+    dispatch(
+      getKPIOverdueAccounts({
+        clientid: 1,
         mode: "AGING",
         accountType: "SUPPLIER",
-    branchcode: filters.branch,
-      dateFrom:  filters.startDate,
-    dateTo:  filters.endDate,
-    periodFrom: getPeriod(filters.startDate),
-      periodTo: getPeriod(filters.endDate),
-    includeZeroBal: false,
-        }),
-      );
-}, [dispatch]);
+        branchcode: filters.branch,
+        dateFrom: filters.startDate,
+        dateTo: filters.endDate,
+        periodFrom: getPeriod(filters.startDate),
+        periodTo: getPeriod(filters.endDate),
+        includeZeroBal: false,
+      }),
+    );
+  }, [dispatch]);
 
   useEffect(() => {
     return () => {
@@ -145,35 +139,34 @@ useEffect(() => {
     const handleScroll = () => {
       setIsSticky(window.scrollY > 50);
     };
-  
+
     window.addEventListener("scroll", handleScroll);
-  
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-const handleApplyFilters = () => {
- 
+  const handleApplyFilters = () => {
     dispatch(
-         getKPIOverdueAccounts({
-           clientid: 1,
-         mode: "AGING",
-         accountType: "SUPPLIER",
-     branchcode: filters.branch,
-       dateFrom:  filters.startDate,
-     dateTo:  filters.endDate,
-     periodFrom: getPeriod(filters.startDate),
-       periodTo: getPeriod(filters.endDate),
-     includeZeroBal: false,
-         }),
-       );
-};
+      getKPIOverdueAccounts({
+        clientid: 1,
+        mode: "AGING",
+        accountType: "SUPPLIER",
+        branchcode: filters.branch,
+        dateFrom: filters.startDate,
+        dateTo: filters.endDate,
+        periodFrom: getPeriod(filters.startDate),
+        periodTo: getPeriod(filters.endDate),
+        includeZeroBal: false,
+      }),
+    );
+  };
   // const selectedBranchName =
   //   filters.branch == null || filters.branch === ""
   //     ? "All Branches"
   //     : (salesBranch || []).find(
   //         (m) => Number(m.branch_ID) === Number(filters.branch),
   //       )?.branch_name || "";
-        
+
   return (
     <React.Fragment>
       <div className="page-content">
@@ -181,111 +174,100 @@ const handleApplyFilters = () => {
           <BreadCrumb
             title="SupplierAgeing"
             pageTitle="Purchases"
-                subtitle= {selectedBranchName}
-
+            subtitle={selectedBranchName}
           />
           <div
-  className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
-  isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
-}`}
-  style={{
-    position: "sticky",
-    top: "70px",
-    zIndex: 1030,
-    width: "100%",
-    marginTop: "-15px",
-    // backgroundColor: "#",
-  }}
->
-    <div className="d-flex align-items-center flex-wrap gap-2">
+            className={`d-flex justify-content-end flex-wrap gap-4 p-1 mb-0 ${
+              isSticky ? "bg-white border-top border-bottom shadow-sm" : ""
+            }`}
+            style={{
+              position: "sticky",
+              top: "70px",
+              zIndex: 100,
+              width: "100%",
+              marginTop: "-15px",
+              // backgroundColor: "#",
+            }}
+          >
+            <div className="d-flex align-items-center flex-wrap gap-2">
+              <div className="d-flex align-items-center gap-1">
+                <span>Filtered From:</span>
+                <strong>{filters?.startDate || ""}</strong> to{" "}
+                <strong>{filters?.endDate || ""}</strong>
+              </div>
 
-  <div className="d-flex align-items-center gap-1">
-    <span>Filtered From:</span>
-    <strong>{filters?.startDate || ""}</strong> to{" "}
-<strong>{filters?.endDate || ""}</strong>
-  </div>
+              <div
+                style={{
+                  borderLeft: "2px solid #ced4da",
+                  height: "12px",
+                  margin: "0 4px",
+                }}
+              />
 
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-
-  <div className="d-flex align-items-center gap-1">
-    <span>Selected Branch:</span>
-    <strong>{selectedBranchName}</strong>
-  </div>
-<div
-  style={{
-    borderLeft: "2px solid #ced4da",
-    height: "12px",
-    margin: "0 4px",
-  }}
-/>
-  <div className="d-flex align-items-center gap-1 no-print">
-    <button
-      type="button"
-      className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
-      onClick={toggleRightColumn}
-    >
-      <i className="ri-filter-fill"></i>
-      Filter
-    </button>
-  </div>
-  </div>
-</div>   
+              <div className="d-flex align-items-center gap-1">
+                <span>Selected Branch:</span>
+                <strong>{selectedBranchName}</strong>
+              </div>
+              <div
+                style={{
+                  borderLeft: "2px solid #ced4da",
+                  height: "12px",
+                  margin: "0 4px",
+                }}
+              />
+              <div className="d-flex align-items-center gap-1 no-print">
+                <button
+                  type="button"
+                  className="btn btn-caramel d-flex align-items-center gap-2 layout-rightside-btn"
+                  onClick={toggleRightColumn}
+                >
+                  <i className="ri-filter-fill"></i>
+                  Filter
+                </button>
+              </div>
+            </div>
+          </div>
           <Row>
-            
-              <Col xl={12}>
-                      <AgeingCards
-                          rightClickBtn={toggleRightColumn}
-                          selectedBranchName={selectedBranchName}
-                        // formatAmount={formatAmount}
-                        overdueSupplierAccounts={overdueSupplierAccounts}
-                        currentReceivables={currentReceivables}
-                        overdue31To60={overdue31To60}
-                        overdue61To90={overdue61To90}
-                        overdue91To120={overdue91To120}
-                        overdue120Plus={overdue120Plus}
-                        error={error}
-                        loading={loading}
-                      />
+            <Col xl={12}>
+              <AgeingCards
+                rightClickBtn={toggleRightColumn}
+                selectedBranchName={selectedBranchName}
+                // formatAmount={formatAmount}
+                overdueSupplierAccounts={overdueSupplierAccounts}
+                currentReceivables={currentReceivables}
+                overdue31To60={overdue31To60}
+                overdue61To90={overdue61To90}
+                overdue91To120={overdue91To120}
+                overdue120Plus={overdue120Plus}
+                error={error}
+                loading={loading}
+              />
             </Col>
-            </Row>
-                <Row>                  
-                  
-                    <Col> 
-                                 <SupplierAgeingTable
-                               data={overdueSupplierAccounts}
-                               loading={loading}
-                               error={error}
-                             />
-                          </Col>                             
-          <FilterActions
-                  branch={filters.branch}
-                    dateRange={filters.dateRange}
-                    startDate={filters.startDate}
-                    endDate={filters.endDate}
-                    onBranchChange={(value) =>
-                      dispatch(setBranch(value === "" ? null : Number(value)))
-                    }
-                      onBranchNameChange={setSelectedBranchName}
-
-                    onDateRangeChange={(value) =>
-                      dispatch(setDateRange(value))
-                    }
-                    onStartDateChange={(value) =>
-                      dispatch(setStartDate(value))
-                    }
-                    onEndDateChange={(value) =>
-                      dispatch(setEndDate(value))
-                    }
-            onApply={handleApplyFilters}
-            rightColumn={rightColumn}
-            hideRightColumn={toggleRightColumn}
-          />
+          </Row>
+          <Row>
+            <Col>
+              <SupplierAgeingTable
+                data={overdueSupplierAccounts}
+                loading={loading}
+                error={error}
+              />
+            </Col>
+            <FilterActions
+              branch={filters.branch}
+              dateRange={filters.dateRange}
+              startDate={filters.startDate}
+              endDate={filters.endDate}
+              onBranchChange={(value) =>
+                dispatch(setBranch(value === "" ? null : Number(value)))
+              }
+              onBranchNameChange={setSelectedBranchName}
+              onDateRangeChange={(value) => dispatch(setDateRange(value))}
+              onStartDateChange={(value) => dispatch(setStartDate(value))}
+              onEndDateChange={(value) => dispatch(setEndDate(value))}
+              onApply={handleApplyFilters}
+              rightColumn={rightColumn}
+              hideRightColumn={toggleRightColumn}
+            />
           </Row>
         </Container>
       </div>

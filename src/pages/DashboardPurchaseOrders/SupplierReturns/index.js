@@ -240,13 +240,7 @@ SupplierReturnsReasonData,
       }),
     );
   };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (salesBranch || []).find(
-  //         (m) => Number(m.branch_ID) === Number(filters.branch),
-  //       )?.branch_name || "";
-
+ 
   return (
     <React.Fragment>
       <div className="page-content">
@@ -263,7 +257,7 @@ SupplierReturnsReasonData,
   style={{
     position: "sticky",
     top: "70px",
-    zIndex: 1030,
+    zIndex: 100,
     width: "100%",
     marginTop: "-15px",
     // backgroundColor: "#",
