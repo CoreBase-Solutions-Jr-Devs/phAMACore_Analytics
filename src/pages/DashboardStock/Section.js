@@ -6,7 +6,7 @@ import { resolveBranchName, cleanBranchName } from "../../helpers/branch_helper"
 import { formatAmount } from "../../helpers/format_helper";
 import DashboardSectionHeader from "../../Components/Common/DashboardSectionHeader";
 
-const Section = ({ rightClickBtn, onExportExcel, title = "KEY METRICS", pageLabel = "Inventory/Stock" }) => {
+const Section = ({ rightClickBtn, onExportExcel, title = "KEY METRICS", pageLabel = "Inventory/Stock", showMetricsHeader = false }) => {
   const {
     batchExpiryNeo = [],
     totalStockValueByBranch = [],
@@ -200,9 +200,10 @@ const Section = ({ rightClickBtn, onExportExcel, title = "KEY METRICS", pageLabe
       startDate={startDate}
       endDate={endDate}
       stockAsOf={stockAsOf}
-      onExportExcel={onExportExcel || handleExportExcel}
-      onPrint={handlePrint}
+      onExportExcel={showMetricsHeader ? (onExportExcel || handleExportExcel) : undefined}
+      onPrint={showMetricsHeader ? handlePrint : undefined}
       onFilterClick={rightClickBtn}
+      showMetricsHeader={showMetricsHeader}
     />
   );
 };

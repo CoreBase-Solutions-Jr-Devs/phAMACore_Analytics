@@ -2,8 +2,9 @@ import React, { useRef } from "react";
 import useStickyState from "../../hooks/useStickyState";
 
 /**
- * Shared dashboard section header with non-sticky KPI export/print actions
- * and a sticky filter summary + Filter trigger bar that stays accessible while scrolling.
+ * Shared dashboard section header with a sticky filter summary + Filter trigger bar
+ * that stays accessible while scrolling, followed optionally by non-sticky KPI
+ * section title and export/print actions.
  */
 const DashboardSectionHeader = ({
   title = "KEY METRICS",
@@ -16,45 +17,13 @@ const DashboardSectionHeader = ({
   onExportExcel,
   onPrint,
   onFilterClick,
+  showMetricsHeader = true,
 }) => {
   const stickyRef = useRef(null);
   const isStuck = useStickyState(stickyRef);
 
   return (
     <>
-      {/* Top Row: Section Title + KPI Export/Print Actions (scrolls normally) */}
-      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-        <h4 className="card-title mb-0">{title}</h4>
-
-        {(onExportExcel || onPrint) && (
-          <div className="d-flex align-items-center gap-2 no-print">
-            {onExportExcel && (
-              <button
-                type="button"
-                className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
-                onClick={onExportExcel}
-                title="Export to Excel"
-              >
-                <i className="ri-file-excel-2-line align-bottom"></i>
-                <span>Export Excel</span>
-              </button>
-            )}
-
-            {onPrint && (
-              <button
-                type="button"
-                className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
-                onClick={onPrint}
-                title="Print Dashboard"
-              >
-                <i className="ri-printer-line align-bottom"></i>
-                <span>Print</span>
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
       {/* Sticky Filter Bar: Remains pinned below the top navbar while scrolling */}
       <div
         ref={stickyRef}
@@ -103,6 +72,41 @@ const DashboardSectionHeader = ({
           )}
         </div>
       </div>
+
+      {/* Key Metrics Row: Section Title + KPI Export/Print Actions (scrolls normally below sticky bar) */}
+      {showMetricsHeader && (title || onExportExcel || onPrint) && (
+        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+          {title ? <h4 className="card-title mb-0">{title}</h4> : <span />}
+
+          {(onExportExcel || onPrint) && (
+            <div className="d-flex align-items-center gap-2 no-print">
+              {onExportExcel && (
+                <button
+                  type="button"
+                  className="btn btn-soft-success btn-export-excel d-flex align-items-center gap-1"
+                  onClick={onExportExcel}
+                  title="Export to Excel"
+                >
+                  <i className="ri-file-excel-2-line align-bottom"></i>
+                  <span>Export Excel</span>
+                </button>
+              )}
+
+              {onPrint && (
+                <button
+                  type="button"
+                  className="btn btn-soft-info btn-export-print d-flex align-items-center gap-1"
+                  onClick={onPrint}
+                  title="Print Dashboard"
+                >
+                  <i className="ri-printer-line align-bottom"></i>
+                  <span>Print</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 };

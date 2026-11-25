@@ -143,10 +143,8 @@ const SellThroughAnalysis = () => {
                     />
 
                     <Section
-                        title="SELL-THROUGH ANALYSIS"
                         pageLabel="Sell-Through Analysis"
                         rightClickBtn={toggleRightColumn}
-                        onExportExcel={handleExportSellThrough}
                     />
 
                     <Row>

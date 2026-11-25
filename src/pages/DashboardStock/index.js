@@ -300,7 +300,7 @@ const DashboardStock = () => {
                         subtitle={isBranchView ? branchDisplayName : undefined}
                     />
 
-                    <Section rightClickBtn={toggleRightColumn} />
+                    <Section rightClickBtn={toggleRightColumn} showMetricsHeader />
 
                     <Row>
                         <Col xl={12}>
