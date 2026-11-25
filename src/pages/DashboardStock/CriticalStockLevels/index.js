@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -89,8 +89,15 @@ const CriticalStockLevels = () => {
         dispatch(fetchKPICriticalStockouts({ ...health, GroupBy: "CRITICAL_STOCKOUTS", TopN: CRITICAL_TOP_N }));
     }, [dispatch, branchCode, activeFilters.endDate, lookbackDays]);
 
+    const filteredCriticalRef = useRef(null);
+
+    const handleFilteredCriticalChange = useCallback((items) => {
+        filteredCriticalRef.current = items;
+    }, []);
+
     const handleExportCriticalStock = () => {
-        const rows = (criticalStockouts || []).map((item) => ({
+        const source = filteredCriticalRef.current ?? criticalStockouts;
+        const rows = (source || []).map((item) => ({
             "Item Name": item.item_name || "Unknown",
             "Item Code": item.item_code || "",
             "Category / Group": item.item_group || "-",
@@ -153,7 +160,7 @@ const CriticalStockLevels = () => {
                                     </div>
                                 </CardHeader>
                                 <CardBody>
-                                    <CriticalStockChart />
+                                    <CriticalStockChart onFilteredDataChange={handleFilteredCriticalChange} />
                                 </CardBody>
                             </Card>
                         </Col>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Alert, Input } from "reactstrap";
 import TableContainer from "../../../../Components/Common/TableContainerReactTable";
@@ -57,6 +57,7 @@ const ExpiryProductTable = ({
     searchPlaceholder = "Search Products...",
     searchIdPrefix = "table-search",
     actionOptions = null,
+    onFilteredDataChange,
 }) => {
     const [searchValue, setSearchValue] = useState("");
     const [actionFilter, setActionFilter] = useState("ALL");
@@ -103,6 +104,12 @@ const ExpiryProductTable = ({
                 .some((field) => String(field ?? "").toLowerCase().includes(term))
         );
     }, [rows, searchValue, actionFilter]);
+
+    useEffect(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange(filteredTable);
+        }
+    }, [filteredTable, onFilteredDataChange]);
 
     const columns = useMemo(
         () => [
@@ -324,7 +331,7 @@ const ExpiryProductTable = ({
 // Write-Off Risk actions (excludes the "expired" bucket)
 const WRITE_OFF_ACTIONS = EXPIRY_BUCKETS.filter((b) => b.id !== "expired");
 
-const CustomTableOne = () => {
+const CustomTableOne = ({ onFilteredDataChange }) => {
     const {
         batchExpiryNeo,
         loadingBatchExpiryNeo,
@@ -335,6 +342,34 @@ const CustomTableOne = () => {
     } = useSelector((state) => state.StockInventory);
 
     const activeFilters = appliedFilters || filters;
+
+    const writeOffFilteredRef = useRef([]);
+    const expiredFilteredRef = useRef([]);
+
+    const emitCombinedFiltered = useCallback(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange([
+                ...(writeOffFilteredRef.current || []),
+                ...(expiredFilteredRef.current || []),
+            ]);
+        }
+    }, [onFilteredDataChange]);
+
+    const handleWriteOffFiltered = useCallback(
+        (rows) => {
+            writeOffFilteredRef.current = rows;
+            emitCombinedFiltered();
+        },
+        [emitCombinedFiltered]
+    );
+
+    const handleExpiredFiltered = useCallback(
+        (rows) => {
+            expiredFilteredRef.current = rows;
+            emitCombinedFiltered();
+        },
+        [emitCombinedFiltered]
+    );
 
     const { expiredTableRows, writeOffRiskTableRows } = useMemo(() => {
         const allRows = getExpiryRows(batchExpiryNeo, {
@@ -384,6 +419,7 @@ const CustomTableOne = () => {
                 searchPlaceholder="Search Write-Off Risk Products..."
                 searchIdPrefix="writeoff-table-search"
                 actionOptions={WRITE_OFF_ACTIONS}
+                onFilteredDataChange={handleWriteOffFiltered}
             />
 
             <hr className="my-4" />
@@ -398,6 +434,7 @@ const CustomTableOne = () => {
                 exportPrefix="Expired_Products_Stock"
                 searchPlaceholder="Search Expired Products..."
                 searchIdPrefix="expired-table-search"
+                onFilteredDataChange={handleExpiredFiltered}
             />
         </React.Fragment>
     );

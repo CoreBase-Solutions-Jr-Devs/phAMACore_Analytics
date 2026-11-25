@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -111,8 +111,17 @@ const SlowMovingStockPage = () => {
         dispatch(fetchKPISlowMovingStock({ ...health, GroupBy: "SLOW_MOVERS", TopN: SLOW_MOVER_TOP_N }));
     }, [dispatch, branchCode, activeFilters.endDate, lookbackDays]);
 
+    const filteredSlowRef = useRef(null);
+
+    const handleFilteredSlowChange = useCallback((rows) => {
+        filteredSlowRef.current = rows;
+    }, []);
+
     const handleExportSlowMovingStock = () => {
-        const rows = sortSlowMovingRows(buildSlowMovingRows(slowMovingStock), sortField, sortDesc).map((item) => ({
+        const source =
+            filteredSlowRef.current ??
+            sortSlowMovingRows(buildSlowMovingRows(slowMovingStock), sortField, sortDesc);
+        const rows = (source || []).map((item) => ({
             "Item Name": item.name,
             "Item Code": item.itemCode,
             "Category": item.category,
@@ -208,6 +217,7 @@ const SlowMovingStockPage = () => {
                                             sortField={sortField}
                                             sortDesc={sortDesc}
                                             onSort={handleSlowMovingSort}
+                                            onFilteredDataChange={handleFilteredSlowChange}
                                         />
                                     </div>
                                 </CardBody>

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -92,10 +92,17 @@ const BranchOrderFillRate = () => {
         dispatch(fetchKPIBranchOrderFillRate({ ...periodParams, GroupBy: "TOP_SHORTAGES" }));
     }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate]);
 
+    const filteredOfrRef = useRef(null);
+
+    const handleFilteredOfrChange = useCallback((rows) => {
+        filteredOfrRef.current = rows;
+    }, []);
+
     const handleExportBranchOfr = () => {
-        let source = branchOrderFillRateByBranch;
-        if (ofrActiveTab === "ORDER_DRILLDOWN") source = branchOrderFillRateDrilldown;
-        else if (ofrActiveTab === "TOP_SHORTAGES") source = branchOrderFillRateTopShortages;
+        let fallbackSource = branchOrderFillRateByBranch;
+        if (ofrActiveTab === "ORDER_DRILLDOWN") fallbackSource = branchOrderFillRateDrilldown;
+        else if (ofrActiveTab === "TOP_SHORTAGES") fallbackSource = branchOrderFillRateTopShortages;
+        const source = filteredOfrRef.current ?? fallbackSource;
         const rows = (Array.isArray(source) ? source : []).map((r) => ({ ...r }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
         exportToExcel(rows, `Branch_Order_Fill_Rate_${ofrActiveTab}_${todayStr}`);
@@ -176,6 +183,7 @@ const BranchOrderFillRate = () => {
                                     <BranchOfrSection
                                         activeTab={ofrActiveTab}
                                         searchTerm={ofrSearchTerm}
+                                        onFilteredDataChange={handleFilteredOfrChange}
                                     />
                                 </CardBody>
                             </Card>

@@ -36,7 +36,7 @@ export const suggestedOrderQty = (item) =>
         0
     );
 
-const CriticalStockChart = () => {
+const CriticalStockChart = ({ onFilteredDataChange }) => {
     const {
         criticalStockouts = [],
         loadingCriticalStockouts,
@@ -107,6 +107,12 @@ const CriticalStockChart = () => {
             (item) => normalizeAbcClass(item.abc_class) === abcFilter
         );
     }, [searchMatchedItems, abcFilter]);
+
+    useEffect(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange(filteredItems);
+        }
+    }, [filteredItems, onFilteredDataChange]);
 
     const displayedItems = useMemo(() => {
         const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
