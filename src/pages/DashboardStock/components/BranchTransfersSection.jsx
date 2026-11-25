@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardHeader, CardBody, Col, Row, Spinner } from "reactstrap";
 import { useSelector } from "react-redux";
 import TablePagination from "../../../Components/Common/TablePagination";
@@ -117,6 +117,7 @@ const TransferAgingTable = ({
     activeTab = "DEST_STOCK_AGING",
     searchTerm = "",
     branchFilter = "",
+    onFilteredDataChange,
 }) => {
     const [pageIndex, setPageIndex] = useState(0);
 
@@ -144,6 +145,12 @@ const TransferAgingTable = ({
     useEffect(() => {
         setPageIndex(0);
     }, [activeTab, searchTerm, branchFilter, filteredRows.length]);
+
+    useEffect(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange(filteredRows);
+        }
+    }, [filteredRows, onFilteredDataChange]);
 
     const pageCount = Math.max(Math.ceil(filteredRows.length / MAX_ROWS), 1);
     const safePageIndex = Math.min(pageIndex, pageCount - 1);
@@ -564,47 +571,71 @@ const BranchTransfersSection = () => {
         return Array.from(set).sort((a, b) => a.localeCompare(b));
     }, [enrichedAgingRows, allDrilldownRows]);
 
+    const filteredTransfersRef = useRef(null);
+    const filteredMainPullRef = useRef(null);
+
+    const handleFilteredTransfersChange = useCallback((rows) => {
+        filteredTransfersRef.current = rows;
+    }, []);
+
+    const handleFilteredMainPullChange = useCallback((rows) => {
+        filteredMainPullRef.current = rows;
+    }, []);
+
+    const formatTransferExportRows = (source, tab) => {
+        const list = Array.isArray(source) ? source : [];
+        if (tab === "DEST_STOCK_AGING") {
+            return list.map((r) => ({
+                "Product": r.itemName,
+                "Item Code": r.itemCode,
+                "Batch": r.batchNo,
+                "Source Branch": r.sourceBranchName || "-",
+                "Destination Branch": r.destBranchName,
+                "BTR": r.transferDoc,
+                "Transfer Date": r.transferDate,
+                "BRN": r.receiptDoc,
+                "Receipt Date": r.receiptDate,
+                "Transferred Units (Packs)": r.transferredUnits,
+                "Transfer Value (KES)": r.transferredCost,
+                "Sold Since Receipt": r.unitsSoldSinceReceipt,
+                "Current Branch Stock": r.currentBranchStock,
+                "Days in Stock": r.daysInStock,
+                "Aging Bucket": r.agingBucket,
+            }));
+        }
+        if (tab === "DRILLDOWN") {
+            return list.map((r) => ({
+                "Product": r.itemName,
+                "Item Code": r.itemCode,
+                "Batch": r.batchNo,
+                "Source Branch": r.sourceBranchName || "-",
+                "Destination Branch": r.destBranchName,
+                "Transfer Document": r.transferDoc,
+                "Transfer Date": r.transferDate,
+                "Receipt Document": r.receiptDoc,
+                "Receipt Date": r.receiptDate,
+                "Quantity (Packs)": r.quantityPw ?? 0,
+                "Value (KES)": r.totalCost ?? 0,
+                "Transit Days": r.transitDays ?? 0,
+                "Status": r.shipmentStatus || "-",
+            }));
+        }
+        return list.map((r) => ({ ...r }));
+    };
+
     const handleExportBranchTransfers = () => {
-        const rows = enrichedAgingRows.map((r) => ({
-            "Product": r.itemName,
-            "Item Code": r.itemCode,
-            "Batch": r.batchNo,
-            "Source Branch": r.sourceBranchName || "-",
-            "Destination Branch": r.destBranchName,
-            "BTR": r.transferDoc,
-            "Transfer Date": r.transferDate,
-            "BRN": r.receiptDoc,
-            "Receipt Date": r.receiptDate,
-            "Transferred Units (Packs)": r.transferredUnits,
-            "Transfer Value (KES)": r.transferredCost,
-            "Sold Since Receipt": r.unitsSoldSinceReceipt,
-            "Current Branch Stock": r.currentBranchStock,
-            "Days in Stock": r.daysInStock,
-            "Aging Bucket": r.agingBucket,
-        }));
+        const source = filteredTransfersRef.current ?? enrichedAgingRows;
+        const rows = formatTransferExportRows(source, transfersTab);
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-        exportToExcel(rows, `Branch_Transfers_${todayStr}`);
+        exportToExcel(rows, `Branch_Transfers_${transfersTab}_${todayStr}`);
     };
 
     const handleExportMainPull = () => {
-        const source = mainAgingRows.length > 0 ? mainAgingRows : mainDrilldownRows;
-        const rows = source.map((r) => ({
-            "Product": r.itemName,
-            "Item Code": r.itemCode,
-            "Batch": r.batchNo,
-            "Source Branch": r.sourceBranchName || "-",
-            "Destination Branch": r.destBranchName,
-            "Transfer Document": r.transferDoc,
-            "Transfer Date": r.transferDate,
-            "Receipt Document": r.receiptDoc,
-            "Receipt Date": r.receiptDate,
-            "Quantity (Packs)": r.transferredUnits ?? r.quantityPw ?? 0,
-            "Value (KES)": r.transferredCost ?? r.totalCost ?? 0,
-            "Current Branch Stock": r.currentBranchStock ?? "-",
-            "Days in Stock": r.daysInStock ?? r.transitDays ?? 0,
-        }));
+        const fallback = mainAgingRows.length > 0 ? mainAgingRows : mainDrilldownRows;
+        const source = filteredMainPullRef.current ?? fallback;
+        const rows = formatTransferExportRows(source, mainTab);
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-        exportToExcel(rows, `Branch_Pull_Main_${todayStr}`);
+        exportToExcel(rows, `Branch_Pull_Main_${mainTab}_${todayStr}`);
     };
 
     return (
@@ -749,6 +780,7 @@ const BranchTransfersSection = () => {
                                     activeTab={transfersTab}
                                     searchTerm={transfersSearch}
                                     branchFilter={transfersBranchFilter}
+                                    onFilteredDataChange={handleFilteredTransfersChange}
                                 />
                             )}
                         </CardBody>
@@ -901,6 +933,7 @@ const BranchTransfersSection = () => {
                                 activeTab={mainTab}
                                 searchTerm={mainSearch}
                                 branchFilter={mainBranchFilter}
+                                onFilteredDataChange={handleFilteredMainPullChange}
                             />
                         </CardBody>
                     </Card>

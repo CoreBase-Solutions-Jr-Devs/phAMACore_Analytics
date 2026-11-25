@@ -105,11 +105,12 @@ const SalesComposition = () => {
     return {
       total: metric(rows, "Total Collections") || metric(rows, "Total Cash Collections"),
       cash: metric(rows, "Total Cash Collections") || metric(rows, "Cash"),
-      mpesa: metric(rows, "M-Pesa Collections") || metric(rows, "Mpesa"),
-      card: metric(rows, "Card Collections") || metric(rows, "Card"),
-      bank: metric(rows, "Bank Transfer Collections") || metric(rows, "Bank Transfer"),
-      allocated: metric(rows, "Allocated Receipts") || metric(rows, "Allocated"),
-      unallocated: metric(rows, "Unallocated Receipts") || metric(rows, "Unallocated"),
+      mpesa: metric(rows, "Total M-Pesa / Mobile Collections") || metric(rows, "Mpesa"),
+      card: metric(rows, "Total Card / PDQ Collections") || metric(rows, "Card"),
+      cheque: metric(rows, "Total Cheque Collections") || metric(rows, "Cheque"),
+      bank: metric(rows, "Total Bank Wire / Transfer") || metric(rows, "Bank Transfer"),
+      allocated: metric(rows, "Allocated Collections Amount") || metric(rows, "Allocated"),
+      unallocated: metric(rows, "Unallocated Collections Amount") || metric(rows, "Unallocated"),
     };
   }, [cashbookSummary, cashbookSummaryMetrics]);
 

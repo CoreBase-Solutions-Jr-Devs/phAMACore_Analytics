@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -87,21 +87,39 @@ const ExpiryWatch = () => {
         }));
     }, [dispatch, branchCode, activeFilters.endDate]);
 
+    const filteredExpiryRef = useRef(null);
+
+    const handleFilteredExpiryChange = useCallback((rows) => {
+        filteredExpiryRef.current = rows;
+    }, []);
+
     const handleExportExpiryWatch = () => {
-        const rows = getExpiryRows(batchExpiryNeo, {
-            branchCode,
-            branches,
-            asOfDate: activeFilters.endDate,
-        }).map((row) => ({
-            "Product": row.product,
-            "Batch": row.batch || "-",
-            "Branch": row.branch,
-            "Expiry Date": row.expiry.toLocaleDateString("en-GB"),
-            "Days Remaining": row.daysRemaining,
-            "Qty Balance": row.qty.toLocaleString(),
-            "Cost Value (KES)": row.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            "Action Status": row.action,
-        }));
+        const filteredRows = filteredExpiryRef.current;
+        const rows = filteredRows
+            ? filteredRows.map((row) => ({
+                  "Product": row.product,
+                  "Batch": row.batch || "-",
+                  "Branch": row.branch,
+                  "Expiry Date": row.date,
+                  "Days Remaining": row.days,
+                  "Qty Balance": row.total,
+                  "Cost Value (KES)": row.value,
+                  "Action Status": row.status,
+              }))
+            : getExpiryRows(batchExpiryNeo, {
+                  branchCode,
+                  branches,
+                  asOfDate: activeFilters.endDate,
+              }).map((row) => ({
+                  "Product": row.product,
+                  "Batch": row.batch || "-",
+                  "Branch": row.branch,
+                  "Expiry Date": row.expiry.toLocaleDateString("en-GB"),
+                  "Days Remaining": row.daysRemaining,
+                  "Qty Balance": row.qty.toLocaleString(),
+                  "Cost Value (KES)": row.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                  "Action Status": row.action,
+              }));
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
         exportToExcel(rows, `Expiry_Watch_Stock_${todayStr}`);
     };
@@ -146,7 +164,7 @@ const ExpiryWatch = () => {
                                     <WidgetsTwo />
                                 </div>
                                 <CardBody className="border-top">
-                                    <CustomTableOne />
+                                    <CustomTableOne onFilteredDataChange={handleFilteredExpiryChange} />
                                 </CardBody>
                             </Card>
                         </Col>

@@ -47,6 +47,7 @@ const StockCoverageSection = ({
     branchFilter = "",
     statusFilter = "ALL",
     onSelectBranch,
+    onFilteredDataChange,
 }) => {
     const [hoverInfo, setHoverInfo] = useState(null);
     const [pageIndex, setPageIndex] = useState(0);
@@ -163,6 +164,15 @@ const StockCoverageSection = ({
     useEffect(() => {
         setPageIndex(0);
     }, [viewMode, searchTerm, branchFilter, statusFilter, branchSortField, branchSortDesc, itemSortField, itemSortDesc]);
+
+    useEffect(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange({
+                viewMode,
+                rows: viewMode === "ITEM_MOVEMENT" ? itemRows : branchRows,
+            });
+        }
+    }, [viewMode, itemRows, branchRows, onFilteredDataChange]);
 
     const handleBranchSort = (field) => {
         if (branchSortField === field) {
