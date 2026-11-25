@@ -207,7 +207,7 @@ const BestPriceSupplier = () => {
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="BestPricePerSupplier
+            title="Best Price Per Supplier
             "
             pageTitle="Purchases"
             subtitle={selectedBranchName}

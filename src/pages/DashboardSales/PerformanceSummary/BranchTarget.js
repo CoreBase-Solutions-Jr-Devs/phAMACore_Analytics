@@ -1,5 +1,4 @@
-import React, { useMemo } from "react";
-import {
+import React, { useMemo, useState } from "react";import {
   Card,
   CardBody,
   CardHeader,
@@ -68,7 +67,7 @@ const InsightCell = ({ id, children, insight }) => (
 
 const BranchTarget = ({ data = [], loading = false, error = null }) => {
   const sourceData = Array.isArray(data) ? data : [];
-
+const [globalFilter, setGlobalFilter] = useState("");
   const branchData = useMemo(() => {
     const branches = new Map();
 
@@ -118,7 +117,17 @@ const BranchTarget = ({ data = [], loading = false, error = null }) => {
       a.branchName.localeCompare(b.branchName),
     );
   }, [sourceData]);
+const filteredData = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
 
+  if (!search) return branchData;
+
+  return branchData.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value ?? "").toLowerCase().includes(search)
+    )
+  );
+}, [branchData, globalFilter]);
   const columns = useMemo(() => {
     const branchColumn = {
       header: "Branch",
@@ -286,7 +295,7 @@ const BranchTarget = ({ data = [], loading = false, error = null }) => {
   );
 
   const handleExportExcel = () => {
-    const rows = branchData.map((branch) => {
+    const rows = filteredData.map((branch) => {
       const row = { Branch: branch.branchName };
 
       MONTHS.forEach((month) => {
@@ -339,11 +348,13 @@ const BranchTarget = ({ data = [], loading = false, error = null }) => {
 
         <TanstackTable
           columns={columns}
-          data={branchData}
+          data={filteredData}
           customHeader={customHeader}
           searchInputWidth="450px"
           isGlobalFilter={true}
           isColumnFilter={false}
+            globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
           customPageSize={10}
           pageSizeOptions={[5, 10, 20, 30]}
           SearchPlaceholder="Search branches or monthly performance..."

@@ -105,24 +105,37 @@ SupplierReturnsReason,
   loading = false,
   error = null,
 }) => {
-  const [activeTab, setActiveTab] = useState("branch");
 
-const tabCounts = useMemo(
-  () => ({
-    supplier: SupplierReturnsSupplier.length,
-    drilldown: SupplierReturnsDrilldown.length,
-    branch: SupplierReturnsBranch.length,
-    reason: SupplierReturnsReason.length,
-    sku: SupplierReturnsSKU.length,
-  }),
-  [
-   SupplierReturnsSupplier,
- SupplierReturnsDrilldown,
- SupplierReturnsBranch,
-SupplierReturnsSKU,
-SupplierReturnsReason,
-  ]
-);
+const [activeTab, setActiveTab] = useState("branch");
+const [globalFilter, setGlobalFilter] = useState("");
+const tabCounts = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+
+  const getCount = (data = []) => {
+    if (!search) return data.length;
+
+    return data.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value ?? "").toLowerCase().includes(search)
+      )
+    ).length;
+  };
+
+  return {
+    supplier: getCount(SupplierReturnsSupplier),
+    drilldown: getCount(SupplierReturnsDrilldown),
+    branch: getCount(SupplierReturnsBranch),
+    reason: getCount(SupplierReturnsReason),
+    sku: getCount(SupplierReturnsSKU),
+  };
+}, [
+  SupplierReturnsSupplier,
+  SupplierReturnsDrilldown,
+  SupplierReturnsBranch,
+  SupplierReturnsReason,
+  SupplierReturnsSKU,
+  globalFilter,
+]);
 
 const renderInsightCell = (content, row, prefix) => {
   const tooltipId = `${prefix}-${row.index}`;
@@ -784,6 +797,19 @@ const skuColumns = useMemo(
 
   const currentTable = tableConfig[activeTab];
 
+  const filteredData = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+  const data = currentTable?.data || [];
+
+  if (!search) return data;
+
+  return data.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value ?? "").toLowerCase().includes(search)
+    )
+  );
+}, [currentTable?.data, globalFilter]);
+
  const toolbarContent = (
   <Nav
     pills
@@ -831,7 +857,7 @@ const skuColumns = useMemo(
 );
 
 const handleExportExcel = () => {
-  const rows = (currentTable.data || []).map((item) => {
+  const rows = (filteredData  || []).map((item) => {
     if (activeTab === "supplier") {
       return {
         "Supplier ID": item.supplier_id,
@@ -947,9 +973,11 @@ const handleExportExcel = () => {
             )}
     <TanstackTable
       columns={currentTable.columns}
-      data={currentTable.data}
+      data={filteredData}
       tableTabs={toolbarContent}
       isGlobalFilter={true}
+       globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
       SearchPlaceholder={currentTable.placeholder}
       customPageSize={10}
        searchInputWidth="450px"

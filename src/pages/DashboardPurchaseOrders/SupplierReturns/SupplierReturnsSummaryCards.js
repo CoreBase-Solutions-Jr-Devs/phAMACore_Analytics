@@ -117,7 +117,15 @@ const summary = SupplierReturnsSummaryData || {};
     <div>
       <React.Fragment>
         
-
+        {summary.action_insight && (
+  <Row className="mt-1">
+    <Col xs="12">
+      <div className="alert alert-info mb-0 py-1 w-100">
+        {summary.action_insight}
+      </div>
+    </Col>
+  </Row>
+)}
         {loading ? (
           <div className="text-center py-5">
             <div
@@ -131,6 +139,7 @@ const summary = SupplierReturnsSummaryData || {};
             <p className="text-danger mb-0">{error}</p>
           </div>
         ) : (
+
    <Row className="g-2 mb-0 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6">
 <Col className="d-flex">
     <Card
@@ -275,15 +284,7 @@ const summary = SupplierReturnsSummaryData || {};
 </Row>
 
         )}
-        {summary.action_insight && (
-  <Row className="mt-1 g-0">
-    <Col xs="12">
-      <div className="alert alert-info mb-0 mt-0 py-1 w-100">
-        {summary.action_insight}
-      </div>
-    </Col>
-  </Row>
-)}
+
       </React.Fragment>
     </div>
   );

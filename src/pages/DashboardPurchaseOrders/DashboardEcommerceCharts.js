@@ -38,11 +38,11 @@ const currentMonthExists = categories.includes(currentMonth);
       categories,
 
       axisTicks: {
-        show: false,
+        show: true,
       },
 
       axisBorder: {
-        show: false,
+        show: true,
       },
         labels: {
     formatter: (value) => {
@@ -161,11 +161,11 @@ const todayExists = categories.some(
       categories,
 
       axisTicks: {
-        show: false,
+        show: true,
       },
 
       axisBorder: {
-        show: false,
+        show: true,
       },
        labels: {
           rotate: 0,

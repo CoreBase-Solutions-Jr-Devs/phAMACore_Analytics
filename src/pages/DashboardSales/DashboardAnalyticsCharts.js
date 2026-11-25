@@ -363,11 +363,11 @@ const ProgressiveSalesChart = ({
       categories,
 
       axisTicks: {
-        show: false,
+        show: true,
       },
 
       axisBorder: {
-        show: false,
+        show: true,
       },
 
       labels: {
@@ -745,26 +745,35 @@ const MonthToDateSalesChart = ({
 
     grid: {
       padding: {
-        bottom: 0,
+        bottom: 10,
       },
     },
     xaxis: {
-      type: "category",
       categories,
-      tickPlacement: "on",
 
-      labels: {
-        formatter: (value) => {
-          const day = Number(value);
-          return day === 1 || day % 5 === 0 ? day : "";
-        },
-      },
+    axisTicks: {
+    show: true,
+  },
+  axisBorder: {
+    show: true,
+  },
+       labels: {
+         show: true,
+  rotate: 0,
+    rotateAlways: false,
+    hideOverlappingLabels: false,
+    formatter: (value) => {
+      const day = Number(value);
+      return day === 1 || day % 5 === 0 ? day : "";
+    },
+  },
     },
 
     yaxis: {
       title: {
         text: "Sales (KES)",
       },
+      
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,

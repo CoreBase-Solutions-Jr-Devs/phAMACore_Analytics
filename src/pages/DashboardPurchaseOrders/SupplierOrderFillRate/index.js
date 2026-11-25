@@ -179,7 +179,7 @@ const [isSticky, setIsSticky] = useState(false);
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="SupplierOrderFillRate"
+            title="Supplier Order FillRate"
             pageTitle="Purchases"
             subtitle={selectedBranchName}
           />

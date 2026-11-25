@@ -1,5 +1,5 @@
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Card,
   CardBody,
@@ -90,9 +90,20 @@ const BestPricePerSupplierTable = ({
   error = null,
   loading = false,
 }) => {
-  const [activeTab, setActiveTab] = useState("supplier");
+const [activeTab, setActiveTab] = useState("supplier");
+const [globalFilter, setGlobalFilter] = useState("");
 
+const applySearchFilter = (data = []) => {
+  const search = globalFilter.trim().toLowerCase();
 
+  if (!search) return data;
+
+  return data.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value ?? "").toLowerCase().includes(search)
+    )
+  );
+};
   const supplierData = useMemo(() => {
     return [...(BestPricePerSupplierSupplierScorecardData || [])].sort(
       (a, b) =>
@@ -834,12 +845,12 @@ const proposedHistoricalColumns = useMemo(
 },
   ];
 
-  const tabCounts = {
-    supplier: supplierData.length,
-    matrix: itemMatrixData.length,
-    catalog: bestPriceCatalogData.length,
-      proposedHistorical: proposedHistoricalData.length,
-  };
+const tabCounts = {
+  supplier: applySearchFilter(supplierData).length,
+  matrix: applySearchFilter(itemMatrixData).length,
+  catalog: applySearchFilter(bestPriceCatalogData).length,
+  proposedHistorical: applySearchFilter(proposedHistoricalData).length,
+};
 
   const tableConfig = {
     supplier: {
@@ -882,6 +893,11 @@ const proposedHistoricalColumns = useMemo(
 
   const currentTable = tableConfig[activeTab];
 
+
+
+const filteredData = useMemo(() => {
+  return applySearchFilter(currentTable?.data || []);
+}, [currentTable?.data, globalFilter]);
   const toolbarContent = (
     <Nav
       pills
@@ -928,7 +944,7 @@ const proposedHistoricalColumns = useMemo(
     </Nav>
   );
 const handleExportExcel = () => {
-  const rows = (currentTable.data || []).map((item) => {
+  const rows = (filteredData || []).map((item) => {
     if (activeTab === "supplier") {
       return {
         "Supplier ID": item.supplier_id,
@@ -1053,21 +1069,23 @@ const handleExportExcel = () => {
           </Alert>
         )}
 
-        <TanstackTable
-          columns={currentTable.columns}
-          data={currentTable.data}
-          tableTabs={toolbarContent}
-          isGlobalFilter={true}
-          SearchPlaceholder={currentTable.placeholder}
-          searchInputWidth="450px"
-          customPageSize={10}
-          pageSizeOptions={[5, 10, 20, 30, 50]}
-          tableClass="table align-middle table-hover table-bordered table-striped"
-          theadClass="table-light"
-          loading={loading}
-          error={error}
-          emptyMessage={currentTable.emptyMessage}
-        />
+     <TanstackTable
+  columns={currentTable.columns}
+  data={filteredData}
+  tableTabs={toolbarContent}
+  isGlobalFilter={true}
+  globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
+  SearchPlaceholder={currentTable.placeholder}
+  searchInputWidth="450px"
+  customPageSize={10}
+  pageSizeOptions={[5, 10, 20, 30, 50]}
+  tableClass="table align-middle table-hover table-bordered table-striped"
+  theadClass="table-light"
+  loading={loading}
+  error={error}
+  emptyMessage={currentTable.emptyMessage}
+/>
       </CardBody>
     </Card>
   );
