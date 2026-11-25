@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -96,12 +96,19 @@ const SellThroughAnalysis = () => {
         dispatch(fetchKPISellThroughAnalysis({ ...periodParams, GroupBy: "SKU_SUMMARY" }));
     }, [dispatch, branchCode, activeFilters.startDate, activeFilters.endDate]);
 
+    const filteredSellThroughRef = useRef(null);
+
+    const handleFilteredSellThroughChange = useCallback((rows) => {
+        filteredSellThroughRef.current = rows;
+    }, []);
+
     const handleExportSellThrough = () => {
         const source =
-            sellThroughViewMode === "SKU_SUMMARY"
+            filteredSellThroughRef.current ??
+            (sellThroughViewMode === "SKU_SUMMARY"
                 ? normalizeSellThroughSkuRows(sellThroughSkuSummary)
-                : normalizeSellThroughBatchRows(sellThroughReceiptBatch);
-        const rows = source.map((r) => ({
+                : normalizeSellThroughBatchRows(sellThroughReceiptBatch));
+        const rows = (source || []).map((r) => ({
             "Product": r.itemName,
             "Item Code": r.itemCode,
             "Pack Size": r.packQty,
@@ -218,6 +225,7 @@ const SellThroughAnalysis = () => {
                                         viewMode={sellThroughViewMode}
                                         receiptTypeFilter={sellThroughReceiptType}
                                         searchTerm={sellThroughSearchTerm}
+                                        onFilteredDataChange={handleFilteredSellThroughChange}
                                     />
                                 </CardBody>
                             </Card>

@@ -206,6 +206,7 @@ const SellThroughSection = ({
     viewMode = "RECEIPT_BATCH",
     receiptTypeFilter = "ALL",
     searchTerm = "",
+    onFilteredDataChange,
 }) => {
     const dispatch = useDispatch();
     const [hoverInfo, setHoverInfo] = useState(null);
@@ -298,6 +299,12 @@ const SellThroughSection = ({
     useEffect(() => {
         setPageIndex(0);
     }, [viewMode, receiptTypeFilter, searchTerm, sortField, sortDesc]);
+
+    useEffect(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange(rows);
+        }
+    }, [rows, onFilteredDataChange]);
 
     const pageCount = Math.max(Math.ceil(rows.length / MAX_ROWS), 1);
     const safePageIndex = Math.min(pageIndex, pageCount - 1);

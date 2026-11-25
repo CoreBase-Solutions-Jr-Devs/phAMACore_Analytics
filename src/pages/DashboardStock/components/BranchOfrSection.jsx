@@ -47,7 +47,7 @@ export const extractOfrSummary = (summaryRows = [], branchRows = []) => {
     };
 };
 
-const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
+const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "", onFilteredDataChange }) => {
     const dispatch = useDispatch();
     const [pageIndex, setPageIndex] = useState(0);
 
@@ -110,6 +110,12 @@ const BranchOfrSection = ({ activeTab = "BRANCH_OFR", searchTerm = "" }) => {
     useEffect(() => {
         setPageIndex(0);
     }, [activeTab, searchTerm, rows.length]);
+
+    useEffect(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange(rows);
+        }
+    }, [rows, onFilteredDataChange]);
 
     const pageCount = Math.max(Math.ceil(rows.length / MAX_ROWS), 1);
     const safePageIndex = Math.min(pageIndex, pageCount - 1);

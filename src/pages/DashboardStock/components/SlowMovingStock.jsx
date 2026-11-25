@@ -18,6 +18,7 @@ const SlowMovingStock = ({
     sortField = "tiedUpCapital",
     sortDesc = true,
     onSort,
+    onFilteredDataChange,
 }) => {
     const [hoverInfo, setHoverInfo] = useState(null);
     const [pageIndex, setPageIndex] = useState(0);
@@ -75,6 +76,12 @@ const SlowMovingStock = ({
     useEffect(() => {
         setPageIndex(0);
     }, [searchTerm, sortField, sortDesc, slowMovingStock]);
+
+    useEffect(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange(processed);
+        }
+    }, [processed, onFilteredDataChange]);
 
     const pageCount = Math.max(Math.ceil(processed.length / MAX_ROWS), 1);
     const safePageIndex = Math.min(pageIndex, pageCount - 1);

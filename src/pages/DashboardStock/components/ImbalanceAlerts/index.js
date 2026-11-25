@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import ImbalanceAlertList from "./ImbalanceAlertList";
 import {
@@ -12,7 +12,7 @@ const MAX_ROWS = 100;
 // Transfer suggestions come straight from PowerBIKPIStockHealth (GroupBy = IMBALANCES),
 // replacing the old client-side engine that needed every closing-stock line in the browser.
 // Rows keep the API's severity ranking; the Deficit / Surplus and Branch filters narrow the list.
-const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL", branchFilter = "" }) => {
+const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL", branchFilter = "", onFilteredDataChange }) => {
     const {
         imbalances = [],
         loadingImbalances = false,
@@ -36,6 +36,12 @@ const ImbalanceAlerts = ({ searchTerm = "", statusFilter = "ALL", branchFilter =
         );
         return filterTransferSuggestions(list, statusFilter, branchFilter);
     }, [imbalances, lookbackDays, searchTerm, statusFilter, branchFilter]);
+
+    useEffect(() => {
+        if (onFilteredDataChange) {
+            onFilteredDataChange(alerts);
+        }
+    }, [alerts, onFilteredDataChange]);
 
     return (
         <>

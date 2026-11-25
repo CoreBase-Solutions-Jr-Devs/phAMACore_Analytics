@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -223,16 +223,28 @@ const DashboardStock = () => {
         exportToExcel(rows, `Stock_Value_By_Branch_${todayStr}`);
     };
 
+    const filteredCoverageRef = useRef(null);
+
+    const handleFilteredCoverageChange = useCallback((payload) => {
+        filteredCoverageRef.current = payload;
+    }, []);
+
     const handleExportStockVelocity = () => {
         const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+        const filteredPayload = filteredCoverageRef.current;
 
         if (coverageViewMode === "ITEM_MOVEMENT") {
-            const normalized = normalizeItemMovementRows(itemMovement);
-            const filtered = coverageBranchFilter
-                ? normalized.filter((r) => r.branchName.toLowerCase() === coverageBranchFilter.toLowerCase())
-                : normalized;
+            const filtered =
+                filteredPayload && filteredPayload.viewMode === "ITEM_MOVEMENT"
+                    ? filteredPayload.rows
+                    : (() => {
+                          const normalized = normalizeItemMovementRows(itemMovement);
+                          return coverageBranchFilter
+                              ? normalized.filter((r) => r.branchName.toLowerCase() === coverageBranchFilter.toLowerCase())
+                              : normalized;
+                      })();
 
-            const rows = filtered.map((r) => ({
+            const rows = (filtered || []).map((r) => ({
                 "Rank": r.rankPos,
                 "Branch": r.branchName,
                 "Item Code": r.itemCode,
@@ -255,6 +267,30 @@ const DashboardStock = () => {
                 "Action Insight": r.actionInsight,
             }));
             exportToExcel(rows, `Item_Stock_VS_Movement_${todayStr}`);
+            return;
+        }
+
+        if (
+            coverageViewMode === "STOCK_VS_MOVEMENT" &&
+            filteredPayload &&
+            filteredPayload.viewMode === "STOCK_VS_MOVEMENT"
+        ) {
+            const rows = (filteredPayload.rows || []).map((r) => ({
+                "Branch": r.branchName,
+                "Stocked SKUs": r.stockedSkus ?? "-",
+                "Total Stock Pieces": r.totalStockPieces ?? "-",
+                "Stock at Cost (KES)": (r.rawStock || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                "Stock Value (M KES)": Number(((r.rawStock || 0) / 1000000).toFixed(2)),
+                "30d Consumed Pieces": r.monthlyConsumedPieces ?? "-",
+                "30d Cost of Sales (KES)": (r.monthlyConsumption || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                "Avg Daily Cost of Sales (KES)": (r.rawDailySales || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                "30d Net Sales (KES)": (r.monthlyNetSales || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                "Stock Cover (Months)": r.stockCoverMonths ?? "-",
+                "Days of Cover": r.daysCover ?? "-",
+                "Health Status": r.stockHealthStatus ?? "-",
+                "Action Insight": r.actionInsight ?? "-",
+            }));
+            exportToExcel(rows, `Stock_VS_Cost_of_Sales_Coverage_${todayStr}`);
             return;
         }
 
@@ -429,6 +465,7 @@ const DashboardStock = () => {
                                                 branchFilter={coverageBranchFilter}
                                                 statusFilter={coverageStatusFilter}
                                                 onSelectBranch={handleSelectCoverageBranch}
+                                                onFilteredDataChange={handleFilteredCoverageChange}
                                             />
                                         </>
                                     )}

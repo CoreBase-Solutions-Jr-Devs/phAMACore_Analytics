@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -124,13 +124,21 @@ const InterBranchImbalances = () => {
         return { deficit, surplus: list.length - deficit };
     }, [imbalances, lookbackDays, imbalanceBranchFilter]);
 
+    const filteredImbalancesRef = useRef(null);
+
+    const handleFilteredImbalancesChange = useCallback((rows) => {
+        filteredImbalancesRef.current = rows;
+    }, []);
+
     const handleExportImbalanceAlerts = () => {
-        const suggestions = filterTransferSuggestions(
-            buildTransferSuggestions(imbalances, lookbackDays),
-            imbalanceStatusFilter,
-            imbalanceBranchFilter
-        );
-        const rows = suggestions.map((a) => ({
+        const suggestions =
+            filteredImbalancesRef.current ??
+            filterTransferSuggestions(
+                buildTransferSuggestions(imbalances, lookbackDays),
+                imbalanceStatusFilter,
+                imbalanceBranchFilter
+            );
+        const rows = (suggestions || []).map((a) => ({
             "Product": a.product,
             "Item Code": a.itemCode,
             "Category": a.group,
@@ -254,6 +262,7 @@ const InterBranchImbalances = () => {
                                         searchTerm={imbalanceSearchTerm}
                                         statusFilter={imbalanceStatusFilter}
                                         branchFilter={imbalanceBranchFilter}
+                                        onFilteredDataChange={handleFilteredImbalancesChange}
                                     />
                                 </CardBody>
                             </Card>
