@@ -47,13 +47,12 @@ const BestPriceSupplier = () => {
     BestPricePerSupplierBestPriceCatalogData,
     BestPricePerSupplierProposedHistoricalData,
   } = usePurchaseOrders(
-    [], // PurchaseOrders
     [], // KPIPurchases
     [], // KPISummary
     [], // KPICategory
     [], // KPISupplier
     [], // KPIBranch
-    [], // KPIMonthly
+
     [], // KPIType
 
     [], // KPIMaverickSpend
@@ -79,36 +78,8 @@ const BestPriceSupplier = () => {
     [], // LastYearGoodsReceived
 
     [], // ActualSpend
-    [], // ActualSpendSummary
-    [], // ActualSpendCategory
-    [], // ActualSpendSupplier
-    [], // ActualSpendBranch
-    [], // ActualSpendMonthly
-    [], // ActualSpendType
-
-    [], // DailySpend
-    [], // DailySpendSummary
-    [], // DailySpendCategory
-    [], // DailySpendSupplier
-    [], // DailySpendBranch
-    [], // DailySpendMonthly
-    [], // DailySpendType
 
     [], // LastYearActualSpend
-    [], // LastYearActualSpendSummary
-    [], // LastYearActualSpendCategory
-    [], // LastYearActualSpendSupplier
-    [], // LastYearActualSpendBranch
-    [], // LastYearActualSpendMonthly
-    [], // LastYearActualSpendType
-
-    [], // LastYearDailySpend
-    [], // LastYearDailySpendSummary
-    [], // LastYearDailySpendCategory
-    [], // LastYearDailySpendSupplier
-    [], // LastYearDailySpendBranch
-    [], // LastYearDailySpendMonthly
-    [], // LastYearDailySpendType
 
     [], // kpiOverdueAccounts
 

@@ -15,18 +15,18 @@ import SupplierSpend from "./SupplierSpend";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
 // import RecentActivity from "./RecentActivity";
 import {
-  getPurchaseOrders,
+
   getActualSpend,
-  getDailySpend,
+
   getLastYearActualSpend,
-  getLastYearDailySpend,
+ 
   getKPIPurchases,
   getKPIMaverickSpend,
   getKPIPriceAlerts,
   getKPILeadTime,
   getGoodsReceived,
   getLastYearGoodsReceived,
-  //  getBestPricePerSupplier,
+  
 } from "../../slices/dashboardPurchase/thunk";
 import FilterActions from "../../Components/Common/FilterActions";
 import {
@@ -52,11 +52,11 @@ const KPI_GROUP_BYS = [
  
   "SUPPLIER",
   "BRANCH",
-  "MONTHLY",
+  // "MONTHLY",
   "TYPE",
 ];
 
-const ACTUAL_SPEND_GROUP_BYS = ["MONTHLY"];
+// const ACTUAL_SPEND_GROUP_BYS = ["MONTHLY"];
 
 const LEAD_TIME_GROUP_BYS = [
   "SUMMARY",
@@ -90,13 +90,10 @@ const DashboardPurchaseOrders = () => {
   const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
 
   const {
-    PurchaseOrders = [],
-
     KPIPurchases = [],
     kpiOverdueAccounts = [],
 
     KPISummary = [],
-    // KPICategory = [],
     KPISupplier = [],
     KPIBranch = [],
     KPIMonthly = [],
@@ -128,36 +125,10 @@ const DashboardPurchaseOrders = () => {
     LastYearGoodsReceived = [],
 
     ActualSpend = [],
-    ActualSpendSummary = [],
-    // ActualSpendCategory = [],
-    ActualSpendSupplier = [],
-    ActualSpendBranch = [],
-    ActualSpendMonthly = [],
-    ActualSpendType = [],
 
-    DailySpend = [],
-    DailySpendSummary = [],
-    // DailySpendCategory = [],
-    DailySpendSupplier = [],
-    DailySpendBranch = [],
-    DailySpendMonthly = [],
-    DailySpendType = [],
+    
+    LastYearActualSpend= [],
 
-    LastYearActualSpend = [],
-    LastYearActualSpendSummary = [],
-    // LastYearActualSpendCategory = [],
-    LastYearActualSpendSupplier = [],
-    LastYearActualSpendBranch = [],
-    LastYearActualSpendMonthly = [],
-    LastYearActualSpendType = [],
-
-    LastYearDailySpend = [],
-    LastYearDailySpendSummary = [],
-    // LastYearDailySpendCategory = [],
-    LastYearDailySpendSupplier = [],
-    LastYearDailySpendBranch = [],
-    LastYearDailySpendMonthly = [],
-    LastYearDailySpendType = [],
     loading,
     error,
     filters,
@@ -179,29 +150,16 @@ const DashboardPurchaseOrders = () => {
     maverickSpendSummary,
     maverickSpendPercentage,
     spendBySupplier,
-    topSuppliers,
-    top2Suppliers,
     branchData,
     actualSpendChart,
-    monthToDateChart,
-    bottomSuppliers,
-    // spendByCategory,
-    currentReceivables,
-    overdue31To60,
-    overdue61To90,
-    overdue91To120,
-    overdue120Plus,
-    overdueSupplierAccounts,
+    monthToDateChart,  
     ConsolidatedLPOReviewSummaryData,
   } = usePurchaseOrders(
-    PurchaseOrders,
-
     KPIPurchases,
     KPISummary,
-    // KPICategory,
+    [], //KPICategory,
     KPISupplier,
     KPIBranch,
-    KPIMonthly,
     KPIType,
 
     KPIMaverickSpend,
@@ -216,8 +174,6 @@ const DashboardPurchaseOrders = () => {
     KPIPriceAlertsItems,
     KPIPriceAlertsHistory,
 
-    // BestPricePerSupplier,
-
     KPILeadTime,
     KPILeadTimeSummary,
     KPILeadTimeSupplier,
@@ -227,39 +183,11 @@ const DashboardPurchaseOrders = () => {
 
     GoodsReceived,
     LastYearGoodsReceived,
-
+ 
     ActualSpend,
-    ActualSpendSummary,
-    // ActualSpendCategory,
-    ActualSpendSupplier,
-    ActualSpendBranch,
-    ActualSpendMonthly,
-    ActualSpendType,
-
-    DailySpend,
-    DailySpendSummary,
-    // DailySpendCategory,
-    DailySpendSupplier,
-    DailySpendBranch,
-    DailySpendMonthly,
-    DailySpendType,
 
     LastYearActualSpend,
-    LastYearActualSpendSummary,
-    // LastYearActualSpendCategory,
-    LastYearActualSpendSupplier,
-    LastYearActualSpendBranch,
-    LastYearActualSpendMonthly,
-    LastYearActualSpendType,
-
-    LastYearDailySpend,
-    LastYearDailySpendSummary,
-    // LastYearDailySpendCategory,
-    LastYearDailySpendSupplier,
-    LastYearDailySpendBranch,
-    LastYearDailySpendMonthly,
-    LastYearDailySpendType,
-
+    
     kpiOverdueAccounts,
 
     [], //KPISupplierOrderFillRateSummary,
@@ -311,32 +239,6 @@ const DashboardPurchaseOrders = () => {
   };
 
   useEffect(() => {
-    // ----------------------------------------------
-    // PURCHASE ORDERS
-    // ----------------------------------------------
-
-    // dispatch(
-    //   getPurchaseOrders({
-    //     clientid: 1,
-    //     startDate: filters.startDate,
-    //     endDate: filters.endDate,
-    //     branchcode: branchId ,
-    //   })
-    // );
-
-    //   dispatch(
-    //   getBestPricePerSupplier({
-    //     clientid: 1,
-    //     startDate: filters.startDate,
-    //     endDate: filters.endDate,
-    //     branchcode: filters.branch,
-    //     itemCode: "",
-    //     supplierCode: "",
-    //     groupBy: "ITEM_MATRIX",
-    //     includeZeroPrice: false,
-    //     topN: 0,
-    //   })
-    // );
 
     dispatch(
       getKPIConsolidatedLPOReview({
@@ -365,29 +267,28 @@ const DashboardPurchaseOrders = () => {
         endDate: dates.lastYearToday,
         clientid: 1,
         branchcode: filters.branch,
+       
       }),
     );
 
-    dispatchGroupByRequests(
-      getActualSpend,
-      {
+    dispatch(
+      getActualSpend({     
         clientid: 1,
         startDate: dates.currentYearStart,
         endDate: dates.today,
         branchcode: filters.branch,
-      },
-      ACTUAL_SPEND_GROUP_BYS,
+         groupBy: "MONTHLY"
+      }),     
     );
 
-    dispatchGroupByRequests(
-      getLastYearActualSpend,
-      {
+    dispatch(
+      getLastYearActualSpend({
         clientid: 1,
         startDate: dates.lastYearStart,
         endDate: dates.lastYearToday,
         branchcode: filters.branch,
-      },
-      ACTUAL_SPEND_GROUP_BYS,
+        groupBy: "MONTHLY"
+      }),     
     );
 
     dispatchGroupByRequests(
@@ -402,30 +303,7 @@ const DashboardPurchaseOrders = () => {
       KPI_GROUP_BYS,
     );
 
-    //  dispatch(
-    //       getKPIPurchases({
-    //       clientid: 1,
-    //     startDate: filters.startDate,
-    //     endDate: dates.lastYearToday,
-    //   branchcode: filters.branch,
-    //    groupBy: "MONTHLY",
-    //     TopN: 0,
-    //       }),
-    //     );
-
-    // dispatch(
-    //   getKPIOverdueAccounts({
-    //     clientid: 1,
-    //     mode: "AGING",
-    //     accountType: "SUPPLIER",
-    //     branchcode: filters.branch,
-    //     dateFrom: filters.startDate,
-    //     dateTo: filters.endDate,
-    //     periodFrom: getPeriod(filters.startDate),
-    //     periodTo: getPeriod(filters.endDate),
-    //     includeZeroBal: false,
-    //   }),
-    // );
+    
 
     dispatchGroupByRequests(
       getKPILeadTime,
@@ -473,6 +351,7 @@ const DashboardPurchaseOrders = () => {
       dispatch(clearPurchaseOrdersData());
     };
   }, [dispatch]);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsSticky(window.scrollY > 50);
@@ -482,36 +361,45 @@ const DashboardPurchaseOrders = () => {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
   const handleApplyFilters = () => {
-    // dispatch(
-    //   getPurchaseOrders({
-    //     clientid: 1,
-    //     startDate: filters.startDate,
-    //     endDate: filters.endDate,
-    //     branchcode: filters.branch ?? null,
-    //   })
-    // );
+    dispatch(
+      getGoodsReceived({
+        startDate: dates.currentMonthStart,
+        endDate: dates.today,
+        clientid: 1,
+        branchcode: filters.branch,
+      }),
+    );
 
-    // const goodsReceivedParams = {
-    //   clientid: 1,
-    //     branchcode: filters.branch,
-    // };
+    dispatch(
+      getLastYearGoodsReceived({
+        startDate: dates.lastYearMonthStart,
+        endDate: dates.lastYearToday,
+        clientid: 1,
+        branchcode: filters.branch,
+      }),
+    );
 
-    // dispatch(
-    //   getGoodsReceived({
-    //     ...goodsReceivedParams,
-    //     startDate: filters.startDate,
-    //     endDate: filters.endDate,
-    //   })
-    // );
+       dispatch(
+      getActualSpend({     
+        clientid: 1,
+        startDate: dates.currentYearStart,
+        endDate: dates.today,
+        branchcode: filters.branch,
+         groupBy: "MONTHLY"
+      }),     
+    );
 
-    // dispatch(
-    //   getGoodsReceived({
-    //     ...goodsReceivedParams,
-    //     startDate: getPreviousYearDate(filters.startDate),
-    //     endDate: getPreviousYearDate(filters.endDate),
-    //   })
-    // );
+    dispatch(
+      getLastYearActualSpend({
+        clientid: 1,
+        startDate: dates.lastYearStart,
+        endDate: dates.lastYearToday,
+        branchcode: filters.branch,
+        groupBy: "MONTHLY"
+      }),     
+    );
 
     dispatch(
       getKPIConsolidatedLPOReview({
@@ -536,20 +424,6 @@ const DashboardPurchaseOrders = () => {
       },
       KPI_GROUP_BYS,
     );
-
-    // dispatch(
-    //   getKPIOverdueAccounts({
-    //     clientid: 1,
-    //     mode: "AGING",
-    //     accountType: "SUPPLIER",
-    //     branchcode: filters.branch,
-    //     dateFrom: filters.startDate,
-    //     dateTo: filters.endDate,
-    //     periodFrom: getPeriod(filters.startDate),
-    //     periodTo: getPeriod(filters.endDate),
-    //     includeZeroBal: false,
-    //   }),
-    // );
 
     dispatchGroupByRequests(
       getKPILeadTime,
@@ -578,20 +452,7 @@ const DashboardPurchaseOrders = () => {
         TopN: 0,
       },
       PRICE_ALERTS_GROUP_BYS,
-    );
-    //   dispatch(
-    //   getBestPricePerSupplier({
-    //     clientid: 1,
-    //     startDate: filters.startDate,
-    //     endDate: filters.endDate,
-    //     branchcode: filters.branch,
-    //     itemCode: "",
-    //     supplierCode: "",
-    //     groupBy: "ITEM_MATRIX",
-    //     includeZeroPrice: false,
-    //     topN: 0,
-    //   })
-    // );
+    );  
 
     dispatchGroupByRequests(
       getKPIMaverickSpend,

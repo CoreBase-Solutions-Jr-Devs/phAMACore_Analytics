@@ -2,37 +2,20 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 import {
-  getPurchaseOrders as getPurchaseOrdersApi,
+ 
   getActualSpend as getActualSpendApi,
-  getDailySpend as getDailySpendApi,
+ 
   getKPIPurchases as getKPIPurchasesApi,
   getLastYearActualSpend as getLastYearActualSpendApi,
-  getLastYearDailySpend as getLastYearDailySpendApi,
+ 
   getKPIMaverickSpend as getKPIMaverickSpendApi,
   getKPIPriceAlerts as getKPIPriceAlertsApi,
   getKPILeadTime as getKPILeadTimeApi,
   getGoodsReceived as getGoodsReceivedApi,
-  // getBestPricePerSupplier as getBestPricePerSupplierApi,
+
   getLastYearGoodsReceived as getLastYearGoodsReceivedApi,
  
 } from "../../helpers/fakebackend_helper";
-
-export const getPurchaseOrders = createAsyncThunk(
-  "powerbi/getPurchaseOrders",
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await getPurchaseOrdersApi(params);
-
-      return response.data || response;
-    } catch (error) {
-      toast.error("Failed to fetch purchase orders", {
-        autoClose: 3000,
-      });
-
-      return rejectWithValue(error.message);
-    }
-  },
-);
 
 export const getKPIPurchases = createAsyncThunk(
   "powerbi/getKPIPurchases",
@@ -74,42 +57,6 @@ export const getLastYearActualSpend = createAsyncThunk(
       return response.data || response;
     } catch (error) {
       toast.error("Failed to fetch last year actual spend", {
-        autoClose: 3000,
-      });
-
-      return rejectWithValue(error.message);
-    }
-  },
-);
-
-// DAILY SPEND
-export const getDailySpend = createAsyncThunk(
-  "powerbi/getDailySpend",
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await getDailySpendApi(params);
-
-      return response.data || response;
-    } catch (error) {
-      toast.error("Failed to fetch daily spend", {
-        autoClose: 3000,
-      });
-
-      return rejectWithValue(error.message);
-    }
-  },
-);
-
-// LAST YEAR DAILY SPEND
-export const getLastYearDailySpend = createAsyncThunk(
-  "powerbi/getLastYearDailySpend",
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await getLastYearDailySpendApi(params);
-
-      return response.data || response;
-    } catch (error) {
-      toast.error("Failed to fetch last year daily spend", {
         autoClose: 3000,
       });
 

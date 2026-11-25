@@ -1,11 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import {
-  getPurchaseOrders,
+import {  
   getActualSpend,
-  getDailySpend,
   getKPIPurchases,
-  getLastYearDailySpend,
   getLastYearActualSpend,
   getKPIMaverickSpend,
   getKPIPriceAlerts,
@@ -53,38 +50,10 @@ const initialState = {
   KPILeadTimeBranch: [],
   GoodsReceived: [],
   LastYearGoodsReceived: [],
-  // BestPricePerSupplier: [],
-  ActualSpend: [],
-  ActualSpendSummary: [],
-  ActualSpendCategory: [],
-  ActualSpendSupplier: [],
-  ActualSpendBranch: [],
-  ActualSpendMonthly: [],
-  ActualSpendType: [],
 
-  DailySpend: [],
-  DailySpendSummary: [],
-  DailySpendCategory: [],
-  DailySpendSupplier: [],
-  DailySpendBranch: [],
-  DailySpendMonthly: [],
-  DailySpendType: [],
+  ActualSpend: [],
 
   LastYearActualSpend: [],
-  LastYearActualSpendSummary: [],
-  LastYearActualSpendCategory: [],
-  LastYearActualSpendSupplier: [],
-  LastYearActualSpendBranch: [],
-  LastYearActualSpendMonthly: [],
-  LastYearActualSpendType: [],
-
-  LastYearDailySpend: [],
-  LastYearDailySpendSummary: [],
-  LastYearDailySpendCategory: [],
-  LastYearDailySpendSupplier: [],
-  LastYearDailySpendBranch: [],
-  LastYearDailySpendMonthly: [],
-  LastYearDailySpendType: [],
 
   kpiOverdueAccounts: [],
 
@@ -309,32 +278,6 @@ const PurchaseOrdersSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-
-      // ------------------------------------------
-      // PURCHASE ORDERS
-      // ------------------------------------------
-
-      .addCase(getPurchaseOrders.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-
-      .addCase(getPurchaseOrders.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
-
-        state.PurchaseOrders = action.payload?.result || action.payload || [];
-      })
-
-      .addCase(getPurchaseOrders.rejected, (state, action) => {
-        state.loading = false;
-        state.error =
-          action.payload?.message ||
-          action.payload ||
-          action.error.message ||
-          "Error loading data";
-      })
-
       // ------------------------------------------
       // KPI PURCHASES
       // ------------------------------------------
@@ -406,38 +349,7 @@ const PurchaseOrdersSlice = createSlice({
         state.loading = false;
         state.error = null;
 
-        const groupBy = action.meta.arg?.groupBy;
-        const result = action.payload?.result || action.payload || [];
-
-        switch (groupBy) {
-          case "SUMMARY":
-            state.ActualSpendSummary = result;
-            break;
-
-          case "CATEGORY":
-            state.ActualSpendCategory = result;
-            break;
-
-          case "SUPPLIER":
-            state.ActualSpendSupplier = result;
-            break;
-
-          case "BRANCH":
-            state.ActualSpendBranch = result;
-            break;
-
-          case "MONTHLY":
-            state.ActualSpendMonthly = result;
-            break;
-
-          case "TYPE":
-            state.ActualSpendType = result;
-            break;
-
-          default:
-            state.ActualSpend = result;
-            break;
-        }
+        state.ActualSpend = action.payload?.result || action.payload || [];
       })
 
       .addCase(getActualSpend.rejected, (state, action) => {
@@ -447,62 +359,6 @@ const PurchaseOrdersSlice = createSlice({
           action.payload ||
           action.error.message ||
           "Error loading actual spend";
-      })
-
-      // ------------------------------------------
-      // DAILY SPEND
-      // ------------------------------------------
-
-      .addCase(getDailySpend.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-
-      .addCase(getDailySpend.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
-
-        const groupBy = action.meta.arg?.groupBy;
-        const result = action.payload?.result || action.payload || [];
-
-        switch (groupBy) {
-          case "SUMMARY":
-            state.DailySpendSummary = result;
-            break;
-
-          case "CATEGORY":
-            state.DailySpendCategory = result;
-            break;
-
-          case "SUPPLIER":
-            state.DailySpendSupplier = result;
-            break;
-
-          case "BRANCH":
-            state.DailySpendBranch = result;
-            break;
-
-          case "MONTHLY":
-            state.DailySpendMonthly = result;
-            break;
-
-          case "TYPE":
-            state.DailySpendType = result;
-            break;
-
-          default:
-            state.DailySpend = result;
-            break;
-        }
-      })
-
-      .addCase(getDailySpend.rejected, (state, action) => {
-        state.loading = false;
-        state.error =
-          action.payload?.message ||
-          action.payload ||
-          action.error.message ||
-          "Error loading daily spend";
       })
 
       // ------------------------------------------
@@ -518,39 +374,7 @@ const PurchaseOrdersSlice = createSlice({
         state.loading = false;
         state.error = null;
 
-        const groupBy = action.meta.arg?.groupBy;
-
-        const result = action.payload?.result || action.payload || [];
-
-        switch (groupBy) {
-          case "SUMMARY":
-            state.LastYearActualSpendSummary = result;
-            break;
-
-          case "CATEGORY":
-            state.LastYearActualSpendCategory = result;
-            break;
-
-          case "SUPPLIER":
-            state.LastYearActualSpendSupplier = result;
-            break;
-
-          case "BRANCH":
-            state.LastYearActualSpendBranch = result;
-            break;
-
-          case "MONTHLY":
-            state.LastYearActualSpendMonthly = result;
-            break;
-
-          case "TYPE":
-            state.LastYearActualSpendType = result;
-            break;
-
-          default:
-            state.LastYearActualSpend = result;
-            break;
-        }
+         state.LastYearActualSpend = action.payload?.result || action.payload || [];
       })
 
       .addCase(getLastYearActualSpend.rejected, (state, action) => {
@@ -562,62 +386,6 @@ const PurchaseOrdersSlice = createSlice({
           "Error loading last year actual spend";
       })
 
-      // ------------------------------------------
-      // LAST YEAR DAILY SPEND
-      // ------------------------------------------
-
-      .addCase(getLastYearDailySpend.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-
-      .addCase(getLastYearDailySpend.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
-
-        const groupBy = action.meta.arg?.groupBy;
-
-        const result = action.payload?.result || action.payload || [];
-
-        switch (groupBy) {
-          case "SUMMARY":
-            state.LastYearDailySpendSummary = result;
-            break;
-
-          case "CATEGORY":
-            state.LastYearDailySpendCategory = result;
-            break;
-
-          case "SUPPLIER":
-            state.LastYearDailySpendSupplier = result;
-            break;
-
-          case "BRANCH":
-            state.LastYearDailySpendBranch = result;
-            break;
-
-          case "MONTHLY":
-            state.LastYearDailySpendMonthly = result;
-            break;
-
-          case "TYPE":
-            state.LastYearDailySpendType = result;
-            break;
-
-          default:
-            state.LastYearDailySpend = result;
-            break;
-        }
-      })
-
-      .addCase(getLastYearDailySpend.rejected, (state, action) => {
-        state.loading = false;
-        state.error =
-          action.payload?.message ||
-          action.payload ||
-          action.error.message ||
-          "Error loading last year daily spend";
-      })
       // ------------------------------------------
       // KPI MAVERICK SPEND
       // ------------------------------------------
@@ -813,32 +581,7 @@ const PurchaseOrdersSlice = createSlice({
           action.error.message ||
           "Error loading last year goods received";
       })
-      // ------------------------------------------
-      // BEST PRICE PER SUPPLIER
-      // ------------------------------------------
-
-      // .addCase(getBestPricePerSupplier.pending, (state) => {
-      //   state.loading = true;
-      //   state.error = null;
-      // })
-
-      // .addCase(getBestPricePerSupplier.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   state.error = null;
-
-      //   state.BestPricePerSupplier =
-      //     action.payload?.result || action.payload || [];
-      // })
-
-      // .addCase(getBestPricePerSupplier.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error =
-      //     action.payload?.message ||
-      //     action.payload ||
-      //     action.error.message ||
-      //     "Error loading best price per supplier";
-      // })
-
+      
       // ------------------------------------------
       // KPI OVERDUE ACCOUNTS
       // ------------------------------------------

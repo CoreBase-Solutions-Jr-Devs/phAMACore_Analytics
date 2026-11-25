@@ -675,7 +675,7 @@ const MonthToDateSalesChart = ({
       <div style="padding: 10px; font-size: 11px; min-width: 230px; background: #fff; color: #333; border-radius: 6px;">
 
         <div style="font-weight: 500; margin-bottom: 10px;">
-          Day ${categories[dataPointIndex]}
+           ${categories[dataPointIndex]}
         </div>
 
         <div style="margin-bottom: 5px;">

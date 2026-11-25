@@ -1,14 +1,12 @@
 import { useMemo } from "react";
 
 const usePurchaseOrders = (
-  PurchaseOrders = [],
 
   KPIPurchases = [],
   KPISummary = [],
   KPICategory = [],
   KPISupplier = [],
   KPIBranch = [],
-  KPIMonthly = [],
   KPIType = [],
 
   KPIMaverickSpend = [],
@@ -23,8 +21,6 @@ const usePurchaseOrders = (
   KPIPriceAlertsItems = [],
   KPIPriceAlertsHistory = [],
 
-  // BestPricePerSupplier = [],
-
   KPILeadTime = [],
   KPILeadTimeSummary = [],
   KPILeadTimeSupplier = [],
@@ -36,36 +32,9 @@ const usePurchaseOrders = (
   LastYearGoodsReceived = [],
 
   ActualSpend = [],
-  ActualSpendSummary = [],
-  ActualSpendCategory = [],
-  ActualSpendSupplier = [],
-  ActualSpendBranch = [],
-  ActualSpendMonthly = [],
-  ActualSpendType = [],
+ 
+  LastYearActualSpend= [],
 
-  DailySpend = [],
-  DailySpendSummary = [],
-  DailySpendCategory = [],
-  DailySpendSupplier = [],
-  DailySpendBranch = [],
-  DailySpendMonthly = [],
-  DailySpendType = [],
-
-  LastYearActualSpend = [],
-  LastYearActualSpendSummary = [],
-  LastYearActualSpendCategory = [],
-  LastYearActualSpendSupplier = [],
-  LastYearActualSpendBranch = [],
-  LastYearActualSpendMonthly = [],
-  LastYearActualSpendType = [],
-
-  LastYearDailySpend = [],
-  LastYearDailySpendSummary = [],
-  LastYearDailySpendCategory = [],
-  LastYearDailySpendSupplier = [],
-  LastYearDailySpendBranch = [],
-  LastYearDailySpendMonthly = [],
-  LastYearDailySpendType = [],
   kpiOverdueAccounts = [],
 
   KPISupplierOrderFillRateSummary = [],
@@ -281,7 +250,7 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
     // CURRENT YEAR
     // =========================
 
-    (ActualSpendMonthly || []).forEach((item) => {
+    (ActualSpend || []).forEach((item) => {
       if (!item?.year || !item?.month) return;
 
       if (Number(item.year) !== currentYear) return;
@@ -303,7 +272,7 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
     // LAST YEAR
     // =========================
 
-    (LastYearActualSpendMonthly || []).forEach((item) => {
+    (LastYearActualSpend || []).forEach((item) => {
       if (!item?.year || !item?.month) return;
 
       if (Number(item.year) !== lastYear) return;
@@ -321,8 +290,8 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
       }
     });
 
-    console.log("ActualSpendMonthly:", ActualSpendMonthly);
-    console.log("LastYearActualSpendMonthly:", LastYearActualSpendMonthly);
+    console.log("ActualSpend:", ActualSpend);
+    console.log("LastYearActualSpend:", LastYearActualSpend);
 
     console.log("Current Year Map:", currentYearMap);
     console.log("Last Year Map:", lastYearMap);
@@ -341,7 +310,7 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
         },
       ],
     };
-  }, [ActualSpendMonthly, LastYearActualSpendMonthly, filters]);
+  }, [ActualSpend, LastYearActualSpend, filters]);
 
   // ============================================================
   // MONTH-TO-DATE SPEND CHART
