@@ -46,7 +46,7 @@ const SalesRevenueAnalysis = ({
   error = null,
 }) => {
   const [activeTab, setActiveTab] = useState("salesperson");
-  
+  const [globalFilter, setGlobalFilter] = useState("");
   const salespersonColumns = useMemo(
     () => [
       columnHelper.accessor("staff_Name", {
@@ -193,14 +193,43 @@ const SalesRevenueAnalysis = ({
 
   const currentTable = tableConfig[activeTab];
 
+  const filteredData = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+  const data = currentTable.data || [];
+
+  if (!search) return data;
+
+  return data.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value ?? "").toLowerCase().includes(search)
+    )
+  );
+}, [currentTable.data, globalFilter]);
+
+const tabCounts = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+
+  const getCount = (data = []) => {
+    if (!search) return data.length;
+
+    return data.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value ?? "").toLowerCase().includes(search)
+      )
+    ).length;
+  };
+
+  return {
+    salesperson: getCount(salesmanData),
+    customer: getCount(customerData),
+  };
+}, [salesmanData, customerData, globalFilter]);
+
   const toolbarContent = (
     <Nav pills className="nav-tabs-custom flex-wrap gap-1" role="tablist">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.value;
-        const count =
-          tab.value === "salesperson"
-            ? salesmanData.length
-            : customerData.length;
+       const count = tabCounts[tab.value];
 
         return (
           <NavItem key={tab.value}>
@@ -239,7 +268,7 @@ const SalesRevenueAnalysis = ({
   );
 
   const handleExportExcel = () => {
-    const rows = currentTable.data.map((item) => {
+    const rows = filteredData.map((item) => {
       const commonFields = {
         Item: item.item_Name || "N/A",
         Branch: item.brancch_Name || "N/A",
@@ -289,11 +318,13 @@ const SalesRevenueAnalysis = ({
       <CardBody  className="mb-0">
         <TanstackTable
           columns={currentTable.columns}
-          data={currentTable.data}
+          data={filteredData}
           tableTabs={toolbarContent}
           loading={loading}
           error={error}
           isGlobalFilter={true}
+            globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
           isColumnFilter={false}
           searchInputWidth="450px"
           customPageSize={10}

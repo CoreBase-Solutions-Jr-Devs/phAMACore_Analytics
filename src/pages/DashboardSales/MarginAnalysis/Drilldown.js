@@ -109,6 +109,7 @@ const Drilldown = ({
   onBandChange = () => {},
 }) => {
   const [activeTab, setActiveTab] = useState("drilldown");
+const [globalFilter, setGlobalFilter] = useState("");
 
 const drilldownColumns = useMemo(
   () => [
@@ -370,30 +371,50 @@ const skuColumns = useMemo(
 
   const currentTable = tableConfig[activeTab];
 
-  const filteredData = useMemo(() => {
-    if (activeBand === "ALL") {
-      return currentTable.data;
-    }
+const filteredData = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
 
-    return currentTable.data.filter((item) => item.margin_band === activeBand);
-  }, [currentTable.data, activeBand]);
+  return currentTable.data.filter((item) => {
+    // First apply the selected margin band.
+    const matchesBand =
+      activeBand === "ALL" || item.margin_band === activeBand;
 
-  const bandCounts = useMemo(
-    () => ({
-      ALL: currentTable.data.length,
-      "<25%": currentTable.data.filter((item) => item.margin_band === "<25%")
-        .length,
-      "25% to 30%": currentTable.data.filter(
-        (item) => item.margin_band === "25% to 30%",
-      ).length,
-      "30% to 45%": currentTable.data.filter(
-        (item) => item.margin_band === "30% to 45%",
-      ).length,
-      ">45%": currentTable.data.filter((item) => item.margin_band === ">45%")
-        .length,
-    }),
-    [currentTable.data],
-  );
+    if (!matchesBand) return false;
+
+    // Then apply the search filter.
+    if (!search) return true;
+
+    return Object.values(item).some((value) =>
+      String(value ?? "").toLowerCase().includes(search)
+    );
+  });
+}, [currentTable.data, activeBand, globalFilter]);
+
+const bandCounts = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+
+  const getCount = (band) =>
+    currentTable.data.filter((item) => {
+      const matchesBand =
+        band === "ALL" || item.margin_band === band;
+
+      if (!matchesBand) return false;
+
+      if (!search) return true;
+
+      return Object.values(item).some((value) =>
+        String(value ?? "").toLowerCase().includes(search)
+      );
+    }).length;
+
+  return {
+    ALL: getCount("ALL"),
+    "<25%": getCount("<25%"),
+    "25% to 30%": getCount("25% to 30%"),
+    "30% to 45%": getCount("30% to 45%"),
+    ">45%": getCount(">45%"),
+  };
+}, [currentTable.data, globalFilter]);
 
   const handleExportExcel = () => {
     const rows =
@@ -522,6 +543,8 @@ const skuColumns = useMemo(
           data={filteredData}
           isGlobalFilter={true}
           isColumnFilter={false}
+            globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
           customPageSize={10}
           pageSizeOptions={[5, 10, 20, 30]}
           SearchPlaceholder={currentTable.placeholder}

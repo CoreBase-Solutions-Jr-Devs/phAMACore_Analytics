@@ -90,19 +90,32 @@ const SupplierOrderFillRateTable = ({
   error = null,
 }) => {
   const [activeTab, setActiveTab] = useState("branch");
+const [globalFilter, setGlobalFilter] = useState("");
 
-const tabCounts = useMemo(
-  () => ({
-    supplier: SupplierOrderFillRateSupplierOFR.length,
-    orders: SupplierOrderFillRateOrderDrilldown.length,
-    branch: SupplierOrderFillRateBranch.length,
-  }),
-  [
-    SupplierOrderFillRateSupplierOFR,
-    SupplierOrderFillRateOrderDrilldown,
-    SupplierOrderFillRateBranch,
-  ]
-);
+const tabCounts = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+
+  const getCount = (data = []) => {
+    if (!search) return data.length;
+
+    return data.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value ?? "").toLowerCase().includes(search)
+      )
+    ).length;
+  };
+
+  return {
+    supplier: getCount(SupplierOrderFillRateSupplierOFR),
+    orders: getCount(SupplierOrderFillRateOrderDrilldown),
+    branch: getCount(SupplierOrderFillRateBranch),
+  };
+}, [
+  SupplierOrderFillRateSupplierOFR,
+  SupplierOrderFillRateOrderDrilldown,
+  SupplierOrderFillRateBranch,
+  globalFilter,
+]);
 
 const renderInsightCell = (content, row, prefix) => {
   const tooltipId = `${prefix}-${row.index}`;
@@ -742,6 +755,19 @@ const branchColumns = useMemo(
 
   const currentTable = tableConfig[activeTab];
 
+  const filteredData = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+  const data = currentTable?.data || [];
+
+  if (!search) return data;
+
+  return data.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value ?? "").toLowerCase().includes(search)
+    )
+  );
+}, [currentTable?.data, globalFilter]);
+
   const toolbarContent = (
    <Nav
     pills
@@ -789,68 +815,69 @@ const branchColumns = useMemo(
   );
 
 const handleExportExcel = () => {
-  const rows = (currentTable.data || []).map((item) => {
-    if (activeTab === "supplier") {
-      return {
-        "Branch Code": item.branch_code,
-        "Branch Name": item.branch_name,
-        Orders: item.orders_count,
-        "Lines Ordered": item.lines_ordered_count,
-        "Ordered Units": item.ordered_units,
-        "Ordered Value": item.ordered_value_cost,
-        "Dispatched Units": item.dispatched_units,
-        "Dispatched Value": item.dispatched_value_cost,
-        "Received Units": item.received_units,
-        "Received Value": item.received_value_cost,
-        "Order Fill Rate (%)": item.order_fill_rate_perc,
-        "Line Fill Rate (%)": item.line_fill_rate_perc,
-        "Quantity Fill Rate (%)": item.quantity_fill_rate_perc,
-        "Unfulfilled Units": item.unfulfilled_units,
-        "Unfulfilled Value": item.unfulfilled_value_cost,
-        "Action Insight": item.action_insight,
-      };
-    }
+  const rows = (filteredData || []).map((item) => {
+   if (activeTab === "supplier") {
+  return {
+    "Supplier Name": item.supplier_name ?? "-",
+    "Supplier ID": item.supplier_id ?? "-",
+    "POs Issued": Number(item.total_pos_issued ?? 0),
+    "Ordered Value (KES)": Number(item.total_ordered_value_kes ?? 0),
+    "Received Value (KES)": Number(item.total_received_value_kes ?? 0),
+    "Outstanding Balance (KES)": Number(item.outstanding_balance_kes ?? 0),
+    Fulfilled: Number(item.fulfilled_pos_count ?? 0),
+    Partial: Number(item.partial_pos_count ?? 0),
+    Outstanding: Number(item.outstanding_pos_count ?? 0),
+    "Order Fill (%)": Number(item.order_fill_rate_perc ?? 0),
+    "Value Fill (%)": Number(item.value_fill_rate_perc ?? 0),
+    "Average Delivery (Days)": Number(item.avg_delivery_lead_days ?? 0),
+    "On-Time Delivery (%)": Number(item.on_time_delivery_rate_perc ?? 0),
+    "Average Outstanding (Days)": Number(item.avg_outstanding_days ?? 0),
+    Performance: item.supplier_performance_grade ?? "-",
+    "Action Insight": item.action_insight ?? "-",
+  };
+}
 
-    if (activeTab === "orders") {
-      return {
-        "Order Number": item.order_number,
-        "Order Date": item.order_date,
-        "Destination Branch": item.dest_branch_name,
-        "Source Branch": item.source_branch_name,
-        "Transfer Document": item.transfer_doc_number,
-        "Transfer Date": item.transfer_date,
-        "Receipt Document": item.receipt_doc_number,
-        "Receipt Date": item.receipt_date,
-        "Lines Ordered": item.lines_ordered,
-        "Lines Fulfilled": item.lines_fulfilled,
-        "Ordered Units": item.ordered_units,
-        "Dispatched Units": item.dispatched_units,
-        "Received Units": item.received_units,
-        "Ordered Value": item.ordered_value_cost,
-        "Dispatched Value": item.dispatched_value_cost,
-        "Received Value": item.received_value_cost,
-        "Unfulfilled Units": item.unfulfilled_units,
-        "Unfulfilled Value": item.unfulfilled_value_cost,
-        "Fulfillment Status": item.order_fulfillment_status,
-        "Fulfillment Days": item.fulfillment_days,
-        "Action Insight": item.action_insight,
-      };
-    }
+  if (activeTab === "orders") {
+  return {
+    "Supplier Name": item.supplier_name ?? "-",
+    "Supplier ID": item.supplier_id ?? "-",
+    "PO Number": item.po_number ?? "-",
+    "PO Date": item.po_date ?? "-",
+    "Expected Delivery Date": item.expected_delivery_date ?? "-",
+    Branch: item.branch_name ?? "-",
+    "PO Value (KES)": Number(item.po_total_value_kes ?? 0),
+    "Invoice Number": item.invoice_number ?? "-",
+    "Invoice Date": item.invoice_date ?? "-",
+    "Invoice Capture Date": item.invoice_capture_date ?? "-",
+    "Invoice Value (KES)": Number(item.invoice_total_value_kes ?? 0),
+    "Received Value (KES)": Number(item.cumulative_lpo_received_kes ?? 0),
+    "Outstanding Balance (KES)": Number(item.outstanding_balance_kes ?? 0),
+    "Fulfillment Status": item.fulfillment_status ?? "-",
+    "Delivery Lead (Days)": Number(item.delivery_lead_days ?? 0),
+    "Days Open": Number(item.days_open ?? 0),
+    "SLA Delay (Days)": Number(item.sla_delay_days ?? 0),
+    "Raised By": item.raised_by ?? "-",
+    "Action Insight": item.action_insight ?? "-",
+  };
+}
 
-    return {
-      "Item Code": item.item_code,
-      "Item Name": item.item_name,
-      "Orders Affected": item.orders_affected_count,
-      "Units Ordered": item.total_units_ordered,
-      "Units Dispatched": item.total_units_dispatched,
-      "Unfulfilled Units": item.total_unfulfilled_units,
-      "Unfulfilled WP": item.total_unfulfilled_wp,
-      "Shortage Value": item.total_shortage_value_cost,
-      "Fulfillment Rate (%)": item.fulfillment_rate_perc,
-      "Affected Branches": item.affected_branches_count,
-      "Branch Codes": item.affected_branches_list,
-      "Action Insight": item.action_insight,
-    };
+   return {
+  "Branch Name": item.branch_name?.replace(
+    /^AXCESS PHARMACY\s*-\s*/i,
+    ""
+  ) ?? "-",
+  "POs Issued": Number(item.total_pos_issued ?? 0),
+  Fulfilled: Number(item.fulfilled_pos_count ?? 0),
+  Partial: Number(item.partial_pos_count ?? 0),
+  Outstanding: Number(item.outstanding_pos_count ?? 0),
+  "Order Fill (%)": Number(item.order_fill_rate_perc ?? 0),
+  "Ordered Value (KES)": Number(item.total_ordered_value_kes ?? 0),
+  "Received Value (KES)": Number(item.total_received_value_kes ?? 0),
+  "Outstanding Balance (KES)": Number(item.outstanding_balance_kes ?? 0),
+  "Value Fill (%)": Number(item.value_fill_rate_perc ?? 0),
+  "Average Delivery (Days)": Number(item.avg_delivery_lead_days ?? 0),
+  "Action Insight": item.action_insight ?? "-",
+};
   });
 
   const todayStr = new Date()
@@ -890,19 +917,21 @@ const handleExportExcel = () => {
                   : error.message || "Failed to load category spend data."}
               </Alert>
             )}
-    <TanstackTable
-      columns={currentTable.columns}
-      data={currentTable.data}
-      tableTabs={toolbarContent}
-      isGlobalFilter={true}
-      SearchPlaceholder={currentTable.placeholder}
-      customPageSize={10}
-         searchInputWidth="450px"
-      pageSizeOptions={[5, 10, 20, 30, 50]}
-      loading={loading}
-      error={error}
-      emptyMessage={currentTable.emptyMessage}
-    />
+ <TanstackTable
+  columns={currentTable.columns}
+  data={filteredData}
+  tableTabs={toolbarContent}
+  isGlobalFilter={true}
+  globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
+  SearchPlaceholder={currentTable.placeholder}
+  customPageSize={10}
+  searchInputWidth="450px"
+  pageSizeOptions={[5, 10, 20, 30, 50]}
+  loading={loading}
+  error={error}
+  emptyMessage={currentTable.emptyMessage}
+/>
       </CardBody>
         </Card>
   );

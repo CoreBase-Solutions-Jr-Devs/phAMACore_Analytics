@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Card, CardBody, CardHeader,Badge, } from "reactstrap";
 
 import { exportToExcel } from "../../../helpers/export_helper";
@@ -38,6 +38,20 @@ const Products = ({
   rightClickBtn,
   categoryPerformance = [],
 }) => {
+  const [globalFilter, setGlobalFilter] = useState("");
+
+const filteredData = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+  const data = categoryPerformance ?? [];
+
+  if (!search) return data;
+
+  return data.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value ?? "").toLowerCase().includes(search)
+    )
+  );
+}, [categoryPerformance, globalFilter]);
   const columns = useMemo(
     () => [
       {
@@ -246,7 +260,7 @@ const Products = ({
 
   const handleExportExcel = () => {
     // Export all records supplied to the component.
-    const rows = (categoryPerformance ?? []).map((original) => ({
+    const rows = (filteredData ?? []).map((original) => ({
       Group: original.group_name ?? "—",
       "Subgroup Name": original.subgroup_name ?? "—",
       "Subgroup Code": original.subgroup_code ?? "—",
@@ -302,10 +316,12 @@ const Products = ({
       <CardBody className="p-2">
         <TanstackTable
           columns={columns}
-          data={categoryPerformance ?? []}
+        data={filteredData}
           loading={loading}
           error={error}
           searchInputWidth="450px"
+           globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
           customPageSize={10}
           pageSizeOptions={[5, 10, 20, 30]}
           isGlobalFilter={true}

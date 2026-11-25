@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Card, CardBody, CardHeader } from "reactstrap";
 import TanstackTable from "../../../Components/Common/TanstackTable";
 import { exportToExcel } from "../../../helpers/export_helper";
@@ -176,8 +176,22 @@ const SummaryTable = ({
   loading,
   error,
 }) => {
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  const filteredData = useMemo(() => {
+    const search = globalFilter.trim().toLowerCase();
+
+    if (!search) return salesPeriodicBreakdownData;
+
+    return salesPeriodicBreakdownData.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value ?? "").toLowerCase().includes(search)
+      )
+    );
+  }, [salesPeriodicBreakdownData, globalFilter]);
+
   const handleExportExcel = () => {
-    const rows = (salesPeriodicBreakdownData ?? []).map((original) => ({
+    const rows = (filteredData ?? []).map((original) => ({
       Period: original.period ?? "—",
       "Cash Sales": Number(original.cash_sales_incl ?? 0),
       "Cash Invoices": Number(original.cash_invoices_incl ?? 0),
@@ -221,10 +235,13 @@ const SummaryTable = ({
         <CardBody>
           <TanstackTable
             columns={columns}
-            data={salesPeriodicBreakdownData}
+            data={filteredData}
             
             isGlobalFilter={true}
             isColumnFilter={false}
+              globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
+
             searchInputWidth="450px"
             loading={loading}
             error={error}

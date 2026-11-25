@@ -120,7 +120,7 @@ const ConsolidatedLPOReviewTable = ({
   loading = false,
   error = null,
 }) => {
- const [activeTab, setActiveTab] = useState("branch");
+ const [activeTab, setActiveTab] = useState("ConsolidatedList");
 const [selectedABCClass, setSelectedABCClass] = useState("ALL");
 const [globalFilter, setGlobalFilter] = useState("");
 

@@ -142,21 +142,38 @@ const SupplierAgeingTable = ({
   loading = false,
   error = null,
 }) => {
-  const [activeTab, setActiveTab] = useState("ALL");
+const [activeTab, setActiveTab] = useState("ALL");
+const [globalFilter, setGlobalFilter] = useState("");
 
 const filteredData = useMemo(() => {
-  if (activeTab === "ALL") return data;
+  let result = data;
 
-  const selectedTab = ReceivablesTabs.find(
-    (tab) => tab.value === activeTab
-  );
+  // First apply the selected ageing tab
+  if (activeTab !== "ALL") {
+    const selectedTab = ReceivablesTabs.find(
+      (tab) => tab.value === activeTab
+    );
 
-  if (!selectedTab?.field) return data;
+    if (selectedTab?.field) {
+      result = result.filter(
+        (item) => Number(item[selectedTab.field] ?? 0) !== 0
+      );
+    }
+  }
 
-  return data.filter(
-    (item) => Number(item[selectedTab.field] ?? 0) !== 0
-  );
-}, [data, activeTab]);
+  // Then apply the search
+  const search = globalFilter.trim().toLowerCase();
+
+  if (search) {
+    result = result.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value ?? "").toLowerCase().includes(search)
+      )
+    );
+  }
+
+  return result;
+}, [data, activeTab, globalFilter]);
 
 const tabCounts = useMemo(() => {
   const counts = { ALL: data.length };
@@ -361,8 +378,10 @@ onExport={handleExportExcel}        />
           data={filteredData}
           loading={loading}
           error={null}
-          isGlobalFilter={true}
-          isColumnFilter={false}
+        isGlobalFilter={true}
+  isColumnFilter={false}
+  globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
           customPageSize={10}
           searchInputWidth="450px"
           pageSizeOptions={[5, 10, 20, 30, 50]}
