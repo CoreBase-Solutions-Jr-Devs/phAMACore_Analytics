@@ -126,7 +126,7 @@ const Widget = ({
 
   return (
     <React.Fragment>   
-     {loading ? (
+     {Object.values(loading || {}).some(Boolean) ? (
           <div className="text-center py-5">
             <div
               className="spinner-border text-primary"

@@ -253,7 +253,7 @@ const handleMarginBandSelect = (band) => {
               // marginDrilldown30To45={marginDrilldown30To45}
               // marginDrilldownAbove45={marginDrilldownAbove45}
               selectedBranchName={selectedBranchName}
-              loading={loading}
+              loading={loading.kpiMarginAnalysis}
               error={error}
               rightClickBtn={toggleRightColumn}
             />
@@ -266,7 +266,7 @@ const handleMarginBandSelect = (band) => {
     marginAnalysisSKUData={marginAnalysisSKU}
   activeBand={selectedMarginBand}
   onBandChange={handleMarginBandSelect}
-  loading={loading}
+  loading={loading.kpiMarginAnalysis}
   error={error}
 />
           </Col>

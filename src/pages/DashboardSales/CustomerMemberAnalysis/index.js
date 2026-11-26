@@ -256,7 +256,7 @@ const CustomerMemberAnalysis = () => {
               memberTransactionShare={memberTransactionShare}
               memberActionInsight={memberActionInsight}
               selectedBranchName={selectedBranchName}
-              loading={loading}
+              loading={loading.customerMemberAnalysis}
               error={error}
               rightClickBtn={toggleRightColumn}
             />
@@ -284,7 +284,7 @@ const CustomerMemberAnalysis = () => {
               nonMemberSalesIncl={nonMemberSalesIncl}
               nonMemberABV={nonMemberABV}
               nonMemberSalesContribution={nonMemberSalesContribution}
-              loading={loading}
+              loading={loading.customerMemberAnalysis}
               error={error}
             />
           </Col>

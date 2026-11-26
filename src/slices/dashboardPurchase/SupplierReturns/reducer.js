@@ -11,7 +11,9 @@ const initialState = {
  KPISupplierReturnsBranch: [],
 KPISupplierReturnsSKU: [],
 KPISupplierReturnsReason: [],
-  loading: false,
+      loading: {
+  kpiSupplierReturns: false,
+},
   error: null,
   filters: {
     branchcode: "",
@@ -229,20 +231,18 @@ const SupplierReturnsSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder
-
-  
+    builder 
       // ------------------------------------------
       // KPI PURCHASES
       // ------------------------------------------
 
       .addCase(getKPISupplierReturns.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiSupplierReturns = true;
         state.error = null;
       })
 
       .addCase(getKPISupplierReturns.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSupplierReturns = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -276,7 +276,7 @@ const SupplierReturnsSlice = createSlice({
       })
 
       .addCase(getKPISupplierReturns.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSupplierReturns = false;
         state.error =
           action.payload?.message ||
           action.payload ||

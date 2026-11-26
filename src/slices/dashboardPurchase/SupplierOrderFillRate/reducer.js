@@ -10,7 +10,9 @@ const initialState = {
  KPISupplierOrderFillRateOrderDrilldown: [],
  KPISupplierOrderFillRateBranch: [],
 
-  loading: false,
+    loading: {
+  kpiSupplierOrderFillRate: false,
+},
   error: null,
   filters: {
     branchcode: "",
@@ -228,20 +230,18 @@ const SupplierOrderFillRateSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder
-
-  
+    builder 
       // ------------------------------------------
       // KPI PURCHASES
       // ------------------------------------------
 
       .addCase(getKPISupplierOrderFillRate.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiSupplierOrderFillRate = true;
         state.error = null;
       })
 
       .addCase(getKPISupplierOrderFillRate.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSupplierOrderFillRate = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -269,14 +269,13 @@ const SupplierOrderFillRateSlice = createSlice({
       })
 
       .addCase(getKPISupplierOrderFillRate.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSupplierOrderFillRate = false;
         state.error =
           action.payload?.message ||
           action.payload ||
           action.error.message ||
           "Error loading KPI purchases";
       })
-
 ;
   },
 });

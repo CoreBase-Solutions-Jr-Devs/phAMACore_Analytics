@@ -32,7 +32,16 @@ const initialState = {
   salesDaily: [],
  salesPeriodicBreakdown: [],
 
-  loading: false,
+  loading:  {
+    salesTransactions: false,
+    monthlySales: false,
+    monthToDateSales: false,
+    lastYearMonthToDateSales: false,
+    lastYearMonthlySales: false,
+    branches: false,
+    kpiSalesTransactions: false,
+    kpiOverdueAccounts: false,
+  },
   error: null,
 
   filters: {
@@ -226,12 +235,12 @@ const powerBISlice = createSlice({
     builder
 
       .addCase(getSalesTransactions.pending, (state) => {
-        state.loading = true;
+        state.loading.salesTransactions = true;
         state.error = null;
       })
 
       .addCase(getSalesTransactions.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.salesTransactions = false;
         state.error = null;
 
         const data = action.payload?.result || action.payload || [];
@@ -240,7 +249,7 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getSalesTransactions.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.salesTransactions = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -249,12 +258,12 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getKPISalesTransactions.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiSalesTransactions = true;
         state.error = null;
       })
 
       .addCase(getKPISalesTransactions.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSalesTransactions = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -295,7 +304,7 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getKPISalesTransactions.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSalesTransactions = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -304,19 +313,19 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getMonthlySales.pending, (state) => {
-        state.loading = true;
+        state.loading.monthlySales = true;
         state.error = null;
       })
 
       .addCase(getMonthlySales.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.monthlySales = false;
         state.error = null;
 
         state.monthlySales = action.payload?.result || action.payload || [];
       })
 
       .addCase(getMonthlySales.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.monthlySales = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -325,12 +334,12 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getLastYearMonthlySales.pending, (state) => {
-        state.loading = true;
+        state.loading.lastYearMonthlySales = true;
         state.error = null;
       })
 
       .addCase(getLastYearMonthlySales.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.lastYearMonthlySales = false;
         state.error = null;
 
         state.lastYearMonthlySales =
@@ -338,7 +347,7 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getLastYearMonthlySales.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.lastYearMonthlySales = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -347,19 +356,19 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getMonthToDateSales.pending, (state) => {
-        state.loading = true;
+        state.loading.monthToDateSales = true;
         state.error = null;
       })
 
       .addCase(getMonthToDateSales.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.monthToDateSales = false;
         state.error = null;
 
         state.monthToDateSales = action.payload?.result || action.payload || [];
       })
 
       .addCase(getMonthToDateSales.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.monthToDateSales = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -368,12 +377,12 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getLastYearMonthToDateSales.pending, (state) => {
-        state.loading = true;
+        state.loading.lastYearMonthToDateSales = true;
         state.error = null;
       })
 
       .addCase(getLastYearMonthToDateSales.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.lastYearMonthToDateSales = false;
         state.error = null;
 
         state.lastYearMonthToDateSales =
@@ -381,7 +390,7 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getLastYearMonthToDateSales.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.lastYearMonthToDateSales = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -390,12 +399,12 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getKPIOverdueAccounts.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiOverdueAccounts = true;
         state.error = null;
       })
 
       .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiOverdueAccounts = false;
         state.error = null;
 
         state.kpiOverdueAccounts =
@@ -403,7 +412,7 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiOverdueAccounts = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -412,19 +421,19 @@ const powerBISlice = createSlice({
       })
 
       .addCase(getBranches.pending, (state) => {
-        state.loading = true;
+        state.loading.branches = true;
         state.error = null;
       })
 
       .addCase(getBranches.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.branches = false;
         state.error = null;
 
         state.branches = action.payload?.result || action.payload || [];
       })
 
       .addCase(getBranches.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.branches = false;
         state.error =
           action.payload?.message ||
           action.payload ||

@@ -548,7 +548,7 @@ const bandCounts = useMemo(() => {
           customPageSize={10}
           pageSizeOptions={[5, 10, 20, 30]}
           SearchPlaceholder={currentTable.placeholder}
-          searchInputWidth="300px"
+          // searchInputWidth="300px"
           tableTabs={
             <UncontrolledDropdown>
               <DropdownToggle

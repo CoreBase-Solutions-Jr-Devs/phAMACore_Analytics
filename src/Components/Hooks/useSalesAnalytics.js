@@ -253,6 +253,8 @@ const useSalesAnalytics = (
       salesVariance: data.map((item) => Number(item.sales_variance || 0)),
 
       salesGrowth: data.map((item) => Number(item.growth_perc) || 0),
+            grossProfit: data.map((item) => Number(item.current_year_gp) || 0),
+      CostOfGoods: data.map((item) => Number(item.current_year_cogs) || 0),
     };
   }, [salesComparativeYTD]);
 

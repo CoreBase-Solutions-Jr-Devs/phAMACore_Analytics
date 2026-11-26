@@ -57,7 +57,17 @@ const initialState = {
 
   kpiOverdueAccounts: [],
 
-  loading: false,
+ loading: {
+  kpiPurchases: false,
+  actualSpend: false,
+  lastYearActualSpend: false,
+  maverickSpend: false,
+  priceAlerts: false,
+  leadTime: false,
+  goodsReceived: false,
+  lastYearGoodsReceived: false,
+  overdueAccounts: false,
+},
   error: null,
 
   filters: {
@@ -283,12 +293,12 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getKPIPurchases.pending, (state) => {
-        state.loading = true;
+         state.loading.kpiPurchases = true;
         state.error = null;
       })
 
       .addCase(getKPIPurchases.fulfilled, (state, action) => {
-        state.loading = false;
+         state.loading.kpiPurchases = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -328,7 +338,7 @@ const PurchaseOrdersSlice = createSlice({
       })
 
       .addCase(getKPIPurchases.rejected, (state, action) => {
-        state.loading = false;
+         state.loading.kpiPurchases = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -341,19 +351,19 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getActualSpend.pending, (state) => {
-        state.loading = true;
+        state.loading.actualSpend = true;
         state.error = null;
       })
 
       .addCase(getActualSpend.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.actualSpend = false;
         state.error = null;
 
         state.ActualSpend = action.payload?.result || action.payload || [];
       })
 
       .addCase(getActualSpend.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.actualSpend = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -366,19 +376,19 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getLastYearActualSpend.pending, (state) => {
-        state.loading = true;
+        state.loading.lastYearActualSpend = true;
         state.error = null;
       })
 
       .addCase(getLastYearActualSpend.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.lastYearActualSpend = false;
         state.error = null;
 
          state.LastYearActualSpend = action.payload?.result || action.payload || [];
       })
 
       .addCase(getLastYearActualSpend.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.lastYearActualSpend = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -391,12 +401,12 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getKPIMaverickSpend.pending, (state) => {
-        state.loading = true;
+        state.loading.maverickSpend = true;
         state.error = null;
       })
 
       .addCase(getKPIMaverickSpend.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.maverickSpend = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -429,7 +439,7 @@ const PurchaseOrdersSlice = createSlice({
       })
 
       .addCase(getKPIMaverickSpend.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.maverickSpend = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -442,12 +452,12 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getKPIPriceAlerts.pending, (state) => {
-        state.loading = true;
+        state.loading.priceAlerts = true;
         state.error = null;
       })
 
       .addCase(getKPIPriceAlerts.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.priceAlerts = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -472,7 +482,7 @@ const PurchaseOrdersSlice = createSlice({
       })
 
       .addCase(getKPIPriceAlerts.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.priceAlerts = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -485,12 +495,12 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getKPILeadTime.pending, (state) => {
-        state.loading = true;
+        state.loading.leadTime = true;
         state.error = null;
       })
 
       .addCase(getKPILeadTime.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.leadTime = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -523,7 +533,7 @@ const PurchaseOrdersSlice = createSlice({
       })
 
       .addCase(getKPILeadTime.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.leadTime = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -536,19 +546,19 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getGoodsReceived.pending, (state) => {
-        state.loading = true;
+        state.loading.goodsReceived = true;
         state.error = null;
       })
 
       .addCase(getGoodsReceived.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.goodsReceived = false;
         state.error = null;
 
         state.GoodsReceived = action.payload?.result || action.payload || [];
       })
 
       .addCase(getGoodsReceived.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.goodsReceived = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -561,12 +571,12 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getLastYearGoodsReceived.pending, (state) => {
-        state.loading = true;
+        state.loading.lastYearGoodsReceived = true;
         state.error = null;
       })
 
       .addCase(getLastYearGoodsReceived.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.lastYearGoodsReceived = false;
         state.error = null;
 
         state.LastYearGoodsReceived =
@@ -574,7 +584,7 @@ const PurchaseOrdersSlice = createSlice({
       })
 
       .addCase(getLastYearGoodsReceived.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.lastYearGoodsReceived = false;
         state.error =
           action.payload?.message ||
           action.payload ||
@@ -587,12 +597,12 @@ const PurchaseOrdersSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getKPIOverdueAccounts.pending, (state) => {
-        state.loading = true;
+        state.loading.overdueAccounts = true;
         state.error = null;
       })
 
       .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.overdueAccounts = false;
         state.error = null;
 
         state.kpiOverdueAccounts =
@@ -600,7 +610,7 @@ const PurchaseOrdersSlice = createSlice({
       })
 
       .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.overdueAccounts = false;
         state.error =
           action.payload?.message ||
           action.payload ||

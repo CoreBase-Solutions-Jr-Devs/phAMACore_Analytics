@@ -1,10 +1,6 @@
 import React from "react";
 import { Card, CardBody, Row, Col, CardHeader, } from "reactstrap";
-import {  useSelector } from "react-redux";
-import {
-  exportDashboardReportToExcel,
-  triggerPrint,
-} from "../../../helpers/export_helper";
+
 const AgeingCards = ({
   // overdueSupplierAccounts = [],
   currentReceivables = 0,
@@ -12,89 +8,15 @@ const AgeingCards = ({
   overdue61To90 = 0,
   overdue91To120 = 0,
   overdue120Plus = 0,
-   selectedBranchName,
-   rightClickBtn,
   loading,
   error,
 }) => {
-    const { startDate, endDate } = useSelector(
-        (state) => state.supplierAgeing.filters,
-      );
-
-    
-  const handleExportExcel = () => {
-    const rows = [
-      {
-        Category: "Aging Summary",
-        Supplier: "Current (0-30 days)",
-        "Outstanding (KES)": Number(currentReceivables || 0).toLocaleString(
-          undefined,
-          { minimumFractionDigits: 2 },
-        ),
-        "Last Invoice": "-",
-        "Last Payment": "-",
-      },
-      {
-        Category: "Aging Summary",
-        Supplier: "31–60 days",
-        "Outstanding (KES)": Number(overdue31To60 || 0).toLocaleString(
-          undefined,
-          { minimumFractionDigits: 2 },
-        ),
-        "Last Invoice": "-",
-        "Last Payment": "-",
-      },
-      {
-        Category: "Aging Summary",
-        Supplier: "61–90 days",
-        "Outstanding (KES)": Number(overdue61To90 || 0).toLocaleString(
-          undefined,
-          { minimumFractionDigits: 2 },
-        ),
-        "Last Invoice": "-",
-        "Last Payment": "-",
-      },
-      {
-        Category: "Aging Summary",
-        Supplier: "91–120 days",
-        "Outstanding (KES)": Number(overdue91To120 || 0).toLocaleString(
-          undefined,
-          { minimumFractionDigits: 2 },
-        ),
-        "Last Invoice": "-",
-        "Last Payment": "-",
-      },
-      {
-        Category: "Aging Summary",
-        Supplier: "120+ days",
-        "Outstanding (KES)": Number(overdue120Plus || 0).toLocaleString(
-          undefined,
-          { minimumFractionDigits: 2 },
-        ),
-        "Last Invoice": "-",
-        "Last Payment": "-",
-      },
-      ...(overdueSupplierAccounts || []).map((item) => ({
-        Category: "Overdue Supplier Account",
-        Supplier: `${item.supplier || ""} (${item.cuscode || ""})`,
-        "Outstanding (KES)": Number(item.outstanding || 0).toLocaleString(
-          undefined,
-          { minimumFractionDigits: 2 },
-        ),
-        "Last Invoice": item.lastInvoice
-          ? new Date(item.lastInvoice).toLocaleDateString("en-GB")
-          : "-",
-        "Last Payment": item.lastPayment
-          ? new Date(item.lastPayment).toLocaleDateString("en-GB")
-          : "-",
-      })),
-    ];
-    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-    exportToExcel(rows, `Supplier_Overdue_Invoices_${todayStr}`);
-  };
-  const handlePrint = () => {
-    triggerPrint();
-  };
+   
+ const formatAmount = (value) =>
+  Number(value ?? 0).toLocaleString("en-KE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
   return (
     <React.Fragment>
       
@@ -123,7 +45,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">Current</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-success">
-            KES 0
+            KES {formatAmount(currentReceivables)}
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">0–30 days</p>
@@ -138,7 +60,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">31–60 Days</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-warning">
-            KES 0
+           KES {formatAmount(overdue31To60)}
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">Overdue invoices</p>
@@ -153,7 +75,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">61–90 Days</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-danger">
-            KES 0
+            KES {formatAmount(overdue61To90)}
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">Overdue invoices</p>
@@ -168,7 +90,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">91–120 Days</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-info">
-            KES 0
+             KES {formatAmount(overdue91To120)}
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">Overdue invoices</p>
@@ -183,7 +105,7 @@ const AgeingCards = ({
         <div>
           <p className="font-medium mb-0">120+ Days</p>
           <h5 className="mt-2 ff-secondary fw-semibold text-danger">
-            KES 0
+             KES {formatAmount(overdue120Plus)}
           </h5>
         </div>
         <p className="text-muted mb-0 mt-auto">Long overdue invoices</p>

@@ -5,10 +5,10 @@ const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
  kpiOverdueAccounts: [],
-
-  loading: false,
+  loading: {
+  kpiOverdueAccounts: false,
+},
   error: null,
-
   filters: {
     branchcode: "",
     dateRange: "Month To Yesterday",
@@ -16,8 +16,6 @@ const initialState = {
       new Date(new Date().getFullYear(), new Date().getMonth(), 1),
     ),
     endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
-    // groupBy: "SUMMARY",
-    // topN: 0,
   },
 };
 
@@ -229,12 +227,12 @@ const SupplierAgeingSlice = createSlice({
     builder
 
  .addCase(getKPIOverdueAccounts.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiOverdueAccounts = true;
         state.error = null;
       })
 
       .addCase(getKPIOverdueAccounts.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiOverdueAccounts = false;
         state.error = null;
 
         state.kpiOverdueAccounts =
@@ -242,7 +240,7 @@ const SupplierAgeingSlice = createSlice({
       })
 
       .addCase(getKPIOverdueAccounts.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiOverdueAccounts = false;
         state.error =
           action.payload?.message ||
           action.payload ||

@@ -45,6 +45,10 @@ const currentMonthExists = categories.includes(currentMonth);
         show: true,
       },
         labels: {
+               show: true,
+  rotate: 0,
+    rotateAlways: false,
+    hideOverlappingLabels: false,
     formatter: (value) => {
       const monthIndex = categories.indexOf(value);
       return monthIndex % 2 === 0 ? value : "";

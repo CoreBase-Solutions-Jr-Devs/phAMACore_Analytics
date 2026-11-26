@@ -130,19 +130,13 @@ const SupplierAgeing = () => {
       }),
     );
   };
-  // const selectedBranchName =
-  //   filters.branch == null || filters.branch === ""
-  //     ? "All Branches"
-  //     : (salesBranch || []).find(
-  //         (m) => Number(m.branch_ID) === Number(filters.branch),
-  //       )?.branch_name || "";
 
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="SupplierAgeing"
+            title="Supplier Ageing"
             pageTitle="Purchases"
             subtitle={selectedBranchName}
           />
@@ -210,7 +204,7 @@ const SupplierAgeing = () => {
                 overdue91To120={overdue91To120}
                 overdue120Plus={overdue120Plus}
                 error={error}
-                loading={loading}
+                loading={loading.kpiOverdueAccounts}
               />
             </Col>
           </Row>
@@ -218,7 +212,7 @@ const SupplierAgeing = () => {
             <Col>
               <SupplierAgeingTable
                 data={overdueSupplierAccounts}
-                loading={loading}
+                loading={loading.kpiOverdueAccounts}
                 error={error}
               />
             </Col>

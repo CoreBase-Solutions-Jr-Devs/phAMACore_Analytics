@@ -244,7 +244,7 @@ const [isSticky, setIsSticky] = useState(false);
                   SupplierOrderFillRateSummaryData
                 }
                 error={error}
-                loading={loading}
+                loading={loading.kpiSupplierOrderFillRate}
               />
             </Col>
           </Row>
@@ -259,7 +259,7 @@ const [isSticky, setIsSticky] = useState(false);
                 }
                 SupplierOrderFillRateBranch={SupplierOrderFillRateBranchData}
                 error={error}
-                loading={loading}
+                loading={loading.kpiSupplierOrderFillRate}
               />
             </Col>
             <FilterActions

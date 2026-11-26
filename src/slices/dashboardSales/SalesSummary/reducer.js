@@ -12,7 +12,9 @@ const initialState = {
   salesPeriodicBreakdown: [],
 
 
-  loading: false,
+    loading:  {
+    kpiSalesTransactions: false,  
+  },
   error: null,
 
   filters: {
@@ -222,12 +224,12 @@ const salesSummarySlice = createSlice({
       // ------------------------------------------
 
       .addCase(getKPISalesTransactions.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiSalesTransactions = true;
         state.error = null;
       })
 
       .addCase(getKPISalesTransactions.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSalesTransactions = false;
         state.error = null;
 
         const GroupBy = action.meta.arg?.GroupBy;
@@ -247,7 +249,7 @@ const salesSummarySlice = createSlice({
       })
 
       .addCase(getKPISalesTransactions.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSalesTransactions = false;
         state.error =
           action.payload?.message ||
           action.payload ||

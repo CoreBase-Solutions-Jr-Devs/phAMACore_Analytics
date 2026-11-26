@@ -272,7 +272,7 @@ const BestPriceSupplier = () => {
                   BestPricePerSupplierSupplierScorecardData
                 }
                 error={error}
-                loading={loading}
+                loading={loading.kpiBestPricePerSupplier}
               />
             </Col>
           </Row>
@@ -293,7 +293,7 @@ const BestPriceSupplier = () => {
                 }
                 // SupplierReturnsReason={SupplierReturnsReasonData}
                 error={error}
-                loading={loading}
+                loading={loading.kpiBestPricePerSupplier}
               />
             </Col>
             <FilterActions

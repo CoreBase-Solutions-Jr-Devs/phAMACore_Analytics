@@ -189,7 +189,7 @@ const SalesBreakdown = () => {
               TOTAL={TOTAL}
               // performanceSummary={performanceSummary}
               selectedBranchName={selectedBranchName}
-              loading={loading}
+              loading={loading.kpiSalesTransactions}
               error={error}
               rightClickBtn={toggleRightColumn}
             />
@@ -203,7 +203,7 @@ const SalesBreakdown = () => {
               OTHER_ACCOUNT={OTHER_ACCOUNT}
               RETURN={RETURN}
               TOTAL={TOTAL}
-              loading={loading}
+              loading={loading.kpiSalesTransactions}
               error={error}
             />
           </Col>

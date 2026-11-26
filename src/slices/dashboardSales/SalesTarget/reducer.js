@@ -17,7 +17,9 @@ salesTargetSummary: [],
 salesTargetBranch: [],
 salesTargetMONTHLY_PIVOT: [],
 
-  loading: false,
+   loading:  {
+    salesTarget: false,  
+  },
   error: null,
 
   filters: {
@@ -212,12 +214,12 @@ const salesTargetSlice = createSlice({
 extraReducers: (builder) => {
   builder
     .addCase(getSalesTarget.pending, (state) => {
-      state.loading = true;
+      state.loading.salesTarget = true;
       state.error = null;
     })
 
    .addCase(getSalesTarget.fulfilled, (state, action) => {
-  state.loading = false;
+  state.loading.salesTarget = false;
   state.error = null;
 
   const groupBy =
@@ -249,7 +251,7 @@ extraReducers: (builder) => {
 })
 
     .addCase(getSalesTarget.rejected, (state, action) => {
-      state.loading = false;
+      state.loading.salesTarget = false;
       state.error =
         action.payload?.message ||
         action.payload ||

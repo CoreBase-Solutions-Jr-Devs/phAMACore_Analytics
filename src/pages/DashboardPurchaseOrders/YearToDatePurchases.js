@@ -8,7 +8,7 @@ import { createSelector } from "reselect";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const YearToDatePurchases = ({categories, series, formatAmount}) => {
+const YearToDatePurchases = ({categories, series, formatAmount,error, loading}) => {
   const handleExportExcel = () => {
     const rows = (categories || []).map((cat, idx) => {
       const row = { Period: cat };
@@ -23,6 +23,7 @@ const YearToDatePurchases = ({categories, series, formatAmount}) => {
 
   return (
     <React.Fragment>
+      
       <Card id="purchases-ytd-card">
           <CardHeader className="p-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
                      <h6 className="card-title mb-0">
@@ -35,7 +36,19 @@ const YearToDatePurchases = ({categories, series, formatAmount}) => {
           />
           </div>
         </CardHeader>
-
+    {loading ? (
+          <div className="text-center py-5">
+            <div
+              className="spinner-border text-primary"
+              role="status"
+              aria-label="Loading category metrics"
+            ></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-5">
+            <p className="text-danger mb-0">{error}</p>
+          </div>
+        ) : (
         <CardBody className="pb-2">
 <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2 pb-1">
   <div className="d-flex align-items-center gap-2">
@@ -64,7 +77,9 @@ const YearToDatePurchases = ({categories, series, formatAmount}) => {
               <RevenueCharts categories={categories} series={series} formatAmount={formatAmount} dataColors='["--vz-primary", "--vz-success", "--vz-danger"]' />            
           </div>
         </CardBody>
+          )}
       </Card>
+    
     </React.Fragment>
   );
 };

@@ -11,7 +11,9 @@ const initialState = {
  KPIBestPricePerSupplierProposedHistorical: [],
 // KPISupplierReturnsSKU: [],
 // KPISupplierReturnsReason: [],
-  loading: false,
+     loading: {
+  kpiBestPricePerSupplier: false,
+},
   error: null,
   filters: {
     branchcode: "",
@@ -235,12 +237,12 @@ const BestPricePerSupplierSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getKPIBestPricePerSupplier.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiBestPricePerSupplier = true;
         state.error = null;
       })
 
       .addCase(getKPIBestPricePerSupplier.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiBestPricePerSupplier = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -269,7 +271,7 @@ const BestPricePerSupplierSlice = createSlice({
       })
 
       .addCase(getKPIBestPricePerSupplier.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiBestPricePerSupplier = false;
         state.error =
           action.payload?.message ||
           action.payload ||

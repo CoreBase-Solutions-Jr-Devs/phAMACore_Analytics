@@ -1077,7 +1077,7 @@ const handleExportExcel = () => {
   globalFilter={globalFilter}
   onGlobalFilterChange={setGlobalFilter}
   SearchPlaceholder={currentTable.placeholder}
-  searchInputWidth="450px"
+  // searchInputWidth="450px"
   customPageSize={10}
   pageSizeOptions={[5, 10, 20, 30, 50]}
   tableClass="table align-middle table-hover table-bordered table-striped"

@@ -279,7 +279,7 @@ const ConsolidatedLPOReview = () => {
                   ConsolidatedLPOReviewSummaryData
                 }
                 error={error}
-                loading={loading}
+                loading={loading.kpiConsolidatedLPOReview}
               />
             </Col>
           </Row>
@@ -298,7 +298,7 @@ const ConsolidatedLPOReview = () => {
                 }
                 // SupplierReturnsReason={SupplierReturnsReasonData}
                 error={error}
-                loading={loading}
+                loading={loading.kpiConsolidatedLPOReview}
               />
             </Col>
             <FilterActions

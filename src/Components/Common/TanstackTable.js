@@ -155,33 +155,56 @@ const TanstackTable = ({
 
   return (
     <Fragment>
- {(isGlobalFilter || toolbarContent || tableTabs) && (
+{(isGlobalFilter || toolbarContent || tableTabs) && (
   <div className={searchContainerClass}>
-    <Row className="align-items-center g-2 flex-nowrap">
-      {/* SEARCH - LEFT */}
+    <Row className="align-items-center g-2">
+
+      {/* SEARCH */}
       {isGlobalFilter && (
-        <Col xs="auto">
-          <div className="search-box">
+        <Col
+          xs={12}
+          md="auto"
+          className="flex-grow-1"
+          style={{ minWidth: 0 }}
+        >
+          <div
+            className="search-box w-100"
+            style={{
+              width: "100%",
+              maxWidth: searchInputWidth,
+            }}
+          >
             <DebouncedInput
               value={globalFilter}
               onChange={setGlobalFilter}
               placeholder={SearchPlaceholder}
               aria-label="Search table"
-              style={{ width: searchInputWidth }}
+              style={{
+                width: "100%",
+                minWidth: 0,
+              }}
             />
+
             <i className="bx bx-search-alt search-icon" />
           </div>
         </Col>
       )}
 
+      {/* TABS AND TOOLBAR */}
       {(tableTabs || toolbarContent) && (
-         <Col xs="auto" className="ms-auto">
-    <div className="d-flex align-items-center gap-2 flex-nowrap">
+        <Col
+          xs={12}
+          md="auto"
+          className="ms-md-auto"
+          style={{ minWidth: 0 }}
+        >
+          <div className="d-flex align-items-center gap-2 flex-wrap justify-content-start justify-content-md-end">
             {tableTabs}
             {toolbarContent}
           </div>
         </Col>
       )}
+
     </Row>
   </div>
 )}

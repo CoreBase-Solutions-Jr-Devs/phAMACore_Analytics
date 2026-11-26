@@ -358,7 +358,11 @@ const DashboardSales = () => {
               // branchMap={branchMap}
               selectedBranchName={selectedBranchName}
               rightClickBtn={toggleRightColumn}
-              loading={loading}
+                   loading={{
+                  kpiSalesTransactions: loading.kpiSalesTransactions,
+                  kpiOverdueAccounts: loading.kpiOverdueAccounts,
+                
+                }}
               error={error}
             />
           </Col>
@@ -372,7 +376,7 @@ const DashboardSales = () => {
               categories={branchCategories}
               totalRevenue={totalRevenue}
               formatAmount={formatAmount}
-              loading={loading}
+              loading={loading.kpiSalesTransactions}
               error={error}
             />
           </Col>
@@ -386,7 +390,7 @@ const DashboardSales = () => {
               salesmanData={salesmanData}
               formatAmount={formatAmount}
               error={error}
-              loading={loading}
+              loading={loading.salesTransactions}
             />
           </Col>
         </Row>
@@ -402,7 +406,7 @@ const DashboardSales = () => {
               CostOfGoods={monthToDateChart.CostOfGoods}
               formatAmount={formatAmount}
               error={error}
-              loading={loading}
+              loading={loading.kpiSalesTransactions}
             />
           </Col>
           <Col xl={6}>
@@ -415,7 +419,7 @@ const DashboardSales = () => {
               CostOfGoods={monthlyChart.CostOfGoods}
               formatAmount={formatAmount}
               error={error}
-              loading={loading}
+              loading={loading.kpiSalesTransactions}
             />
           </Col>
 

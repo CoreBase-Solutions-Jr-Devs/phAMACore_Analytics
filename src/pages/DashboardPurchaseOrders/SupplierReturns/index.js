@@ -281,7 +281,7 @@ SupplierReturnsReasonData,
                   SupplierReturnsSummaryData
                 }
                 error={error}
-                loading={loading}
+                loading={loading.kpiSupplierReturns}
               />
             </Col>
           </Row>
@@ -294,7 +294,7 @@ SupplierReturnsReasonData,
   SupplierReturnsSKU={SupplierReturnsSKUData}
   SupplierReturnsReason={SupplierReturnsReasonData}
                 error={error}
-                loading={loading}
+                loading={loading.kpiSupplierReturns}
               />
             </Col>
             <FilterActions

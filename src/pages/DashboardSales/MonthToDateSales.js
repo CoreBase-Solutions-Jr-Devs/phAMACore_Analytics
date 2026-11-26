@@ -29,6 +29,8 @@ const MonthToDateSales = ({
   grossProfit,
   CostOfGoods,
   formatAmount,
+  error,
+  loading,
 }) => {
   const currentDayIndex = new Date().getDate() - 1;
 
@@ -69,6 +71,19 @@ const MonthToDateSales = ({
                 />
               </div>
             </CardHeader>
+                       {loading ? (
+          <div className="text-center py-5">
+            <div
+              className="spinner-border text-primary"
+              role="status"
+              aria-label="Loading category metrics"
+            ></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-5">
+            <p className="text-danger mb-0">{error}</p>
+          </div>
+        ) : (
             <CardBody className="p-2">
               <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2 pb-1">
                 <div className="d-flex align-items-center gap-2">
@@ -104,6 +119,7 @@ const MonthToDateSales = ({
                 dataColors='["--vz-primary","--vz-success","--vz-gray-300"]'
               />
             </CardBody>
+             )}
           </Card>
         </Col>
       </Row>

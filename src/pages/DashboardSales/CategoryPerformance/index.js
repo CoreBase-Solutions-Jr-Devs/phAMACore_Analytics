@@ -176,7 +176,7 @@ const CategoryPerformance = () => {
               categoryPerformance={categoryTotals}
               categoryAvgOrderValue={categoryAvgOrderValue}
               categoryGrossMargin={categoryGrossMargin}
-              loading={loading}
+              loading={loading.kpiSalesTransactions}
               error={error}
               rightClickBtn={toggleRightColumn}
               selectedBranchName={selectedBranchName}
@@ -188,7 +188,7 @@ const CategoryPerformance = () => {
             <Products
               categoryPerformance={categoryPerformance}
               selectedBranchName={selectedBranchName}
-              loading={loading}
+              loading={loading.kpiSalesTransactions}
               error={error}
               // rightClickBtn={toggleRightColumn}
             />

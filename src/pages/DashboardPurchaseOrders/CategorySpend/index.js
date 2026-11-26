@@ -123,7 +123,7 @@ const CategorySpend = () => {
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="CategorySpend"
+            title="Category Spend"
             pageTitle="Purchases"
             subtitle={selectedBranchName}
           />
@@ -185,7 +185,7 @@ const CategorySpend = () => {
                 selectedBranchName={selectedBranchName}
                 categoryTotals={categoryTotals}
                 error={error}
-                loading={loading}
+                loading={loading.kpiPurchases}
               />
             </Col>
           </Row>
@@ -195,7 +195,7 @@ const CategorySpend = () => {
                 data={spendByCategory}
                 // totalSpend={totalSpend}
                 error={error}
-                loading={loading}
+                loading={loading.kpiPurchases}
               />
             </Col>
             <FilterActions

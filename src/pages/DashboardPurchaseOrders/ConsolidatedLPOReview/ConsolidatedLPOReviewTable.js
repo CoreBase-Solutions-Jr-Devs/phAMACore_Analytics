@@ -1158,7 +1158,7 @@ const filteredData = useMemo(() => {
 onGlobalFilterChange={setGlobalFilter}
   SearchPlaceholder={currentTable.placeholder}
 
-  searchInputWidth="350px"
+  // searchInputWidth="350px"
   customPageSize={10}
   pageSizeOptions={[5, 10, 20, 30, 50]}
   tableClass="table align-middle table-hover table-bordered table-striped"

@@ -5,16 +5,15 @@ const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
   salesSubgroup: [],
-
-  loading: false,
+       loading:  {
+     kpiSalesTransactions: false,  
+   },
   error: null,
-
   filters: {
     branchcode: "",
   dateRange: "Month To Yesterday",
   startDate: formatDMY(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
   endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
-
   },
 };
 
@@ -215,12 +214,12 @@ const categoryPerformanceSlice = createSlice({
       // ------------------------------------------
 
       .addCase(getKPISalesTransactions.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiSalesTransactions = true;
         state.error = null;
       })
 
       .addCase(getKPISalesTransactions.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSalesTransactions = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -239,7 +238,7 @@ const categoryPerformanceSlice = createSlice({
       })
 
       .addCase(getKPISalesTransactions.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiSalesTransactions = false;
         state.error =
           action.payload?.message ||
           action.payload ||

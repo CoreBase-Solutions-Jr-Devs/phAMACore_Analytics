@@ -294,7 +294,7 @@ const tabCounts = useMemo(() => {
             insight={info.row.original.action_insight}
           >
             <span className="text-muted small">
-              {"-"}
+             {formatDate(info.getValue())}
             </span>
           </InsightCell>
         ),
@@ -308,7 +308,7 @@ const tabCounts = useMemo(() => {
 
           return (
             <Badge className={risk.className}  pill>
-              { "-"}
+            {risk.label}
             </Badge>
           );
         },
@@ -383,52 +383,56 @@ onExport={handleExportExcel}        />
   globalFilter={globalFilter}
   onGlobalFilterChange={setGlobalFilter}
           customPageSize={10}
-          searchInputWidth="450px"
+          // searchInputWidth="450px"
           pageSizeOptions={[5, 10, 20, 30, 50]}
           SearchPlaceholder="Search customers..."
           showPagination={true}
           showPageSize={true}
           emptyMessage="No receivables ageing records available."
           tableTabs={
-            <Nav
-              pills
-              className="nav-tabs-custom flex-wrap gap-1"
-              role="tablist"
-            >
-              {ReceivablesTabs.map((tab) => {
-                const isActive = activeTab === tab.value;
-
-                return (
-                  <NavItem key={tab.value}>
-                    <NavLink
-                      href="#"
-                      active={isActive}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setActiveTab(tab.value);
-                      }}
-                      className={`px-2 py-1 ${
-                        isActive ? tab.activeClass : tab.className
-                      }`}
-                      style={{
-                        whiteSpace: "nowrap",
-                        cursor: "pointer",
-                        fontSize: "11px",
-                        borderRadius: "6px",
-                      }}
-                    >
-                      {tab.label}
-
-     {/* <Badge
-className={`ms-1 ${isActive ? "bg-white text-dark" : `text-white ${tab.badgeClass}`}`}
+           <Nav
+  pills
+  className="nav-tabs-custom flex-wrap gap-1 w-100"
+  role="tablist"
 >
-  {tabCounts[tab.value]}
-</Badge> */}
-                    </NavLink>
-                  </NavItem>
-                );
-              })}
-            </Nav>
+  {ReceivablesTabs.map((tab) => {
+    const isActive = activeTab === tab.value;
+
+    return (
+      <NavItem key={tab.value}>
+        <NavLink
+          href="#"
+          active={isActive}
+          onClick={(event) => {
+            event.preventDefault();
+            setActiveTab(tab.value);
+          }}
+          className={`px-2 py-1 ${
+            isActive ? tab.activeClass : tab.className
+          }`}
+          style={{
+            whiteSpace: "nowrap",
+            cursor: "pointer",
+            fontSize: "11px",
+            borderRadius: "6px",
+          }}
+        >
+          {tab.label}
+
+          <Badge
+            className={`ms-1 ${
+              isActive
+                ? "bg-white text-dark"
+                : `${tab.badgeClass} text-white`
+            }`}
+          >
+            {tabCounts[tab.value] ?? 0}
+          </Badge>
+        </NavLink>
+      </NavItem>
+    );
+  })}
+</Nav>
           }
           tableClass="table align-middle table-hover table-bordered table-striped"
           theadClass="table-light"

@@ -202,7 +202,7 @@ const SalesSummary = () => {
               salesPeriodicBreakdownData={salesPeriodicBreakdownData}
               selectedBranchName={selectedBranchName}
               rightClickBtn={toggleRightColumn}
-              loading={loading}
+              loading={loading.kpiSalesTransactions}
               error={error}
             />
           </Col>

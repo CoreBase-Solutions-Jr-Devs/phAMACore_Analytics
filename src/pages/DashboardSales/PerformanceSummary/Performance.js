@@ -305,7 +305,7 @@ const Performance = ({
             </Col> */}
           </Row>
         )}
-        {performanceSummary?.action_insight && (
+        {/* {performanceSummary?.action_insight && (
           <Row className="mt-1 g-0">
             <Col xs="12">
               <div className="alert alert-info mb-0 mt-0 py-1 w-100">
@@ -313,7 +313,7 @@ const Performance = ({
               </div>
             </Col>
           </Row>
-        )}
+        )} */}
       </React.Fragment>
     </div>
   );

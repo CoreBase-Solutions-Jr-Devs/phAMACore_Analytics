@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Card, CardHeader } from "reactstrap";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
@@ -29,6 +29,20 @@ const formatPercentage = (value) => `${Number(value ?? 0).toFixed(2)}%`;
 
 const SupplierSpend = ({ supplierData, error, loading }) => {
   const hasData = Array.isArray(supplierData) && supplierData.length > 0;
+const [globalFilter, setGlobalFilter] = useState("");
+
+const filteredData = useMemo(() => {
+  const search = globalFilter.trim().toLowerCase();
+  const data = supplierData || [];
+
+  if (!search) return data;
+
+  return data.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value ?? "").toLowerCase().includes(search)
+    )
+  );
+}, [supplierData, globalFilter]);
 
   const columns = [
     {
@@ -135,7 +149,7 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
   ];
 
   const handleExportExcel = () => {
-    const rows = (supplierData || []).map((item) => ({
+    const rows = (filteredData || []).map((item) => ({
       Rank: item.rank_pos,
       "Supplier ID": item.supplier_id,
       "Supplier Name": item.supplier_name,
@@ -193,10 +207,12 @@ const SupplierSpend = ({ supplierData, error, loading }) => {
           ) : hasData ? (
             <TanstackTable
               columns={columns}
-              data={supplierData}
+              data={filteredData}
               emptyMessage="No supplier spend data available"
               isGlobalFilter={true}
               isColumnFilter={false}
+               globalFilter={globalFilter}
+  onGlobalFilterChange={setGlobalFilter}
               customPageSize={10}
                  searchInputWidth="450px"
               pageSizeOptions={[5, 10, 20, 30, 50]}

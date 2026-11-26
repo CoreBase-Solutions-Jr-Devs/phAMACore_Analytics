@@ -1,33 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-
-  getCustomerMemberAnalysis,
-
-} from "./thunk";
+import { getCustomerMemberAnalysis } from "./thunk";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
- 
-
-customerMemberAnalysis: [],
-customerMemberAnalysisSummary: [],
-customerMemberAnalysisBranch: [],
-customerMemberAnalysisCohort: [],
-  loading: false,
+  customerMemberAnalysis: [],
+  customerMemberAnalysisSummary: [],
+  customerMemberAnalysisBranch: [],
+  customerMemberAnalysisCohort: [],
+  loading: {
+    customerMemberAnalysis: false,
+  },
   error: null,
-
-
-
-
-  loading: false,
-  error: null,
-
   filters: {
     branchcode: "",
     dateRange: "Month To Yesterday",
-  startDate: formatDMY(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
-  endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),  
+    startDate: formatDMY(
+      new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    ),
+    endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
   },
 };
 
@@ -171,7 +162,7 @@ const customerMemberAnalysisSlice = createSlice({
           break;
         }
 
-         case "Month To Yesterday": {
+        case "Month To Yesterday": {
           const today = new Date();
 
           const start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -184,20 +175,20 @@ const customerMemberAnalysisSlice = createSlice({
 
           break;
         }
-   
+
         case "Year To Yesterday": {
-  const today = new Date();
+          const today = new Date();
 
-  const start = new Date(today.getFullYear(), 0, 1);
+          const start = new Date(today.getFullYear(), 0, 1);
 
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(yesterday);
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(yesterday);
 
-  break;
-}
+          break;
+        }
 
         case "Custom":
           state.filters.dateRange = "Custom";
@@ -223,52 +214,50 @@ const customerMemberAnalysisSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-             // ------------------------------------------
+      // ------------------------------------------
       // CUSTOMER MEMBER ANALYSIS
       // ------------------------------------------
       .addCase(getCustomerMemberAnalysis.pending, (state) => {
-        state.loading = true;
+        state.loading.customerMemberAnalysis = true;
         state.error = null;
       })
-      
+
       .addCase(getCustomerMemberAnalysis.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.customerMemberAnalysis = false;
         state.error = null;
-      
+
         const groupBy = action.meta.arg?.groupBy;
         const result = action.payload?.result || action.payload || [];
-      
+
         // Store the latest customer member analysis result
         state.customerMemberAnalysis = result;
-      
+
         switch (groupBy) {
           case "SUMMARY":
             state.customerMemberAnalysisSummary = result;
             break;
-      
+
           case "BRANCH":
             state.customerMemberAnalysisBranch = result;
             break;
-      
+
           case "COHORT":
             state.customerMemberAnalysisCohort = result;
             break;
-      
+
           default:
             break;
         }
       })
-      
+
       .addCase(getCustomerMemberAnalysis.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.customerMemberAnalysis = false;
         state.error =
           action.payload?.message ||
           action.payload ||
           action.error.message ||
           "Error loading customer member analysis";
-      })
-   
-  ;
+      });
   },
 });
 

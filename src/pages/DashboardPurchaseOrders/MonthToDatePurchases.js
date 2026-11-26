@@ -5,7 +5,7 @@ import { MonthToDateCharts } from "./DashboardEcommerceCharts";
 import { exportToExcel } from "../../helpers/export_helper";
 import CardExportButtons from "../../Components/Common/CardExportButtons";
 
-const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
+const MonthToDatePurchases = ({ categories, series, formatAmount, loading, error }) => {
   const handleExportExcel = () => {
     const rows = (categories || []).map((cat, idx) => {
       const row = { Day: cat };
@@ -23,6 +23,7 @@ const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
 
   return (
     <React.Fragment>
+
       <Card id="purchases-mtd-card">
             <CardHeader className="p-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
                               <h6 className="card-title mb-0">
@@ -36,7 +37,19 @@ const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
           />
           </div>
         </CardHeader>
-
+               {loading ? (
+          <div className="text-center py-5">
+            <div
+              className="spinner-border text-primary"
+              role="status"
+              aria-label="Loading category metrics"
+            ></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-5">
+            <p className="text-danger mb-0">{error}</p>
+          </div>
+        ) : (
         <CardBody className="p-2 ">
         <div className="d-flex justify-content-end align-items-center gap-3 px-3 pt-2 pb-1">
   <div className="d-flex align-items-center gap-2">
@@ -71,7 +84,9 @@ const MonthToDatePurchases = ({ categories, series, formatAmount }) => {
             </div>
          
         </CardBody>
+          )}
       </Card>
+     
     </React.Fragment>
   );
 };

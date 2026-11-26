@@ -321,44 +321,6 @@ const ProgressiveSalesChart = ({
       dashArray: [0, 6],
     },
 
-    // dataLabels: {
-    //   enabled: true,
-
-    //   formatter: function (value, { seriesIndex, dataPointIndex }) {
-    //     // 2026 at December
-    //     if (seriesIndex === 0 && dataPointIndex === currentYearIndex) {
-    //       return `${today.getFullYear()}`;
-    //     }
-
-    //     // 2025 at its last valid point
-    //     if (seriesIndex === 1 && dataPointIndex === priorYearIndex) {
-    //       return `${today.getFullYear() - 1}`;
-    //     }
-
-    //     return "";
-    //   },
-
-    //   background: {
-    //     enabled: true,
-    //     foreColor: "#fff",
-    //     borderRadius: 4,
-    //     padding: 5,
-    //     opacity: 1,
-    //     borderWidth: 0,
-    //   },
-
-    //   style: {
-    //     fontSize: "12px",
-    //     fontWeight: 600,
-    //     colors: [
-    //       colors[0], // 2026 label
-    //       colors[0], // 2025 label
-    //     ],
-    //   },
-
-    //   offsetY: -12,
-    // },
-
     xaxis: {
       categories,
 
@@ -371,6 +333,10 @@ const ProgressiveSalesChart = ({
       },
 
       labels: {
+        show: true,
+        rotate: 0,
+        rotateAlways: false,
+        hideOverlappingLabels: false,
         formatter: (value) => {
           const monthIndex = categories.indexOf(value);
           return monthIndex % 2 === 0 ? value : "";
@@ -391,6 +357,8 @@ const ProgressiveSalesChart = ({
 
         const variance = salesVariance?.[dataPointIndex] ?? 0;
         const growth = salesGrowth?.[dataPointIndex];
+        const profit = grossProfit?.[dataPointIndex];
+        const cost = CostOfGoods?.[dataPointIndex];
 
         return `
       <div style="padding: 10px; font-size: 11px; min-width: 230px; background: #fff; color: #333; border-radius: 6px;">
@@ -427,16 +395,16 @@ const ProgressiveSalesChart = ({
 <div style="margin-bottom: 5px;">
   Gross Profit:
   <strong class="${
-    grossProfit == null || grossProfit === ""
+    profit == null || profit === ""
       ? "text-muted"
-      : Number(grossProfit) >= 0
+      : Number(profit) >= 0
         ? "text-success"
         : "text-danger"
   }">
     ${
-      grossProfit == null || grossProfit === ""
+      profit == null || profit === ""
         ? "_"
-        : `KES ${Number(grossProfit).toLocaleString("en-KE")}`
+        : `KES ${Number(profit).toLocaleString("en-KE")}`
     }
   </strong>
 </div>
@@ -444,20 +412,19 @@ const ProgressiveSalesChart = ({
 <div style="margin-bottom: 5px;">
   COGS:
   <strong class="${
-    CostOfGoods == null || CostOfGoods === ""
+    cost == null || cost === ""
       ? "text-muted"
-      : Number(CostOfGoods) >= 0
+      : Number(cost) >= 0
         ? "text-success"
         : "text-danger"
   }">
     ${
-      CostOfGoods == null || CostOfGoods === ""
+      cost == null || cost === ""
         ? "_"
-        : `KES ${Number(CostOfGoods).toLocaleString("en-KE")}`
+        : `KES ${Number(cost).toLocaleString("en-KE")}`
     }
   </strong>
 </div>
-      </div>
     `;
       },
     },
@@ -474,34 +441,7 @@ const ProgressiveSalesChart = ({
         formatter: (val) => Number(val || 0).toLocaleString("en-KE"),
       },
     },
-
-    // annotations: {
-    //   xaxis: currentMonthExists
-    //     ? [
-    //         {
-    //           x: currentMonth,
-    //           borderColor: "#C68E45",
-    //           strokeDashArray: 5,
-    //           borderWidth: 2,
-
-    //           label: {
-    //             text: "currentMonth",
-    //             position: "top",
-    //             orientation: "horizontal",
-    //             borderColor: "#C68E45",
-    //             padding: "2px 6px",
-    //             borderRadius: "4px",
-    //             style: {
-    //               color: "#fff",
-    //               background: "#C68E45",
-    //               fontSize: "11px",
-    //               // fontWeight: 500,
-    //             },
-    //           },
-    //         },
-    //       ]
-    //     : [],
-    // },
+   
   };
 
   return (
@@ -751,29 +691,29 @@ const MonthToDateSalesChart = ({
     xaxis: {
       categories,
 
-    axisTicks: {
-    show: true,
-  },
-  axisBorder: {
-    show: true,
-  },
-       labels: {
-         show: true,
-  rotate: 0,
-    rotateAlways: false,
-    hideOverlappingLabels: false,
-    formatter: (value) => {
-      const day = Number(value);
-      return day === 1 || day % 5 === 0 ? day : "";
-    },
-  },
+      axisTicks: {
+        show: true,
+      },
+      axisBorder: {
+        show: true,
+      },
+      labels: {
+        show: true,
+        rotate: 0,
+        rotateAlways: false,
+        hideOverlappingLabels: false,
+        formatter: (value) => {
+          const day = Number(value);
+          return day === 1 || day % 5 === 0 ? day : "";
+        },
+      },
     },
 
     yaxis: {
       title: {
         text: "Sales (KES)",
       },
-      
+
       min: 0,
       forceNiceScale: true,
       tickAmount: 5,
@@ -859,7 +799,7 @@ const CountriesCharts = ({ dataColors, series }) => {
         fontSize: "12px",
         fontWeight: 400,
         colors: ["#adb5bd"],
-        // colors:['#878a99']
+       
       },
     },
 

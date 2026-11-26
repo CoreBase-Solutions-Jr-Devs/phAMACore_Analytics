@@ -262,7 +262,7 @@ const PerformanceSummary = () => {
             <Performance
               performanceSummary={performanceSummary}
               selectedBranchName={selectedBranchName}
-              loading={loading}
+              loading={loading.salesTarget}
               error={error}
               rightClickBtn={toggleRightColumn}
             />
@@ -271,7 +271,7 @@ const PerformanceSummary = () => {
         <Row>
           <Col xl={12}>
             <BranchTarget data={performanceSummaryMONTHLY} />
-            loading={loading}
+            loading={loading.salesTarget}
             error={error}
           </Col>
           <FilterActions

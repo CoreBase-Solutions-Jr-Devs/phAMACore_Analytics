@@ -11,7 +11,9 @@ const initialState = {
  KPIConsolidatedLPOReviewBranch: [],
   KPIConsolidatedLPOReviewDrilldown: [],
 
-  loading: false,
+     loading: {
+  kpiConsolidatedLPOReview: false,
+},
   error: null,
   filters: {
     branchcode: "",
@@ -229,20 +231,18 @@ const ConsolidatedLPOReviewSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder
-
-  
+    builder 
       // ------------------------------------------
       // KPI PURCHASES
       // ------------------------------------------
 
       .addCase(getKPIConsolidatedLPOReview.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiConsolidatedLPOReview = true;
         state.error = null;
       })
 
       .addCase(getKPIConsolidatedLPOReview.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiConsolidatedLPOReview = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -273,7 +273,7 @@ const ConsolidatedLPOReviewSlice = createSlice({
       })
 
       .addCase(getKPIConsolidatedLPOReview.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiConsolidatedLPOReview = false;
         state.error =
           action.payload?.message ||
           action.payload ||

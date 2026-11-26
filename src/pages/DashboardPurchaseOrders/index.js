@@ -15,18 +15,14 @@ import SupplierSpend from "./SupplierSpend";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
 // import RecentActivity from "./RecentActivity";
 import {
-
   getActualSpend,
-
   getLastYearActualSpend,
- 
   getKPIPurchases,
   getKPIMaverickSpend,
   getKPIPriceAlerts,
   getKPILeadTime,
   getGoodsReceived,
   getLastYearGoodsReceived,
-  
 } from "../../slices/dashboardPurchase/thunk";
 import FilterActions from "../../Components/Common/FilterActions";
 import {
@@ -38,25 +34,21 @@ import {
 import { getKPIOverdueAccounts } from "../../slices/dashboardSales/thunk";
 import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
 import usePurchaseOrders from "../../Components/Hooks/usePurchaseOrders";
-// import BestPrices from "./BestPrices";
 import {
   getDateRanges,
   getPreviousYearDate,
   getPeriod,
 } from "../../helpers/date_helper";
 import { getKPIConsolidatedLPOReview } from "../../slices/dashboardPurchase/ConsolidatedLPOReview/thunk";
-import { groupBy } from "lodash";
 
 const KPI_GROUP_BYS = [
   "SUMMARY",
- 
+
   "SUPPLIER",
   "BRANCH",
   // "MONTHLY",
   "TYPE",
 ];
-
-// const ACTUAL_SPEND_GROUP_BYS = ["MONTHLY"];
 
 const LEAD_TIME_GROUP_BYS = [
   "SUMMARY",
@@ -126,8 +118,7 @@ const DashboardPurchaseOrders = () => {
 
     ActualSpend = [],
 
-    
-    LastYearActualSpend= [],
+    LastYearActualSpend = [],
 
     loading,
     error,
@@ -152,7 +143,7 @@ const DashboardPurchaseOrders = () => {
     spendBySupplier,
     branchData,
     actualSpendChart,
-    monthToDateChart,  
+    monthToDateChart,
     ConsolidatedLPOReviewSummaryData,
   } = usePurchaseOrders(
     KPIPurchases,
@@ -183,11 +174,11 @@ const DashboardPurchaseOrders = () => {
 
     GoodsReceived,
     LastYearGoodsReceived,
- 
+
     ActualSpend,
 
     LastYearActualSpend,
-    
+
     kpiOverdueAccounts,
 
     [], //KPISupplierOrderFillRateSummary,
@@ -239,7 +230,6 @@ const DashboardPurchaseOrders = () => {
   };
 
   useEffect(() => {
-
     dispatch(
       getKPIConsolidatedLPOReview({
         clientid: 1,
@@ -267,18 +257,17 @@ const DashboardPurchaseOrders = () => {
         endDate: dates.lastYearToday,
         clientid: 1,
         branchcode: filters.branch,
-       
       }),
     );
 
     dispatch(
-      getActualSpend({     
+      getActualSpend({
         clientid: 1,
         startDate: dates.currentYearStart,
         endDate: dates.today,
         branchcode: filters.branch,
-         groupBy: "MONTHLY"
-      }),     
+        groupBy: "MONTHLY",
+      }),
     );
 
     dispatch(
@@ -287,8 +276,8 @@ const DashboardPurchaseOrders = () => {
         startDate: dates.lastYearStart,
         endDate: dates.lastYearToday,
         branchcode: filters.branch,
-        groupBy: "MONTHLY"
-      }),     
+        groupBy: "MONTHLY",
+      }),
     );
 
     dispatchGroupByRequests(
@@ -302,8 +291,6 @@ const DashboardPurchaseOrders = () => {
       },
       KPI_GROUP_BYS,
     );
-
-    
 
     dispatchGroupByRequests(
       getKPILeadTime,
@@ -381,14 +368,14 @@ const DashboardPurchaseOrders = () => {
       }),
     );
 
-       dispatch(
-      getActualSpend({     
+    dispatch(
+      getActualSpend({
         clientid: 1,
         startDate: dates.currentYearStart,
         endDate: dates.today,
         branchcode: filters.branch,
-         groupBy: "MONTHLY"
-      }),     
+        groupBy: "MONTHLY",
+      }),
     );
 
     dispatch(
@@ -397,8 +384,8 @@ const DashboardPurchaseOrders = () => {
         startDate: dates.lastYearStart,
         endDate: dates.lastYearToday,
         branchcode: filters.branch,
-        groupBy: "MONTHLY"
-      }),     
+        groupBy: "MONTHLY",
+      }),
     );
 
     dispatch(
@@ -452,7 +439,7 @@ const DashboardPurchaseOrders = () => {
         TopN: 0,
       },
       PRICE_ALERTS_GROUP_BYS,
-    );  
+    );
 
     dispatchGroupByRequests(
       getKPIMaverickSpend,
@@ -486,7 +473,6 @@ const DashboardPurchaseOrders = () => {
               zIndex: 100,
               width: "100%",
               marginTop: "-15px",
-              // backgroundColor: "#",
             }}
           >
             <div className="d-flex align-items-center flex-wrap gap-2">
@@ -542,20 +528,29 @@ const DashboardPurchaseOrders = () => {
                 maverickSpendPercentage={maverickSpendPercentage}
                 selectedBranchName={selectedBranchName}
                 error={error}
-                loading={loading}
+                loading={{
+                  purchases: loading.kpiPurchases,
+                  leadTime: loading.leadTime,
+                  priceAlerts: loading.priceAlerts,
+                  maverickSpend: loading.maverickSpend,
+                }}
               />
             </Col>
           </Row>
           <Row>
             <Col xl={12}>
-              <StoreVisits data={branchData} error={error} loading={loading} />
+              <StoreVisits
+                data={branchData}
+                error={error}
+                loading={loading.kpiPurchases}
+              />
             </Col>
           </Row>
           <Row>
             <Col xl={12}>
               <SupplierSpend
                 supplierData={spendBySupplier}
-                loading={loading}
+                loading={loading.kpiPurchases}
                 error={error}
               />
             </Col>
@@ -566,6 +561,7 @@ const DashboardPurchaseOrders = () => {
                 categories={monthToDateChart.categories}
                 series={monthToDateChart.series}
                 formatAmount={formatAmount}
+                loading={loading.goodsReceived}
               />
             </Col>
             <Col xl={6}>
@@ -573,6 +569,7 @@ const DashboardPurchaseOrders = () => {
                 categories={actualSpendChart.categories}
                 series={actualSpendChart.series}
                 formatAmount={formatAmount}
+                loading={loading.actualSpend}
               />
             </Col>
             <FilterActions

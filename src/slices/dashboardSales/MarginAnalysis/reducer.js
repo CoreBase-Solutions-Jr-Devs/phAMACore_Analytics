@@ -1,33 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-
-  getMarginAnalysis,
-
-} from "./thunk";
+import { getMarginAnalysis } from "./thunk";
 
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
- 
-
   marginAnalysis: [],
-marginAnalysisBand: [],
-marginAnalysisDrilldown: [],
-marginAnalysisSKU: [],
-
-
-
-
-  loading: false,
+  marginAnalysisBand: [],
+  marginAnalysisDrilldown: [],
+  marginAnalysisSKU: [],
+  loading: {
+    kpiMarginAnalysis: false,
+  },
   error: null,
 
   filters: {
     branchcode: "All Branches",
-     dateRange: "Month To Yesterday",
-  startDate: formatDMY(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
-  endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
-
-   
+    dateRange: "Month To Yesterday",
+    startDate: formatDMY(
+      new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    ),
+    endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
   },
 };
 
@@ -171,7 +163,7 @@ const marginAnalysisSlice = createSlice({
           break;
         }
 
-         case "Month To Yesterday": {
+        case "Month To Yesterday": {
           const today = new Date();
 
           const start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -184,20 +176,20 @@ const marginAnalysisSlice = createSlice({
 
           break;
         }
-       
+
         case "Year To Yesterday": {
-  const today = new Date();
+          const today = new Date();
 
-  const start = new Date(today.getFullYear(), 0, 1);
+          const start = new Date(today.getFullYear(), 0, 1);
 
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
 
-  state.filters.startDate = formatDMY(start);
-  state.filters.endDate = formatDMY(yesterday);
+          state.filters.startDate = formatDMY(start);
+          state.filters.endDate = formatDMY(yesterday);
 
-  break;
-}
+          break;
+        }
 
         case "Custom":
           state.filters.dateRange = "Custom";
@@ -227,12 +219,12 @@ const marginAnalysisSlice = createSlice({
       // KPI MARGIN ANALYSIS
       // ------------------------------------------
       .addCase(getMarginAnalysis.pending, (state) => {
-        state.loading = true;
+        state.loading.kpiMarginAnalysis = true;
         state.error = null;
       })
 
       .addCase(getMarginAnalysis.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading.kpiMarginAnalysis = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -260,15 +252,13 @@ const marginAnalysisSlice = createSlice({
       })
 
       .addCase(getMarginAnalysis.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.kpiMarginAnalysis = false;
         state.error =
           action.payload?.message ||
           action.payload ||
           action.error.message ||
           "Error loading margin analysis";
-      })
-   
-  ;
+      });
   },
 });
 

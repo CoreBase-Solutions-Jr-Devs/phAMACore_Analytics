@@ -326,7 +326,7 @@ const tabCounts = useMemo(() => {
             globalFilter={globalFilter}
   onGlobalFilterChange={setGlobalFilter}
           isColumnFilter={false}
-          searchInputWidth="450px"
+          // searchInputWidth="450px"
           customPageSize={10}
           pageSizeOptions={[5, 10, 20, 30, 50]}
           showPagination={true}
