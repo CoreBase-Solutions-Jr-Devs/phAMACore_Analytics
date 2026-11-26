@@ -58,7 +58,7 @@ const currentMonthExists = categories.includes(currentMonth);
 
     yaxis: {
          title: {
-        text: "Purchases (KES)",
+        text: "Net Spend(KES)",
       },
       min: 0,
       forceNiceScale: true,
@@ -184,7 +184,7 @@ const todayExists = categories.some(
 
     yaxis: {
         title: {
-        text: "Purchases (KES)",
+        text: "Net Spend(KES)",
       },
       min: 0,
       forceNiceScale: true,
