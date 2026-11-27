@@ -3,11 +3,7 @@ import { Row, Col, Card, CardBody } from "reactstrap";
 import CountUp from "react-countup";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-    getInventoryProfitSummaryUser,
-    getAccountBalance,
-    getCashbookSummary,
-} from "../../slices/thunks";
+import { getInventoryProfitSummaryUser, getAccountBalance, getCashbookSummary } from "../../slices/thunks";
 
 import { getMonthToDateApi } from "../utils/dateHelper";
 import { formatAmount } from "../../helpers/format_helper";
@@ -27,11 +23,7 @@ const calculateProfit = (data) => {
         if (typeof data === "number") return data;
 
         if (typeof data === "object") {
-            const val =
-                data.grossProfit ??
-                data.totalGrossProfit ??
-                data.netProfit ??
-                data.profit;
+            const val = data.grossProfit ?? data.totalGrossProfit ?? data.netProfit ?? data.profit;
 
             if (val !== undefined) return Number(val) || 0;
         }
@@ -40,14 +32,12 @@ const calculateProfit = (data) => {
     }
 
     // Check if the response is summary metrics
-    const summaryProfitItem = items.find(
-        (item) =>
-            item.metric_name &&
-            (
-                item.metric_name.toLowerCase().includes("gross profit") ||
-                item.metric_name.toLowerCase().includes("net profit") ||
-                item.metric_name.toLowerCase().includes("profit")
-            )
+    const summaryProfitItem = items.find((item) => 
+        item.metric_name && (
+            item.metric_name.toLowerCase().includes("gross profit") ||
+            item.metric_name.toLowerCase().includes("net profit") ||
+            item.metric_name.toLowerCase().includes("profit")
+        )
     );
 
     if (summaryProfitItem && summaryProfitItem.metric_value) {
@@ -60,12 +50,7 @@ const calculateProfit = (data) => {
 
     // Default: sum profit across all rows
     return items.reduce((acc, curr) => {
-        const val =
-            curr.grossProfit ??
-            curr.profit ??
-            curr.netProfit ??
-            curr.totalProfit ??
-            0;
+        const val = curr.grossProfit ?? curr.profit ?? curr.netProfit ?? curr.totalProfit ?? 0;
 
         return acc + (Number(val) || 0);
     }, 0);
@@ -84,12 +69,7 @@ const calculateSales = (data) => {
         if (typeof data === "number") return data;
 
         if (typeof data === "object") {
-            const val =
-                data.salesValueExcl ??
-                data.salesValueIncl ??
-                data.totalSales ??
-                data.sales ??
-                data.salesRevenue;
+            const val = data.salesValueExcl ?? data.salesValueIncl ?? data.totalSales ?? data.sales ?? data.salesReve 
 
             if (val !== undefined) return Number(val) || 0;
         }
@@ -100,18 +80,10 @@ const calculateSales = (data) => {
     // Check if the response is summary metrics
     const summarySalesItem =
         items.find(
-            (item) =>
-                item.metric_name &&
-                (
-                    item.metric_name.toLowerCase().includes("sales revenue") ||
-                    item.metric_name.toLowerCase().includes("total sales")
-                )
-        ) ||
+            (item) => item.metric_name && (item.metric_name.toLowerCase().includes("sales revenue") || item.metric_name.toLowerCase().includes("total sales") )
+        ) || 
         items.find(
-            (item) =>
-                item.metric_name &&
-                item.metric_name.toLowerCase().includes("sales") &&
-                !item.metric_name.toLowerCase().includes("loss")
+            (item) => item.metric_name && item.metric_name.toLowerCase().includes("sales") && !item.metric_name.toLowerCase().includes("loss")
         ) ||
         items.find((item) => item.metric_order === 1);
 
@@ -125,13 +97,7 @@ const calculateSales = (data) => {
 
     // Default: sum sales across all rows
     return items.reduce((acc, curr) => {
-        const val =
-            curr.salesValueExcl ??
-            curr.salesValueIncl ??
-            curr.totalSales ??
-            curr.sales ??
-            curr.salesRevenue ??
-            0;
+        const val = curr.salesValueExcl ?? curr.salesValueIncl ?? curr.totalSales ?? curr.sales ?? curr.salesRevenue ?? 0;
 
         return acc + (Number(val) || 0);
     }, 0);
@@ -149,9 +115,7 @@ const parseMetricValue = (val) => {
 
     const str = String(val).trim();
 
-    const isNegative =
-        (str.startsWith("(") && str.endsWith(")")) ||
-        str.startsWith("-");
+    const isNegative = (str.startsWith("(") && str.endsWith(")")) || str.startsWith("-");
 
     const cleaned = str.replace(/[^0-9.]/g, "");
 
@@ -177,12 +141,7 @@ const calculateCashAvailable = (data) => {
         if (typeof data === "number") return data;
 
         if (typeof data === "object") {
-            const val =
-                data["Total Cash Collections"] ??
-                data.totalCashCollections ??
-                data.total_cash_collections ??
-                data.metric_value ??
-                data.value;
+            const val =  data["Total Cash Collections"] ??  data.totalCashCollections ??  data.total_cash_collections ??  data.metric_value ??  data.value;
 
             if (val !== undefined && val !== null) {
                 return parseMetricValue(val);
@@ -195,57 +154,34 @@ const calculateCashAvailable = (data) => {
     // Find Total Cash Collections
     const totalCashCollectionsItem =
         items.find((item) => {
-            const rawName =
-                item.metric_name ||
-                item.metricName ||
-                item.MetricName ||
-                item.name ||
-                "";
+            const rawName = item.metric_name || item.metricName || item.MetricName || item.name || "";
 
             const normalized = rawName
                 .toLowerCase()
                 .replace(/[^a-z0-9]/g, "");
 
             return (
-                normalized === "totalcashcollections" ||
-                normalized === "totalcashcollection"
+                normalized === "totalcashcollections" || normalized === "totalcashcollection"
             );
         }) ||
         items.find((item) => {
-            const rawName = (
-                item.metric_name ||
-                item.metricName ||
-                item.MetricName ||
-                item.name ||
-                ""
-            ).toLowerCase();
+            const rawName = (item.metric_name || item.metricName || item.MetricName || item.name || "").toLowerCase();
 
             return rawName.includes("total cash collections");
         }) ||
         items.find((item) => {
-            const rawName = (
-                item.metric_name ||
-                item.metricName ||
-                item.MetricName ||
-                item.name ||
-                ""
-            ).toLowerCase();
+            const rawName = (item.metric_name || item.metricName || item.MetricName || item.name || "").toLowerCase();
 
             return (
-                rawName.includes("cash collections") ||
-                rawName.includes("total collections")
+                rawName.includes("cash collections") ||  rawName.includes("total collections")
             );
         });
 
     if (totalCashCollectionsItem) {
         const rawVal =
-            totalCashCollectionsItem.metric_value ??
-            totalCashCollectionsItem.metricValue ??
-            totalCashCollectionsItem.response ??
-            totalCashCollectionsItem.numericalResponse ??
-            totalCashCollectionsItem.value ??
-            totalCashCollectionsItem.amount ??
-            totalCashCollectionsItem.total;
+            totalCashCollectionsItem.metric_value ??  totalCashCollectionsItem.metricValue ??
+            totalCashCollectionsItem.response ??  totalCashCollectionsItem.numericalResponse ??
+            totalCashCollectionsItem.value ??  totalCashCollectionsItem.amount ??  totalCashCollectionsItem.total;
 
         if (rawVal !== undefined && rawVal !== null) {
             return parseMetricValue(rawVal);
@@ -268,10 +204,7 @@ const calculateCollections = (data) => {
         if (typeof data === "number") return data;
 
         if (typeof data === "object") {
-            const val =
-                data.totalCollections ??
-                data.collections ??
-                data.metric_value;
+            const val = data.totalCollections ?? data.collections ?? data.metric_value;
 
             if (val !== undefined) return Number(val) || 0;
         }
@@ -281,28 +214,16 @@ const calculateCollections = (data) => {
 
     const totalCollectionsItem =
         items.find((item) => {
-            const name = (
-                item.metric_name ||
-                item.metricName ||
-                item.MetricName ||
-                item.name ||
-                ""
-            ).toLowerCase();
+            const name = (item.metric_name || item.metricName || item.MetricName || item.name || "").toLowerCase();
 
             return (
-                name.includes("total cash collections") ||
-                name.includes("total collections") ||
-                name.includes("collections")
+                name.includes("total cash collections") || name.includes("total collections") || name.includes("collections")
             );
         }) ||
         items.find((item) => item.metric_order === 1);
 
     if (totalCollectionsItem) {
-        const rawVal =
-            totalCollectionsItem.metric_value ??
-            totalCollectionsItem.metricValue ??
-            totalCollectionsItem.response ??
-            totalCollectionsItem.value;
+        const rawVal = totalCollectionsItem.metric_value ?? totalCollectionsItem.metricValue ?? totalCollectionsItem.response ?? totalCollectionsItem.value;
 
         if (rawVal !== undefined && rawVal !== null) {
             return parseMetricValue(rawVal);
@@ -351,12 +272,7 @@ function Widgets({ onKpiComputed }) {
         loadingAccountBalance = false,
         loadingCashbookSummary = false,
         loadingVATBreakdown = false,
-    } = useSelector(
-        (state) =>
-            state.DashboardMyBusiness ||
-            state.MyBusiness ||
-            {}
-    );
+    } = useSelector((state) => state.DashboardMyBusiness || state.MyBusiness || {});
 
 
     /**
@@ -399,9 +315,9 @@ function Widgets({ onKpiComputed }) {
      * response is captured immediately and stored separately.
      */
     useEffect(() => {
-        const fetchAccountBalances = async () => {
+        const fetchAccountBalances = () => {
             try {
-                const customerAction = await dispatch(
+                const customerAction = dispatch(
                     getAccountBalance({
                         clientid: 1,
                         Mode: "SUMMARY",
@@ -414,19 +330,14 @@ function Widgets({ onKpiComputed }) {
                 );
 
                 if (getAccountBalance.fulfilled.match(customerAction)) {
-                    const customerData =
-                        customerAction.payload?.result ||
-                        customerAction.payload ||
-                        [];
+                    const customerData = customerAction.payload?.result || customerAction.payload || [];
 
                     setCustomerAccountBalances(
-                        Array.isArray(customerData)
-                            ? customerData
-                            : []
+                        Array.isArray(customerData) ? customerData : []
                     );
                 }
 
-                const supplierAction = await dispatch(
+                const supplierAction = dispatch(
                     getAccountBalance({
                         clientid: 1,
                         Mode: "SUMMARY",
@@ -439,22 +350,12 @@ function Widgets({ onKpiComputed }) {
                 );
 
                 if (getAccountBalance.fulfilled.match(supplierAction)) {
-                    const supplierData =
-                        supplierAction.payload?.result ||
-                        supplierAction.payload ||
-                        [];
+                    const supplierData = supplierAction.payload?.result || supplierAction.payload || [];
 
-                    setSupplierAccountBalances(
-                        Array.isArray(supplierData)
-                            ? supplierData
-                            : []
-                    );
+                    setSupplierAccountBalances(Array.isArray(supplierData) ? supplierData : []);
                 }
             } catch (error) {
-                console.error(
-                    "Failed to fetch account balances:",
-                    error
-                );
+                console.error("Failed to fetch account balances:", error);
             }
         };
 
@@ -634,15 +535,7 @@ function Widgets({ onKpiComputed }) {
         <React.Fragment>
             <Row className="g-2 mb-2" id="business-kpi-widgets">
                 {kpis.map((item, index) => (
-                    <Col
-                        xl={2}
-                        lg={4}
-                        md={4}
-                        sm={6}
-                        xs={12}
-                        key={index}
-                        className="d-flex"
-                    >
+                    <Col xl={2} lg={4} md={4} sm={6} xs={12} key={index} className="d-flex">
                         <Card className="card-animate w-100 h-100 mb-0 d-flex flex-column">
                             <CardBody className="p-3 d-flex flex-column justify-content-between">
 
