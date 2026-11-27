@@ -69,7 +69,7 @@ const calculateSales = (data) => {
         if (typeof data === "number") return data;
 
         if (typeof data === "object") {
-            const val = data.salesValueExcl ?? data.salesValueIncl ?? data.totalSales ?? data.sales ?? data.salesReve 
+            const val = data.salesValueExcl ?? data.salesValueIncl ?? data.totalSales ?? data.sales ?? data.salesRevenue;
 
             if (val !== undefined) return Number(val) || 0;
         }
@@ -315,9 +315,9 @@ function Widgets({ onKpiComputed }) {
      * response is captured immediately and stored separately.
      */
     useEffect(() => {
-        const fetchAccountBalances = () => {
+        const fetchAccountBalances = async () => {
             try {
-                const customerAction = dispatch(
+                const customerAction = await dispatch(
                     getAccountBalance({
                         clientid: 1,
                         Mode: "SUMMARY",
@@ -337,7 +337,7 @@ function Widgets({ onKpiComputed }) {
                     );
                 }
 
-                const supplierAction = dispatch(
+                const supplierAction = await dispatch(
                     getAccountBalance({
                         clientid: 1,
                         Mode: "SUMMARY",
