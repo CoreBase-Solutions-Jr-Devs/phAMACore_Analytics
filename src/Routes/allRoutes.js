@@ -11,18 +11,18 @@ import InterBranchImbalances from "../pages/DashboardBranchAnalysis/InterBranchI
 import SellThroughAnalysis from "../pages/DashboardBranchAnalysis/SellThroughAnalysis";
 import BranchOrderFillRate from "../pages/DashboardBranchAnalysis/BranchOrderFillRate";
 import BranchTransfers from "../pages/DashboardBranchAnalysis/BranchTransfers";
-import DashboardPurchaseOrders from "../pages/DashboardPurchaseOrders";
+import DashboardPurchases from "../pages/DashboardPurchases";
 import DashboardMyBusiness from "../pages/DashboardMyBusiness";
 import MarginAnalysis from "../pages/DashboardSales/MarginAnalysis";
 import CustomerMemberAnalysis from "../pages/DashboardSales/CustomerMemberAnalysis";
 // import SalesTarget from "../pages/DashboardSales/SalesTarget";
 import PerformanceSummary from "../pages/DashboardSales/PerformanceSummary";
 import SalesBreakdown from "../pages/DashboardSales/SalesBreakdown";
-import SupplierAgeing from "../pages/DashboardPurchaseOrders/SupplierAgeing";
-import CategorySpend from "../pages/DashboardPurchaseOrders/CategorySpend";
-import SupplierReturns from "../pages/DashboardPurchaseOrders/SupplierReturns";
-import SupplierOrderFill from "../pages/DashboardPurchaseOrders/SupplierOrderFillRate";
-import ConsolidatedLPOReview from "../pages/DashboardPurchaseOrders/ConsolidatedLPOReview";
+import SupplierAgeing from "../pages/DashboardPurchases/SupplierAgeing";
+import CategorySpend from "../pages/DashboardPurchases/CategorySpend";
+import SupplierReturns from "../pages/DashboardPurchases/SupplierReturns";
+import SupplierOrderFill from "../pages/DashboardPurchases/SupplierOrderFillRate";
+import ConsolidatedLPOReview from "../pages/DashboardPurchases/ConsolidatedLPOReview";
 
 //login
 import Login from "../pages/Authentication/Login";
@@ -62,7 +62,7 @@ import UserProfile from "../pages/Authentication/user-profile";
 import RangeArea from "../pages/Charts/ApexCharts/RangeAreaCharts/Index";
 import CategoryPerformance from "../pages/DashboardSales/CategoryPerformance";
 import SalesSummary from "../pages/DashboardSales/SalesSummary";
-import BestPriceSupplier from "../pages/DashboardPurchaseOrders/BestPriceSupplier";
+import BestPriceSupplier from "../pages/DashboardPurchases/BestPriceSupplier";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardMyBusiness /> },
@@ -143,40 +143,40 @@ const authProtectedRoutes = [
     component: <BranchTransfers />,
   },
   {
-    path: "/dashboard-purchase-orders",
-    component: <DashboardPurchaseOrders />,
+    path: "/dashboard-purchases",
+    component: <DashboardPurchases />,
   },
   //   {
   //   path: "/dashboard-purchase-orders/Recent-Orders",
   //   component: <RecentOrders />,
   // },
   {
-    path: "/dashboard-purchase-orders/Supplier-Ageing",
+    path: "/dashboard-purchases/Supplier-Ageing",
     component: <SupplierAgeing />,
   },
   {
-    path: "/dashboard-purchase-orders/Category-Spend",
+    path: "/dashboard-purchases/Category-Spend",
     component: <CategorySpend />,
   },
   {
-    path: "/dashboard-purchase-orders/Supplier-Order-Fill-Rate",
+    path: "/dashboard-purchases/Supplier-Order-Fill-Rate",
     component: <SupplierOrderFill />,
   },
   {
-    path: "/dashboard-purchase-orders/Supplier-Returns",
+    path: "/dashboard-purchases/Supplier-Returns",
     component: <SupplierReturns />,
   },
   {
-    path: "/dashboard-purchase-orders/Consolidated-LPO-Review",
+    path: "/dashboard-purchases/Consolidated-LPO-Review",
     component: <ConsolidatedLPOReview />,
   },
   {
-    path: "/dashboard-purchase-orders/Best-Price-Supplier",
+    path: "/dashboard-purchases/Best-Price-Supplier",
     component: <BestPriceSupplier />,
   },
   {
-    path: "/dashboard-purchase-orders/branch/:branchId",
-    component: <DashboardPurchaseOrders />,
+    path: "/dashboard-purchases/branch/:branchId",
+    component: <DashboardPurchases />,
   },
 
   { path: "/charts-apex-line", component: <LineCharts /> },

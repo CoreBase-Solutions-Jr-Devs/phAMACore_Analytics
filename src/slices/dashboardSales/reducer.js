@@ -52,8 +52,8 @@ const initialState = {
   },
 };
 
-const powerBISlice = createSlice({
-  name: "powerbi",
+const salesSlice = createSlice({
+  name: "sales",
   initialState,
 
   reducers: {
@@ -450,6 +450,6 @@ export const {
   setStartDate,
   setEndDate,
   clearSalesData,
-} = powerBISlice.actions;
+} = salesSlice.actions;
 
-export default powerBISlice.reducer;
+export default salesSlice.reducer;

@@ -14,7 +14,7 @@ import {
   setEndDate,
 } from "../../../slices/dashboardPurchase/SupplierOrderFillRate/reducer";
 import { clearSupplierOrderFillRateData } from "../../../slices/dashboardPurchase/SupplierOrderFillRate/reducer";
-import usePurchaseOrders from "../../../Components/Hooks/usePurchaseOrders";
+import usePurchases from "../../../Components/Hooks/usePurchases";
 
 const BranchOrderFill = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
@@ -45,7 +45,7 @@ const [isSticky, setIsSticky] = useState(false);
     SupplierOrderFillRateSupplierOFRData,
     SupplierOrderFillRateOrderDrilldownData,
     SupplierOrderFillRateBranchData,
-  } = usePurchaseOrders(
+  } = usePurchases(
     [], // KPIPurchases
     [], // KPISummary
     [], // KPICategory,

@@ -32,8 +32,8 @@ import {
   setEndDate,
 } from "../../slices/dashboardPurchase/reducer";
 import { getKPIOverdueAccounts } from "../../slices/dashboardSales/thunk";
-import { clearPurchaseOrdersData } from "../../slices/dashboardPurchase/reducer";
-import usePurchaseOrders from "../../Components/Hooks/usePurchaseOrders";
+import { clearPurchasesData } from "../../slices/dashboardPurchase/reducer";
+import usePurchases from "../../Components/Hooks/usePurchases";
 import {
   getDateRanges,
   getPreviousYearDate,
@@ -66,7 +66,7 @@ const MAVERICK_SPEND_GROUP_BYS = [
   // "PO_PRICE_VARIANCE",
 ];
 
-const DashboardPurchaseOrders = () => {
+const DashboardPurchases = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
   const dispatch = useDispatch();
@@ -123,7 +123,7 @@ const DashboardPurchaseOrders = () => {
     loading,
     error,
     filters,
-  } = useSelector((state) => state.PurchaseOrders);
+  } = useSelector((state) => state.Purchases);
 
   const {
     KPIConsolidatedLPOReviewConsolidatedList = [],
@@ -145,7 +145,7 @@ const DashboardPurchaseOrders = () => {
     actualSpendChart,
     monthToDateChart,
     ConsolidatedLPOReviewSummaryData,
-  } = usePurchaseOrders(
+  } = usePurchases(
     KPIPurchases,
     KPISummary,
     [], //KPICategory,
@@ -335,7 +335,7 @@ const DashboardPurchaseOrders = () => {
 
   useEffect(() => {
     return () => {
-      dispatch(clearPurchaseOrdersData());
+      dispatch(clearPurchasesData());
     };
   }, [dispatch]);
 
@@ -595,4 +595,4 @@ const DashboardPurchaseOrders = () => {
   );
 };
 
-export default DashboardPurchaseOrders;
+export default DashboardPurchases;

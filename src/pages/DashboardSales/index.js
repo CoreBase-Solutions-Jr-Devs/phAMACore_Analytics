@@ -61,7 +61,7 @@ const DashboardSales = () => {
     filters,
     error,
     loading,
-  } = useSelector((state) => state.powerbi);
+  } = useSelector((state) => state.sales);
 
   const {
     formatAmount,

@@ -148,7 +148,7 @@ const proposedHistoricalData = useMemo(
           ),
       },
         {
-        header: "SavingsLost(KES)",
+        header: "MissedSavings(KES)",
         accessorKey: "total_savings_lost_to_premium",
         cell: ({ getValue, row }) =>
           renderInsightCell(

@@ -7,10 +7,10 @@ const Navdata = () => {
   const branch = "default-branch";
   const filters = { branch: "default-branch" };
 
-  const salesBranch = useSelector((state) => state.powerbi?.filters?.branch);
+  const salesBranch = useSelector((state) => state.sales?.filters?.branch);
 
-  const purchaseBranch = useSelector(
-    (state) => state.PurchaseOrders?.filters?.branch,
+  const purchasesBranch = useSelector(
+    (state) => state.Purchases?.filters?.branch,
   );
 
   // const activeSalesBranch = salesBranch || getActiveBranch('sales');
@@ -21,7 +21,7 @@ const Navdata = () => {
   const [isSales, setIsSales] = useState(false);
   const [isStock, setIsStock] = useState(false);
   const [isBranchAnalysis, setIsBranchAnalysis] = useState(false);
-  const [isPurchaseOrders, setIsPurchaseOrders] = useState(false);
+  const [isPurchases, setIsPurchases] = useState(false);
   const [isMyBusiness, setIsMyBusiness] = useState(false);
   const [iscurrentState, setIscurrentState] = useState("Dashboard");
 
@@ -49,7 +49,7 @@ const Navdata = () => {
 
     if (iscurrentState !== "Sales") setIsSales(false);
     if (iscurrentState !== "Dashboard") setIsDashboard(false);
-    if (iscurrentState !== "Purchase-Orders") setIsPurchaseOrders(false);
+    if (iscurrentState !== "Purchases") setIsPurchases(false);
     if (iscurrentState !== "Stock") setIsStock(false);
     if (iscurrentState !== "Branch-Analysis") setIsBranchAnalysis(false);
     if (iscurrentState !== "MyBusiness") setIsMyBusiness(false);
@@ -227,66 +227,66 @@ const Navdata = () => {
       ],
     },
     {
-      id: "purchase-orders",
+      id: "purchases",
       label: "Purchases",
       icon: "ri-todo-line",
       link: "/#",
-      stateVariables: isPurchaseOrders,
+      stateVariables: isPurchases,
       click: function (e) {
         e.preventDefault();
-        setIsPurchaseOrders(!isPurchaseOrders);
-        setIscurrentState("Purchase-Orders");
+        setIsPurchases(!isPurchases);
+        setIscurrentState("Purchases");
         updateIconSidebar(e);
       },
       subItems: [
         {
-          id: "dashboard-purchase-orders",
+          id: "dashboard-purchases",
           label: "Dashboard",
           icon: "ri-dashboard-2-line",
-          link: "/dashboard-purchase-orders",
-          parentId: "purchase-orders",
+          link: "/dashboard-purchases",
+          parentId: "purchases",
         },
         {
           id: "Supplier-Invoice-Ageing",
           label: "Supplier Ageing",
           icon: "ri-hourglass-line",
-          link: `/dashboard-purchase-orders/Supplier-Ageing`,
-          parentId: "purchase-orders",
+          link: `/dashboard-purchases/Supplier-Ageing`,
+          parentId: "purchases",
         },
           {
           id: "Category-Spend",
           label: "Category Spend",
           icon: "ri-wallet-3-line",
-          link: `/dashboard-purchase-orders/Category-Spend`,
-          parentId: "purchase-orders",
+          link: `/dashboard-purchases/Category-Spend`,
+          parentId: "purchases",
         },
         {
           id: "Supplier-Order-Fill-Rate",
           label: "Supplier Order Fill Rate",
           icon: "ri-check-double-line",
-          link: `/dashboard-purchase-orders/Supplier-Order-Fill-Rate`,
-          parentId: "purchase-orders",
+          link: `/dashboard-purchases/Supplier-Order-Fill-Rate`,
+          parentId: "purchases",
         },
             {
           id: "Supplier-Returns",
           label: "Supplier Returns",
           icon: "ri-arrow-go-back-line",
-          link: `/dashboard-purchase-orders/Supplier-Returns`,
-          parentId: "purchase-orders",
+          link: `/dashboard-purchases/Supplier-Returns`,
+          parentId: "purchases",
         },
             {
           id: "Consolidated-LPO-Review",
           label: "Consolidated Review",
           icon: "ri-survey-line",
-          link: `/dashboard-purchase-orders/Consolidated-LPO-Review`,
-          parentId: "purchase-orders",
+          link: `/dashboard-purchases/Consolidated-LPO-Review`,
+          parentId: "purchases",
         },
              {
           id: "Best-Price-Per-Supplier",
           label: "Best Price Supplier",
            icon: "ri-price-tag-3-line",
-          link: `/dashboard-purchase-orders/Best-Price-Supplier`,
-          parentId: "purchase-orders",
+          link: `/dashboard-purchases/Best-Price-Supplier`,
+          parentId: "purchases",
         },
       ],
     },

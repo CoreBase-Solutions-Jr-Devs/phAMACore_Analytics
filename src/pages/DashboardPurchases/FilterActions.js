@@ -22,7 +22,7 @@ const FilterActions = ({ onApply, rightColumn, hideRightColumn }) => {
   const {
   KPIBranch,
   filters: { branch, dateRange, startDate, endDate, topN },
-} = useSelector((state) => state.PurchaseOrders);
+} = useSelector((state) => state.Purchases);
 
 const branches = (() => {
   const map = {};

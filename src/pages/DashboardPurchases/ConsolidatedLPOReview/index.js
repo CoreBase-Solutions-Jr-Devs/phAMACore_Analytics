@@ -14,7 +14,7 @@ import {
   setEndDate,
 } from "../../../slices/dashboardPurchase/ConsolidatedLPOReview/reducer";
 import { clearConsolidatedLPOReviewData } from "../../../slices/dashboardPurchase/ConsolidatedLPOReview/reducer";
-import usePurchaseOrders from "../../../Components/Hooks/usePurchaseOrders";
+import usePurchases from "../../../Components/Hooks/usePurchases";
 
 const ConsolidatedLPOReview = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
@@ -49,7 +49,7 @@ const ConsolidatedLPOReview = () => {
     ConsolidatedLPOReviewSupplierData,
     ConsolidatedLPOReviewBranchData,
     ConsolidatedLPOReviewDrilldownData,
-  } = usePurchaseOrders(
+  } = usePurchases(
     [], // KPIPurchases
     [], // KPISummary
     [], // KPICategory
@@ -273,8 +273,8 @@ const ConsolidatedLPOReview = () => {
           <Row>
             <Col xl={12}>
               <ConsolidatedLPOReviewCards
-                rightClickBtn={toggleRightColumn}
-                selectedBranchName={selectedBranchName}
+                // rightClickBtn={toggleRightColumn}
+                // selectedBranchName={selectedBranchName}
                 ConsolidatedLPOReviewSummaryData={
                   ConsolidatedLPOReviewSummaryData
                 }

@@ -22,9 +22,7 @@ const Widgets = ({
   error,
   loading,
 }) => {
-  const { startDate, endDate } = useSelector(
-    (state) => state.PurchaseOrders.filters,
-  );
+ 
   const purchaseData = purchaseSummary || {};
   const ConsolidatedLPOReview = ConsolidatedLPOReviewSummaryData || {};
   const leadTimeSummaryData = leadTimeSummary || {};
@@ -32,74 +30,74 @@ const Widgets = ({
   const maverickSpendSummaryData = maverickSpendSummary || {};
   const formatDisplay = (date) => date || "";
 
-  const handleExportExcel = () => {
-    const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
-    const fileName = `Purchases_Dashboard_Analytics_${todayStr}`;
+  // const handleExportExcel = () => {
+  //   const todayStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+  //   const fileName = `Purchases_Dashboard_Analytics_${todayStr}`;
 
-    const metadata = [
-      { label: "Report", value: "Purchase Orders Dashboard Key Metrics" },
-      { label: "Generated Date", value: new Date().toLocaleString("en-GB") },
-      {
-        label: "Date Range Filter",
-        value: `${startDate || ""} to ${endDate || ""}`,
-      },
-    ];
+  //   const metadata = [
+  //     { label: "Report", value: "Purchase Orders Dashboard Key Metrics" },
+  //     { label: "Generated Date", value: new Date().toLocaleString("en-GB") },
+  //     {
+  //       label: "Date Range Filter",
+  //       value: `${startDate || ""} to ${endDate || ""}`,
+  //     },
+  //   ];
 
-    // const kpiMetricsRows = [
-    //   {
-    //     Metric: "Total Spend",
-    //     Value:
-    //       typeof formatAmount === "function"
-    //         ? formatAmount(purchaseData.gross_purchases_excl)
-    //         : Number(purchaseData.gross_purchases_excl || 0).toLocaleString(),
-    //     Notes: "Tax inclusive",
-    //   },
-    //   {
-    //     Metric: "Active Suppliers",
-    //     Value: activeSuppliers,
-    //     Notes: "Suppliers with orders",
-    //   },
-    //   {
-    //     Metric: "Price Alerts",
-    //     Value: priceAlerts,
-    //     Notes: "Items with price increase",
-    //   },
-    //   {
-    //     Metric: "Maverick Spend",
-    //     Value:
-    //       typeof formatAmount === "function"
-    //         ? formatAmount(maverickSpend)
-    //         : Number(maverickSpend || 0).toLocaleString(),
-    //     Notes: `${maverickSpendPercentage}% of spend`,
-    //   },
-    //   {
-    //     Metric: "Avg Lead Time",
-    //     Value: `${avgLeadTime} days`,
-    //     Notes: "Order to delivery",
-    //   },
-    // ];
+  //   // const kpiMetricsRows = [
+  //   //   {
+  //   //     Metric: "Total Spend",
+  //   //     Value:
+  //   //       typeof formatAmount === "function"
+  //   //         ? formatAmount(purchaseData.gross_purchases_excl)
+  //   //         : Number(purchaseData.gross_purchases_excl || 0).toLocaleString(),
+  //   //     Notes: "Tax inclusive",
+  //   //   },
+  //   //   {
+  //   //     Metric: "Active Suppliers",
+  //   //     Value: activeSuppliers,
+  //   //     Notes: "Suppliers with orders",
+  //   //   },
+  //   //   {
+  //   //     Metric: "Price Alerts",
+  //   //     Value: priceAlerts,
+  //   //     Notes: "Items with price increase",
+  //   //   },
+  //   //   {
+  //   //     Metric: "Maverick Spend",
+  //   //     Value:
+  //   //       typeof formatAmount === "function"
+  //   //         ? formatAmount(maverickSpend)
+  //   //         : Number(maverickSpend || 0).toLocaleString(),
+  //   //     Notes: `${maverickSpendPercentage}% of spend`,
+  //   //   },
+  //   //   {
+  //   //     Metric: "Avg Lead Time",
+  //   //     Value: `${avgLeadTime} days`,
+  //   //     Notes: "Order to delivery",
+  //   //   },
+  //   // ];
 
-    const sections = [
-      {
-        title: "Key Purchases Metrics",
-        headers: ["Metric", "Value", "Notes"],
-        data: kpiMetricsRows,
-      },
-    ];
+  //   const sections = [
+  //     {
+  //       title: "Key Purchases Metrics",
+  //       headers: ["Metric", "Value", "Notes"],
+  //       data: kpiMetricsRows,
+  //     },
+  //   ];
 
-    exportDashboardReportToExcel(
-      {
-        title: "Purchase Orders Analytics Report",
-        metadata,
-        sections,
-      },
-      fileName,
-    );
-  };
+  //   exportDashboardReportToExcel(
+  //     {
+  //       title: "Purchase Orders Analytics Report",
+  //       metadata,
+  //       sections,
+  //     },
+  //     fileName,
+  //   );
+  // };
 
-  const handlePrint = () => {
-    triggerPrint();
-  };
+  // const handlePrint = () => {
+  //   triggerPrint();
+  // };
 
   return (
     <React.Fragment>

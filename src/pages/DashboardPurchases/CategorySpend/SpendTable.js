@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardBody, CardHeader, Alert } from "reactstrap";
 import { exportToExcel } from "../../../helpers/export_helper";
 import CardExportButtons from "../../../Components/Common/CardExportButtons";
@@ -35,7 +35,7 @@ const getBadgeColor = (percentage) => {
 };
 
 const SpendTable = ({ data = [], error, loading }) => {
-    const [filteredData, setFilteredData] = useState(data);
+    const [globalFilter, setGlobalFilter] = useState("");
   const columns = [
     // {
     //   header: "Rank",
@@ -174,6 +174,18 @@ const SpendTable = ({ data = [], error, loading }) => {
     },
   ];
 
+   const filteredData = useMemo(() => {
+    const search = globalFilter.trim().toLowerCase();
+
+    if (!search) return data || [];
+
+    return (data || []).filter((item) =>
+      Object.values(item).some((value) =>
+        String(value ?? "").toLowerCase().includes(search)
+      )
+    );
+  }, [data, globalFilter]);
+
   const handleExportExcel = () => {
    const rows = (filteredData || []).map((item) => ({
           Rank: item.rank_pos,
@@ -228,13 +240,15 @@ Overview of purchasing spend, returns, and net expenditure by product category. 
 
         <TanstackTable
           columns={columns}
- onFilteredDataChange={setFilteredData}
+ data={filteredData}
            loading={loading}
           error={error}
           emptyMessage="No category data available"
           searchInputWidth="450px"
           isGlobalFilter={true}
           isColumnFilter={false}
+            globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
           customPageSize={10}
           pageSizeOptions={[5, 10, 20, 30, 50]}
           showPagination={true}

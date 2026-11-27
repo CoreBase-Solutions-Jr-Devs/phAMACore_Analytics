@@ -14,11 +14,6 @@ const Category = ({
   loading,
   rightClickBtn,
 }) => {
-  const { startDate, endDate } = useSelector(
-    (state) => state.categorySpend.filters || {}
-  );
-
-
 
   const formatAmount = (value) =>
     Number(value || 0).toLocaleString("en-KE", {

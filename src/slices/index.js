@@ -20,12 +20,12 @@ import CalendarReducer from "./calendar/reducer";
 import APIKeyReducer from "./apiKey/reducer";
 
 // Power BI
-import PowerBIReducer from "./dashboardSales/reducer";
+import SalesReducer from "./dashboardSales/reducer";
 
 // Stock/Inventory
 import StockInventoryReducer from "./dashboardStock/reducer";
 
- import PurchaseOrdersReducer from "./dashboardPurchase/reducer";
+ import PurchasesReducer from "./dashboardPurchase/reducer";
 
 // Dashboard My Business
 import DashboardMyBusinessReducer from "./dashboardMyBusiness/reducer";
@@ -49,8 +49,8 @@ const rootReducer = combineReducers({
     Profile: ProfileReducer,
     Calendar: CalendarReducer,
     APIKey: APIKeyReducer,
-    powerbi: PowerBIReducer,
-    PurchaseOrders: PurchaseOrdersReducer,
+    sales: SalesReducer,
+    Purchases: PurchasesReducer,
     StockInventory: StockInventoryReducer,
     DashboardMyBusiness: DashboardMyBusinessReducer,
     MyBusiness: DashboardMyBusinessReducer,

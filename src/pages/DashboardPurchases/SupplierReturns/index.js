@@ -14,7 +14,7 @@ import {
   setEndDate,
 } from "../../../slices/dashboardPurchase/SupplierReturns/reducer";
 import { clearSupplierReturnsData } from "../../../slices/dashboardPurchase/SupplierReturns/reducer";
-import usePurchaseOrders from "../../../Components/Hooks/usePurchaseOrders";
+import usePurchases from "../../../Components/Hooks/usePurchases";
 
 const SupplierReturns = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
@@ -49,7 +49,7 @@ KPISupplierReturnsReason = [],
  SupplierReturnsBranchData,
 SupplierReturnsSKUData,
 SupplierReturnsReasonData,
-} = usePurchaseOrders(
+} = usePurchases(
   [], // KPIPurchases
   [], // KPISummary
   [], // KPICategory

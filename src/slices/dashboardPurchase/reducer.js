@@ -17,7 +17,7 @@ import { getKPIOverdueAccounts } from "../dashboardSales/thunk";
 const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
-  PurchaseOrders: [],
+  Purchases: [],
 
   KPIPurchases: [],
   KPISummary: [],
@@ -82,8 +82,8 @@ const initialState = {
   },
 };
 
-const PurchaseOrdersSlice = createSlice({
-  name: "PurchaseOrders",
+const PurchasesSlice = createSlice({
+  name: "purchases",
 
   initialState,
 
@@ -283,7 +283,7 @@ const PurchaseOrdersSlice = createSlice({
       state.filters.topN = action.payload;
     },
 
-    clearPurchaseOrdersData: () => initialState,
+    clearPurchasesData: () => initialState,
   },
 
   extraReducers: (builder) => {
@@ -627,7 +627,7 @@ export const {
   setEndDate,
   setGroupBy,
   setTopN,
-  clearPurchaseOrdersData,
-} = PurchaseOrdersSlice.actions;
+  clearPurchasesData,
+} = PurchasesSlice.actions;
 
-export default PurchaseOrdersSlice.reducer;
+export default PurchasesSlice.reducer;

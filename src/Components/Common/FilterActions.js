@@ -26,7 +26,7 @@ const FilterActions = ({
   const {
     branches: apiBranches = [],
     loading,
-  } = useSelector((state) => state.powerbi);
+  } = useSelector((state) => state.sales);
 
   useEffect(() => {
     dispatch(

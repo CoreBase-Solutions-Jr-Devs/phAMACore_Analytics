@@ -5,23 +5,27 @@ const formatDMY = (date) => date.toLocaleDateString("en-GB");
 
 const initialState = {
  KPICategory: [],
-   loading: {
-  kpiPurchases: false,
-},
+
+  loading: false,
   error: null,
+
   filters: {
     branchcode: "",
     dateRange: "Month To Yesterday",
     startDate: formatDMY(
       new Date(new Date().getFullYear(), new Date().getMonth(), 1),
     ),
-    endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))), 
+    endDate: formatDMY(new Date(new Date().setDate(new Date().getDate() - 1))),
+    // groupBy: "SUMMARY",
+    // topN: 0,
   },
 };
 
 const CategorySpendSlice = createSlice({
   name: "categorySpend",
+
   initialState,
+
   reducers: {
     setBranch: (state, action) => {
       state.filters.branch = action.payload;
@@ -222,18 +226,20 @@ const CategorySpendSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder  
+    builder
+
+  
       // ------------------------------------------
       // KPI PURCHASES
       // ------------------------------------------
 
       .addCase(getKPIPurchases.pending, (state) => {
-        state.loading.kpiPurchases = true;
+        state.loading = true;
         state.error = null;
       })
 
       .addCase(getKPIPurchases.fulfilled, (state, action) => {
-        state.loading.kpiPurchases = false;
+        state.loading = false;
         state.error = null;
 
         const groupBy = action.meta.arg?.groupBy;
@@ -261,7 +267,7 @@ const CategorySpendSlice = createSlice({
       })
 
       .addCase(getKPIPurchases.rejected, (state, action) => {
-        state.loading.kpiPurchases = false;
+        state.loading = false;
         state.error =
           action.payload?.message ||
           action.payload ||

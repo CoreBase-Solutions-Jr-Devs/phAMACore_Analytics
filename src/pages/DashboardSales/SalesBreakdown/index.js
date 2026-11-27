@@ -32,7 +32,7 @@ const SalesBreakdown = () => {
     loading,
     error,
   } = useSelector((state) => state.salesBreakdown);
-  const { salesBranch = [] } = useSelector((state) => state.powerbi);
+  const { salesBranch = [] } = useSelector((state) => state.sales);
 
   const { CASH, INSURANCE, OTHER_ACCOUNT, RETURN, TOTAL } = useSalesAnalytics(
     [], // 1. sales

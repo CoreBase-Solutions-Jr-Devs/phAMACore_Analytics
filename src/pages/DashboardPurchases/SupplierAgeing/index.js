@@ -2,21 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Col, Container, Row } from "reactstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import BestPricePerSupplierTable from "../BestPriceSupplier/BestPriceSupplierTable";
-import BestPricePerSupplierCards from "../BestPriceSupplier/BestPriceSupplierCards";
+import AgeingCards from "../SupplierAgeing/AgeingCards";
+import SupplierAgeingTable from "../SupplierAgeing/SupplierAgeingTable";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import { getKPIBestPricePerSupplier } from "../../../slices/dashboardPurchase/BestPriceSupplier/thunk";
+import { getKPIOverdueAccounts } from "../../../slices/dashboardSales/thunk";
 import FilterActions from "../../../Components/Common/FilterActions";
 import {
   setBranch,
   setDateRange,
   setStartDate,
   setEndDate,
-} from "../../../slices/dashboardPurchase/BestPriceSupplier/reducer";
-import { clearBestPricePerSupplierData } from "../../../slices/dashboardPurchase/BestPriceSupplier/reducer";
-import usePurchaseOrders from "../../../Components/Hooks/usePurchaseOrders";
-
-const BestPriceSupplier = () => {
+} from "../../../slices/dashboardPurchase/SupplierAgeing/reducer";
+import { clearSupplierAgeingData } from "../../../slices/dashboardPurchase/SupplierAgeing/reducer";
+import usePurchases from "../../../Components/Hooks/usePurchases";
+import { getPeriod } from "../../../helpers/date_helper";
+const SupplierAgeing = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
 
   const dispatch = useDispatch();
@@ -32,27 +32,25 @@ const BestPriceSupplier = () => {
   const [selectedBranchName, setSelectedBranchName] = useState("All Branches");
 
   const {
-    KPIBestPricePerSupplierItemMatrix = [],
-    KPIBestPricePerSupplierSupplierScorecard = [],
-    KPIBestPricePerSupplierBestPriceCatalog = [],
-    KPIBestPricePerSupplierProposedHistorical = [],
+    kpiOverdueAccounts = [],
     loading,
     error,
     filters,
-  } = useSelector((state) => state.bestPricePerSupplier);
+  } = useSelector((state) => state.supplierAgeing);
 
   const {
-    BestPricePerSupplierItemMatrixData,
-    BestPricePerSupplierSupplierScorecardData,
-    BestPricePerSupplierBestPriceCatalogData,
-    BestPricePerSupplierProposedHistoricalData,
-  } = usePurchaseOrders(
+    currentReceivables,
+    overdue31To60,
+    overdue61To90,
+    overdue91To120,
+    overdue120Plus,
+    overdueSupplierAccounts,
+  } = usePurchases(
     [], // KPIPurchases
     [], // KPISummary
     [], // KPICategory
     [], // KPISupplier
     [], // KPIBranch
-
     [], // KPIType
 
     [], // KPIMaverickSpend
@@ -81,78 +79,29 @@ const BestPriceSupplier = () => {
 
     [], // LastYearActualSpend
 
-    [], // kpiOverdueAccounts
-
-    [], // KPISupplierOrderFillRateSummary
-    [], // KPISupplierOrderFillRateSupplierOFR
-    [], // KPISupplierOrderFillRateOrderDrilldown
-    [], // KPISupplierOrderFillRateBranch
-
-    [], // KPISupplierReturnsSummary
-    [], // KPISupplierReturnsSupplier
-    [], // KPISupplierReturnsDrilldown
-    [], // KPISupplierReturnsBranch
-    [], // KPISupplierReturnsSKU
-    [], // KPISupplierReturnsReason
-
-    [], // KPIConsolidatedLPOReviewConsolidatedList
-    [], // KPIConsolidatedLPOReviewSummary
-    [], // KPIConsolidatedLPOReviewSupplier
-    [], // KPIConsolidatedLPOReviewBranch
-    [], // KPIConsolidatedLPOReviewDrilldown
-
-    KPIBestPricePerSupplierItemMatrix,
-    KPIBestPricePerSupplierSupplierScorecard,
-    KPIBestPricePerSupplierBestPriceCatalog,
-    KPIBestPricePerSupplierProposedHistorical,
+    kpiOverdueAccounts,
     filters,
   );
 
   useEffect(() => {
-    const params = {
-      clientid: 1,
-      branchcode: filters.branch,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      TopN: 500,
-      IncludeZeroPrice: "false",
-      // status: "All",
-    };
     dispatch(
-      getKPIBestPricePerSupplier({
-        ...params,
-        groupBy: "ITEM_MATRIX",
+      getKPIOverdueAccounts({
+        clientid: 1,
+        mode: "AGING",
+        accountType: "SUPPLIER",
+        branchcode: filters.branch,
+        dateFrom: filters.startDate,
+        dateTo: filters.endDate,
+        periodFrom: getPeriod(filters.startDate),
+        periodTo: getPeriod(filters.endDate),
+        includeZeroBal: false,
       }),
     );
-    dispatch(
-      getKPIBestPricePerSupplier({
-        ...params,
-        groupBy: "SUPPLIER_SCORECARD",
-      }),
-    );
-    dispatch(
-      getKPIBestPricePerSupplier({
-        ...params,
-        groupBy: "BEST_PRICE_CATALOG",
-      }),
-    );
-    dispatch(
-      getKPIBestPricePerSupplier({
-        ...params,
-        groupBy: "PROPOSED_VS_HISTORICAL",
-      }),
-    );
-    //   dispatch(
-    //   getKPISupplierReturns({
-    //     ...params,
-    //     groupBy: "SKU",
-    //   }),
-    // );
   }, [dispatch]);
 
   useEffect(() => {
     return () => {
-      dispatch(clearBestPricePerSupplierData());
+      dispatch(clearSupplierAgeingData());
     };
   }, [dispatch]);
 
@@ -167,37 +116,17 @@ const BestPriceSupplier = () => {
   }, []);
 
   const handleApplyFilters = () => {
-    const params = {
-      clientid: 1,
-      branchcode: filters.branch,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      TopN: 500,
-      IncludeZeroPrice: "false",
-      // status: "All",
-    };
     dispatch(
-      getKPIBestPricePerSupplier({
-        ...params,
-        groupBy: "ITEM_MATRIX",
-      }),
-    );
-    dispatch(
-      getKPIBestPricePerSupplier({
-        ...params,
-        groupBy: "SUPPLIER_SCORECARD",
-      }),
-    );
-    dispatch(
-      getKPIBestPricePerSupplier({
-        ...params,
-        groupBy: "BEST_PRICE_CATALOG",
-      }),
-    );
-    dispatch(
-      getKPIBestPricePerSupplier({
-        ...params,
-        groupBy: "PROPOSED_VS_HISTORICAL",
+      getKPIOverdueAccounts({
+        clientid: 1,
+        mode: "AGING",
+        accountType: "SUPPLIER",
+        branchcode: filters.branch,
+        dateFrom: filters.startDate,
+        dateTo: filters.endDate,
+        periodFrom: getPeriod(filters.startDate),
+        periodTo: getPeriod(filters.endDate),
+        includeZeroBal: false,
       }),
     );
   };
@@ -207,8 +136,7 @@ const BestPriceSupplier = () => {
       <div className="page-content">
         <Container fluid>
           <BreadCrumb
-            title="Best Price Per Supplier
-            "
+            title="Supplier Ageing"
             pageTitle="Purchases"
             subtitle={selectedBranchName}
           />
@@ -265,35 +193,27 @@ const BestPriceSupplier = () => {
           </div>
           <Row>
             <Col xl={12}>
-              <BestPricePerSupplierCards
+              <AgeingCards
                 rightClickBtn={toggleRightColumn}
                 selectedBranchName={selectedBranchName}
-                BestPricePerSupplierSupplierScorecardData={
-                  BestPricePerSupplierSupplierScorecardData
-                }
+                // formatAmount={formatAmount}
+                overdueSupplierAccounts={overdueSupplierAccounts}
+                currentReceivables={currentReceivables}
+                overdue31To60={overdue31To60}
+                overdue61To90={overdue61To90}
+                overdue91To120={overdue91To120}
+                overdue120Plus={overdue120Plus}
                 error={error}
-                loading={loading.kpiBestPricePerSupplier}
+                loading={loading.kpiOverdueAccounts}
               />
             </Col>
           </Row>
           <Row>
             <Col>
-              <BestPricePerSupplierTable
-                BestPricePerSupplierSupplierScorecardData={
-                  BestPricePerSupplierSupplierScorecardData
-                }
-                BestPricePerSupplierItemMatrixData={
-                  BestPricePerSupplierItemMatrixData
-                }
-                BestPricePerSupplierBestPriceCatalogData={
-                  BestPricePerSupplierBestPriceCatalogData
-                }
-                BestPricePerSupplierProposedHistoricalData={
-                  BestPricePerSupplierProposedHistoricalData
-                }
-                // SupplierReturnsReason={SupplierReturnsReasonData}
+              <SupplierAgeingTable
+                data={overdueSupplierAccounts}
+                loading={loading.kpiOverdueAccounts}
                 error={error}
-                loading={loading.kpiBestPricePerSupplier}
               />
             </Col>
             <FilterActions
@@ -319,4 +239,4 @@ const BestPriceSupplier = () => {
   );
 };
 
-export default BestPriceSupplier;
+export default SupplierAgeing;

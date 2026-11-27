@@ -37,7 +37,7 @@ const Widget = ({
   loading,
 }) => {
   const { branch, dateRange, startDate, endDate } = useSelector(
-    (state) => state.powerbi.filters,
+    (state) => state.sales.filters,
   );
   const formatDisplay = (date) => date || "";
 

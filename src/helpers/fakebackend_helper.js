@@ -71,7 +71,7 @@ export const getKPIOverdueAccounts = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_KPI_OVERDUE_ACCOUNTS, { params });
 export const getAccountBalance = (params) => 
   PowerBIAPI.get(url.GET_POWERBI_ACCOUNT_BALANCE, { params });
-export const getPurchaseOrders = (params) =>
+export const getPurchases = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_PURCHASE_ORDERS, { params });
 export const getKPIPurchases = (params) =>
   PowerBIAPI.get(url.GET_POWERBI_KPIPURCHASES, { params });

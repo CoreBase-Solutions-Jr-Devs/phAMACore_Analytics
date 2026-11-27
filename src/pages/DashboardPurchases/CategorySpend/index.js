@@ -14,7 +14,7 @@ import {
   setEndDate,
 } from "../../../slices/dashboardPurchase/CategorySpend/reducer";
 import { clearCategorySpendData } from "../../../slices/dashboardPurchase/CategorySpend/reducer";
-import usePurchaseOrders from "../../../Components/Hooks/usePurchaseOrders";
+import usePurchases from "../../../Components/Hooks/usePurchases";
 
 const CategorySpend = () => {
   document.title = "Purchases Dashboard | phAMACore Analytics";
@@ -38,7 +38,7 @@ const CategorySpend = () => {
     filters,
   } = useSelector((state) => state.categorySpend);
 
-  const { spendByCategory, categoryTotals } = usePurchaseOrders(
+  const { spendByCategory, categoryTotals } = usePurchases(
     [], // KPIPurchases
     [], // KPISummary
     KPICategory,
@@ -72,7 +72,31 @@ const CategorySpend = () => {
 
     [], // LastYearActualSpend
 
-    [], //kpiOverdueAccounts,
+    [], // kpiOverdueAccounts
+
+[], // KPISupplierOrderFillRateSummary
+[], // KPISupplierOrderFillRateSupplierOFR
+[], // KPISupplierOrderFillRateOrderDrilldown
+[], // KPISupplierOrderFillRateBranch
+
+[], // KPISupplierReturnsSummary
+[], // KPISupplierReturnsSupplier
+[], // KPISupplierReturnsDrilldown
+[], // KPISupplierReturnsBranch
+[], // KPISupplierReturnsSKU
+[], // KPISupplierReturnsReason
+
+[], // KPIConsolidatedLPOReviewConsolidatedList
+[], // KPIConsolidatedLPOReviewSummary
+[], // KPIConsolidatedLPOReviewSupplier
+[], // KPIConsolidatedLPOReviewBranch
+[], // KPIConsolidatedLPOReviewDrilldown
+
+[], // KPIBestPricePerSupplierItemMatrix
+[], // KPIBestPricePerSupplierSupplierScorecard
+[], // KPIBestPricePerSupplierBestPriceCatalog
+[], // KPIBestPricePerSupplierProposedHistorical
+
     filters,
   );
 

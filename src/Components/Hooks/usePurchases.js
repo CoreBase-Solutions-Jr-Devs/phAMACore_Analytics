@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-const usePurchaseOrders = (
+const usePurchases = (
 
   KPIPurchases = [],
   KPISummary = [],
@@ -118,9 +118,6 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
 
       return acc;
     }, {});
-
-    console.log("Spend by Branch:", grouped);
-    console.log("Total Spend:", totalSpend);
 
     const amounts = Object.values(grouped);
 
@@ -290,12 +287,6 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
       }
     });
 
-    console.log("ActualSpend:", ActualSpend);
-    console.log("LastYearActualSpend:", LastYearActualSpend);
-
-    console.log("Current Year Map:", currentYearMap);
-    console.log("Last Year Map:", lastYearMap);
-
     return {
       categories: months,
 
@@ -383,6 +374,16 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
         lastYearMap[day] += Number(item?.total_grn_value || 0);
       }
     });
+// Calculate totals
+const currentYearTotal = Object.values(currentYearMap).reduce(
+  (sum, value) => sum + value,
+  0
+);
+
+const lastYearTotal = Object.values(lastYearMap).reduce(
+  (sum, value) => sum + value,
+  0
+);
 
     return {
       categories: DAYS.map(String),
@@ -398,6 +399,7 @@ const totalSpend = Number(purchaseSummary.gross_purchases_excl || 0);
         },
       ],
     };
+    
   }, [GoodsReceived, LastYearGoodsReceived]);
 
   // ============================================================
@@ -594,4 +596,4 @@ const BestPricePerSupplierProposedHistoricalData =
   };
 };
 
-export default usePurchaseOrders;
+export default usePurchases;
